@@ -1,0 +1,43 @@
+ow166() - started;
+        state.metrics.lastTargetingMs = now166() - started;
+        publishContact166(this, observer, entity);
+        return entity;
+      }
+      if (!cached.id) {
+        state.metrics.targetCacheHits += 1;
+        state.metrics.targetingMs += now166() - started;
+        state.metrics.lastTargetingMs = now166() - started;
+        return null;
+      }
+    }
+
+    const keyData = fireGroupKey166(observer, x, y, radius, targetLayers);
+    const group = buildFireGroup166(this, state, observer, radius, targetLayers, keyData);
+    const weaponDamage = Math.max(1, finite166(observer.stats.weapon.damage, 1));
+    let best = null;
+    let bestScore = Infinity;
+    let checked = 0;
+
+    const consider166 = target => {
+      checked += 1;
+      if (!validTarget166(this, observer, target, x, y, team, radius, targetLayers)) return;
+      const dx = target.x - x;
+      const dy = target.y - y;
+      const distanceSquared = dx * dx + dy * dy;
+      const reserved = state.reservations.get(target) || 0;
+      const health = Math.max(1, finite166(target.hp, target.maxHp || 1));
+      const overkill = reserved / health;
+      const priority = targetPriority166(observer, target);
+      const tie = ((hash166(observer.id) ^ entityNumber166(target)) & 255) * 1e-5;
+      const score = distanceSquared * (1 + Math.min(3, overkill) * .42) / priority + tie;
+      if (score < bestScore) {
+        best = target;
+        bestScore = score;
+      }
+    };
+    const massBattle166 = (this._v94AliveUnits || this.units?.length || 0) >= 30000;
+    const primaryPool166 = Math.min(
+      group.candidates.length,
+      massBattle166 ? MASS_PRIMARY_TARGET_POOL : PRIMARY_TARGET_POOL,
+    );
+    const primaryProbes166 = Ma

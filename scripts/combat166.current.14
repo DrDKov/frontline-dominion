@@ -1,0 +1,42 @@
+3;
+    if (deterministicSample !== 0 && (game._v94AliveUnits || game.units?.length || 0) >= 12000) return;
+    state.tracerCells.set(key, used + 1);
+    state.tracerBudget -= 1;
+    state.metrics.tracerEvents += 1;
+    game.addEffect?.({
+      type: 'tracer166',
+      x: muzzle.x,
+      y: muzzle.y,
+      z: muzzle.z || 0,
+      x2: aimX,
+      y2: aimY,
+      z2: game.getEntityAimAltitude?.(target) || 0,
+      color: weapon.projectileColor || weapon.trailColor || (source.team === 'player' ? '#d9f7d0' : '#ffc4a9'),
+      width: clamp166(Number(weapon.visualSize || 2), 1, 3.5),
+      duration: .09,
+    });
+    if (state.soundBudget > 0) {
+      const onScreen = typeof document === 'undefined' ? used === 0 : Boolean(game.isOnScreen?.(source.x, source.y, 260));
+      if (onScreen) {
+        state.soundBudget -= 1;
+        game.sound?.shot?.(false);
+      }
+    }
+  }
+
+  function resolveVirtualShot166(attacker, target, weapon, veteranMultiplier = 1, muzzle = null) {
+    const game = attacker.game;
+    const state = stateFor166(game);
+    const origin = muzzle || game.getUnitWeaponMuzzle?.(attacker, target) || {
+      x: attacker.x + Math.cos(attacker.rotation || 0) * (attacker.radius || 8),
+      y: attacker.y + Math.sin(attacker.rotation || 0) * (attacker.radius || 8),
+      z: 0,
+    };
+    const distance = Math.max(1, Math.hypot(target.x - origin.x, target.y - origin.y));
+    const accuracy = clamp166(Number(weapon.accuracy ?? .96), .25, 1);
+    const spread = (1 - accuracy) * (24 + distance * .16);
+    let aimX = target.x;
+    let aimY = target.y;
+    if (spread > .25) {
+      const angle = (game.rng?.next?.() ?? Math.random()) * TWO_PI;
+      const magnitude = spread * Math.sqrt(game.rng?.next?.() ?? 

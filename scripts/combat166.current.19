@@ -1,0 +1,53 @@
+, effect.y2, effect.z2 || 0);
+        if (!first || !second) continue;
+        context.save();
+        context.globalAlpha = fade;
+        context.strokeStyle = effect.color || '#eaf7d0';
+        context.lineWidth = clamp166(Number(effect.width || 1.4), .8, 3.2);
+        context.beginPath();
+        context.moveTo(first.x, first.y);
+        context.lineTo(second.x, second.y);
+        context.stroke();
+        context.globalAlpha = fade * .7;
+        context.strokeStyle = '#ffffff';
+        context.lineWidth = .7;
+        context.beginPath();
+        context.moveTo(first.x, first.y);
+        context.lineTo(second.x, second.y);
+        context.stroke();
+        context.restore();
+      }
+    };
+
+    const baseDrawEffects3D166 = GameClass.prototype.drawEffects3D;
+    if (typeof baseDrawEffects3D166 === 'function') {
+      GameClass.prototype.drawEffects3D = function(...args) {
+        const result = baseDrawEffects3D166.apply(this, args);
+        drawTracerEffects166(this);
+        return result;
+      };
+    } else {
+      const baseDrawEffects166 = GameClass.prototype.drawEffects;
+      if (typeof baseDrawEffects166 === 'function') {
+        GameClass.prototype.drawEffects = function(...args) {
+          const result = baseDrawEffects166.apply(this, args);
+          drawTracerEffects166(this);
+          return result;
+        };
+      }
+    }
+  }
+
+  root.__FD_COMBAT_SCALE166__ = {
+    version: VERSION,
+    build: BUILD,
+    diagnostics() {
+      const game = root.__FD_DEBUG__?.game;
+      return game?.combatScaleDiagnostics166?.() || null;
+    },
+    forceRebuild() {
+      const game = root.__FD_DEBUG__?.game;
+      return game ? rebuildIndex166(game, true) : null;
+    },
+  };
+})();

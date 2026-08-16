@@ -5,9 +5,9 @@ def rep(s,a,b,label):
     if a not in s: raise RuntimeError('v16.6 anchor missing: '+label)
     return s.replace(a,b,1)
 subprocess.run(['python','scripts/assemble165.py'],cwd=R,check=True)
-parts=[f'combat166.js.{index}' for index in range(8)]
+parts=[f'combat166.current.{index:02d}' for index in range(20)]
 combat=''.join((R/'scripts'/name).read_text('utf-8') for name in parts).encode('utf-8')
-if hashlib.sha256(combat).hexdigest()!='b3d68fe458e964b05b65823079ea4673538fc044e054eb5fb811df4eabbfa108':
+if hashlib.sha256(combat).hexdigest()!='f55bacc03d21aeed53e95759b4e551df5ce98415a779716968d3b92e1b7d0c20':
     raise RuntimeError('v16.6 combat module checksum mismatch')
 (O/'combat-scale-core-v166.js').write_bytes(combat)
 

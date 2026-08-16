@@ -1,0 +1,37 @@
+ix + 'a']);
+    if (wantsGround) {
+      const order = groundClassOrder166(observer);
+      for (const kind of order) for (const prefix of prefixes) arrays.push(bucket[prefix + kind]);
+    }
+    return arrays;
+  }
+
+  function weaponClass166(observer, targetLayers) {
+    const weapon = observer?.stats?.weapon || {};
+    const wantsGround = targetLayers.includes('ground');
+    const wantsAir = targetLayers.includes('air');
+    let role = 0;
+    const bonus = weapon.bonus || {};
+    if (wantsAir && !wantsGround) role = 1;
+    else if (Number(bonus.vehicle || bonus.heavy || bonus.armor || 1) > 1.12) role = 2;
+    else if (weapon.ballistic || Number(weapon.range) >= 900) role = 3;
+    else if (Number(weapon.damage) <= 48 && Number(weapon.projectileSpeed) >= 600) role = 4;
+    const layerMask = (wantsGround ? 1 : 0) | (wantsAir ? 2 : 0);
+    return (role << 2) | layerMask;
+  }
+
+  function targetPriority166(observer, target) {
+    const weapon = observer?.stats?.weapon || {};
+    const bonus = weapon.bonus || {};
+    let priority = Number(bonus[target?.armor] ?? 1) || 1;
+    if (target?.kind === 'unit' && target.stats?.weapon) priority *= 1.06;
+    if (target?.vehicle && Number(bonus.vehicle || bonus.armor || 1) > 1.1) priority *= 1.18;
+    if (target?.air && weapon.targets?.length === 1 && weapon.targets[0] === 'air') priority *= 1.12;
+    const healthRatio = Math.max(.05, finite166(target?.hp, 1) / Math.max(1, finite166(target?.maxHp, 1)));
+    priority *= 1 + (1 - healthRatio) * .08;
+    return clamp166(priority, .45, 3.5);
+  }
+
+  function fireGroupKey166(observer, x, y, radius, targetLayers) {
+    const cell = cellKey166(x, y);
+    const radiusCells = clamp166(Math.ceil(radius / CELL_SIZE), 1, MAX_CELL_R

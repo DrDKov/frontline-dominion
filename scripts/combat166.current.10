@@ -1,0 +1,38 @@
+th.min(
+      primaryPool166,
+      massBattle166 ? MASS_PRIMARY_FIRE_PROBES : PRIMARY_FIRE_PROBES,
+    );
+    // A fire-control group distributes its nearest shared targets between the
+    // shooters. Most observers validate only three or four candidates instead
+    // of repeating the whole shortlist; detector/LOS edge cases expand below.
+    const primaryStart166 = primaryPool166
+      ? (hash166(observer.id) ^ (state.indexEpoch * 2654435761)) >>> 0
+      : 0;
+    for (let probe = 0; probe < primaryProbes166; probe += 1) {
+      consider166(group.candidates[(primaryStart166 + probe) % primaryPool166]);
+    }
+    // Only an observer that found no legal candidate expands the search. This
+    // preserves stealth/detector and cell-edge range cases without making every
+    // member of the fire-control group repeat the same work.
+    if (!best) {
+      for (const target of group.candidates) consider166(target);
+      if (!best) for (const target of group.overflow || []) consider166(target);
+    }
+
+    state.metrics.candidateChecks += checked;
+    if (best) {
+      state.reservations.set(best, (state.reservations.get(best) || 0) + weaponDamage);
+      state.metrics.targetsAssigned += 1;
+      publishContact166(this, observer, best);
+    } else {
+      const unitCount = this._v94AliveUnits || this.units?.length || 0;
+      const commandType = observer.currentCommand?.type || '';
+      const preserveEdgeCase = unitCount < 3000 || observer.selected || commandType === 'attack';
+      if (preserveEdgeCase) {
+        state.metrics.fallbackQueries += 1;
+        best = originalFindNearestEnemy166.call(this, x, y, team, radius, targetLayers, observer);
+      }
+    }
+
+    observer._fdTarget166 = {
+      id: best

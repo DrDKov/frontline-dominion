@@ -1,0 +1,42 @@
+ADIUS);
+    // A cell can contain weapons whose ranges differ by hundreds of units.
+    // Keep them in separate 96-unit bands so a group built by the shortest-
+    // ranged shooter never truncates the candidate set of longer-ranged peers.
+    const rangeBand = clamp166(Math.ceil(radius / RANGE_BAND_SIZE), 1, 63);
+    const groupRadius = rangeBand * RANGE_BAND_SIZE;
+    const weaponClass = weaponClass166(observer, targetLayers);
+    return {
+      cell,
+      code: (radiusCells << 12) | (rangeBand << 6) | weaponClass,
+      radiusCells,
+      rangeBand,
+      groupRadius,
+    };
+  }
+
+  function buildFireGroup166(game, state, observer, radius, targetLayers, keyData) {
+    let cellGroups = state.fireGroups.get(keyData.cell);
+    if (!cellGroups) {
+      cellGroups = new Map();
+      state.fireGroups.set(keyData.cell, cellGroups);
+    }
+    let group = cellGroups.get(keyData.code);
+    if (group) {
+      state.metrics.fireControlHits += 1;
+      return group;
+    }
+
+    const { cx, cy } = unpackCell166(keyData.cell);
+    const wantsGround = targetLayers.includes('ground');
+    const wantsAir = targetLayers.includes('air');
+    const centerX = (cx + .5) * CELL_SIZE;
+    const centerY = (cy + .5) * CELL_SIZE;
+    const raw = [];
+    const seen = new Set();
+    const maxRaw = (game._v94AliveUnits || game.units?.length || 0) >= 30000 ? RAW_CANDIDATE_LIMIT : RAW_CANDIDATE_LIMIT * 2;
+
+    outer:
+    for (let oy = -keyData.radiusCells; oy <= keyData.radiusCells; oy += 1) {
+      for (let ox = -keyData.radiusCells; ox <= keyData.radiusCells; ox += 1) {
+        const bucket = state.cells.get((((cy + oy) & 0xffff) << 16) | ((cx + ox) & 0xffff));
+        for (const list of targetArrays166(bucket, observer.team, wa

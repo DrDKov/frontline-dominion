@@ -1,0 +1,39 @@
+ 'armor'].includes(String(entity?.armor || '')));
+    const signature = (entity?.air ? 1 : 0) | (airOnly ? 2 : 0) | (longRange ? 4 : 0) | (armored ? 8 : 0);
+    if (entity?._fdCombatClassSignature166 === signature && entity._fdCombatClass166) return entity._fdCombatClass166;
+    const kind = entity?.air ? 'a' : airOnly ? 'd' : longRange ? 'r' : armored ? 'v' : 'i';
+    entity._fdCombatClassSignature166 = signature;
+    entity._fdCombatClass166 = kind;
+    return kind;
+  }
+
+  function arrayFor166(bucket, team, targetClass) {
+    return bucket[teamPrefix166(team) + targetClass];
+  }
+
+  function indexEntity166(state, entity, isBuilding = false) {
+    if (!entity?.alive || entity.embarkedIn) return false;
+    if (entity.airServiceState === 'hangar') return false;
+    const key = cellKey166(entity.x, entity.y);
+    let bucket = state.cells.get(key);
+    if (!bucket) {
+      bucket = resetBucket166(state.bucketPool.pop() || makeBucket166());
+      state.cells.set(key, bucket);
+    }
+    const targetClass = targetClass166(entity, isBuilding);
+    arrayFor166(bucket, entity.team, targetClass).push(entity);
+    state.classCounts[targetClass] = (state.classCounts[targetClass] || 0) + 1;
+    return true;
+  }
+
+  function rebuildIndex166(game, force = false) {
+    const state = stateFor166(game);
+    const simTick = Number.isFinite(game.simTick) ? game.simTick : Math.floor((game.time || 0) * SIM_HZ);
+    const cadence = cadenceTicks166(game);
+    const epoch = Math.floor(simTick / cadence);
+    if (!force && epoch === state.indexEpoch) return state;
+
+    const started = now166();
+    for (const bucket of state.cells.values()) state.bucketPool.push(resetBucket166(bucket));
+    state.cells.clear();
+    state.fireGro

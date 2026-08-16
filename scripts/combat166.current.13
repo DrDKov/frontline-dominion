@@ -1,0 +1,28 @@
+  state.soundBudget = count >= 12000 ? 2 : 6;
+  }
+
+  function virtualSmallArm166(attacker, weapon) {
+    if (!attacker || !weapon || attacker.air) return false;
+    if (Number.isFinite(attacker.airAmmo) || Number.isFinite(attacker.magazineAmmo139) ||
+        Number.isFinite(attacker.magazineAmmoMax139) || Number.isFinite(attacker.stats?.magazineCapacity) ||
+        attacker._finiteSalvo139 || attacker._finiteSalvoFollowup139) return false;
+    const trajectory = String(weapon.trajectory || (weapon.ballistic ? 'ballistic' : 'straight')).toLowerCase();
+    const profile = `${weapon.profile || ''} ${weapon.name || ''} ${weapon.label || ''} ${attacker.typeId || ''}`.toLowerCase();
+    if (weapon.ballistic || Number(weapon.splash || 0) > 12) return false;
+    if (Number(weapon.damage || 0) <= 0 || Number(weapon.damage) > 48) return false;
+    if (Number(weapon.range || 0) > 760) return false;
+    if (Number(weapon.projectileSpeed || 0) < 600) return false;
+    if (Number(weapon.interceptability || 0) > 0 || Number(weapon.projectileHp || 0) > 0) return false;
+    if (!['straight', 'direct', 'beam', 'plasma', ''].includes(trajectory)) return false;
+    if (/missile|rocket|bomb|torpedo|artillery|mortar|howitzer|shell|cannon|птур|рак|бомб|артилл|мином|снаряд/.test(profile)) return false;
+    return true;
+  }
+
+  function recordTracerEffect166(game, source, target, weapon, muzzle, aimX, aimY) {
+    const state = stateFor166(game);
+    resetVisualBudget166(game, state);
+    if (state.tracerBudget <= 0) return;
+    const key = cellKey166(source.x, source.y);
+    const used = state.tracerCells.get(key) || 0;
+    if (used >= 3) return;
+    const deterministicSample = (hash166(source.id) + state.visualTick + used) % 

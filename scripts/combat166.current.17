@@ -1,0 +1,53 @@
+this.game.time;
+      const muzzle = this.game.getBuildingWeaponMuzzle?.(this, this.weaponRotation || 0, this.shotSequence || 0) || {
+        x: this.x, y: this.y, z: 0,
+      };
+      const hit = resolveVirtualShot166(this, target, weapon, 1, muzzle);
+      this.recoil = 1;
+      this.shotSequence = ((this.shotSequence || 0) + 1) % 32;
+      return hit;
+    };
+  }
+
+  if (typeof originalSimulateFixed166 === 'function') {
+    GameClass.prototype.simulateFixed = function(dt) {
+      const state = stateFor166(this);
+      state.inSimulationStep = true;
+      resetVisualBudget166(this, state);
+      try {
+        return originalSimulateFixed166.call(this, dt);
+      } finally {
+        flushDamage166(this);
+        state.inSimulationStep = false;
+      }
+    };
+  } else if (typeof originalUpdate166 === 'function') {
+    GameClass.prototype.update = function(dt) {
+      const state = stateFor166(this);
+      state.inSimulationStep = true;
+      resetVisualBudget166(this, state);
+      try {
+        return originalUpdate166.call(this, dt);
+      } finally {
+        flushDamage166(this);
+        state.inSimulationStep = false;
+      }
+    };
+  }
+
+  GameClass.prototype.combatScaleDiagnostics166 = function() {
+    const state = stateFor166(this);
+    const metrics = state.metrics;
+    return {
+      version: VERSION,
+      build: BUILD,
+      indexEpoch: state.indexEpoch,
+      indexSimTick: state.indexSimTick,
+      combatCells: state.cells.size,
+      indexedUnits: metrics.indexedUnits,
+      indexedBuildings: metrics.indexedBuildings,
+      cellClasses: {
+        infantry: state.classCounts.i,
+        armor: state.classCounts.v,
+        airDefense: state.classCounts.d,
+        artillery: state.classCounts.r

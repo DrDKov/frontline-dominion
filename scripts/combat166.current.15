@@ -1,0 +1,33 @@
+Math.random());
+      aimX += Math.cos(angle) * magnitude;
+      aimY += Math.sin(angle) * magnitude;
+    }
+    const hitRadius = (target.radius || 0) + Math.max(12, Number(weapon.splash || 0) * .18);
+    const hit = target.alive && Math.hypot(target.x - aimX, target.y - aimY) <= hitRadius;
+    const rawDamage = Number(weapon.damage || 0) * veteranMultiplier;
+    const suppressionBase = clamp166(
+      Number(weapon.suppression || 0) || rawDamage / Math.max(1, Number(target.maxHp || target.hp || 1)) * .18,
+      .001,
+      .028,
+    );
+    // Unit.takeDamage already derives shock/suppression from damage. Add only
+    // explicit weapon suppression on a hit; misses still contribute near-miss
+    // suppression without creating a projectile object.
+    const explicitSuppression = Math.max(0, Number(weapon.suppression || 0));
+    const supplementalSuppression = hit ? explicitSuppression * .25 : Math.max(explicitSuppression, suppressionBase) * .55;
+    queueDamage166(game, target, attacker, weapon, rawDamage, supplementalSuppression, hit);
+    recordTracerEffect166(game, attacker, target, weapon, origin, aimX, aimY);
+    // Scripted/manual fire outside a simulation step must not leave damage
+    // stranded until a later tick. Normal mass combat still flushes once.
+    if (!state.inSimulationStep) flushDamage166(game);
+    state.metrics.virtualShots += 1;
+    state.metrics.physicalProjectilesAvoided += 1;
+    if (hit) state.metrics.virtualHits += 1;
+    return hit;
+  }
+
+  if (typeof originalUnitFire166 === 'function') {
+    UnitClass.prototype.fire = function(target) {
+      const weapon = this.stats?.weapon;
+      if (!target?.alive) return false;
+      // Never fall through to the physical fire path wh

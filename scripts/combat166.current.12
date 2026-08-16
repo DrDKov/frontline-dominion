@@ -1,0 +1,48 @@
+mation
+      // without retaining a contributor object for every bullet.
+      batch.source = source;
+    }
+    batch.suppression += suppression;
+    state.metrics.damageEvents += 1;
+  }
+
+  function flushDamage166(game) {
+    const state = stateFor166(game);
+    if (!state.damageTargets.size) return;
+    const started = now166();
+    let batches = 0;
+    for (const entry of state.damageTargets.values()) {
+      const target = entry.target;
+      for (const batch of entry.weapons.values()) {
+        batches += 1;
+        if (target?.alive) {
+          if (batch.damage > 0) target.takeDamage?.(batch.damage, batch.source, batch.weapon);
+          if (Number.isFinite(target.suppression160) && batch.suppression > 0) {
+            target.suppression160 = clamp166(target.suppression160 + batch.suppression, 0, 1);
+            target.lastSuppressedAt160 = game.time;
+          }
+        }
+        batch.target = null;
+        batch.source = null;
+        batch.weapon = null;
+        state.damageBatchPool.push(batch);
+      }
+      entry.weapons.clear();
+      entry.target = null;
+      state.targetEntryPool.push(entry);
+    }
+    state.damageTargets.clear();
+    const elapsed = now166() - started;
+    state.metrics.damageBatches += batches;
+    state.metrics.batchMs += elapsed;
+    state.metrics.lastBatchMs = elapsed;
+  }
+
+  function resetVisualBudget166(game, state) {
+    const tick = Number.isFinite(game.simTick) ? game.simTick : Math.floor((game.time || 0) * SIM_HZ);
+    if (state.visualTick === tick) return;
+    state.visualTick = tick;
+    state.tracerCells.clear();
+    const count = game._v94AliveUnits || game.units?.length || 0;
+    state.tracerBudget = count >= 50000 ? 72 : count >= 12000 ? 144 : 360;
+  

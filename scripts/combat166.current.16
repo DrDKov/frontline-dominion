@@ -1,0 +1,28 @@
+en combat policy (for
+      // example the player's v177 hold-fire order) rejects the target.
+      if (this.canAttack && !this.canAttack(target)) return false;
+      if (!virtualSmallArm166(this, weapon)) return originalUnitFire166.call(this, target);
+      const veteranMultiplier = 1 + (Number(this.rank || 1) - 1) * .14;
+      const commandBonus = Number(this.game.getCommandAuraBonus?.(this) || 0);
+      this.weaponCooldown = Number(weapon.reload || .2) / (1 + (Number(this.rank || 1) - 1) * .06 + commandBonus);
+      if (this.stats.stealth) this.revealTimer = 3.2 * (this.stats.stealthRecovery || 1);
+      if (this.stats.covertOps) {
+        this.compromisedUntil = Math.max(this.compromisedUntil || 0, this.game.time + 10);
+        this.coverIntegrity = Math.max(0, finite166(this.coverIntegrity, 1) - .14);
+      }
+      this.lastShotAt = this.game.time;
+      const muzzle = this.game.getUnitWeaponMuzzle?.(this, target) || null;
+      return resolveVirtualShot166(this, target, weapon, veteranMultiplier, muzzle);
+    };
+  }
+
+  if (BuildingClass && typeof originalBuildingFire166 === 'function') {
+    BuildingClass.prototype.fire = function(target) {
+      const weapon = this.stats?.weapon;
+      if (!target?.alive) return false;
+      if (this.canAttack && !this.canAttack(target)) return false;
+      if (!virtualSmallArm166(this, weapon)) return originalBuildingFire166.call(this, target);
+      if (this.stats.category === 'defense' && this.game.isStationaryDefensePowered && !this.game.isStationaryDefensePowered(this)) return;
+      const commandBonus = Number(this.game.getCommandAuraBonus?.(this) || 0);
+      this.weaponCooldown = Number(weapon.reload || .2) / (1 + commandBonus);
+      this.lastShotAt = 

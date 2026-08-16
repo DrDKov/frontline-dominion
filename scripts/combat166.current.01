@@ -1,0 +1,64 @@
+ 16;
+    hash = Math.imul(hash, 2246822507) >>> 0;
+    hash ^= hash >>> 13;
+    return hash >>> 0;
+  }
+
+  function entityNumber166(entity) {
+    const parsed = Number.parseInt(String(entity?.id || '').replace(/^\D+/, ''), 10);
+    return Number.isFinite(parsed) ? parsed >>> 0 : hash166(entity?.id);
+  }
+
+  function cellKey166(x, y) {
+    const cx = Math.floor(finite166(x) / CELL_SIZE);
+    const cy = Math.floor(finite166(y) / CELL_SIZE);
+    return ((cy & 0xffff) << 16) | (cx & 0xffff);
+  }
+
+  function unpackCell166(key) {
+    let cx = key & 0xffff;
+    let cy = (key >>> 16) & 0xffff;
+    if (cx & 0x8000) cx -= 0x10000;
+    if (cy & 0x8000) cy -= 0x10000;
+    return { cx, cy };
+  }
+
+  function emptyMetrics166() {
+    return {
+      indexBuilds: 0,
+      indexedUnits: 0,
+      indexedBuildings: 0,
+      combatCells: 0,
+      targetQueries: 0,
+      targetCacheHits: 0,
+      fireControlBuilds: 0,
+      fireControlHits: 0,
+      candidateChecks: 0,
+      fallbackQueries: 0,
+      targetsAssigned: 0,
+      virtualShots: 0,
+      virtualHits: 0,
+      physicalProjectilesAvoided: 0,
+      damageEvents: 0,
+      damageBatches: 0,
+      tracerEvents: 0,
+      indexMs: 0,
+      targetingMs: 0,
+      batchMs: 0,
+      lastIndexMs: 0,
+      lastTargetingMs: 0,
+      lastBatchMs: 0,
+      lastCandidateCount: 0,
+      maxCandidateCount: 0,
+    };
+  }
+
+  const CELL_CLASSES166 = Object.freeze(['i', 'v', 'd', 'r', 'b', 'a']);
+  const CELL_TEAMS166 = Object.freeze(['p', 'e', 'n']);
+  const CELL_BUCKET_KEYS166 = Object.freeze(
+    CELL_TEAMS166.flatMap(team => CELL_CLASSES166.map(kind => team + kind)),
+  );
+
+  function makeBucket166() {
+    const bucket = {};
+    for (const key of CELL_BUCKET_KEYS166) bucket[key] = [];

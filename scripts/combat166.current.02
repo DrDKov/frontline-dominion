@@ -1,0 +1,56 @@
+    return bucket;
+  }
+
+  function resetBucket166(bucket) {
+    for (const key of CELL_BUCKET_KEYS166) bucket[key].length = 0;
+    return bucket;
+  }
+
+  function stateFor166(game) {
+    let state = states.get(game);
+    if (state) return state;
+    state = {
+      version: VERSION,
+      build: BUILD,
+      indexEpoch: -1,
+      indexSimTick: -1,
+      cells: new Map(),
+      bucketPool: [],
+      fireGroups: new Map(),
+      reservations: new Map(),
+      classCounts: { i: 0, v: 0, d: 0, r: 0, b: 0, a: 0 },
+      damageTargets: new Map(),
+      targetEntryPool: [],
+      damageBatchPool: [],
+      weaponIds: new WeakMap(),
+      nextWeaponId: 1,
+      metrics: emptyMetrics166(),
+      visualTick: -1,
+      tracerCells: new Map(),
+      tracerBudget: 0,
+      soundBudget: 0,
+      inSimulationStep: false,
+    };
+    states.set(game, state);
+    game._combatScale166 = state;
+    return state;
+  }
+
+  function cadenceTicks166(game) {
+    const count = game?._v94AliveUnits || game?.units?.length || 0;
+    if (count >= 80000) return 5;  // 5 Hz
+    if (count >= 30000) return 4;  // 6.25 Hz
+    return 3;                      // 8.33 Hz
+  }
+
+  function teamPrefix166(team) {
+    return team === 'player' ? 'p' : team === 'enemy' ? 'e' : 'n';
+  }
+
+  function targetClass166(entity, isBuilding = false) {
+    if (isBuilding || entity?.kind === 'building') return 'b';
+    const weapon = entity?.stats?.weapon || {};
+    const targets = Array.isArray(weapon.targets) ? weapon.targets : [];
+    const airOnly = targets.length === 1 && targets[0] === 'air';
+    const longRange = Boolean(weapon.ballistic || Number(weapon.range) >= 900);
+    const armored = Boolean(entity?.vehicle || ['light', 'medium', 'heavy', 'vehicle',

@@ -1,0 +1,40 @@
+,
+        buildings: state.classCounts.b,
+        aircraft: state.classCounts.a,
+      },
+      targetQueries: metrics.targetQueries,
+      targetCacheHits: metrics.targetCacheHits,
+      fireControlBuilds: metrics.fireControlBuilds,
+      fireControlHits: metrics.fireControlHits,
+      candidateChecks: metrics.candidateChecks,
+      fallbackQueries: metrics.fallbackQueries,
+      targetsAssigned: metrics.targetsAssigned,
+      virtualShots: metrics.virtualShots,
+      virtualHits: metrics.virtualHits,
+      physicalProjectilesAvoided: metrics.physicalProjectilesAvoided,
+      damageEvents: metrics.damageEvents,
+      damageBatches: metrics.damageBatches,
+      tracerEvents: metrics.tracerEvents,
+      indexMs: metrics.indexMs,
+      targetingMs: metrics.targetingMs,
+      batchMs: metrics.batchMs,
+      lastIndexMs: metrics.lastIndexMs,
+      lastTargetingMs: metrics.lastTargetingMs,
+      lastBatchMs: metrics.lastBatchMs,
+      lastCandidateCount: metrics.lastCandidateCount,
+      maxCandidateCount: metrics.maxCandidateCount,
+      pendingDamageTargets: state.damageTargets.size,
+    };
+  };
+
+  if (typeof document !== 'undefined') {
+    const canvas = document.getElementById('game-canvas');
+    const context = canvas?.getContext?.('2d');
+    const drawTracerEffects166 = game => {
+      if (!context || !game?.effects?.length) return;
+      for (const effect of game.effects) {
+        if (effect?.type !== 'tracer166') continue;
+        const fade = 1 - clamp166(finite166(effect.age) / Math.max(.001, finite166(effect.duration, .09)), 0, 1);
+        if (fade <= 0) continue;
+        const first = game.worldToScreen?.(effect.x, effect.y, effect.z || 0);
+        const second = game.worldToScreen?.(effect.x2

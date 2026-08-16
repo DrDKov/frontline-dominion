@@ -1,0 +1,44 @@
+ntsGround, wantsAir, observer)) {
+          for (const entity of list) {
+            if (!entity?.alive || seen.has(entity.id)) continue;
+            seen.add(entity.id);
+            const dx = entity.x - centerX;
+            const dy = entity.y - centerY;
+            const roughRadius = keyData.groupRadius + CELL_SIZE * .78;
+            if (dx * dx + dy * dy > roughRadius * roughRadius) continue;
+            raw.push(entity);
+            if (raw.length >= maxRaw) break outer;
+          }
+        }
+      }
+    }
+
+    const limit = (game._v94AliveUnits || game.units?.length || 0) >= 30000 ? MASS_FIRE_GROUP_LIMIT : FIRE_GROUP_LIMIT;
+    raw.sort((left, right) => {
+      const ldx = left.x - centerX;
+      const ldy = left.y - centerY;
+      const rdx = right.x - centerX;
+      const rdy = right.y - centerY;
+      const ls = (ldx * ldx + ldy * ldy) / targetPriority166(observer, left);
+      const rs = (rdx * rdx + rdy * rdy) / targetPriority166(observer, right);
+      return ls - rs || entityNumber166(left) - entityNumber166(right);
+    });
+
+    group = {
+      epoch: state.indexEpoch,
+      cell: keyData.cell,
+      code: keyData.code,
+      radius: keyData.groupRadius,
+      candidates: raw.slice(0, limit),
+      overflow: raw.slice(limit),
+    };
+    cellGroups.set(keyData.code, group);
+    state.metrics.fireControlBuilds += 1;
+    state.metrics.lastCandidateCount = group.candidates.length;
+    state.metrics.maxCandidateCount = Math.max(state.metrics.maxCandidateCount, group.candidates.length);
+    return group;
+  }
+
+  function validTarget166(game, observer, target, x, y, team, radius, targetLayers) {
+    if (!target?.alive || target.team === team || target.team === 'neutral') return false;
+    const 

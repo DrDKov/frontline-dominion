@@ -1,0 +1,47 @@
+(() => {
+  'use strict';
+
+  const root = globalThis;
+  const debug = root.__FD_DEBUG__;
+  const GameClass = debug?.Game;
+  const UnitClass = debug?.Unit;
+  const BuildingClass = debug?.Building;
+  if (!GameClass || !UnitClass) return;
+  if (GameClass.prototype.__fdCombatScale166Installed) return;
+  Object.defineProperty(GameClass.prototype, '__fdCombatScale166Installed', {
+    value: true, configurable: true,
+  });
+
+  const VERSION = '16.6';
+  const BUILD = 180;
+  const SIM_HZ = 25;
+  const CELL_SIZE = 384;
+  const RANGE_BAND_SIZE = 96;
+  const MAX_CELL_RADIUS = 8;
+  const FIRE_GROUP_LIMIT = 24;
+  const MASS_FIRE_GROUP_LIMIT = 16;
+  const RAW_CANDIDATE_LIMIT = 320;
+  const PRIMARY_FIRE_PROBES = 4;
+  const MASS_PRIMARY_FIRE_PROBES = 3;
+  const PRIMARY_TARGET_POOL = 12;
+  const MASS_PRIMARY_TARGET_POOL = 8;
+  const TWO_PI = Math.PI * 2;
+  const states = new WeakMap();
+  const originalFindNearestEnemy166 = GameClass.prototype.findNearestEnemy;
+  const originalUnitFire166 = UnitClass.prototype.fire;
+  const originalBuildingFire166 = BuildingClass?.prototype?.fire;
+  const originalSimulateFixed166 = GameClass.prototype.simulateFixed;
+  const originalUpdate166 = GameClass.prototype.update;
+
+  const clamp166 = (value, min, max) => Math.max(min, Math.min(max, value));
+  const finite166 = (value, fallback = 0) => Number.isFinite(value) ? value : fallback;
+  const now166 = () => typeof performance !== 'undefined' ? performance.now() : Date.now();
+
+  function hash166(value) {
+    const text = String(value ?? '');
+    let hash = 2166136261 >>> 0;
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619) >>> 0;
+    }
+    hash ^= hash >>>

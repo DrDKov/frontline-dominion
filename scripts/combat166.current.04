@@ -1,0 +1,42 @@
+ups.clear();
+    state.reservations.clear();
+    for (const kind of CELL_CLASSES166) state.classCounts[kind] = 0;
+    state.indexEpoch = epoch;
+    state.indexSimTick = simTick;
+
+    let indexedUnits = 0;
+    let indexedBuildings = 0;
+    for (const unit of game.units || []) if (indexEntity166(state, unit, false)) indexedUnits += 1;
+    for (const building of game.buildings || []) if (indexEntity166(state, building, true)) indexedBuildings += 1;
+
+    const elapsed = now166() - started;
+    state.metrics.indexBuilds += 1;
+    state.metrics.indexedUnits = indexedUnits;
+    state.metrics.indexedBuildings = indexedBuildings;
+    state.metrics.combatCells = state.cells.size;
+    state.metrics.indexMs += elapsed;
+    state.metrics.lastIndexMs = elapsed;
+    return state;
+  }
+
+  function groundClassOrder166(observer) {
+    const weapon = observer?.stats?.weapon || {};
+    const bonus = weapon.bonus || {};
+    if (Number(bonus.building || 1) > 1.1) return ['b', 'v', 'r', 'd', 'i'];
+    if (Number(bonus.vehicle || bonus.heavy || bonus.armor || 1) > 1.1) return ['v', 'd', 'r', 'b', 'i'];
+    if (weapon.ballistic || Number(weapon.range) >= 900) return ['r', 'd', 'b', 'v', 'i'];
+    if (Number(weapon.damage) <= 48 && Number(weapon.projectileSpeed) >= 600) return ['i', 'd', 'r', 'v', 'b'];
+    return ['v', 'i', 'd', 'r', 'b'];
+  }
+
+  function enemyPrefixes166(team) {
+    if (team === 'player') return ['e'];
+    if (team === 'enemy') return ['p'];
+    return ['p', 'e'];
+  }
+
+  function targetArrays166(bucket, team, wantsGround, wantsAir, observer) {
+    if (!bucket) return [];
+    const arrays = [];
+    const prefixes = enemyPrefixes166(team);
+    if (wantsAir) for (const prefix of prefixes) arrays.push(bucket[pref
