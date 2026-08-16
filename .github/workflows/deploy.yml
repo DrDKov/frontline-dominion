@@ -22,33 +22,46 @@ jobs:
       - name: Checkout publisher
         uses: actions/checkout@v6
 
-      - name: Assemble v16.5 build 179
+      - name: Assemble v16.6 build 180
         run: |
           rm -rf dist
-          python scripts/assemble165.py
+          python scripts/assemble166.py
 
-      - name: Validate Stable State Core
+      - name: Validate Combat Scale Core
         run: |
           set -euo pipefail
-          for f in index.html frontline-dominion.html stable-state-core-v165.js fire-discipline-v177.js minimap-stability-v176.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js multiplayer-game-v96.js authoritative-simulation-bundle-v172.js combined-arms-doctrine-v141.js models/pilot/manifest.json; do
+          for f in \
+            index.html \
+            frontline-dominion.html \
+            combat-scale-core-v166.js \
+            simulation-profiler-v166.js \
+            fire-discipline-v177.js \
+            minimap-stability-v176.js \
+            authoritative-simulation-v174.js \
+            authoritative-simulation-worker-v174.js \
+            authoritative-simulation-bundle-v172.js \
+            combined-arms-doctrine-v141.js \
+            multiplayer-game-v96.js \
+            models/pilot/manifest.json; do
             test -s "dist/$f" || { echo "missing: $f"; exit 1; }
           done
-          grep -q 'frontline-dominion.html?build=179' dist/index.html
-          grep -q 'stable-state-core-v165.js?build=179' dist/frontline-dominion.html
-          grep -q "const VERSION = '16.5'" dist/authoritative-simulation-v174.js
-          grep -q "const VERSION = '16.5'" dist/authoritative-simulation-worker-v174.js
-          grep -q 'createSharedTransport165' dist/authoritative-simulation-v174.js
-          grep -q 'acquireSharedFrame165' dist/authoritative-simulation-v174.js
-          grep -q 'reserveSharedSlot165' dist/authoritative-simulation-worker-v174.js
-          grep -q 'buildingState165' dist/authoritative-simulation-v174.js
-          grep -q 'buildingState165' dist/authoritative-simulation-worker-v174.js
-          grep -q 'minimapState165' dist/authoritative-simulation-v174.js
-          grep -q 'minimapState165' dist/authoritative-simulation-worker-v174.js
+          grep -q 'frontline-dominion.html?build=180' dist/index.html
+          grep -q 'combat-scale-core-v166.js?build=180' dist/frontline-dominion.html
+          grep -q 'simulation-profiler-v166.js?build=180' dist/frontline-dominion.html
+          grep -q "combat-scale-core-v166.js?build=180" dist/authoritative-simulation-worker-v174.js
+          grep -q "const BUILD = 180" dist/authoritative-simulation-v174.js
+          grep -q "const VERSION = '16.6'" dist/authoritative-simulation-v174.js
+          grep -q "const BUILD = 180" dist/authoritative-simulation-worker-v174.js
+          grep -q "const VERSION = '16.6'" dist/authoritative-simulation-worker-v174.js
+          grep -q 'combat166: game.combatScaleDiagnostics166' dist/authoritative-simulation-worker-v174.js
+          grep -q 'GameClass.prototype.findNearestEnemy' dist/combat-scale-core-v166.js
+          grep -q 'physicalProjectilesAvoided' dist/combat-scale-core-v166.js
+          grep -q 'flushDamage166' dist/combat-scale-core-v166.js
           grep -q 'playerDirectedBuild178' dist/combined-arms-doctrine-v141.js
-          grep -q 'playerDirectedBuild178' dist/authoritative-simulation-bundle-v172.js
-          ! grep -q 'context.arc(center.x, center.y, screenRadius' dist/combined-arms-doctrine-v141.js
-          ! grep -q 'context.arc(center.x, center.y, screenRadius' dist/authoritative-simulation-bundle-v172.js
-          node --check dist/stable-state-core-v165.js
+          grep -q 'no minefield perimeter/radius overlay' dist/combined-arms-doctrine-v141.js
+          grep -q 'fireDiscipline177' dist/authoritative-simulation-worker-v174.js
+          node --check dist/combat-scale-core-v166.js
+          node --check dist/simulation-profiler-v166.js
           node --check dist/authoritative-simulation-v174.js
           node --check dist/authoritative-simulation-worker-v174.js
           count=$(find dist/models -type f | wc -l)
@@ -66,6 +79,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.5 build 179"
+          git commit -m "Frontline Dominion v16.6 build 180"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
