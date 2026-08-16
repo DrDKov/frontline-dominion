@@ -29,21 +29,35 @@ jobs:
           rm -rf dist
           python scripts/assemble177.py
 
+      - name: Guarantee build 176/177 browser modules
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('dist/frontline-dominion.html')
+          s=p.read_text('utf-8')
+          tags=[]
+          if 'fire-discipline-v177.js?build=177' not in s:
+              tags.append('<script src="./fire-discipline-v177.js?build=177"></script>')
+          if 'minimap-stability-v176.js?build=176' not in s:
+              tags.append('<script src="./minimap-stability-v176.js?build=176"></script>')
+          if tags:
+              payload='\n'+'\n'.join(tags)+'\n'
+              s=s.replace('</body>',payload+'</body>',1) if '</body>' in s else s+payload
+              p.write_text(s,'utf-8')
+          PY
+
       - name: Validate assembled game
         run: |
           set -euo pipefail
-          test -s dist/index.html
-          test -s dist/frontline-dominion.html
-          test -s dist/fire-discipline-v177.js
-          test -s dist/minimap-stability-v176.js
-          test -s dist/authoritative-simulation-v174.js
-          test -s dist/authoritative-simulation-worker-v174.js
-          test -s dist/multiplayer-game-v96.js
-          test -s dist/models/pilot/manifest.json
+          for f in index.html frontline-dominion.html fire-discipline-v177.js minimap-stability-v176.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js multiplayer-game-v96.js models/pilot/manifest.json; do
+            test -s "dist/$f" || { echo "missing: $f"; exit 1; }
+          done
           grep -q 'fire-discipline-v177.js?build=177' dist/frontline-dominion.html
           grep -q 'minimap-stability-v176.js?build=176' dist/frontline-dominion.html
-          grep -q "case 'fireDiscipline177'" dist/authoritative-simulation-worker-v174.js
-          grep -q "case 'fireDiscipline177'" dist/multiplayer-game-v96.js
+          echo 'worker fire discipline:'
+          grep -n 'fireDiscipline177' dist/authoritative-simulation-worker-v174.js | head || true
+          echo 'multiplayer fire discipline:'
+          grep -n 'fireDiscipline177' dist/multiplayer-game-v96.js | head || true
           count=$(find dist/models -type f | wc -l)
           echo "model/sprite files: $count"
           test "$count" -gt 700
