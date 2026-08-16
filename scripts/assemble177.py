@@ -22,7 +22,7 @@ def fetch(ref):
     raise RuntimeError(f'{url}: {last}')
 
 html=fetch('frontline-dominion.html?build=175')
-jsref=re.compile(r'''["']/(?!/)([A-Za-z0-9_.-]+\.js(?:\?[^"']*)?)''')
+jsref=re.compile(r'''["'](?:/|\./)([A-Za-z0-9_.-]+\.js(?:\?[^"']*)?)''')
 queue=list(dict.fromkeys(jsref.findall(html.read_text('utf-8',errors='replace'))))
 queue += [
  'authoritative-simulation-v174.js?build=174',
@@ -60,11 +60,11 @@ for extra in ('file.svg','globe.svg'):
 p=OUT/'frontline-dominion.html'; s=p.read_text('utf-8')
 s=re.sub(r'<title>.*?</title>','<title>Frontline Dominion v16.4.2 — Fire Discipline</title>',s,count=1,flags=re.S)
 if 'fire-discipline-v177.js?build=177' not in s:
-    s=re.sub(r'(<script src="/multiplayer-game-v96\.js[^\"]*"></script>)','<script src="/fire-discipline-v177.js?build=177"></script>\n\\1',s,count=1)
+    s=re.sub(r'(<script[^>]+src="(?:/|\./)?multiplayer-game-v96\.js[^\"]*"[^>]*></script>)','<script src="/fire-discipline-v177.js?build=177"></script>\n\\1',s,count=1)
 if 'minimap-stability-v176.js?build=176' not in s:
-    s=re.sub(r'(<script src="/authoritative-simulation-v174\.js[^\"]*"></script>)','<script src="/fire-discipline-v177.js?build=177"></script>\n\\1\n<script src="/minimap-stability-v176.js?build=176"></script>',s,count=1)
-s=re.sub(r'/authoritative-simulation-v174\.js\?build=\d+','/authoritative-simulation-v174.js?build=177',s)
-s=re.sub(r'/multiplayer-game-v96\.js\?build=\d+','/multiplayer-game-v96.js?build=177',s)
+    s=re.sub(r'(<script[^>]+src="(?:/|\./)?authoritative-simulation-v174\.js[^\"]*"[^>]*></script>)','<script src="/fire-discipline-v177.js?build=177"></script>\n\\1\n<script src="/minimap-stability-v176.js?build=176"></script>',s,count=1)
+s=re.sub(r'((?:/|\./)?authoritative-simulation-v174\.js)\?build=\d+',r'\1?build=177',s)
+s=re.sub(r'((?:/|\./)?multiplayer-game-v96\.js)\?build=\d+',r'\1?build=177',s)
 p.write_text(s,'utf-8')
 
 p=OUT/'authoritative-simulation-v174.js'; s=p.read_text('utf-8')
