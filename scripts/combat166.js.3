@@ -1,0 +1,98 @@
+     const rdy = right.y - centerY;
+      const ls = (ldx * ldx + ldy * ldy) / targetPriority166(observer, left);
+      const rs = (rdx * rdx + rdy * rdy) / targetPriority166(observer, right);
+      return ls - rs || entityNumber166(left) - entityNumber166(right);
+    });
+
+    group = {
+      epoch: state.indexEpoch,
+      cell: keyData.cell,
+      code: keyData.code,
+      radius: keyData.groupRadius,
+      candidates: raw.slice(0, limit),
+      overflow: raw.slice(limit),
+    };
+    cellGroups.set(keyData.code, group);
+    state.metrics.fireControlBuilds += 1;
+    state.metrics.lastCandidateCount = group.candidates.length;
+    state.metrics.maxCandidateCount = Math.max(state.metrics.maxCandidateCount, group.candidates.length);
+    return group;
+  }
+
+  function validTarget166(game, observer, target, x, y, team, radius, targetLayers) {
+    if (!target?.alive || target.team === team || target.team === 'neutral') return false;
+    const layer = target.air ? 'air' : 'ground';
+    if (!targetLayers.includes(layer)) return false;
+    const dx = target.x - x;
+    const dy = target.y - y;
+    if (dx * dx + dy * dy > radius * radius) return false;
+    if (observer?.canAttack && !observer.canAttack(target)) return false;
+    if (game.isTargetableBy && !game.isTargetableBy(target, team, observer)) return false;
+    return true;
+  }
+
+  function publishContact166(game, observer, target) {
+    if (!observer || !target) return;
+    try {
+      if (game.isDirectCombatContact132?.(observer, target)) {
+        game.publishCombatContact132?.(observer, target);
+        observer._networkFire132 = null;
+      }
+    } catch (_) {}
+  }
+
+  GameClass.prototype.findNearestEnemy = function(x, y, team, radius, targetLayers = ['ground'], observer = null) {
+    if (!observer || !observer.stats?.weapon || !Number.isFinite(radius) || radius <= 0 || !Array.isArray(targetLayers)) {
+      return originalFindNearestEnemy166.call(this, x, y, team, radius, targetLayers, observer);
+    }
+    const started = now166();
+    const state = rebuildIndex166(this);
+    state.metrics.targetQueries += 1;
+
+    const queryCell166 = cellKey166(x, y);
+    const queryWeaponClass166 = weaponClass166(observer, targetLayers);
+    const cached = observer._fdTarget166;
+    if (cached?.epoch === state.indexEpoch && cached.team === team && cached.radius >= radius * .92 && cached.cell === queryCell166 && cached.weaponClass === queryWeaponClass166) {
+      const entity = cached.id ? this.getEntity?.(cached.id) : null;
+      if (entity && validTarget166(this, observer, entity, x, y, team, radius, targetLayers)) {
+        state.metrics.targetCacheHits += 1;
+        state.metrics.targetingMs += now166() - started;
+        state.metrics.lastTargetingMs = now166() - started;
+        publishContact166(this, observer, entity);
+        return entity;
+      }
+      if (!cached.id) {
+        state.metrics.targetCacheHits += 1;
+        state.metrics.targetingMs += now166() - started;
+        state.metrics.lastTargetingMs = now166() - started;
+        return null;
+      }
+    }
+
+    const keyData = fireGroupKey166(observer, x, y, radius, targetLayers);
+    const group = buildFireGroup166(this, state, observer, radius, targetLayers, keyData);
+    const weaponDamage = Math.max(1, finite166(observer.stats.weapon.damage, 1));
+    let best = null;
+    let bestScore = Infinity;
+    let checked = 0;
+
+    const consider166 = target => {
+      checked += 1;
+      if (!validTarget166(this, observer, target, x, y, team, radius, targetLayers)) return;
+      const dx = target.x - x;
+      const dy = target.y - y;
+      const distanceSquared = dx * dx + dy * dy;
+      const reserved = state.reservations.get(target) || 0;
+      const health = Math.max(1, finite166(target.hp, target.maxHp || 1));
+      const overkill = reserved / health;
+      const priority = targetPriority166(observer, target);
+      const tie = ((hash166(observer.id) ^ entityNumber166(target)) & 255) * 1e-5;
+      const score = distanceSquared * (1 + Math.min(3, overkill) * .42) / priority + tie;
+      if (score < bestScore) {
+        best = target;
+        bestScore = score;
+      }
+    };
+    const massBattle166 = (this._v94AliveUnits || this.units?.length || 0) >= 30000;
+    const primaryPool166 = Math.min(
+      group.candidates.leng

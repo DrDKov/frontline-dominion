@@ -1,14 +1,13 @@
 from pathlib import Path
-import base64,hashlib,re,subprocess,zlib
+import hashlib,re,subprocess
 R=Path(__file__).resolve().parents[1]; O=R/'dist'
 def rep(s,a,b,label):
     if a not in s: raise RuntimeError('v16.6 anchor missing: '+label)
     return s.replace(a,b,1)
 subprocess.run(['python','scripts/assemble165.py'],cwd=R,check=True)
-parts=['combat166.zb64.0','combat166.zb64.1','combat166.zb64.2','combat166.zb64.3a','combat166.zb64.3b','combat166.zb64.3c','combat166.zb64.3d']
-payload=''.join((R/'scripts'/name).read_text('ascii').strip() for name in parts)
-combat=zlib.decompress(base64.b64decode(payload,validate=True))
-if hashlib.sha256(combat).hexdigest()!='fd694aee449f88748ad1140b17444ac51c98108782b7f8d2f42f80762d35585b':
+parts=[f'combat166.js.{index}' for index in range(8)]
+combat=''.join((R/'scripts'/name).read_text('utf-8') for name in parts).encode('utf-8')
+if hashlib.sha256(combat).hexdigest()!='b3d68fe458e964b05b65823079ea4673538fc044e054eb5fb811df4eabbfa108':
     raise RuntimeError('v16.6 combat module checksum mismatch')
 (O/'combat-scale-core-v166.js').write_bytes(combat)
 

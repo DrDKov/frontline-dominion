@@ -1,0 +1,93 @@
+          target.suppression160 = clamp166(target.suppression160 + batch.suppression, 0, 1);
+            target.lastSuppressedAt160 = game.time;
+          }
+        }
+        batch.target = null;
+        batch.source = null;
+        batch.weapon = null;
+        state.damageBatchPool.push(batch);
+      }
+      entry.weapons.clear();
+      entry.target = null;
+      state.targetEntryPool.push(entry);
+    }
+    state.damageTargets.clear();
+    const elapsed = now166() - started;
+    state.metrics.damageBatches += batches;
+    state.metrics.batchMs += elapsed;
+    state.metrics.lastBatchMs = elapsed;
+  }
+
+  function resetVisualBudget166(game, state) {
+    const tick = Number.isFinite(game.simTick) ? game.simTick : Math.floor((game.time || 0) * SIM_HZ);
+    if (state.visualTick === tick) return;
+    state.visualTick = tick;
+    state.tracerCells.clear();
+    const count = game._v94AliveUnits || game.units?.length || 0;
+    state.tracerBudget = count >= 50000 ? 72 : count >= 12000 ? 144 : 360;
+    state.soundBudget = count >= 12000 ? 2 : 6;
+  }
+
+  function virtualSmallArm166(attacker, weapon) {
+    if (!attacker || !weapon || attacker.air) return false;
+    if (Number.isFinite(attacker.airAmmo) || Number.isFinite(attacker.magazineAmmo139) ||
+        Number.isFinite(attacker.magazineAmmoMax139) || Number.isFinite(attacker.stats?.magazineCapacity) ||
+        attacker._finiteSalvo139 || attacker._finiteSalvoFollowup139) return false;
+    const trajectory = String(weapon.trajectory || (weapon.ballistic ? 'ballistic' : 'straight')).toLowerCase();
+    const profile = `${weapon.profile || ''} ${weapon.name || ''} ${weapon.label || ''} ${attacker.typeId || ''}`.toLowerCase();
+    if (weapon.ballistic || Number(weapon.splash || 0) > 12) return false;
+    if (Number(weapon.damage || 0) <= 0 || Number(weapon.damage) > 48) return false;
+    if (Number(weapon.range || 0) > 760) return false;
+    if (Number(weapon.projectileSpeed || 0) < 600) return false;
+    if (Number(weapon.interceptability || 0) > 0 || Number(weapon.projectileHp || 0) > 0) return false;
+    if (!['straight', 'direct', 'beam', 'plasma', ''].includes(trajectory)) return false;
+    if (/missile|rocket|bomb|torpedo|artillery|mortar|howitzer|shell|cannon|птур|рак|бомб|артилл|мином|снаряд/.test(profile)) return false;
+    return true;
+  }
+
+  function recordTracerEffect166(game, source, target, weapon, muzzle, aimX, aimY) {
+    const state = stateFor166(game);
+    resetVisualBudget166(game, state);
+    if (state.tracerBudget <= 0) return;
+    const key = cellKey166(source.x, source.y);
+    const used = state.tracerCells.get(key) || 0;
+    if (used >= 3) return;
+    const deterministicSample = (hash166(source.id) + state.visualTick + used) % 3;
+    if (deterministicSample !== 0 && (game._v94AliveUnits || game.units?.length || 0) >= 12000) return;
+    state.tracerCells.set(key, used + 1);
+    state.tracerBudget -= 1;
+    state.metrics.tracerEvents += 1;
+    game.addEffect?.({
+      type: 'tracer166',
+      x: muzzle.x,
+      y: muzzle.y,
+      z: muzzle.z || 0,
+      x2: aimX,
+      y2: aimY,
+      z2: game.getEntityAimAltitude?.(target) || 0,
+      color: weapon.projectileColor || weapon.trailColor || (source.team === 'player' ? '#d9f7d0' : '#ffc4a9'),
+      width: clamp166(Number(weapon.visualSize || 2), 1, 3.5),
+      duration: .09,
+    });
+    if (state.soundBudget > 0) {
+      const onScreen = typeof document === 'undefined' ? used === 0 : Boolean(game.isOnScreen?.(source.x, source.y, 260));
+      if (onScreen) {
+        state.soundBudget -= 1;
+        game.sound?.shot?.(false);
+      }
+    }
+  }
+
+  function resolveVirtualShot166(attacker, target, weapon, veteranMultiplier = 1, muzzle = null) {
+    const game = attacker.game;
+    const state = stateFor166(game);
+    const origin = muzzle || game.getUnitWeaponMuzzle?.(attacker, target) || {
+      x: attacker.x + Math.cos(attacker.rotation || 0) * (attacker.radius || 8),
+      y: attacker.y + Math.sin(attacker.rotation || 0) * (attacker.radius || 8),
+      z: 0,
+    };
+    const distance = Math.max(1, Math.hypot(target.x - origin.x, target.y - origin.y));
+    const accuracy = clamp166(Number(weapon.accuracy ?? .96), .25, 1);
+    const spread = (1 - accuracy) * (24 + distance * .16);
+    let aimX = target.x;
+    let aimY =

@@ -1,0 +1,84 @@
+ target.y;
+    if (spread > .25) {
+      const angle = (game.rng?.next?.() ?? Math.random()) * TWO_PI;
+      const magnitude = spread * Math.sqrt(game.rng?.next?.() ?? Math.random());
+      aimX += Math.cos(angle) * magnitude;
+      aimY += Math.sin(angle) * magnitude;
+    }
+    const hitRadius = (target.radius || 0) + Math.max(12, Number(weapon.splash || 0) * .18);
+    const hit = target.alive && Math.hypot(target.x - aimX, target.y - aimY) <= hitRadius;
+    const rawDamage = Number(weapon.damage || 0) * veteranMultiplier;
+    const suppressionBase = clamp166(
+      Number(weapon.suppression || 0) || rawDamage / Math.max(1, Number(target.maxHp || target.hp || 1)) * .18,
+      .001,
+      .028,
+    );
+    // Unit.takeDamage already derives shock/suppression from damage. Add only
+    // explicit weapon suppression on a hit; misses still contribute near-miss
+    // suppression without creating a projectile object.
+    const explicitSuppression = Math.max(0, Number(weapon.suppression || 0));
+    const supplementalSuppression = hit ? explicitSuppression * .25 : Math.max(explicitSuppression, suppressionBase) * .55;
+    queueDamage166(game, target, attacker, weapon, rawDamage, supplementalSuppression, hit);
+    recordTracerEffect166(game, attacker, target, weapon, origin, aimX, aimY);
+    state.metrics.virtualShots += 1;
+    state.metrics.physicalProjectilesAvoided += 1;
+    if (hit) state.metrics.virtualHits += 1;
+    return hit;
+  }
+
+  if (typeof originalUnitFire166 === 'function') {
+    UnitClass.prototype.fire = function(target) {
+      const weapon = this.stats?.weapon;
+      if (!target?.alive) return false;
+      // Never fall through to the physical fire path when combat policy (for
+      // example the player's v177 hold-fire order) rejects the target.
+      if (this.canAttack && !this.canAttack(target)) return false;
+      if (!virtualSmallArm166(this, weapon)) return originalUnitFire166.call(this, target);
+      const veteranMultiplier = 1 + (Number(this.rank || 1) - 1) * .14;
+      const commandBonus = Number(this.game.getCommandAuraBonus?.(this) || 0);
+      this.weaponCooldown = Number(weapon.reload || .2) / (1 + (Number(this.rank || 1) - 1) * .06 + commandBonus);
+      if (this.stats.stealth) this.revealTimer = 3.2 * (this.stats.stealthRecovery || 1);
+      if (this.stats.covertOps) {
+        this.compromisedUntil = Math.max(this.compromisedUntil || 0, this.game.time + 10);
+        this.coverIntegrity = Math.max(0, finite166(this.coverIntegrity, 1) - .14);
+      }
+      this.lastShotAt = this.game.time;
+      const muzzle = this.game.getUnitWeaponMuzzle?.(this, target) || null;
+      return resolveVirtualShot166(this, target, weapon, veteranMultiplier, muzzle);
+    };
+  }
+
+  if (BuildingClass && typeof originalBuildingFire166 === 'function') {
+    BuildingClass.prototype.fire = function(target) {
+      const weapon = this.stats?.weapon;
+      if (!target?.alive) return false;
+      if (this.canAttack && !this.canAttack(target)) return false;
+      if (!virtualSmallArm166(this, weapon)) return originalBuildingFire166.call(this, target);
+      if (this.stats.category === 'defense' && this.game.isStationaryDefensePowered && !this.game.isStationaryDefensePowered(this)) return;
+      const commandBonus = Number(this.game.getCommandAuraBonus?.(this) || 0);
+      this.weaponCooldown = Number(weapon.reload || .2) / (1 + commandBonus);
+      this.lastShotAt = this.game.time;
+      const muzzle = this.game.getBuildingWeaponMuzzle?.(this, this.weaponRotation || 0, this.shotSequence || 0) || {
+        x: this.x, y: this.y, z: 0,
+      };
+      const hit = resolveVirtualShot166(this, target, weapon, 1, muzzle);
+      this.recoil = 1;
+      this.shotSequence = ((this.shotSequence || 0) + 1) % 32;
+      return hit;
+    };
+  }
+
+  if (typeof originalSimulateFixed166 === 'function') {
+    GameClass.prototype.simulateFixed = function(dt) {
+      const state = stateFor166(this);
+      state.inSimulationStep = true;
+      resetVisualBudget166(this, state);
+      try {
+        return originalSimulateFixed166.call(this, dt);
+      } finally {
+        flushDamage166(this);
+        state.inSimulationStep = false;
+      }
+    };
+  } else if (typeof originalUpdate166 === 'function') {
+    GameClass.prototype.update = function(dt) {

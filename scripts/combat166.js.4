@@ -1,0 +1,114 @@
+th,
+      massBattle166 ? MASS_PRIMARY_TARGET_POOL : PRIMARY_TARGET_POOL,
+    );
+    const primaryProbes166 = Math.min(
+      primaryPool166,
+      massBattle166 ? MASS_PRIMARY_FIRE_PROBES : PRIMARY_FIRE_PROBES,
+    );
+    // A fire-control group distributes its nearest shared targets between the
+    // shooters. Most observers validate only three or four candidates instead
+    // of repeating the whole shortlist; detector/LOS edge cases expand below.
+    const primaryStart166 = primaryPool166
+      ? (hash166(observer.id) ^ (state.indexEpoch * 2654435761)) >>> 0
+      : 0;
+    for (let probe = 0; probe < primaryProbes166; probe += 1) {
+      consider166(group.candidates[(primaryStart166 + probe) % primaryPool166]);
+    }
+    // Only an observer that found no legal candidate expands the search. This
+    // preserves stealth/detector and cell-edge range cases without making every
+    // member of the fire-control group repeat the same work.
+    if (!best) {
+      for (const target of group.candidates) consider166(target);
+      if (!best) for (const target of group.overflow || []) consider166(target);
+    }
+
+    state.metrics.candidateChecks += checked;
+    if (best) {
+      state.reservations.set(best, (state.reservations.get(best) || 0) + weaponDamage);
+      state.metrics.targetsAssigned += 1;
+      publishContact166(this, observer, best);
+    } else {
+      const unitCount = this._v94AliveUnits || this.units?.length || 0;
+      const commandType = observer.currentCommand?.type || '';
+      const preserveEdgeCase = unitCount < 3000 || observer.selected || commandType === 'attack';
+      if (preserveEdgeCase) {
+        state.metrics.fallbackQueries += 1;
+        best = originalFindNearestEnemy166.call(this, x, y, team, radius, targetLayers, observer);
+      }
+    }
+
+    observer._fdTarget166 = {
+      id: best?.id || null,
+      epoch: state.indexEpoch,
+      team,
+      radius,
+      cell: queryCell166,
+      weaponClass: queryWeaponClass166,
+    };
+    const elapsed = now166() - started;
+    state.metrics.targetingMs += elapsed;
+    state.metrics.lastTargetingMs = elapsed;
+    return best;
+  };
+
+  function weaponId166(state, weapon) {
+    let id = state.weaponIds.get(weapon);
+    if (id) return id;
+    id = state.nextWeaponId++;
+    state.weaponIds.set(weapon, id);
+    return id;
+  }
+
+  function acquireTargetEntry166(state, target) {
+    let entry = state.damageTargets.get(target);
+    if (entry) return entry;
+    entry = state.targetEntryPool.pop() || { target: null, weapons: new Map() };
+    entry.target = target;
+    entry.weapons.clear();
+    state.damageTargets.set(target, entry);
+    return entry;
+  }
+
+  function queueDamage166(game, target, source, weapon, rawDamage, suppression, hit) {
+    const state = stateFor166(game);
+    const entry = acquireTargetEntry166(state, target);
+    const weaponId = weaponId166(state, weapon);
+    let batch = entry.weapons.get(weaponId);
+    if (!batch) {
+      batch = state.damageBatchPool.pop() || {
+        target: null, source: null, weapon: null, damage: 0, suppression: 0, shots: 0, hits: 0,
+      };
+      batch.target = target;
+      batch.source = null;
+      batch.weapon = weapon;
+      batch.damage = 0;
+      batch.suppression = 0;
+      batch.shots = 0;
+      batch.hits = 0;
+      entry.weapons.set(weaponId, batch);
+    }
+    batch.shots += 1;
+    if (hit) {
+      batch.hits += 1;
+      batch.damage += rawDamage;
+      // Sequential combat would credit the final contributing hit if the
+      // aggregate crosses zero HP. Preserve that deterministic approximation
+      // without retaining a contributor object for every bullet.
+      batch.source = source;
+    }
+    batch.suppression += suppression;
+    state.metrics.damageEvents += 1;
+  }
+
+  function flushDamage166(game) {
+    const state = stateFor166(game);
+    if (!state.damageTargets.size) return;
+    const started = now166();
+    let batches = 0;
+    for (const entry of state.damageTargets.values()) {
+      const target = entry.target;
+      for (const batch of entry.weapons.values()) {
+        batches += 1;
+        if (target?.alive) {
+          if (batch.damage > 0) target.takeDamage?.(batch.damage, batch.source, batch.weapon);
+          if (Number.isFinite(target.suppression160) && batch.suppression > 0) {
