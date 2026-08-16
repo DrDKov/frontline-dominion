@@ -1,11 +1,16 @@
 from pathlib import Path
-import re,subprocess,zlib
+import base64,hashlib,re,subprocess,zlib
 R=Path(__file__).resolve().parents[1]; O=R/'dist'
 def rep(s,a,b,label):
     if a not in s: raise RuntimeError('v16.6 anchor missing: '+label)
     return s.replace(a,b,1)
 subprocess.run(['python','scripts/assemble165.py'],cwd=R,check=True)
-(O/'combat-scale-core-v166.js').write_bytes(zlib.decompress((R/'scripts/combat166.z').read_bytes()))
+parts=['combat166.zb64.0','combat166.zb64.1','combat166.zb64.2','combat166.zb64.3a','combat166.zb64.3b','combat166.zb64.3c','combat166.zb64.3d']
+payload=''.join((R/'scripts'/name).read_text('ascii').strip() for name in parts)
+combat=zlib.decompress(base64.b64decode(payload,validate=True))
+if hashlib.sha256(combat).hexdigest()!='fd694aee449f88748ad1140b17444ac51c98108782b7f8d2f42f80762d35585b':
+    raise RuntimeError('v16.6 combat module checksum mismatch')
+(O/'combat-scale-core-v166.js').write_bytes(combat)
 
 p=O/'frontline-dominion.html'; s=p.read_text('utf-8')
 s=re.sub(r'<title>.*?</title>','<title>Frontline Dominion v16.6 — Combat Scale Core</title>',s,count=1,flags=re.S)
