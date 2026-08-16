@@ -22,45 +22,35 @@ jobs:
       - name: Checkout publisher
         uses: actions/checkout@v6
 
-      - name: Assemble build 178
+      - name: Assemble v16.5 build 179
         run: |
           rm -rf dist
-          python scripts/assemble178.py
+          python scripts/assemble165.py
 
-      - name: Guarantee build 176/177 browser modules
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('dist/frontline-dominion.html')
-          s=p.read_text('utf-8')
-          tags=[]
-          if 'fire-discipline-v177.js?build=177' not in s:
-              tags.append('<script src="./fire-discipline-v177.js?build=177"></script>')
-          if 'minimap-stability-v176.js?build=176' not in s:
-              tags.append('<script src="./minimap-stability-v176.js?build=176"></script>')
-          if tags:
-              payload='\n'+'\n'.join(tags)+'\n'
-              s=s.replace('</body>',payload+'</body>',1) if '</body>' in s else s+payload
-              p.write_text(s,'utf-8')
-          PY
-
-      - name: Validate assembled game
+      - name: Validate Stable State Core
         run: |
           set -euo pipefail
-          for f in index.html frontline-dominion.html fire-discipline-v177.js minimap-stability-v176.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js authoritative-simulation-bundle-v172.js combined-arms-doctrine-v141.js multiplayer-game-v96.js models/pilot/manifest.json; do
+          for f in index.html frontline-dominion.html stable-state-core-v165.js fire-discipline-v177.js minimap-stability-v176.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js multiplayer-game-v96.js authoritative-simulation-bundle-v172.js combined-arms-doctrine-v141.js models/pilot/manifest.json; do
             test -s "dist/$f" || { echo "missing: $f"; exit 1; }
           done
-          grep -q 'frontline-dominion.html?build=178' dist/index.html
-          grep -q 'fire-discipline-v177.js?build=177' dist/frontline-dominion.html
-          grep -q 'minimap-stability-v176.js?build=176' dist/frontline-dominion.html
+          grep -q 'frontline-dominion.html?build=179' dist/index.html
+          grep -q 'stable-state-core-v165.js?build=179' dist/frontline-dominion.html
+          grep -q "const VERSION = '16.5'" dist/authoritative-simulation-v174.js
+          grep -q "const VERSION = '16.5'" dist/authoritative-simulation-worker-v174.js
+          grep -q 'createSharedTransport165' dist/authoritative-simulation-v174.js
+          grep -q 'acquireSharedFrame165' dist/authoritative-simulation-v174.js
+          grep -q 'reserveSharedSlot165' dist/authoritative-simulation-worker-v174.js
+          grep -q 'buildingState165' dist/authoritative-simulation-v174.js
+          grep -q 'buildingState165' dist/authoritative-simulation-worker-v174.js
+          grep -q 'minimapState165' dist/authoritative-simulation-v174.js
+          grep -q 'minimapState165' dist/authoritative-simulation-worker-v174.js
           grep -q 'playerDirectedBuild178' dist/combined-arms-doctrine-v141.js
           grep -q 'playerDirectedBuild178' dist/authoritative-simulation-bundle-v172.js
-          grep -q 'no minefield perimeter/radius overlay' dist/combined-arms-doctrine-v141.js
-          grep -q 'no minefield perimeter/radius overlay' dist/authoritative-simulation-bundle-v172.js
           ! grep -q 'context.arc(center.x, center.y, screenRadius' dist/combined-arms-doctrine-v141.js
           ! grep -q 'context.arc(center.x, center.y, screenRadius' dist/authoritative-simulation-bundle-v172.js
-          grep -q 'fireDiscipline177' dist/authoritative-simulation-worker-v174.js
-          grep -q 'fireDiscipline177' dist/multiplayer-game-v96.js
+          node --check dist/stable-state-core-v165.js
+          node --check dist/authoritative-simulation-v174.js
+          node --check dist/authoritative-simulation-worker-v174.js
           count=$(find dist/models -type f | wc -l)
           echo "model/sprite files: $count"
           test "$count" -gt 700
@@ -76,6 +66,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.4.3 build 178"
+          git commit -m "Frontline Dominion v16.5 build 179"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
