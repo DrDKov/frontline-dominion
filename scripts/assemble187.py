@@ -15,15 +15,12 @@ def replace_once(text, old, new, label):
         raise RuntimeError(f'build 187 patch anchor missing: {label}')
     return text.replace(old, new, 1)
 
-# Canonical build-187 UI and final browser shell owner.
 for source_name in ('runtime-ui-v187.js', 'runtime-shell-v187.js'):
     source = ROOT / 'src' / 'v187' / source_name
     if not source.exists():
         raise RuntimeError(f'build 187 source missing: {source_name}')
     (OUT / source_name).write_text(source.read_text('utf-8'), 'utf-8')
 
-# Historical gameplay modules must never own current browser metadata. Keeping the
-# mechanics is intentional; only their obsolete title/start-eyebrow writes become no-ops.
 title_writers = []
 eyebrow_writers = []
 for path in sorted(OUT.glob('*.js')):
@@ -40,7 +37,6 @@ for path in sorted(OUT.glob('*.js')):
         text = re.sub(r'\beyebrow\.textContent\s*=\s*[^;]+;', 'void 0;', text)
     path.write_text(text, 'utf-8')
 
-# Browser shell: remove the orphaned build-183 boot gate before WebKit parses the page.
 html_path = OUT / 'frontline-dominion.html'
 html = html_path.read_text('utf-8')
 html = re.sub(r'\s*<script[^>]+id=["\']fd-boot183-script["\'][^>]*>.*?</script>', '', html, flags=re.I | re.S)
@@ -50,8 +46,21 @@ html = re.sub(r'\s*<script[^>]+src=["\'](?:\./|/frontline-dominion/)runtime-shel
 html = re.sub(r'<title>.*?</title>', f'<title>Frontline Dominion v{VERSION} — Safari Startup Recovery</title>', html, count=1, flags=re.S)
 html = re.sub(r'document\.title\s*=\s*[^;]+;', 'void 0;', html)
 
-# One cache namespace for every main-thread JS resource, regardless of whether the
-# inherited HTML uses ./file.js or /frontline-dominion/file.js.
+startup_anchor = "      game = new Game(options);\n      game.sound.ensure();"
+startup_instrumented = """      globalThis.__FD_START_PHASE187__ = { phase: 'constructing', startedAt: performance.now(), constructorMs: null, soundMs: null };
+      console.info('[FD187] Game constructor start');
+      const __fdCtorStart187 = performance.now();
+      game = new Game(options);
+      globalThis.__FD_START_PHASE187__.constructorMs = performance.now() - __fdCtorStart187;
+      globalThis.__FD_START_PHASE187__.phase = 'sound';
+      console.info('[FD187] Game constructor done', globalThis.__FD_START_PHASE187__.constructorMs);
+      const __fdSoundStart187 = performance.now();
+      game.sound.ensure();
+      globalThis.__FD_START_PHASE187__.soundMs = performance.now() - __fdSoundStart187;
+      globalThis.__FD_START_PHASE187__.phase = 'ready';
+      console.info('[FD187] Sound ensure done', globalThis.__FD_START_PHASE187__.soundMs);"""
+html = replace_once(html, startup_anchor, startup_instrumented, 'startGame constructor/audio')
+
 def cache_bust(match):
     return f'{match.group(1)}?build={BUILD}{match.group(2)}'
 
@@ -78,7 +87,6 @@ if len(re.findall(r'runtime-shell-v187\.js\?build=187', html)) != 1:
     raise RuntimeError('build 187 canonical runtime shell count invalid')
 html_path.write_text(html, 'utf-8')
 
-# Authoritative bridge build metadata and Worker cache key.
 p = OUT / 'authoritative-simulation-v174.js'
 s = p.read_text('utf-8')
 s = replace_once(s, "const BUILD = 186;\nconst VERSION = '16.8.2';", "const BUILD = 187;\nconst VERSION = '16.8.3';", 'bridge version')
@@ -96,13 +104,11 @@ s = s.replace(
 )
 p.write_text(s, 'utf-8')
 
-# Worker build metadata. Command/pause recovery from build 186 remains unchanged.
 p = OUT / 'authoritative-simulation-worker-v174.js'
 s = p.read_text('utf-8')
 s = replace_once(s, "const BUILD = 186;\nconst VERSION = '16.8.2';", "const BUILD = 187;\nconst VERSION = '16.8.3';", 'worker version')
 p.write_text(s, 'utf-8')
 
-# Profiler build metadata.
 p = OUT / 'simulation-profiler-v166.js'
 s = p.read_text('utf-8')
 s = s.replace("const VERSION = '16.8.2';\n  const BUILD = 186;", "const VERSION = '16.8.3';\n  const BUILD = 187;", 1)
