@@ -12,12 +12,18 @@ if not runtime_src.exists(): raise RuntimeError('runtime UI source missing')
 html_path=OUT/'frontline-dominion.html'
 html=html_path.read_text('utf-8')
 html=re.sub(r'\s*<script[^>]+src=["\']\./(?:action-group-core-v184|construction-victory-v184|start-screen-stable-v184)\.js\?build=\d+["\'][^>]*></script>','',html,flags=re.I)
-html=re.sub(r'\s*<script[^>]+src=["\']\./runtime-ui-v185\.js\?build=\d+["\'][^>]*></script>','',html,flags=re.I)
+html=re.sub(r'\s*<script[^>]+src=["\'](?:\./|/frontline-dominion/|/)?(?:runtime-ui-v185|authoritative-simulation-v174)\.js\?build=\d+["\'][^>]*></script>','',html,flags=re.I)
 html=re.sub(r'<title>.*?</title>','<title>Frontline Dominion v16.8.1 — Runtime Isolation</title>',html,count=1,flags=re.S)
 m=re.search(r'<script src=["\']\./simulation-profiler-v166\.js\?build=\d+["\']></script>',html)
 if not m: raise RuntimeError('profiler tag missing')
-html=html[:m.start()]+'<script src="./runtime-ui-v185.js?build=185"></script>\n<script src="./simulation-profiler-v166.js?build=185"></script>'+html[m.end():]
-html=re.sub(r'(authoritative-simulation-v174\.js)\?build=\d+',r'\1?build=185',html)
+# Authoritative bridge MUST be present in the browser shell. It owns the Worker
+# and therefore loads before the lightweight main-thread UI/profiler modules.
+insert=(
+    '<script src="./authoritative-simulation-v174.js?build=185"></script>\n'
+    '<script src="./runtime-ui-v185.js?build=185"></script>\n'
+    '<script src="./simulation-profiler-v166.js?build=185"></script>'
+)
+html=html[:m.start()]+insert+html[m.end():]
 html_path.write_text(html,'utf-8')
 
 p=OUT/'construction-victory-v184.js'
