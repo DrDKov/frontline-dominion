@@ -34,34 +34,56 @@ jobs:
           python scripts/assemble185.py
           python scripts/assemble186.py
 
-      - name: Assemble and inspect v16.8.3 startup
+      - name: Assemble v16.8.3 Safari startup recovery
         run: |
           set -euo pipefail
           python scripts/assemble187.py
+          for f in index.html frontline-dominion.html runtime-ui-v187.js runtime-shell-v187.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js simulation-profiler-v166.js models/pilot/manifest.json; do
+            test -s "dist/$f" || { echo "missing: $f"; exit 1; }
+          done
+          grep -q 'frontline-dominion.html?build=187' dist/index.html
+          grep -q 'v16.8.3' dist/index.html
+          grep -q 'runtime-ui-v187.js?build=187' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v187.js?build=187' dist/frontline-dominion.html
+          ! grep -q 'runtime-ui-v186.js' dist/frontline-dominion.html
+          ! grep -q 'fd-boot183-script' dist/frontline-dominion.html
+          ! grep -q 'fd-boot183-style' dist/frontline-dominion.html
+          grep -q "const BUILD = 187" dist/authoritative-simulation-v174.js
+          grep -q "const VERSION = '16.8.3'" dist/authoritative-simulation-v174.js
+          grep -q "authoritative-simulation-worker-v174.js?build=187" dist/authoritative-simulation-v174.js
+          grep -q 'resumeIfMainRunning' dist/authoritative-simulation-v174.js
+          grep -q "const BUILD = 187" dist/authoritative-simulation-worker-v174.js
+          grep -q "const VERSION = '16.8.3'" dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'extension.paused || message.paused' dist/authoritative-simulation-worker-v174.js
+          grep -q 'message.resumeIfMainRunning && paused' dist/authoritative-simulation-worker-v174.js
+          grep -q '__FD_START_PHASE187__' dist/frontline-dominion.html
+          python -m py_compile scripts/assemble187.py
+          node --check dist/runtime-ui-v187.js
+          node --check dist/runtime-shell-v187.js
+          node --check dist/authoritative-simulation-v174.js
+          node --check dist/authoritative-simulation-worker-v174.js
           python - <<'PY'
           from pathlib import Path
           import re
           html=Path('dist/frontline-dominion.html').read_text('utf-8')
-          inline=re.findall(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>',html,flags=re.I|re.S)
-          block='\n'.join(inline)
-          patterns=[r'function\s+startGame\s*\(',r'(?:const|let|var)\s+startGame\s*=']
-          hit=None
-          for pat in patterns:
-              m=re.search(pat,block)
-              if m:
-                  hit=m
-                  break
-          if not hit:
-              raise SystemExit('startGame definition not found')
-          lo=max(0,hit.start()-1200); hi=min(len(block),hit.start()+12000)
-          print('--- STARTGAME DEFINITION CONTEXT ---')
-          print(block[lo:hi])
-          print('--- END STARTGAME CONTEXT ---')
+          sources=re.findall(r'<script\b[^>]*\bsrc=["\']([^"\']+\.js(?:\?build=\d+)?)["\']',html,flags=re.I)
+          bad=[s for s in sources if not s.endswith('?build=187')]
+          if bad: raise SystemExit(f'mixed cache generations: {bad}')
+          if not sources or 'runtime-shell-v187.js?build=187' not in sources[-1]: raise SystemExit(f'shell not last: {sources[-5:]}')
+          offenders=[]
+          for p in Path('dist').glob('*.js'):
+              if p.name=='runtime-shell-v187.js': continue
+              if re.search(r'document\.title\s*=',p.read_text('utf-8')): offenders.append(p.name)
+          if offenders: raise SystemExit(f'historical title writers survived: {offenders}')
+          print('main-thread scripts:',len(sources),'all build=187')
           PY
-          exit 92
+          count=$(find dist/models -type f | wc -l)
+          echo "model/sprite files: $count"
+          test "$count" -gt 700
 
       - name: Install WebKit test browser
         run: |
+          set -euo pipefail
           npm install --no-save playwright
           npx playwright install --with-deps webkit
 
@@ -85,10 +107,19 @@ jobs:
           python -m http.server 8765 --directory smoke-root >/tmp/fd-http.log 2>&1 &
           HTTP_PID=$!
           BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$BROWSER" || { echo "No Chromium/Chrome on runner"; exit 1; }
           "$BROWSER" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/fd-smoke-chrome "http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=187" >/tmp/fd-chrome.log 2>&1 &
           CHROME_PID=$!
           trap 'kill $CHROME_PID $HTTP_PID 2>/dev/null || true' EXIT
           FD_DEBUG_PORT=9222 node tests/browser-smoke187.mjs
+
+      - name: Upload WebKit startup screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: webkit-startup-187
+          path: /tmp/webkit187.png
+          if-no-files-found: ignore
 
       - name: Publish complete static build to gh-pages branch
         env:
