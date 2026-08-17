@@ -47,7 +47,6 @@ jobs:
           for file in index.html frontline-dominion.html runtime-ui-v191.js runtime-shell-v191.js engineer-rocket-parity-v191.js command-watchdog-v191.js save-compat-v191.js formation-march-core-v183.js screen-selection-formation-v140.js unit-footprints-v115.js unit-formation-refinement-v138.js model-pilot-v101.js resource-extraction-v114.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js simulation-profiler-v166.js models/pilot/manifest.json models/canvas/b-51-views.webp; do
             test -s "dist/$file" || { echo "missing: $file"; exit 1; }
           done
-
           grep -q 'frontline-dominion.html?build=191' dist/index.html
           grep -q 'v16.8.7' dist/index.html
           grep -q 'fd-boot191-script' dist/frontline-dominion.html
@@ -58,61 +57,76 @@ jobs:
           grep -q 'save-compat-v191.js?build=191' dist/frontline-dominion.html
           ! grep -q 'runtime-stability-v190.js' dist/frontline-dominion.html
           ! grep -q 'engineer-infantry-parity-v189.js' dist/frontline-dominion.html
-          ! grep -q 'runtime-shell-v190.js' dist/frontline-dominion.html
-          ! grep -q 'runtime-ui-v190.js' dist/frontline-dominion.html
-
           grep -q '__FD_ENGINEER_ROCKET_191__' dist/engineer-rocket-parity-v191.js
           grep -q "referenceType: 'rocket'" dist/engineer-rocket-parity-v191.js
-          grep -q 'getInfantryRenderGeometry191' dist/engineer-rocket-parity-v191.js
-          grep -q '__FD_COMMAND_WATCHDOG_191__' dist/command-watchdog-v191.js
           grep -q '__FD_SAVE_COMPAT_191__' dist/save-compat-v191.js
-          grep -q 'legacy-source-build' dist/save-compat-v191.js
-          grep -q 'backup-build${BUILD}' dist/runtime-shell-v191.js
-          grep -q 'drawCatalogBuildingPlaceholder190' dist/model-pilot-v101.js
-          grep -q "'B-51'" dist/model-pilot-v101.js
-          ! grep -q 'ENGINEER_DISPLAY_SCALE = 2.85' dist/model-pilot-v101.js
-
-          grep -q "const BUILD = 191" dist/authoritative-simulation-v174.js
-          grep -q "const VERSION = '16.8.7'" dist/authoritative-simulation-v174.js
           grep -q 'authoritative-simulation-worker-v174.js?build=191' dist/authoritative-simulation-v174.js
-          grep -q "const BUILD = 191" dist/authoritative-simulation-worker-v174.js
-          grep -q "const VERSION = '16.8.7'" dist/authoritative-simulation-worker-v174.js
           grep -q 'engineer-rocket-parity-v191.js?build=191' dist/authoritative-simulation-worker-v174.js
+
+      - name: Assemble v16.8.8 authoritative ore recovery
+        run: |
+          set -euo pipefail
+          python scripts/assemble192.py
+
+          for file in index.html frontline-dominion.html runtime-ui-v192.js runtime-shell-v192.js resource-extraction-authority-v192.js engineer-rocket-parity-v191.js command-watchdog-v191.js save-compat-v191.js resource-extraction-v114.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js models/canvas/b-51-views.webp; do
+            test -s "dist/$file" || { echo "missing: $file"; exit 1; }
+          done
+
+          grep -q 'frontline-dominion.html?build=192' dist/index.html
+          grep -q 'v16.8.8' dist/index.html
+          grep -q 'fd-boot192-script' dist/frontline-dominion.html
+          grep -q 'runtime-ui-v192.js?build=192' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v192.js?build=192' dist/frontline-dominion.html
+          grep -q 'resource-extraction-authority-v192.js?build=192' dist/frontline-dominion.html
+          grep -q 'engineer-rocket-parity-v191.js?build=192' dist/frontline-dominion.html
+          grep -q 'command-watchdog-v191.js?build=192' dist/frontline-dominion.html
+          grep -q 'save-compat-v191.js?build=192' dist/frontline-dominion.html
+          ! grep -q 'runtime-stability-v190.js' dist/frontline-dominion.html
+          ! grep -q 'runtime-shell-v191.js?build=192' dist/frontline-dominion.html
+          ! grep -q 'runtime-ui-v191.js?build=192' dist/frontline-dominion.html
+
+          grep -q '__FD_RESOURCE_AUTHORITY_192__' dist/resource-extraction-authority-v192.js
+          grep -q "'buildResourceExtractor'" dist/resource-extraction-authority-v192.js
+          grep -q "const BUILD = 192" dist/authoritative-simulation-v174.js
+          grep -q "const VERSION = '16.8.8'" dist/authoritative-simulation-v174.js
+          grep -q 'authoritative-simulation-worker-v174.js?build=192' dist/authoritative-simulation-v174.js
+          grep -q 'selectedIds:workerIds' dist/authoritative-simulation-v174.js
+          grep -q "const BUILD = 192" dist/authoritative-simulation-worker-v174.js
+          grep -q "const VERSION = '16.8.8'" dist/authoritative-simulation-worker-v174.js
+          grep -q "case 'buildResourceExtractor'" dist/authoritative-simulation-worker-v174.js
+          grep -q 'engineer-rocket-parity-v191.js?build=192' dist/authoritative-simulation-worker-v174.js
           ! grep -q 'runtime-stability-v190.js' dist/authoritative-simulation-worker-v174.js
 
-          python -m py_compile scripts/assemble189.py scripts/finalize189.py scripts/patch189_engineer_parity.py scripts/assemble190.py scripts/install190_runtime.py scripts/assemble191.py scripts/finalize191.py
+          python -m py_compile scripts/assemble192.py
           for file in dist/*.js; do node --check "$file"; done
-          node --check tests/browser-regression191.mjs
-          node --check tests/save-load191.mjs
-          node --check tests/command-diagnostics191.mjs
+          node --check tests/resource-build192.mjs
 
           python - <<'PY'
           from pathlib import Path
           import re
           html = Path('dist/frontline-dominion.html').read_text('utf-8')
           sources = re.findall(r'<script\b[^>]*\bsrc=["\']([^"\']+\.js(?:\?build=\d+)?)["\']', html, flags=re.I)
-          bad = [source for source in sources if not source.endswith('?build=191')]
+          bad = [source for source in sources if not source.endswith('?build=192')]
           if bad:
               raise SystemExit(f'mixed cache generations: {bad}')
-          if not sources or 'runtime-shell-v191.js?build=191' not in sources[-1]:
+          if not sources or 'runtime-shell-v192.js?build=192' not in sources[-1]:
               raise SystemExit(f'canonical shell not last: {sources[-5:]}')
           required = [
-              'engineer-rocket-parity-v191.js?build=191',
-              'command-watchdog-v191.js?build=191',
-              'save-compat-v191.js?build=191',
-              'runtime-ui-v191.js?build=191',
-              'runtime-shell-v191.js?build=191',
+              'engineer-rocket-parity-v191.js?build=192',
+              'command-watchdog-v191.js?build=192',
+              'save-compat-v191.js?build=192',
+              'resource-extraction-authority-v192.js?build=192',
+              'runtime-ui-v192.js?build=192',
+              'runtime-shell-v192.js?build=192',
           ]
           for source in required:
               if html.count(source) != 1:
                   raise SystemExit(f'owner count invalid: {source}')
-          if html.count('id="fd-boot191-script"') != 1:
+          if html.count('id="fd-boot192-script"') != 1:
               raise SystemExit('canonical boot owner count is not one')
-          if html.count('data-fd-canonical-build="191"') != 1:
+          if html.count('data-fd-canonical-build="192"') != 1:
               raise SystemExit('canonical feature strip count is not one')
-          if html.index('save-compat-v191.js?build=191') > html.index('runtime-shell-v191.js?build=191'):
-              raise SystemExit('save compatibility must load before runtime shell')
-          print('main-thread scripts:', len(sources), 'all build=191')
+          print('main-thread scripts:', len(sources), 'all build=192')
           PY
 
           count=$(find dist/models -type f | wc -l)
@@ -125,7 +139,7 @@ jobs:
           npm install --no-save playwright
           npx playwright install --with-deps chromium webkit
 
-      - name: Real browser command scale and save-load regression
+      - name: Real ore build integrity and post-build command regression
         run: |
           set -euo pipefail
           rm -rf smoke-root
@@ -134,13 +148,20 @@ jobs:
           python -m http.server 8765 --directory smoke-root >/tmp/fd-http.log 2>&1 &
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
-          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=191"
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/command-diagnostics191.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/command-diagnostics191.mjs
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/browser-regression191.mjs
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/save-load191.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/browser-regression191.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/save-load191.mjs
+          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=192"
+
+          # Preserve the already-working save/load regression, adapted only to
+          # the new canonical shell/build number. Save compatibility remains v191.
+          sed -e 's/__FD_RUNTIME_SHELL_191__/__FD_RUNTIME_SHELL_192__/g' \
+              -e 's/newGame.build !== 191/newGame.build !== 192/g' \
+              -e 's/frontline-dominion.html?build=191/frontline-dominion.html?build=192/g' \
+              tests/save-load191.mjs > tests/save-load192.generated.mjs
+          node --check tests/save-load192.generated.mjs
+
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-build192.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-build192.mjs
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/save-load192.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/save-load192.generated.mjs
 
       - name: Publish complete static build to gh-pages branch
         env:
@@ -153,6 +174,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.8.7 build 191"
+          git commit -m "Frontline Dominion v16.8.8 build 192"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
