@@ -22,46 +22,69 @@ jobs:
       - name: Checkout publisher
         uses: actions/checkout@v6
 
-      - name: Assemble and regression-test v16.8 core
+      - name: Assemble inherited v16.8 core
         run: |
           set -euo pipefail
           rm -rf dist
           python scripts/assemble184.py
-          node --check dist/action-group-core-v184.js
-          node --check dist/construction-victory-v184.js
           node tests/verify181.js
           node tests/verify182.generated.js dist/deep-operations-ai-v182.js
           node tests/verify183.generated.js dist
           node tests/verify184.js dist
-
-      - name: Apply v16.8.1 runtime isolation
-        run: |
-          set -euo pipefail
           python scripts/assemble185.py
-          test -s dist/authoritative-simulation-v174.js
-          test -s dist/authoritative-simulation-worker-v174.js
+          python scripts/assemble186.py
 
-      - name: Apply v16.8.2 command recovery
+      - name: Assemble v16.8.3 Safari startup recovery
         run: |
           set -euo pipefail
-          python scripts/assemble186.py
-          for f in index.html frontline-dominion.html runtime-ui-v186.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js models/pilot/manifest.json; do
+          python scripts/assemble187.py
+          for f in index.html frontline-dominion.html runtime-ui-v187.js runtime-shell-v187.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js simulation-profiler-v166.js models/pilot/manifest.json; do
             test -s "dist/$f" || { echo "missing: $f"; exit 1; }
           done
-          grep -q 'frontline-dominion.html?build=186' dist/index.html
-          test "$(grep -o 'authoritative-simulation-v174.js?build=186' dist/frontline-dominion.html | wc -l)" -eq 1
-          test "$(grep -o 'runtime-ui-v186.js?build=186' dist/frontline-dominion.html | wc -l)" -eq 1
+          grep -q 'frontline-dominion.html?build=187' dist/index.html
+          grep -q 'v16.8.3' dist/index.html
+          grep -q 'runtime-ui-v187.js?build=187' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v187.js?build=187' dist/frontline-dominion.html
+          ! grep -q 'runtime-ui-v186.js' dist/frontline-dominion.html
           ! grep -q 'runtime-ui-v185.js' dist/frontline-dominion.html
-          grep -q "const BUILD = 186" dist/authoritative-simulation-v174.js
-          grep -q "const VERSION = '16.8.2'" dist/authoritative-simulation-v174.js
+          ! grep -q 'fd-boot183-script' dist/frontline-dominion.html
+          ! grep -q 'fd-boot183-style' dist/frontline-dominion.html
+          grep -q "const BUILD = 187" dist/authoritative-simulation-v174.js
+          grep -q "const VERSION = '16.8.3'" dist/authoritative-simulation-v174.js
+          grep -q "authoritative-simulation-worker-v174.js?build=187" dist/authoritative-simulation-v174.js
           grep -q 'resumeIfMainRunning' dist/authoritative-simulation-v174.js
-          grep -q "const BUILD = 186" dist/authoritative-simulation-worker-v174.js
-          grep -q "const VERSION = '16.8.2'" dist/authoritative-simulation-worker-v174.js
+          grep -q "const BUILD = 187" dist/authoritative-simulation-worker-v174.js
+          grep -q "const VERSION = '16.8.3'" dist/authoritative-simulation-worker-v174.js
           ! grep -q 'extension.paused || message.paused' dist/authoritative-simulation-worker-v174.js
           grep -q 'message.resumeIfMainRunning && paused' dist/authoritative-simulation-worker-v174.js
-          node --check dist/runtime-ui-v186.js
+          python -m py_compile scripts/assemble187.py
+          node --check dist/runtime-ui-v187.js
+          node --check dist/runtime-shell-v187.js
           node --check dist/authoritative-simulation-v174.js
           node --check dist/authoritative-simulation-worker-v174.js
+          node --check dist/simulation-profiler-v166.js
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path('dist/frontline-dominion.html').read_text('utf-8')
+          sources = re.findall(r'<script\b[^>]*\bsrc=["\']([^"\']+\.js(?:\?build=\d+)?)["\']', html, flags=re.I)
+          bad_cache = [s for s in sources if not s.endswith('?build=187')]
+          if bad_cache:
+              raise SystemExit(f'mixed main-thread cache generations: {bad_cache}')
+          if not sources or 'runtime-shell-v187.js?build=187' not in sources[-1]:
+              raise SystemExit(f'canonical shell is not last: {sources[-5:]}')
+          offenders = []
+          for p in Path('dist').glob('*.js'):
+              if p.name == 'runtime-shell-v187.js':
+                  continue
+              if re.search(r'document\.title\s*=', p.read_text('utf-8')):
+                  offenders.append(p.name)
+          if offenders:
+              raise SystemExit(f'historical title writers survived: {offenders}')
+          if re.search(r'document\.title\s*=', html):
+              raise SystemExit('inline historical title writer survived')
+          print('main-thread scripts:', len(sources), 'all build=187; shell is last')
+          PY
           count=$(find dist/models -type f | wc -l)
           echo "model/sprite files: $count"
           test "$count" -gt 700
@@ -72,7 +95,18 @@ jobs:
           npm install --no-save playwright
           npx playwright install --with-deps webkit
 
-      - name: Browser startup diagnostics
+      - name: WebKit iPad startup gate
+        run: |
+          set -euo pipefail
+          rm -rf smoke-root
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          FD_GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=187" node tests/webkit-diagnostic187.mjs
+
+      - name: Chromium render, command and production gate
         run: |
           set -euo pipefail
           rm -rf smoke-root /tmp/fd-smoke-chrome
@@ -80,17 +114,14 @@ jobs:
           ln -s "$PWD/dist" smoke-root/frontline-dominion
           python -m http.server 8765 --directory smoke-root >/tmp/fd-http.log 2>&1 &
           HTTP_PID=$!
-          trap 'kill ${CHROME_PID:-0} $HTTP_PID 2>/dev/null || true' EXIT
-          FD_GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=186" node tests/webkit-diagnostic187.mjs
           BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           test -n "$BROWSER" || { echo "No Chromium/Chrome on runner"; exit 1; }
-          "$BROWSER" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/fd-smoke-chrome "http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=186" >/tmp/fd-chrome.log 2>&1 &
+          "$BROWSER" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/fd-smoke-chrome "http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=187" >/tmp/fd-chrome.log 2>&1 &
           CHROME_PID=$!
-          FD_DEBUG_PORT=9222 node tests/layout-diagnostic187.mjs
-          FD_DEBUG_PORT=9222 node tests/render-diagnostic187.mjs
-          FD_DEBUG_PORT=9222 node tests/browser-smoke186.mjs
+          trap 'kill $CHROME_PID $HTTP_PID 2>/dev/null || true' EXIT
+          FD_DEBUG_PORT=9222 node tests/browser-smoke187.mjs
 
-      - name: Upload WebKit diagnostic screenshot
+      - name: Upload WebKit startup screenshot
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -109,6 +140,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.8.2 build 186"
+          git commit -m "Frontline Dominion v16.8.3 build 187"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
