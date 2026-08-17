@@ -79,6 +79,9 @@ const checkpoint = await page.evaluate(() => {
       localStorage.removeItem(candidate);
     }
   }
+  // pagehide/visibility autosave would otherwise recreate the current key and
+  // hide the legacy migration path this regression is intended to exercise.
+  if (shell?.state) shell.state.launching = true;
   return {
     ok,
     key,
@@ -93,22 +96,41 @@ if (!checkpoint.ok || checkpoint.bytes < 100 || checkpoint.sentinel !== 'legacy-
 }
 
 await page.reload({ waitUntil: 'load', timeout: 60000 });
-const loadReady = await waitFor(() => page.evaluate(() => {
-  const shell = globalThis.__FD_RUNTIME_SHELL_191__;
-  const compat = globalThis.__FD_SAVE_COMPAT_191__;
-  const button = document.getElementById('load-game');
-  const candidate = shell?.findSavedGame?.();
-  const sentinel = candidate?.data?._fdRegressionSaveLoad191?.sentinel || null;
-  if (!shell?.state?.installed || !compat || !button || button.disabled || sentinel !== 'legacy-wrapper-restored') return null;
-  return {
-    buttonDisabled: button.disabled,
-    sourceKey: shell.state.saveSourceKey,
-    candidateKey: candidate.key,
-    sentinel,
-    compat: { ...compat.state, invalidKeys: [...(compat.state?.invalidKeys || [])] },
-    currentBytes: localStorage.getItem(globalThis.__FD_DEBUG__?.SAVE_KEY || 'frontline-dominion-save-v5')?.length || 0,
-  };
-}), 20000);
+let loadReady;
+try {
+  loadReady = await waitFor(() => page.evaluate(() => {
+    const shell = globalThis.__FD_RUNTIME_SHELL_191__;
+    const compat = globalThis.__FD_SAVE_COMPAT_191__;
+    const button = document.getElementById('load-game');
+    const candidate = shell?.findSavedGame?.();
+    const sentinel = candidate?.data?._fdRegressionSaveLoad191?.sentinel || null;
+    if (!shell?.state?.installed || !compat || !button || button.disabled || sentinel !== 'legacy-wrapper-restored') return null;
+    return {
+      buttonDisabled: button.disabled,
+      sourceKey: shell.state.saveSourceKey,
+      candidateKey: candidate.key,
+      sentinel,
+      compat: { ...compat.state, invalidKeys: [...(compat.state?.invalidKeys || [])] },
+      currentBytes: localStorage.getItem(globalThis.__FD_DEBUG__?.SAVE_KEY || 'frontline-dominion-save-v5')?.length || 0,
+    };
+  }), 20000);
+} catch (error) {
+  const diagnostic = await page.evaluate(() => {
+    const shell = globalThis.__FD_RUNTIME_SHELL_191__;
+    const compat = globalThis.__FD_SAVE_COMPAT_191__;
+    const button = document.getElementById('load-game');
+    const candidate = shell?.findSavedGame?.();
+    const keys = [];
+    for (let index = 0; index < localStorage.length; index += 1) keys.push(localStorage.key(index));
+    return {
+      shell: shell ? { ...shell.state, candidateKey: candidate?.key || null, sentinel: candidate?.data?._fdRegressionSaveLoad191?.sentinel || null } : null,
+      compat: compat ? { ...compat.state, invalidKeys: [...(compat.state?.invalidKeys || [])] } : null,
+      button: button ? { disabled: button.disabled, text: button.textContent } : null,
+      keys,
+    };
+  });
+  throw new Error(`${error.message}; load diagnostic: ${JSON.stringify(diagnostic)}`);
+}
 
 await page.locator('#load-game').click();
 const loadedGame = await waitFor(() => page.evaluate(() => {
