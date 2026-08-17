@@ -34,6 +34,19 @@ for name, content in modules.items():
     (OUT / name).write_text(content, 'utf-8')
 (ROOT / 'tests' / 'verify184.js').write_text(package.get('test') or '', 'utf-8')
 
+# Keep v16.7 behavioral regression tests, but advance only their launcher/UI
+# assertions to the current build. The v183 formation/fortress modules remain
+# unchanged and are still tested by the same harness.
+legacy_test_path = ROOT / 'tests' / 'verify183.generated.js'
+if legacy_test_path.exists():
+    legacy_test = legacy_test_path.read_text('utf-8')
+    legacy_test = legacy_test.replace(r'frontline-dominion\.html\?build=183', r'frontline-dominion\.html\?build=184')
+    legacy_test = legacy_test.replace(r'build=18[0-2]', r'build=18[0-3]')
+    legacy_test = legacy_test.replace(r'start-screen-stable-v183\.js\?build=183', r'start-screen-stable-v184\.js\?build=184')
+    legacy_test = legacy_test.replace('start-screen-stable-v183.js?build=183', 'start-screen-stable-v184.js?build=184')
+    legacy_test = legacy_test.replace('simulation-profiler-v166.js?build=183', 'simulation-profiler-v166.js?build=184')
+    legacy_test_path.write_text(legacy_test, 'utf-8')
+
 # Make the old deep/fortress builders acknowledge a rejected construction and
 # treat an already placed sensor scaffold as planned capacity. This prevents a
 # retry loop from lying to the new construction guard's metrics.
