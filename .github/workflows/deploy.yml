@@ -84,6 +84,7 @@ jobs:
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/browser-regression191.mjs
           node --check tests/save-load191.mjs
+          node --check tests/command-diagnostics191.mjs
 
           python - <<'PY'
           from pathlib import Path
@@ -134,6 +135,8 @@ jobs:
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
           GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=191"
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/command-diagnostics191.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/command-diagnostics191.mjs
           FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/browser-regression191.mjs
           FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/save-load191.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/browser-regression191.mjs
