@@ -45,25 +45,24 @@ html_path = OUT / 'frontline-dominion.html'
 html = html_path.read_text('utf-8')
 html = re.sub(r'\s*<script[^>]+id=["\']fd-boot183-script["\'][^>]*>.*?</script>', '', html, flags=re.I | re.S)
 html = re.sub(r'\s*<style[^>]+id=["\']fd-boot183-style["\'][^>]*>.*?</style>', '', html, flags=re.I | re.S)
-html = re.sub(r'\s*<script[^>]+src=["\']\./runtime-ui-v18[5-7]\.js(?:\?build=\d+)?["\'][^>]*></script>', '', html, flags=re.I)
-html = re.sub(r'\s*<script[^>]+src=["\']\./runtime-shell-v187\.js(?:\?build=\d+)?["\'][^>]*></script>', '', html, flags=re.I)
+html = re.sub(r'\s*<script[^>]+src=["\'](?:\./|/frontline-dominion/)runtime-ui-v18[5-7]\.js(?:\?build=\d+)?["\'][^>]*></script>', '', html, flags=re.I)
+html = re.sub(r'\s*<script[^>]+src=["\'](?:\./|/frontline-dominion/)runtime-shell-v187\.js(?:\?build=\d+)?["\'][^>]*></script>', '', html, flags=re.I)
 html = re.sub(r'<title>.*?</title>', f'<title>Frontline Dominion v{VERSION} — Safari Startup Recovery</title>', html, count=1, flags=re.S)
-# Neutralize any obsolete inline metadata writer too.
 html = re.sub(r'document\.title\s*=\s*[^;]+;', 'void 0;', html)
 
-# One cache namespace for every main-thread JS resource. This prevents Safari from
-# composing a page from multiple historical cache generations.
+# One cache namespace for every main-thread JS resource, regardless of whether the
+# inherited HTML uses ./file.js or /frontline-dominion/file.js.
 def cache_bust(match):
     return f'{match.group(1)}?build={BUILD}{match.group(2)}'
 
 html = re.sub(
-    r'(<script\b[^>]*\bsrc=["\']\./[^"\']+\.js)(?:\?build=\d+)?(["\'][^>]*></script>)',
+    r'(<script\b[^>]*\bsrc=["\'](?:\./|/frontline-dominion/)[^"\']+\.js)(?:\?build=\d+)?(["\'][^>]*></script>)',
     cache_bust,
     html,
     flags=re.I,
 )
 
-prof = re.search(r'<script\b[^>]*src=["\']\./simulation-profiler-v166\.js\?build=187["\'][^>]*></script>', html, flags=re.I)
+prof = re.search(r'<script\b[^>]*src=["\'](?:\./|/frontline-dominion/)simulation-profiler-v166\.js\?build=187["\'][^>]*></script>', html, flags=re.I)
 if not prof:
     raise RuntimeError('build 187 profiler tag missing after cache normalization')
 html = html[:prof.start()] + '<script src="./runtime-ui-v187.js?build=187"></script>\n' + html[prof.start():]
@@ -71,7 +70,6 @@ if '</body>' not in html:
     raise RuntimeError('build 187 closing body missing')
 html = html.replace('</body>', '<script src="./runtime-shell-v187.js?build=187"></script>\n</body>', 1)
 
-# No orphan boot gate may survive in the actual page shell.
 if 'fd-boot183-script' in html or 'fd-boot183-style' in html:
     raise RuntimeError('build 187 orphan boot gate survived')
 if 'runtime-ui-v186.js' in html or 'runtime-ui-v185.js' in html:
