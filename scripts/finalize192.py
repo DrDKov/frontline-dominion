@@ -11,14 +11,17 @@ authority_source = ROOT / 'src' / 'v192' / 'resource-extraction-authority-v192.j
 authority_path = OUT / 'resource-extraction-authority-v192.js'
 ui_source = ROOT / 'src' / 'v192' / 'resource-ui-stability-v192.js'
 ui_path = OUT / 'resource-ui-stability-v192.js'
+render_source = ROOT / 'src' / 'v192' / 'render-state-guard-v192.js'
+render_path = OUT / 'render-state-guard-v192.js'
 
-for path in (worker_path, placement_path, html_path, authority_source, ui_source):
+for path in (worker_path, placement_path, html_path, authority_source, ui_source, render_source):
     if not path.exists():
         raise RuntimeError(f'build 192 finalizer missing: {path}')
 
-# Refresh the authoritative source after assemble192 copied its initial version.
+# Refresh build192 sources after assemble192 copied its initial generation.
 authority_path.write_text(authority_source.read_text('utf-8'), 'utf-8')
 ui_path.write_text(ui_source.read_text('utf-8'), 'utf-8')
+render_path.write_text(render_source.read_text('utf-8'), 'utf-8')
 
 # Resource ownership order is strict: resource-extraction-v114 defines the
 # resource UI and legacy helper first; then build192 replaces only the build
@@ -27,7 +30,7 @@ ui_path.write_text(ui_source.read_text('utf-8'), 'utf-8')
 # them later, so a real click never reached sendAction().
 html = html_path.read_text('utf-8')
 html = re.sub(
-    r'\s*<script\b[^>]*src=["\'](?:\./|/frontline-dominion/)(?:resource-extraction-authority-v192|resource-ui-stability-v192)\.js(?:\?build=\d+)?["\'][^>]*></script>',
+    r'\s*<script\b[^>]*src=["\'](?:\./|/frontline-dominion/)(?:resource-extraction-authority-v192|resource-ui-stability-v192|render-state-guard-v192)\.js(?:\?build=\d+)?["\'][^>]*></script>',
     '',
     html,
     flags=re.I,
@@ -43,6 +46,20 @@ authority_tag = f'<script src="./resource-extraction-authority-v192.js?build={BU
 ui_tag = f'<script src="./resource-ui-stability-v192.js?build={BUILD}"></script>'
 owner_block = resource_core_match.group(0) + '\n' + authority_tag + '\n' + ui_tag
 html = html[:resource_core_match.start()] + owner_block + html[resource_core_match.end():]
+
+# The render-state guard must be the last gameplay render wrapper. Authoritative
+# snapshots can expose a unit for one presentation frame before its derived
+# stats reference is attached; the guard reconstructs only that missing derived
+# reference and otherwise leaves all visualScale/radius values untouched.
+render_tag = f'<script src="./render-state-guard-v192.js?build={BUILD}"></script>'
+runtime_ui_match = re.search(
+    rf'<script\b[^>]*src=["\'](?:\./|/frontline-dominion/)runtime-ui-v192\.js\?build={BUILD}["\'][^>]*></script>',
+    html,
+    flags=re.I,
+)
+if not runtime_ui_match:
+    raise RuntimeError('build 192 runtime UI HTML anchor missing')
+html = html[:runtime_ui_match.start()] + render_tag + '\n' + html[runtime_ui_match.start():]
 html_path.write_text(html, 'utf-8')
 
 worker = worker_path.read_text('utf-8')
@@ -114,17 +131,24 @@ if 'payload.resourceKnown !== true' not in worker:
 if 'resourceKnownRadius' not in worker:
     raise RuntimeError('build 192 scoped resource visibility missing')
 final_html = html_path.read_text('utf-8')
-for tag in (authority_tag, ui_tag):
+for tag in (authority_tag, ui_tag, render_tag):
     if final_html.count(tag) != 1:
-        raise RuntimeError(f'build 192 resource owner count is not one: {tag}')
+        raise RuntimeError(f'build 192 owner count is not one: {tag}')
 core_index = final_html.index('resource-extraction-v114.js?build=192')
 authority_index = final_html.index('resource-extraction-authority-v192.js?build=192')
 ui_index = final_html.index('resource-ui-stability-v192.js?build=192')
+render_index = final_html.index('render-state-guard-v192.js?build=192')
+runtime_ui_index = final_html.index('runtime-ui-v192.js?build=192')
+model_index = final_html.index('model-pilot-v101.js?build=192')
 if not core_index < authority_index < ui_index:
     raise RuntimeError('build 192 resource owner load order is invalid')
+if not model_index < render_index < runtime_ui_index:
+    raise RuntimeError('build 192 render guard load order is invalid')
 if '__fdResourceAuthority192' not in authority_path.read_text('utf-8'):
     raise RuntimeError('build 192 resource authority handler marker missing')
 if '__FD_RESOURCE_UI_STABILITY_192__' not in ui_path.read_text('utf-8'):
     raise RuntimeError('build 192 resource UI stability API missing')
+if '__FD_RENDER_STATE_GUARD_192__' not in render_path.read_text('utf-8'):
+    raise RuntimeError('build 192 render-state guard API missing')
 
-print('Frontline Dominion build 192 resource owner order, Worker placement and stable UI installed')
+print('Frontline Dominion build 192 resource authority, Worker placement, stable UI and render-state guard installed')
