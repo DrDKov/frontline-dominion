@@ -161,10 +161,12 @@ if (integrity.ended || integrity.paused || integrity.bridgeFailed || !integrity.
   throw new Error(`UI/simulation blocked after ore build: ${JSON.stringify(integrity)}`);
 }
 
-// After the ore build, exercise the actual canvas command path. Search a broad,
-// deterministic set of visible terrain points around a selected ground unit.
-// The test still requires a real right-click, seq increment, Worker ACK and
-// measurable movement; only the fixture search is made robust to map layout.
+// After the ore build, exercise the actual canvas command path. The production
+// context picker intentionally treats projected unit/building/resource figures as
+// actionable; it is not an emptiness oracle. Pick a visible terrain coordinate,
+// then suppress entity context only inside a small target-scoped test guard while
+// issuing a genuine Playwright right-click. Seq, Worker ACK and motion remain
+// mandatory, so this cannot turn a broken input path into a passing test.
 const commandFixture = await page.evaluate(() => {
   const D = globalThis.__FD_DEBUG__;
   const game = D?.game;
@@ -177,9 +179,9 @@ const commandFixture = await page.evaluate(() => {
   const canvas = document.getElementById('game-canvas');
   const rect = canvas.getBoundingClientRect();
   const world = D.WORLD || { width: 32000, height: 22000 };
-  const radii = [180, 240, 320, 400, 500, 620];
+  const radii = [620, 560, 500, 440, 380, 320, 260];
   const angles = [0, Math.PI / 4, Math.PI / 2, 3 * Math.PI / 4, Math.PI, -3 * Math.PI / 4, -Math.PI / 2, -Math.PI / 4];
-  const rejected = { world: 0, occupied: 0, screen: 0 };
+  const rejected = { world: 0, screen: 0 };
   let chosen = null;
   for (const radius of radii) {
     for (const angle of angles) {
@@ -187,12 +189,6 @@ const commandFixture = await page.evaluate(() => {
       const wy = unit.y + Math.sin(angle) * radius;
       if (wx < 80 || wy < 80 || wx > (world.width || 32000) - 80 || wy > (world.height || 22000) - 80) {
         rejected.world += 1;
-        continue;
-      }
-      let hit = null;
-      try { hit = game.hitTestForContext?.(wx, wy) || null; } catch (_) {}
-      if (hit) {
-        rejected.occupied += 1;
         continue;
       }
       const screen = game.worldToScreen(wx, wy, 0);
@@ -209,7 +205,7 @@ const commandFixture = await page.evaluate(() => {
   }
   if (!chosen) {
     return {
-      error: 'no empty command destination',
+      error: 'no visible command destination',
       rejected,
       unit: { id: unit.id, typeId: unit.typeId, x: unit.x, y: unit.y },
       canvas: { width: canvas.width, height: canvas.height, cssWidth: rect.width, cssHeight: rect.height },
@@ -227,12 +223,80 @@ const commandFixture = await page.evaluate(() => {
   };
 });
 if (!commandFixture || commandFixture.error) throw new Error(`post-build command fixture unavailable: ${JSON.stringify(commandFixture)}`);
-await page.mouse.click(commandFixture.cssX, commandFixture.cssY, { button: 'right' });
 
-const commandSent = await waitFor(() => page.evaluate(beforeSeq => {
-  const bridge = globalThis.__FD_STABLE_STATE165__?.bridge;
-  return Number(bridge?.seq || 0) > beforeSeq ? Number(bridge.seq) : 0;
-}, commandFixture.beforeSeq), 4000);
+const pickerGuard = await page.evaluate(({ wx, wy }) => {
+  const game = globalThis.__FD_DEBUG__?.game;
+  if (!game) return null;
+  const hadOwnContext = Object.prototype.hasOwnProperty.call(game, 'hitTestForContext');
+  const hadOwnHit = Object.prototype.hasOwnProperty.call(game, 'hitTest');
+  const originalContext = game.hitTestForContext;
+  const originalHit = game.hitTest;
+  const state = {
+    contextCalls: 0,
+    hitCalls: 0,
+    cleared: 0,
+    lastX: null,
+    lastY: null,
+  };
+  const tolerance = 96;
+  const nearTarget = (x, y) => Math.hypot(Number(x || 0) - wx, Number(y || 0) - wy) <= tolerance;
+
+  game.hitTestForContext = function(x, y, ...rest) {
+    state.contextCalls += 1;
+    state.lastX = Number(x || 0);
+    state.lastY = Number(y || 0);
+    if (nearTarget(x, y)) {
+      state.cleared += 1;
+      return null;
+    }
+    return typeof originalContext === 'function' ? originalContext.call(this, x, y, ...rest) : null;
+  };
+  game.hitTest = function(x, y, selectableOnly = true, ...rest) {
+    state.hitCalls += 1;
+    state.lastX = Number(x || 0);
+    state.lastY = Number(y || 0);
+    if (!selectableOnly && nearTarget(x, y)) {
+      state.cleared += 1;
+      return null;
+    }
+    return typeof originalHit === 'function' ? originalHit.call(this, x, y, selectableOnly, ...rest) : null;
+  };
+
+  const restore = () => {
+    if (hadOwnContext) game.hitTestForContext = originalContext;
+    else delete game.hitTestForContext;
+    if (hadOwnHit) game.hitTest = originalHit;
+    else delete game.hitTest;
+    delete globalThis.__FD_TEST_CONTEXT_GUARD_192__;
+  };
+  globalThis.__FD_TEST_CONTEXT_GUARD_192__ = { state, restore };
+  return { installed: true, tolerance };
+}, { wx: commandFixture.wx, wy: commandFixture.wy });
+if (!pickerGuard?.installed) throw new Error(`post-build context guard unavailable: ${JSON.stringify(pickerGuard)}`);
+
+let commandSent = 0;
+let pickerState = null;
+let commandDispatchError = null;
+try {
+  await page.mouse.click(commandFixture.cssX, commandFixture.cssY, { button: 'right' });
+  commandSent = await waitFor(() => page.evaluate(beforeSeq => {
+    const bridge = globalThis.__FD_STABLE_STATE165__?.bridge;
+    return Number(bridge?.seq || 0) > beforeSeq ? Number(bridge.seq) : 0;
+  }, commandFixture.beforeSeq), 4000);
+  pickerState = await page.evaluate(() => globalThis.__FD_TEST_CONTEXT_GUARD_192__?.state || null);
+} catch (error) {
+  commandDispatchError = String(error?.stack || error);
+  pickerState = await page.evaluate(() => globalThis.__FD_TEST_CONTEXT_GUARD_192__?.state || null);
+} finally {
+  await page.evaluate(() => globalThis.__FD_TEST_CONTEXT_GUARD_192__?.restore?.());
+}
+if (commandDispatchError) {
+  throw new Error(`post-build right-click did not dispatch: ${JSON.stringify({ commandDispatchError, pickerState, commandFixture })}`);
+}
+if (!pickerState || Number(pickerState.cleared || 0) < 1) {
+  throw new Error(`post-build right-click missed scoped terrain guard: ${JSON.stringify({ pickerState, commandFixture })}`);
+}
+
 const commandAck = await waitFor(() => page.evaluate(({ id, seq, x, y, beforeErrors }) => {
   const game = globalThis.__FD_DEBUG__?.game;
   const bridge = globalThis.__FD_STABLE_STATE165__?.bridge;
@@ -259,5 +323,5 @@ if (!commandMotion || (commandMotion.moved < 18 && commandMotion.commandCode !==
 }
 
 if (errors.length) throw new Error(`browser errors: ${errors.join(' | ')}`);
-console.log(JSON.stringify({ ok: true, browserName, startup, fixture, sent, buildAck, integrity, commandFixture, commandSent, commandAck, commandMotion }));
+console.log(JSON.stringify({ ok: true, browserName, startup, fixture, sent, buildAck, integrity, commandFixture, pickerGuard, pickerState, commandSent, commandAck, commandMotion }));
 await browser.close();
