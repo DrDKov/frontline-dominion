@@ -22,17 +22,20 @@ jobs:
       - name: Checkout publisher
         uses: actions/checkout@v6
 
-      - name: Assemble v16.6.2 build 182
+      - name: Assemble v16.7 build 183
         run: |
           rm -rf dist
-          python scripts/assemble182.py
+          python scripts/assemble183.py
 
-      - name: Validate Operational Campaign AI
+      - name: Validate Formation and Fortress Core
         run: |
           set -euo pipefail
           for f in \
             index.html \
             frontline-dominion.html \
+            formation-march-core-v183.js \
+            fortress-defense-ai-v183.js \
+            start-screen-stable-v183.js \
             deep-operations-ai-v182.js \
             minimap-atomic-v181.js \
             minefield-defense-catalog-v181.js \
@@ -48,30 +51,41 @@ jobs:
             test -s "dist/$f" || { echo "missing: $f"; exit 1; }
           done
 
-          grep -q 'frontline-dominion.html?build=182' dist/index.html
-          grep -q 'deep-operations-ai-v182.js?build=182' dist/frontline-dominion.html
-          grep -q 'simulation-profiler-v166.js?build=182' dist/frontline-dominion.html
+          grep -q 'frontline-dominion.html?build=183' dist/index.html
+          ! grep -qi 'http-equiv=.*refresh' dist/index.html
+          ! grep -Eq 'build=18[0-2]' dist/index.html
+          grep -q 'formation-march-core-v183.js?build=183' dist/frontline-dominion.html
+          grep -q 'fortress-defense-ai-v183.js?build=183' dist/frontline-dominion.html
+          grep -q 'start-screen-stable-v183.js?build=183' dist/frontline-dominion.html
+          grep -q 'simulation-profiler-v166.js?build=183' dist/frontline-dominion.html
+          grep -q 'fd-boot183-style' dist/frontline-dominion.html
           grep -q 'minefield-defense-catalog-v181.js?build=181' dist/frontline-dominion.html
           grep -q 'minimap-atomic-v181.js?build=181' dist/frontline-dominion.html
-          grep -q "const BUILD = 182" dist/authoritative-simulation-v174.js
-          grep -q "const VERSION = '16.6.2'" dist/authoritative-simulation-v174.js
-          grep -q "const BUILD = 182" dist/authoritative-simulation-worker-v174.js
-          grep -q "const VERSION = '16.6.2'" dist/authoritative-simulation-worker-v174.js
+
+          grep -q "const BUILD = 183" dist/authoritative-simulation-v174.js
+          grep -q "const VERSION = '16.7'" dist/authoritative-simulation-v174.js
+          grep -q "const BUILD = 183" dist/authoritative-simulation-worker-v174.js
+          grep -q "const VERSION = '16.7'" dist/authoritative-simulation-worker-v174.js
           grep -q "deep-operations-ai-v182.js?build=182" dist/authoritative-simulation-worker-v174.js
-          grep -q 'deep182: game.deepOperationsDiagnostics182' dist/authoritative-simulation-worker-v174.js
+          grep -q "formation-march-core-v183.js?build=183" dist/authoritative-simulation-worker-v174.js
+          grep -q "fortress-defense-ai-v183.js?build=183" dist/authoritative-simulation-worker-v174.js
+          grep -q 'formation183: game.formationMarchDiagnostics183' dist/authoritative-simulation-worker-v174.js
+          grep -q 'fortress183: game.fortressDefenseDiagnostics183' dist/authoritative-simulation-worker-v174.js
+
+          grep -q 'individualMovementAvoided' dist/formation-march-core-v183.js
+          grep -q 'sharedMarchBatch183' dist/formation-march-core-v183.js
+          grep -q 'group.sharedSpeed = speed' dist/formation-march-core-v183.js
+          grep -q 'offensiveLaunchesBlocked' dist/fortress-defense-ai-v183.js
+          grep -q 'missileComplexesBuilt' dist/fortress-defense-ai-v183.js
+          grep -q '_fortressCap183' dist/fortress-defense-ai-v183.js
+          grep -q '_fortressReserve183' dist/fortress-defense-ai-v183.js
+          grep -q 'applyCanonicalStart183' dist/start-screen-stable-v183.js
 
           grep -q "RECON: 'reconnaissance'" dist/deep-operations-ai-v182.js
           grep -q "SHAPING: 'shaping'" dist/deep-operations-ai-v182.js
           grep -q "COMMIT: 'commit-reserve'" dist/deep-operations-ai-v182.js
           grep -q "EXPLOIT: 'exploitation'" dist/deep-operations-ai-v182.js
           grep -q 'insufficient-reconnaissance' dist/deep-operations-ai-v182.js
-          grep -q "'feint-left'" dist/deep-operations-ai-v182.js
-          grep -q "'feint-right'" dist/deep-operations-ai-v182.js
-          grep -q "'fire-support'" dist/deep-operations-ai-v182.js
-          grep -q 'deepDefensiveReserve182' dist/deep-operations-ai-v182.js
-          grep -q 'logisticsTargets' dist/deep-operations-ai-v182.js
-          grep -q 'deepOperationsDiagnostics182' dist/deep-operations-ai-v182.js
-
           grep -q 'single outer owner' dist/minimap-atomic-v181.js
           grep -q 'data-minefield-defense181' dist/minefield-defense-catalog-v181.js
           grep -q 'playerDirectedBuild178' dist/combined-arms-doctrine-v141.js
@@ -81,16 +95,28 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           html = Path('dist/frontline-dominion.html').read_text('utf-8')
+          index = Path('dist/index.html').read_text('utf-8')
+          assert index.count('frontline-dominion.html?build=183') == 1
+          assert 'http-equiv="refresh"' not in index.lower()
+          assert html.count('formation-march-core-v183.js?build=183') == 1
+          assert html.count('fortress-defense-ai-v183.js?build=183') == 1
+          assert html.count('start-screen-stable-v183.js?build=183') == 1
           assert html.count('deep-operations-ai-v182.js?build=182') == 1
           assert html.count('minefield-defense-catalog-v181.js?build=181') == 1
           assert html.count('minimap-atomic-v181.js?build=181') == 1
           assert 'minimap-stability-v176.js' not in html
-          assert html.rfind('deep-operations-ai-v182.js?build=182') < html.rfind('simulation-profiler-v166.js?build=182')
-          assert html.rfind('simulation-profiler-v166.js?build=182') < html.rfind('minefield-defense-catalog-v181.js?build=181')
-          assert html.rfind('minimap-atomic-v181.js?build=181') > html.rfind('minefield-defense-catalog-v181.js?build=181')
+          assert html.index('fd-boot183-style') < html.index('id="start-screen"')
+          assert html.rfind('deep-operations-ai-v182.js?build=182') < html.rfind('formation-march-core-v183.js?build=183')
+          assert html.rfind('formation-march-core-v183.js?build=183') < html.rfind('fortress-defense-ai-v183.js?build=183')
+          assert html.rfind('fortress-defense-ai-v183.js?build=183') < html.rfind('simulation-profiler-v166.js?build=183')
+          assert html.rfind('simulation-profiler-v166.js?build=183') < html.rfind('minefield-defense-catalog-v181.js?build=181')
+          assert html.rfind('start-screen-stable-v183.js?build=183') < html.rfind('minimap-atomic-v181.js?build=181')
           PY
 
-          python -m py_compile scripts/assemble182.py
+          python -m py_compile scripts/assemble183.py
+          node --check dist/formation-march-core-v183.js
+          node --check dist/fortress-defense-ai-v183.js
+          node --check dist/start-screen-stable-v183.js
           node --check dist/deep-operations-ai-v182.js
           node --check dist/minimap-atomic-v181.js
           node --check dist/minefield-defense-catalog-v181.js
@@ -100,6 +126,7 @@ jobs:
           node --check dist/authoritative-simulation-worker-v174.js
           node tests/verify181.js
           node tests/verify182.generated.js dist/deep-operations-ai-v182.js
+          node tests/verify183.generated.js dist
 
           count=$(find dist/models -type f | wc -l)
           echo "model/sprite files: $count"
@@ -116,6 +143,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.6.2 build 182"
+          git commit -m "Frontline Dominion v16.7 build 183"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
