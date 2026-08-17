@@ -46,13 +46,28 @@
       state.lastReason = 'resource-invalid';
       return false;
     }
-    const resourceKnown = this.isExploredAt ? Boolean(this.isExploredAt(node.x, node.y)) : true;
+
+    // Resource visibility is represented asynchronously by the authoritative
+    // mirror, so a second isExploredAt() query here can disagree with the
+    // resource panel that the player is actively using. Treat an explicit click
+    // on the currently selected live resource card as the trusted discovery
+    // intent. Hidden resources cannot create this card or become the primary
+    // selection through normal input. Worker-side placement remains authoritative
+    // and receives only this one selected node as a scoped known-resource grant.
+    const primary = this.getPrimarySelection?.();
+    const resourceKnown = Boolean(
+      primary &&
+      (primary === node || primary.id === node.id) &&
+      primary.alive &&
+      primary.kind === 'resource'
+    );
     if (!resourceKnown) {
-      this.alert?.('Сначала разведайте месторождение.', 'warning', node.x, node.y);
+      this.alert?.('Сначала выберите разведанное месторождение.', 'warning', node.x, node.y);
       state.rejected += 1;
-      state.lastReason = 'resource-unexplored';
+      state.lastReason = 'resource-not-selected';
       return false;
     }
+
     const existing = node.extractorBuildingId ? this.getEntity?.(node.extractorBuildingId) : null;
     if (existing?.alive) {
       this.alert?.('На этом месторождении уже есть добывающее предприятие.', 'warning', node.x, node.y);
@@ -72,7 +87,7 @@
     const beforeSeq = Number(bridge.seq || 0);
     const sent = bridge.sendAction(
       'buildResourceExtractor',
-      { resourceId: node.id, workerIds, resourceKnown },
+      { resourceId: node.id, workerIds, resourceKnown: true },
       workerIds,
     );
     if (!sent) {
