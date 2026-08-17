@@ -7,6 +7,8 @@
   const VERSION = '16.8.6';
   const BUILD = 190;
   const LONG_PRESS_MS = 390;
+  const DOUBLE_TAP_MS = 340;
+  const DOUBLE_TAP_DISTANCE = 30;
   const MOVE_TOLERANCE = 14;
   const DEDUPE_MS = 140;
   const diagnostics = {
@@ -14,6 +16,7 @@
     routed: 0,
     rightClicks: 0,
     longPresses: 0,
+    doubleTaps: 0,
     cancels: 0,
     ignored: 0,
     errors: 0,
@@ -26,6 +29,7 @@
 
   let canvas = null;
   let touch = null;
+  let lastTap = null;
   let rightPointer = null;
   let lastPointerEventAt = -Infinity;
   let lastRoute = { at: -Infinity, x: NaN, y: NaN };
@@ -106,6 +110,7 @@
     diagnostics.routed += 1;
     diagnostics.rightClicks += source.includes('right') ? 1 : 0;
     diagnostics.longPresses += source === 'long-press' ? 1 : 0;
+    diagnostics.doubleTaps += source === 'double-tap' ? 1 : 0;
     diagnostics.lastSource = source;
     diagnostics.lastWorld = { x: point.x, y: point.y };
     diagnostics.lastSelectedIds = units.map(unit => unit.id);
@@ -138,6 +143,7 @@
         timer: setTimeout(() => {
           if (!touch || touch.id !== event.pointerId) return;
           touch.fired = route(touch.x, touch.y, 'long-press', touch.append);
+          if (touch.fired) lastTap = null;
         }, LONG_PRESS_MS),
       };
       return;
@@ -155,9 +161,26 @@
   const onPointerUp = event => {
     lastPointerEventAt = performance.now();
     if (touch && touch.id === event.pointerId) {
-      const fired = touch.fired;
+      const state = touch;
+      const fired = state.fired;
       cancelTouch();
-      if (fired) stopEvent(event);
+      if (fired) {
+        stopEvent(event);
+        return;
+      }
+
+      const now = performance.now();
+      const previous = lastTap;
+      const isDoubleTap = previous &&
+        now - previous.at <= DOUBLE_TAP_MS &&
+        Math.hypot(event.clientX - previous.x, event.clientY - previous.y) <= DOUBLE_TAP_DISTANCE;
+      if (isDoubleTap) {
+        lastTap = null;
+        stopEvent(event);
+        route(event.clientX, event.clientY, 'double-tap', state.append || event.shiftKey);
+        return;
+      }
+      lastTap = { at: now, x: event.clientX, y: event.clientY };
       return;
     }
     if (!rightPointer || (rightPointer.id != null && rightPointer.id !== event.pointerId)) return;
