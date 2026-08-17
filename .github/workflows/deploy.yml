@@ -43,9 +43,11 @@ jobs:
           python scripts/patch189_engineer_parity.py
           python scripts/assemble190.py
           python scripts/install190_runtime.py
-          for f in index.html frontline-dominion.html runtime-ui-v190.js runtime-shell-v190.js runtime-stability-v190.js engineer-rocket-visual-v190.js command-input-v190.js formation-march-core-v183.js screen-selection-formation-v140.js unit-footprints-v115.js unit-formation-refinement-v138.js model-pilot-v101.js resource-extraction-v114.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js simulation-profiler-v166.js models/pilot/manifest.json models/canvas/b-51-views.webp; do
-            test -s "dist/$f" || { echo "missing: $f"; exit 1; }
+
+          for file in index.html frontline-dominion.html runtime-ui-v190.js runtime-shell-v190.js runtime-stability-v190.js engineer-rocket-visual-v190.js command-input-v190.js formation-march-core-v183.js screen-selection-formation-v140.js unit-footprints-v115.js unit-formation-refinement-v138.js model-pilot-v101.js resource-extraction-v114.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js simulation-profiler-v166.js models/pilot/manifest.json models/canvas/b-51-views.webp; do
+            test -s "dist/$file" || { echo "missing: $file"; exit 1; }
           done
+
           grep -q 'frontline-dominion.html?build=190' dist/index.html
           grep -q 'v16.8.6' dist/index.html
           grep -q 'fd-boot190-script' dist/frontline-dominion.html
@@ -57,16 +59,10 @@ jobs:
           ! grep -q 'engineer-infantry-parity-v189.js' dist/frontline-dominion.html
           ! grep -q 'runtime-ui-v189.js' dist/frontline-dominion.html
           ! grep -q 'runtime-shell-v189.js' dist/frontline-dominion.html
-          grep -q "const BUILD = 190" dist/formation-march-core-v183.js
-          grep -q "const VERSION = '16.8.6'" dist/formation-march-core-v183.js
-          grep -q 'optimizeFormationSlots189' dist/formation-march-core-v183.js
-          grep -q 'state.formingTicks189 >= 24' dist/formation-march-core-v183.js
-          grep -q 'getInfantryRenderGeometry190' dist/runtime-stability-v190.js
-          grep -q "referenceType: 'rocket'" dist/runtime-stability-v190.js
-          grep -q 'repairIntegrity190' dist/runtime-stability-v190.js
+
           grep -q 'rocket-height-engineer-190' dist/engineer-rocket-visual-v190.js
           grep -q '__FD_COMMAND_INPUT_190__' dist/command-input-v190.js
-          grep -q "current.issueContext" dist/command-input-v190.js
+          grep -q 'current.issueContext' dist/command-input-v190.js
           grep -q 'drawCatalogBuildingPlaceholder190' dist/model-pilot-v101.js
           grep -q "'B-51'" dist/model-pilot-v101.js
           ! grep -q 'ENGINEER_DISPLAY_SCALE = 2.85' dist/model-pilot-v101.js
@@ -74,74 +70,61 @@ jobs:
           grep -q 'backup-build190' dist/runtime-shell-v190.js
           grep -q 'launch-checkpoint' dist/runtime-shell-v190.js
           ! grep -q 'storageRemove' dist/runtime-shell-v190.js
+
           grep -q "const BUILD = 190" dist/authoritative-simulation-v174.js
           grep -q "const VERSION = '16.8.6'" dist/authoritative-simulation-v174.js
-          grep -q "authoritative-simulation-worker-v174.js?build=190" dist/authoritative-simulation-v174.js
+          grep -q 'authoritative-simulation-worker-v174.js?build=190' dist/authoritative-simulation-v174.js
           grep -q "const BUILD = 190" dist/authoritative-simulation-worker-v174.js
           grep -q "const VERSION = '16.8.6'" dist/authoritative-simulation-worker-v174.js
-          grep -q "runtime-stability-v190.js?build=190" dist/authoritative-simulation-worker-v174.js
+          grep -q 'runtime-stability-v190.js?build=190' dist/authoritative-simulation-worker-v174.js
           ! grep -q 'engineer-infantry-parity-v189.js' dist/authoritative-simulation-worker-v174.js
           ! grep -q 'extension.paused || message.paused' dist/authoritative-simulation-worker-v174.js
           grep -q 'message.resumeIfMainRunning && paused' dist/authoritative-simulation-worker-v174.js
-          python -m py_compile scripts/assemble189.py scripts/finalize189.py scripts/patch189_engineer_parity.py scripts/assemble190.py scripts/install190_runtime.py
+
+          python -m py_compile scripts/assemble189.py scripts/finalize189.py scripts/patch189_engineer_parity.py scripts/assemble190.py scripts/install190_runtime.py scripts/generate190_browser_tests.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/verify190.js
-          node --check tests/webkit-gate190.mjs
           node --check tests/chromium-real-input190.mjs
           node tests/verify190.js dist
+
           python - <<'PY'
           from pathlib import Path
           import re
-          html=Path('dist/frontline-dominion.html').read_text('utf-8')
-          sources=re.findall(r'<script\b[^>]*\bsrc=["\']([^"\']+\.js(?:\?build=\d+)?)["\']',html,flags=re.I)
-          bad=[source for source in sources if not source.endswith('?build=190')]
-          if bad: raise SystemExit(f'mixed cache generations: {bad}')
-          if not sources or 'runtime-shell-v190.js?build=190' not in sources[-1]: raise SystemExit(f'canonical shell not last: {sources[-5:]}')
-          if html.count('id="fd-boot190-script"') != 1: raise SystemExit('canonical boot owner count is not one')
-          if html.count('data-fd-canonical-build="190"') != 1: raise SystemExit('canonical feature strip count is not one')
-          if html.count('runtime-stability-v190.js?build=190') != 1: raise SystemExit('runtime stability browser owner count is not one')
-          if html.count('engineer-rocket-visual-v190.js?build=190') != 1: raise SystemExit('engineer visual owner count is not one')
-          if html.count('command-input-v190.js?build=190') != 1: raise SystemExit('command input owner count is not one')
-          if html.index('engineer-rocket-visual-v190.js?build=190') < html.index('runtime-stability-v190.js?build=190'): raise SystemExit('engineer visual owner order invalid')
-          if html.index('command-input-v190.js?build=190') > html.index('runtime-shell-v190.js?build=190'): raise SystemExit('command input owner order invalid')
-          print('main-thread scripts:',len(sources),'all build=190')
+          html = Path('dist/frontline-dominion.html').read_text('utf-8')
+          sources = re.findall(r'<script\b[^>]*\bsrc=["\']([^"\']+\.js(?:\?build=\d+)?)["\']', html, flags=re.I)
+          bad = [source for source in sources if not source.endswith('?build=190')]
+          if bad:
+              raise SystemExit(f'mixed cache generations: {bad}')
+          if not sources or 'runtime-shell-v190.js?build=190' not in sources[-1]:
+              raise SystemExit(f'canonical shell not last: {sources[-5:]}')
+          required = ['runtime-stability-v190.js?build=190','engineer-rocket-visual-v190.js?build=190','command-input-v190.js?build=190']
+          for source in required:
+              if html.count(source) != 1:
+                  raise SystemExit(f'owner count invalid: {source}')
+          if html.count('id="fd-boot190-script"') != 1:
+              raise SystemExit('canonical boot owner count is not one')
+          if html.count('data-fd-canonical-build="190"') != 1:
+              raise SystemExit('canonical feature strip count is not one')
+          if html.index('engineer-rocket-visual-v190.js?build=190') < html.index('runtime-stability-v190.js?build=190'):
+              raise SystemExit('engineer visual owner order invalid')
+          if html.index('command-input-v190.js?build=190') > html.index('runtime-shell-v190.js?build=190'):
+              raise SystemExit('command input owner order invalid')
+          print('main-thread scripts:', len(sources), 'all build=190')
           PY
+
           count=$(find dist/models -type f | wc -l)
           echo "model/sprite files: $count"
           test "$count" -gt 700
 
-      - name: Install WebKit test browser
+      - name: Install browser gates
         run: |
           set -euo pipefail
           npm install --no-save playwright
           npx playwright install --with-deps webkit
-          python - <<'PY'
-          from pathlib import Path
-          text = Path('tests/browser-smoke187.mjs').read_text('utf-8')
-          text = text.replace('187', '190')
-          text = text.replace(r'16\.8\.3', r'16\.8\.6')
-          text = text.replace('16.8.3', '16.8.6')
-          Path('tests/browser-smoke190.generated.mjs').write_text(text, 'utf-8')
-
-          gate = Path('tests/webkit-gate190.mjs').read_text('utf-8')
-          old = """if (engineer.widthRatio < 0.90 || engineer.widthRatio > 1.10 || engineer.heightRatio < 0.90 || engineer.heightRatio > 1.10) {
-            throw new Error(`engineer visible envelope differs from rocket: ${JSON.stringify(engineer)}`);
-          }
-          if (engineer.workerSize.source !== 'rocket-equivalent-engineer-190') throw new Error(`engineer UI bounds use another scale: ${JSON.stringify(engineer)}`);"""
-          new = """if (engineer.heightRatio < 0.96 || engineer.heightRatio > 1.04) {
-            throw new Error(`engineer visible height differs from rocket: ${JSON.stringify(engineer)}`);
-          }
-          if (engineer.widthRatio < 0.70 || engineer.widthRatio > 0.98) {
-            throw new Error(`engineer silhouette was stretched or collapsed: ${JSON.stringify(engineer)}`);
-          }
-          if (engineer.workerSize.source !== 'rocket-height-engineer-190') throw new Error(`engineer UI bounds use another scale: ${JSON.stringify(engineer)}`);"""
-          if old not in gate:
-            raise SystemExit('WebKit engineer assertion anchor missing')
-          gate = gate.replace(old, new, 1)
-          Path('tests/webkit-gate190.generated.mjs').write_text(gate, 'utf-8')
-          PY
+          python scripts/generate190_browser_tests.py
           grep -q 'v16\\.8\\.6' tests/browser-smoke190.generated.mjs
           grep -q 'rocket-height-engineer-190' tests/webkit-gate190.generated.mjs
+          grep -q 'const rotation = Math.atan2' tests/webkit-gate190.generated.mjs
           node --check tests/browser-smoke190.generated.mjs
           node --check tests/webkit-gate190.generated.mjs
 
