@@ -1,13 +1,37 @@
 from pathlib import Path
+import re
 
-OUT = Path('dist')
+ROOT = Path('.')
+OUT = ROOT / 'dist'
 BUILD = 192
 worker_path = OUT / 'authoritative-simulation-worker-v174.js'
 placement_path = OUT / 'extractor-placement-v190.js'
+html_path = OUT / 'frontline-dominion.html'
+ui_source = ROOT / 'src' / 'v192' / 'resource-ui-stability-v192.js'
+ui_path = OUT / 'resource-ui-stability-v192.js'
 
-for path in (worker_path, placement_path):
+for path in (worker_path, placement_path, html_path, ui_source):
     if not path.exists():
         raise RuntimeError(f'build 192 finalizer missing: {path}')
+
+# Install the resource action-panel stability owner. The legacy resource UI
+# rebuilds its button on every renderActionUI call, which can detach the
+# element while a real pointer click is in flight. The wrapper keeps the same
+# DOM controls while the selected resource state is unchanged.
+ui_path.write_text(ui_source.read_text('utf-8'), 'utf-8')
+html = html_path.read_text('utf-8')
+html = re.sub(
+    r'\s*<script\b[^>]*src=["\'](?:\./|/frontline-dominion/)resource-ui-stability-v192\.js(?:\?build=\d+)?["\'][^>]*></script>',
+    '',
+    html,
+    flags=re.I,
+)
+authority_tag = f'<script src="./resource-extraction-authority-v192.js?build={BUILD}"></script>'
+ui_tag = f'<script src="./resource-ui-stability-v192.js?build={BUILD}"></script>'
+if authority_tag not in html:
+    raise RuntimeError('build 192 resource authority HTML anchor missing')
+html = html.replace(authority_tag, authority_tag + '\n' + ui_tag, 1)
+html_path.write_text(html, 'utf-8')
 
 worker = worker_path.read_text('utf-8')
 placement_import = f"importScripts('/frontline-dominion/extractor-placement-v190.js?build={BUILD}');"
@@ -77,5 +101,10 @@ if 'payload.resourceKnown !== true' not in worker:
     raise RuntimeError('build 192 resource-known gate missing')
 if 'resourceKnownRadius' not in worker:
     raise RuntimeError('build 192 scoped resource visibility missing')
+final_html = html_path.read_text('utf-8')
+if final_html.count(ui_tag) != 1:
+    raise RuntimeError('build 192 resource UI stability owner count is not one')
+if '__FD_RESOURCE_UI_STABILITY_192__' not in ui_path.read_text('utf-8'):
+    raise RuntimeError('build 192 resource UI stability API missing')
 
-print('Frontline Dominion build 192 Worker extractor placement finalizer installed')
+print('Frontline Dominion build 192 Worker extractor placement and stable resource UI installed')
