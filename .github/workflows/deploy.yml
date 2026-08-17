@@ -22,21 +22,22 @@ jobs:
       - name: Checkout publisher
         uses: actions/checkout@v6
 
-      - name: Assemble v16.6 build 180
+      - name: Assemble v16.6.1 build 181
         run: |
           rm -rf dist
-          python scripts/assemble166.py
+          python scripts/assemble181.py
 
-      - name: Validate Combat Scale Core
+      - name: Validate minimap ownership and defense catalog
         run: |
           set -euo pipefail
           for f in \
             index.html \
             frontline-dominion.html \
+            minimap-atomic-v181.js \
+            minefield-defense-catalog-v181.js \
             combat-scale-core-v166.js \
             simulation-profiler-v166.js \
             fire-discipline-v177.js \
-            minimap-stability-v176.js \
             authoritative-simulation-v174.js \
             authoritative-simulation-worker-v174.js \
             authoritative-simulation-bundle-v172.js \
@@ -45,25 +46,37 @@ jobs:
             models/pilot/manifest.json; do
             test -s "dist/$f" || { echo "missing: $f"; exit 1; }
           done
-          grep -q 'frontline-dominion.html?build=180' dist/index.html
-          grep -q 'combat-scale-core-v166.js?build=180' dist/frontline-dominion.html
-          grep -q 'simulation-profiler-v166.js?build=180' dist/frontline-dominion.html
-          grep -q "combat-scale-core-v166.js?build=180" dist/authoritative-simulation-worker-v174.js
-          grep -q "const BUILD = 180" dist/authoritative-simulation-v174.js
-          grep -q "const VERSION = '16.6'" dist/authoritative-simulation-v174.js
-          grep -q "const BUILD = 180" dist/authoritative-simulation-worker-v174.js
-          grep -q "const VERSION = '16.6'" dist/authoritative-simulation-worker-v174.js
-          grep -q 'combat166: game.combatScaleDiagnostics166' dist/authoritative-simulation-worker-v174.js
-          grep -q 'GameClass.prototype.findNearestEnemy' dist/combat-scale-core-v166.js
-          grep -q 'physicalProjectilesAvoided' dist/combat-scale-core-v166.js
-          grep -q 'flushDamage166' dist/combat-scale-core-v166.js
+
+          grep -q 'frontline-dominion.html?build=181' dist/index.html
+          grep -q 'minefield-defense-catalog-v181.js?build=181' dist/frontline-dominion.html
+          grep -q 'minimap-atomic-v181.js?build=181' dist/frontline-dominion.html
+          grep -q 'single outer owner' dist/minimap-atomic-v181.js
+          grep -q 'data-minefield-defense181' dist/minefield-defense-catalog-v181.js
+          grep -q 'data-command-minefield141' dist/minefield-defense-catalog-v181.js
           grep -q 'playerDirectedBuild178' dist/combined-arms-doctrine-v141.js
           grep -q 'no minefield perimeter/radius overlay' dist/combined-arms-doctrine-v141.js
+          grep -q 'combat-scale-core-v166.js?build=180' dist/frontline-dominion.html
+          grep -q "combat-scale-core-v166.js?build=180" dist/authoritative-simulation-worker-v174.js
           grep -q 'fireDiscipline177' dist/authoritative-simulation-worker-v174.js
+
+          python - <<'PY'
+          from pathlib import Path
+          html = Path('dist/frontline-dominion.html').read_text('utf-8')
+          assert html.count('minefield-defense-catalog-v181.js?build=181') == 1
+          assert html.count('minimap-atomic-v181.js?build=181') == 1
+          assert 'minimap-stability-v176.js' not in html
+          assert html.rfind('minimap-atomic-v181.js?build=181') > html.rfind('simulation-profiler-v166.js?build=180')
+          assert html.rfind('minimap-atomic-v181.js?build=181') > html.rfind('minefield-defense-catalog-v181.js?build=181')
+          PY
+
+          node --check dist/minimap-atomic-v181.js
+          node --check dist/minefield-defense-catalog-v181.js
           node --check dist/combat-scale-core-v166.js
           node --check dist/simulation-profiler-v166.js
           node --check dist/authoritative-simulation-v174.js
           node --check dist/authoritative-simulation-worker-v174.js
+          node tests/verify181.js
+
           count=$(find dist/models -type f | wc -l)
           echo "model/sprite files: $count"
           test "$count" -gt 700
@@ -79,6 +92,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.6 build 180"
+          git commit -m "Frontline Dominion v16.6.1 build 181"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
