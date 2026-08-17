@@ -1,6 +1,7 @@
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 const root = process.argv[2] || 'dist';
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
@@ -10,6 +11,19 @@ const footprints = read('unit-footprints-v115.js');
 const refinement = read('unit-formation-refinement-v138.js');
 const html = read('frontline-dominion.html');
 const bundle = read('authoritative-simulation-bundle-v172.js');
+
+const workerSource = read('authoritative-simulation-worker-v174.js');
+const workerImports = [...workerSource.matchAll(/importScripts\('\/frontline-dominion\/([^'?]+\.js)\?build=189'\)/g)].map(match => match[1]);
+if (workerImports.length < 10) throw new Error(`authoritative Worker import list incomplete: ${workerImports.join(', ')}`);
+for (const file of workerImports) {
+  const source = read(file);
+  try {
+    new vm.Script(source, { filename: file });
+  } catch (error) {
+    const emDashLines = source.split('\n').flatMap((line, index) => line.includes('—') ? [`${index + 1}:${line}`] : []);
+    throw new Error(`Worker import does not parse: ${file}\n${error.stack || error}\nU+2014 contexts:\n${emDashLines.slice(0, 20).join('\n')}`);
+  }
+}
 
 if (!formationSource.includes("const VERSION = '16.8.5';\n  const BUILD = 189;")) throw new Error('formation build 189 version missing');
 if (!formationSource.includes('optimizeFormationSlots189')) throw new Error('nearest-slot assignment missing');
@@ -147,6 +161,7 @@ if (diag.build !== 189 || diag.version !== '16.8.5') throw new Error(`diagnostic
 console.log(JSON.stringify({
   ok: true,
   build: diag.build,
+  workerImportsParsed: workerImports.length,
   beforeAssignmentCost,
   afterAssignmentCost,
   releasedAt,
