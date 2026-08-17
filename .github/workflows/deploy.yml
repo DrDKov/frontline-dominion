@@ -34,7 +34,6 @@ jobs:
           python scripts/assemble185.py
           python scripts/assemble186.py
           python scripts/assemble187.py
-          python scripts/assemble188.py
 
       - name: Assemble v16.8.5 stable launch and formation
         run: |
