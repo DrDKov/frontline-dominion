@@ -94,8 +94,20 @@ jobs:
           set -euo pipefail
           npm install --no-save playwright
           npx playwright install --with-deps webkit
-          sed -e 's/187/188/g' -e 's/16\.8\.3/16.8.4/g' tests/webkit-diagnostic187.mjs > tests/webkit-diagnostic188.generated.mjs
-          sed -e 's/187/188/g' -e 's/16\.8\.3/16.8.4/g' tests/browser-smoke187.mjs > tests/browser-smoke188.generated.mjs
+          python - <<'PY'
+          from pathlib import Path
+          for source, target in [
+              ('tests/webkit-diagnostic187.mjs', 'tests/webkit-diagnostic188.generated.mjs'),
+              ('tests/browser-smoke187.mjs', 'tests/browser-smoke188.generated.mjs'),
+          ]:
+              text = Path(source).read_text('utf-8')
+              text = text.replace('187', '188')
+              text = text.replace(r'16\.8\.3', r'16\.8\.4')
+              text = text.replace('16.8.3', '16.8.4')
+              Path(target).write_text(text, 'utf-8')
+          PY
+          grep -q 'v16\\.8\\.4' tests/webkit-diagnostic188.generated.mjs
+          grep -q 'v16\\.8\\.4' tests/browser-smoke188.generated.mjs
 
       - name: WebKit iPad startup gate
         run: |
