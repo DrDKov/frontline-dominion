@@ -40,7 +40,8 @@ jobs:
           set -euo pipefail
           python scripts/assemble189.py
           python scripts/finalize189.py
-          for f in index.html frontline-dominion.html runtime-ui-v189.js runtime-shell-v189.js formation-march-core-v183.js screen-selection-formation-v140.js unit-footprints-v115.js unit-formation-refinement-v138.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js simulation-profiler-v166.js models/pilot/manifest.json; do
+          python scripts/patch189_engineer_parity.py
+          for f in index.html frontline-dominion.html runtime-ui-v189.js runtime-shell-v189.js engineer-infantry-parity-v189.js formation-march-core-v183.js screen-selection-formation-v140.js unit-footprints-v115.js unit-formation-refinement-v138.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js simulation-profiler-v166.js models/pilot/manifest.json; do
             test -s "dist/$f" || { echo "missing: $f"; exit 1; }
           done
           grep -q 'frontline-dominion.html?build=189' dist/index.html
@@ -48,6 +49,7 @@ jobs:
           grep -q 'fd-boot189-script' dist/frontline-dominion.html
           grep -q 'runtime-ui-v189.js?build=189' dist/frontline-dominion.html
           grep -q 'runtime-shell-v189.js?build=189' dist/frontline-dominion.html
+          grep -q 'engineer-infantry-parity-v189.js?build=189' dist/frontline-dominion.html
           ! grep -q 'runtime-ui-v188.js' dist/frontline-dominion.html
           ! grep -q 'runtime-shell-v188.js' dist/frontline-dominion.html
           grep -q "const BUILD = 189" dist/formation-march-core-v183.js
@@ -57,17 +59,22 @@ jobs:
           grep -q 'march183?.build || 0) >= 189' dist/screen-selection-formation-v140.js
           ! grep -q 'ENGINEER_DISPLAY_SCALE = 2.85' dist/unit-footprints-v115.js
           ! grep -q 'ENGINEER_DISPLAY_SCALE = 2.85' dist/unit-formation-refinement-v138.js
+          grep -q '__FD_ENGINEER_PARITY_189__' dist/engineer-infantry-parity-v189.js
+          grep -q 'copyEngineerGeometry189' dist/engineer-infantry-parity-v189.js
           grep -q "const BUILD = 189" dist/authoritative-simulation-v174.js
           grep -q "const VERSION = '16.8.5'" dist/authoritative-simulation-v174.js
           grep -q "authoritative-simulation-worker-v174.js?build=189" dist/authoritative-simulation-v174.js
           grep -q "const BUILD = 189" dist/authoritative-simulation-worker-v174.js
           grep -q "const VERSION = '16.8.5'" dist/authoritative-simulation-worker-v174.js
           grep -q "formation-march-core-v183.js?build=189" dist/authoritative-simulation-worker-v174.js
+          grep -q "engineer-infantry-parity-v189.js?build=189" dist/authoritative-simulation-worker-v174.js
           ! grep -q 'extension.paused || message.paused' dist/authoritative-simulation-worker-v174.js
           grep -q 'message.resumeIfMainRunning && paused' dist/authoritative-simulation-worker-v174.js
-          python -m py_compile scripts/assemble189.py scripts/finalize189.py
+          python -m py_compile scripts/assemble189.py scripts/finalize189.py scripts/patch189_engineer_parity.py
           for file in dist/*.js; do node --check "$file"; done
-          node tests/verify189.js dist
+          node --check tests/webkit-gate189.generated.mjs
+          node --check tests/chromium-engineer-parity189.mjs
+          node tests/verify189.generated.js dist
           python - <<'PY'
           from pathlib import Path
           import re
@@ -78,6 +85,7 @@ jobs:
           if not sources or 'runtime-shell-v189.js?build=189' not in sources[-1]: raise SystemExit(f'canonical shell not last: {sources[-5:]}')
           if html.count('id="fd-boot189-script"') != 1: raise SystemExit('canonical boot owner count is not one')
           if html.count('data-fd-canonical-build="189"') != 1: raise SystemExit('canonical feature strip count is not one')
+          if html.count('engineer-infantry-parity-v189.js?build=189') != 1: raise SystemExit('engineer parity browser owner count is not one')
           print('main-thread scripts:',len(sources),'all build=189')
           PY
           count=$(find dist/models -type f | wc -l)
@@ -108,9 +116,9 @@ jobs:
           python -m http.server 8765 --directory smoke-root >/tmp/fd-http.log 2>&1 &
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
-          FD_GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=189" node tests/webkit-gate189.mjs
+          FD_GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=189" node tests/webkit-gate189.generated.mjs
 
-      - name: Chromium render command and production gate
+      - name: Chromium render command production and engineer gate
         run: |
           set -euo pipefail
           rm -rf smoke-root /tmp/fd-smoke-chrome
@@ -124,6 +132,7 @@ jobs:
           CHROME_PID=$!
           trap 'kill $CHROME_PID $HTTP_PID 2>/dev/null || true' EXIT
           FD_DEBUG_PORT=9222 node tests/browser-smoke189.generated.mjs
+          FD_DEBUG_PORT=9222 node tests/chromium-engineer-parity189.mjs
 
       - name: Publish complete static build to gh-pages branch
         env:
