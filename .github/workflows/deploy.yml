@@ -39,6 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/assemble189.py
+          python scripts/finalize189.py
           for f in index.html frontline-dominion.html runtime-ui-v189.js runtime-shell-v189.js formation-march-core-v183.js screen-selection-formation-v140.js unit-footprints-v115.js unit-formation-refinement-v138.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js simulation-profiler-v166.js models/pilot/manifest.json; do
             test -s "dist/$f" || { echo "missing: $f"; exit 1; }
           done
@@ -64,15 +65,8 @@ jobs:
           grep -q "formation-march-core-v183.js?build=189" dist/authoritative-simulation-worker-v174.js
           ! grep -q 'extension.paused || message.paused' dist/authoritative-simulation-worker-v174.js
           grep -q 'message.resumeIfMainRunning && paused' dist/authoritative-simulation-worker-v174.js
-          python -m py_compile scripts/assemble189.py
-          node --check dist/runtime-ui-v189.js
-          node --check dist/runtime-shell-v189.js
-          node --check dist/formation-march-core-v183.js
-          node --check dist/screen-selection-formation-v140.js
-          node --check dist/unit-footprints-v115.js
-          node --check dist/unit-formation-refinement-v138.js
-          node --check dist/authoritative-simulation-v174.js
-          node --check dist/authoritative-simulation-worker-v174.js
+          python -m py_compile scripts/assemble189.py scripts/finalize189.py
+          for file in dist/*.js; do node --check "$file"; done
           node tests/verify189.js dist
           python - <<'PY'
           from pathlib import Path
