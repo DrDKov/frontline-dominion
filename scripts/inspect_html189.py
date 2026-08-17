@@ -2,8 +2,10 @@ from pathlib import Path
 import re
 import runpy
 
-runpy.run_path('scripts/assemble188.py', run_name='__main__')
-html = Path('dist/frontline-dominion.html').read_text('utf-8')
+html_path = Path('dist/frontline-dominion.html')
+if not html_path.exists():
+    runpy.run_path('scripts/assemble188.py', run_name='__main__')
+html = html_path.read_text('utf-8')
 patterns = [
     r"start-game",
     r"load-game",
