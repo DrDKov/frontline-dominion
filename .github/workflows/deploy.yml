@@ -78,7 +78,7 @@ jobs:
           echo "model/sprite files: $count"
           test "$count" -gt 700
 
-      - name: Browser command and production regression test
+      - name: Browser startup render and command regression tests
         run: |
           set -euo pipefail
           rm -rf smoke-root /tmp/fd-smoke-chrome
@@ -91,6 +91,7 @@ jobs:
           "$BROWSER" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/fd-smoke-chrome "http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=186" >/tmp/fd-chrome.log 2>&1 &
           CHROME_PID=$!
           trap 'kill $CHROME_PID $HTTP_PID 2>/dev/null || true' EXIT
+          FD_DEBUG_PORT=9222 node tests/render-diagnostic187.mjs
           FD_DEBUG_PORT=9222 node tests/browser-smoke186.mjs
 
       - name: Publish complete static build to gh-pages branch
