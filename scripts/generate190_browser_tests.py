@@ -46,5 +46,44 @@ if old_resource not in gate:
     raise RuntimeError('WebKit resource rotation anchor missing')
 gate = gate.replace(old_resource, new_resource, 1)
 
+old_result = """  const ok = game.buildExtractorFromResource83(node);
+  return { ok, nodeId: node.id, before };"""
+new_result = """  const rotation = Math.atan2(
+    (game.playerBase?.y ?? node.y) - node.y,
+    (game.playerBase?.x ?? node.x + 1) - node.x,
+  );
+  const bridge = globalThis.__FD_STABLE_STATE165__?.bridge || null;
+  const stats = debug.getBuildingStats?.('oreMine', game.teams.player) || debug.BUILDING_TYPES?.oreMine || null;
+  const diagnostics = {
+    nodeKind: node.kind,
+    nodeVariant: node.variant,
+    extractorBuildingId: node.extractorBuildingId || null,
+    typeAvailable: !!stats,
+    workerCount: before.workerIds.length,
+    requirementsMet: game.requirementsMet?.('player', stats?.requires || [], stats?.rank || 1),
+    placementValid: game.isBuildPlacementValid?.('oreMine', node.x, node.y, rotation, node),
+    bridgeReady: !!bridge?.ready,
+    bridgeFailed: !!bridge?.failed,
+    bridgeApplying: !!bridge?.applying,
+    workerTick: Number(bridge?.workerTick || 0),
+    rotation,
+  };
+  const alerts = [];
+  const baseAlert = game.alert;
+  game.alert = function(message, ...args) {
+    alerts.push(String(message));
+    return baseAlert?.call(this, message, ...args);
+  };
+  let ok = false;
+  try {
+    ok = game.buildExtractorFromResource83(node);
+  } finally {
+    game.alert = baseAlert;
+  }
+  return { ok, nodeId: node.id, before, diagnostics, alerts };"""
+if old_result not in gate:
+    raise RuntimeError('WebKit resource result anchor missing')
+gate = gate.replace(old_result, new_result, 1)
+
 (ROOT / 'tests' / 'webkit-gate190.generated.mjs').write_text(gate, 'utf-8')
-print('Build 190 browser gates generated with real input and aligned resource rotation')
+print('Build 190 browser gates generated with real input, aligned resource rotation and rejection diagnostics')
