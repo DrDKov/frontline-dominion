@@ -36,7 +36,8 @@
       state.rejected += 1;
       return false;
     }
-    if (this.isExploredAt && !this.isExploredAt(node.x, node.y)) {
+    const resourceKnown = this.isExploredAt ? Boolean(this.isExploredAt(node.x, node.y)) : true;
+    if (!resourceKnown) {
       this.alert?.('Сначала разведайте месторождение.', 'warning', node.x, node.y);
       state.rejected += 1;
       return false;
@@ -58,7 +59,7 @@
     const beforeSeq = Number(bridge.seq || 0);
     const sent = bridge.sendAction(
       'buildResourceExtractor',
-      { resourceId: node.id, workerIds },
+      { resourceId: node.id, workerIds, resourceKnown },
       workerIds,
     );
     if (!sent) {
@@ -66,8 +67,8 @@
       return false;
     }
 
-    // Do not execute placeBuilding() on the presentation mirror. The Worker is
-    // the sole owner of placement, credits, links and construction commands.
+    // Presentation never places the extractor itself. One Worker command owns
+    // validation, payment, resource linking and all engineer construction orders.
     this.buildMode = null;
     this.commandMode = null;
     this.uiDirty = true;
