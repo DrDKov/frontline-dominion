@@ -29,6 +29,11 @@ jobs:
           python scripts/assemble187.py
           python scripts/assemble188.py
 
+      - name: Inspect launch handler anchors
+        run: |
+          set -euo pipefail
+          python scripts/inspect_html189.py
+
       - name: Install WebKit
         run: |
           set -euo pipefail
