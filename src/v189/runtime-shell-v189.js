@@ -4,6 +4,10 @@
   const BUILD = 189;
   if (globalThis.__FD_RUNTIME_SHELL_189__) return;
 
+  const root = document.documentElement;
+  root.dataset.fdBuild = String(BUILD);
+  root.dataset.fdVersion = VERSION;
+
   const boot = globalThis.__FD_BOOT_189__;
   const state = {
     installed: false,
@@ -47,8 +51,8 @@
       start.style.removeProperty('pointer-events');
     }
     boot?.stop?.();
-    document.documentElement.classList.remove('fd-loading189', 'fd-ready189');
-    document.documentElement.classList.add('fd-running189');
+    root.classList.remove('fd-loading189', 'fd-ready189');
+    root.classList.add('fd-running189');
     state.launching = false;
     console.info('[FD189] Game object observed after launch', Math.round(state.gameObservedAt - (state.launchStartedAt || state.gameObservedAt)), 'ms');
     return true;
