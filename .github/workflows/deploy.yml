@@ -43,6 +43,7 @@ jobs:
           done
           grep -q 'frontline-dominion.html?build=185' dist/index.html
           ! grep -Eq 'build=18[0-4]' dist/index.html
+          test "$(grep -o 'authoritative-simulation-v174.js?build=185' dist/frontline-dominion.html | wc -l)" -eq 1
           grep -q 'runtime-ui-v185.js?build=185' dist/frontline-dominion.html
           grep -q 'simulation-profiler-v166.js?build=185' dist/frontline-dominion.html
           ! grep -q '<script src="./action-group-core-v184.js' dist/frontline-dominion.html
