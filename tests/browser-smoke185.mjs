@@ -13,12 +13,26 @@ function call(method,params={}){return new Promise((resolve,reject)=>{const id=s
 async function evaluate(expression){const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw new Error(r.exceptionDetails.text||'evaluation failed');return r.result?.value;}
 await call('Runtime.enable');await call('Page.enable');
 for(let i=0;i<50;i++){if(await evaluate(`document.readyState === 'complete' && !!document.querySelector('#start-game')`))break;await sleep(200);}
-const initial=await evaluate(`({title:document.title,body:document.body.innerText.length,start:!!document.querySelector('#start-screen'),button:!!document.querySelector('#start-game'),ui185:!!window.__FD_RUNTIME_UI_185__,mainAction184:!!window.__FD_ACTION_GROUP_184__,mainObjective184:!!window.__FD_CONSTRUCTION_VICTORY_184__})`);
+const initial=await evaluate(`({
+  title:document.title,body:document.body.innerText.length,start:!!document.querySelector('#start-screen'),button:!!document.querySelector('#start-game'),
+  ui185:!!window.__FD_RUNTIME_UI_185__,mainAction184:!!window.__FD_ACTION_GROUP_184__,mainObjective184:!!window.__FD_CONSTRUCTION_VICTORY_184__,
+  bridgeExport:!!window.__FD_V172__,stable:!!window.__FD_STABLE_STATE165__,
+  debugKeys:Object.keys(window.__FD_DEBUG__||{}).sort(),
+  required:{Game:!!window.__FD_DEBUG__?.Game,Unit:!!window.__FD_DEBUG__?.Unit,Building:!!window.__FD_DEBUG__?.Building,ResourceNode:!!window.__FD_DEBUG__?.ResourceNode,Projectile:!!window.__FD_DEBUG__?.Projectile},
+  authScript:[...document.scripts].some(s=>String(s.src).includes('authoritative-simulation-v174.js')),
+  authResources:performance.getEntriesByType('resource').filter(r=>String(r.name).includes('authoritative-simulation')).map(r=>({name:r.name,duration:r.duration,transferSize:r.transferSize}))
+})`);
+console.log('SMOKE_INITIAL '+JSON.stringify(initial));
 if(!initial.start||!initial.button||initial.body<100)throw new Error('Game start screen did not render');
 if(!initial.ui185)throw new Error('Runtime UI 185 missing');
 if(initial.mainAction184||initial.mainObjective184)throw new Error('Authoritative simulation leaked onto main thread');
 await evaluate(`document.querySelector('#start-game').click(); true`);
-let state=null;for(let i=0;i<50;i++){state=await evaluate(`({game:!!window.__FD_DEBUG__?.game,stable:!!window.__FD_STABLE_STATE165__,workerTick:Number(window.__FD_STABLE_STATE165__?.bridge?.workerTick||0),transport:window.__FD_STABLE_STATE165__?.bridge?.transportMode165||null,mainAction184:!!window.__FD_ACTION_GROUP_184__,mainObjective184:!!window.__FD_CONSTRUCTION_VICTORY_184__,ui185:!!window.__FD_RUNTIME_UI_185__})`);if(state.game&&state.stable&&state.workerTick>0)break;await sleep(200);}
+let state=null;for(let i=0;i<50;i++){state=await evaluate(`({
+  game:!!window.__FD_DEBUG__?.game,stable:!!window.__FD_STABLE_STATE165__,workerTick:Number(window.__FD_STABLE_STATE165__?.bridge?.workerTick||0),transport:window.__FD_STABLE_STATE165__?.bridge?.transportMode165||null,
+  mainAction184:!!window.__FD_ACTION_GROUP_184__,mainObjective184:!!window.__FD_CONSTRUCTION_VICTORY_184__,ui185:!!window.__FD_RUNTIME_UI_185__,bridgeExport:!!window.__FD_V172__,
+  debugKeys:Object.keys(window.__FD_DEBUG__||{}).sort(),required:{Game:!!window.__FD_DEBUG__?.Game,Unit:!!window.__FD_DEBUG__?.Unit,Building:!!window.__FD_DEBUG__?.Building,ResourceNode:!!window.__FD_DEBUG__?.ResourceNode,Projectile:!!window.__FD_DEBUG__?.Projectile}
+})`);if(state.game&&state.stable&&state.workerTick>0)break;await sleep(200);}
+console.log('SMOKE_AFTER_START '+JSON.stringify(state));
 if(!state?.game||!state?.stable||state.workerTick<=0)throw new Error(`Authoritative Worker failed to start: ${JSON.stringify(state)}`);
 if(state.mainAction184||state.mainObjective184)throw new Error('Simulation modules appeared on main thread after match start');
 if(exceptions.length)throw new Error(`Runtime exceptions: ${exceptions.join(' | ')}`);
