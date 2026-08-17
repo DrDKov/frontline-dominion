@@ -10,7 +10,15 @@ const context = await browser.newContext({
 });
 const page = await context.newPage();
 const pageErrors = [];
+const consoles = [];
 page.on('pageerror', error => pageErrors.push(String(error?.stack || error)));
+page.on('console', message => {
+  const record = { type: message.type(), text: message.text() };
+  consoles.push(record);
+  if (['error', 'warning'].includes(record.type) || /FD189|Frontline Dominion|Worker/i.test(record.text)) {
+    console.log('WEBKIT189_CONSOLE ' + JSON.stringify(record));
+  }
+});
 
 await page.addInitScript(() => {
   globalThis.__FD_SCREEN_SAMPLES_189__ = [];
@@ -30,26 +38,79 @@ await page.addInitScript(() => {
   setInterval(sample, 5);
 });
 
-await page.goto(url, { waitUntil: 'commit', timeout: 30000 });
-await page.locator('#start-game').waitFor({ state: 'attached', timeout: 30000 });
-const early = await page.evaluate(() => {
+const runtimeState = () => page.evaluate(() => {
   const button = document.getElementById('start-game');
+  const start = document.getElementById('start-screen');
+  const bridge = globalThis.__FD_STABLE_STATE165__?.bridge;
   return {
-    disabled: button.disabled,
-    text: button.textContent,
+    readyState: document.readyState,
+    href: location.href,
+    title: document.title,
+    button: button ? {
+      text: button.textContent,
+      disabled: button.disabled,
+      connected: button.isConnected,
+      display: getComputedStyle(button).display,
+      pointerEvents: getComputedStyle(button).pointerEvents,
+    } : null,
+    startDisplay: start ? getComputedStyle(start).display : null,
     boot: globalThis.__FD_BOOT_189__?.state || null,
-    shell: !!globalThis.__FD_RUNTIME_SHELL_189__,
+    shell: globalThis.__FD_RUNTIME_SHELL_189__?.state || null,
+    debug: {
+      present: !!globalThis.__FD_DEBUG__,
+      startGame: typeof globalThis.__FD_DEBUG__?.startGame,
+      game: !!globalThis.__FD_DEBUG__?.game,
+    },
+    stable: globalThis.__FD_STABLE_STATE165__ ? {
+      build: Number(globalThis.__FD_STABLE_STATE165__.build || 0),
+      tick: Number(bridge?.workerTick || 0),
+      ready: !!bridge?.ready,
+      failed: !!bridge?.failed,
+      actionErrors: Number(bridge?.actionErrors || 0),
+      lastError: bridge?.lastError || null,
+    } : null,
+    alerts: [...document.querySelectorAll('#alerts .alert')].map(element => element.textContent.trim()),
   };
 });
-if (!early.disabled && !early.boot?.ready) throw new Error(`start button was actionable before core readiness: ${JSON.stringify(early)}`);
+
+await page.goto(url, { waitUntil: 'commit', timeout: 30000 });
+await page.locator('#start-game').waitFor({ state: 'attached', timeout: 30000 });
+const early = await runtimeState();
+console.log('WEBKIT189_EARLY ' + JSON.stringify(early));
+if (!early.button?.disabled && !early.boot?.ready) throw new Error(`start button was actionable before core readiness: ${JSON.stringify(early)}`);
+
+await page.waitForFunction(
+  () => globalThis.__FD_RUNTIME_SHELL_189__?.state?.installed === true &&
+    globalThis.__FD_BOOT_189__?.state?.ready === true &&
+    document.getElementById('start-game')?.disabled === false,
+  null,
+  { timeout: 45000 },
+);
+const ready = await runtimeState();
+console.log('WEBKIT189_READY ' + JSON.stringify(ready));
 
 const clickStarted = Date.now();
-await page.locator('#start-game').click({ timeout: 45000 });
+await page.locator('#start-game').click({ timeout: 10000 });
 const clickMs = Date.now() - clickStarted;
-await page.waitForFunction(
-  () => !!globalThis.__FD_DEBUG__?.game && Number(globalThis.__FD_STABLE_STATE165__?.bridge?.workerTick || 0) > 0,
-  { timeout: 25000 },
-);
+const afterClick = await runtimeState();
+console.log('WEBKIT189_AFTER_CLICK ' + JSON.stringify({ clickMs, afterClick }));
+
+let launchWaitError = null;
+try {
+  await page.waitForFunction(
+    () => !!globalThis.__FD_DEBUG__?.game && Number(globalThis.__FD_STABLE_STATE165__?.bridge?.workerTick || 0) > 0,
+    null,
+    { timeout: 25000 },
+  );
+} catch (error) {
+  launchWaitError = String(error?.stack || error);
+}
+if (launchWaitError) {
+  const failedState = await runtimeState();
+  console.log('WEBKIT189_LAUNCH_TIMEOUT ' + JSON.stringify({ launchWaitError, failedState, pageErrors, consoles }));
+  await browser.close();
+  throw new Error(`WebKit game did not start: ${launchWaitError}; state=${JSON.stringify(failedState)}`);
+}
 await page.waitForTimeout(700);
 
 const startup = await page.evaluate(() => {
@@ -100,6 +161,7 @@ const startup = await page.evaluate(() => {
     startDisplay: getComputedStyle(document.getElementById('start-screen')).display,
   };
 });
+console.log('WEBKIT189_STARTUP ' + JSON.stringify(startup));
 
 if (startup.build !== 189 || startup.workerTick <= 0 || startup.failed || startup.paused) throw new Error(`WebKit Worker start failed: ${JSON.stringify(startup)}`);
 if (startup.launchCount !== 1) throw new Error(`start handler executed ${startup.launchCount} times`);
