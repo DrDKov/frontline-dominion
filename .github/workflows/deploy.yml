@@ -73,21 +73,21 @@ jobs:
               raise SystemExit(f'mixed main-thread cache generations: {bad_cache}')
           if not sources or 'runtime-shell-v187.js?build=187' not in sources[-1]:
               raise SystemExit(f'canonical shell is not last: {sources[-5:]}')
-          offenders = []
-          for p in Path('dist').glob('*.js'):
-              if p.name == 'runtime-shell-v187.js':
-                  continue
-              if re.search(r'document\.title\s*=', p.read_text('utf-8')):
-                  offenders.append(p.name)
-          if offenders:
-              raise SystemExit(f'historical title writers survived: {offenders}')
-          if re.search(r'document\.title\s*=', html):
-              raise SystemExit('inline historical title writer survived')
-          print('main-thread scripts:', len(sources), 'all build=187; shell is last')
+          inline = re.findall(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', html, flags=re.I|re.S)
+          hits = []
+          for block_i, block in enumerate(inline):
+              for m in re.finditer(r'start-game', block):
+                  lo=max(0,m.start()-2500); hi=min(len(block),m.end()+4000)
+                  hits.append((block_i, block[lo:hi]))
+          print('START_HANDLER_CONTEXTS', len(hits))
+          for i,(block_i,snippet) in enumerate(hits[:12]):
+              print(f'--- START CONTEXT {i} INLINE_BLOCK {block_i} ---')
+              print(snippet)
+              print('--- END CONTEXT ---')
+          if not hits:
+              raise SystemExit('no inline start-game handler context found')
           PY
-          count=$(find dist/models -type f | wc -l)
-          echo "model/sprite files: $count"
-          test "$count" -gt 700
+          exit 91
 
       - name: Install WebKit test browser
         run: |
@@ -120,14 +120,6 @@ jobs:
           CHROME_PID=$!
           trap 'kill $CHROME_PID $HTTP_PID 2>/dev/null || true' EXIT
           FD_DEBUG_PORT=9222 node tests/browser-smoke187.mjs
-
-      - name: Upload WebKit startup screenshot
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: webkit-startup-187
-          path: /tmp/webkit187.png
-          if-no-files-found: ignore
 
       - name: Publish complete static build to gh-pages branch
         env:
