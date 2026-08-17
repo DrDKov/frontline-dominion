@@ -14,6 +14,8 @@
   const state = {
     rendered: 0,
     reused: 0,
+    authorityRepins: 0,
+    authorityMissing: 0,
     lastNodeId: null,
     lastSignature: null,
   };
@@ -53,6 +55,20 @@
     return Boolean(panel?.isConnected && queue?.isConnected && button?.isConnected && card?.isConnected);
   };
 
+  const pinAuthoritativeHandler192 = () => {
+    const authority = root.__FD_RESOURCE_AUTHORITY_192__;
+    const handler = authority?.handler;
+    if (typeof handler !== 'function') {
+      state.authorityMissing += 1;
+      return false;
+    }
+    if (Game.prototype.buildExtractorFromResource83 !== handler) {
+      Game.prototype.buildExtractorFromResource83 = handler;
+      state.authorityRepins += 1;
+    }
+    return true;
+  };
+
   Game.prototype.renderActionUI = function stableResourceActionUI192(force = false) {
     const node = this.getPrimarySelection?.();
     if (node?.kind !== 'resource') {
@@ -61,6 +77,12 @@
       state.lastSignature = null;
       return previousRenderActionUI.call(this, force);
     }
+
+    // The resource card's listener resolves this.buildExtractorFromResource83
+    // at click time. Reassert the authoritative dispatch immediately before the
+    // button is created/reused, so no later compatibility module can silently
+    // route a real user click back through presentation-side placeBuilding().
+    pinAuthoritativeHandler192();
 
     const signature = signatureFor(this, node);
     if (this._fdResourceUiSignature192 === signature && controlsConnected()) {
@@ -71,6 +93,7 @@
     }
 
     const result = previousRenderActionUI.call(this, force);
+    pinAuthoritativeHandler192();
     this._fdResourceUiSignature192 = signature;
     state.rendered += 1;
     state.lastNodeId = node.id || null;
@@ -79,6 +102,7 @@
     if (button) {
       button.dataset.fdResourceUiStable = '192';
       button.dataset.fdResourceNodeId = String(node.id || '');
+      button.dataset.fdResourceAuthority = Game.prototype.buildExtractorFromResource83 === root.__FD_RESOURCE_AUTHORITY_192__?.handler ? '192' : 'missing';
     }
     return result;
   };
@@ -89,5 +113,6 @@
     build: BUILD,
     state,
     signatureFor,
+    pinAuthoritativeHandler: pinAuthoritativeHandler192,
   };
 })();
