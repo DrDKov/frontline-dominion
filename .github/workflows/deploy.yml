@@ -67,8 +67,9 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/assemble192.py
+          python scripts/finalize192.py
 
-          for file in index.html frontline-dominion.html runtime-ui-v192.js runtime-shell-v192.js resource-extraction-authority-v192.js engineer-rocket-parity-v191.js command-watchdog-v191.js save-compat-v191.js resource-extraction-v114.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js models/canvas/b-51-views.webp; do
+          for file in index.html frontline-dominion.html runtime-ui-v192.js runtime-shell-v192.js resource-extraction-authority-v192.js engineer-rocket-parity-v191.js command-watchdog-v191.js save-compat-v191.js resource-extraction-v114.js extractor-placement-v190.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js models/canvas/b-51-views.webp; do
             test -s "dist/$file" || { echo "missing: $file"; exit 1; }
           done
 
@@ -87,6 +88,7 @@ jobs:
 
           grep -q '__FD_RESOURCE_AUTHORITY_192__' dist/resource-extraction-authority-v192.js
           grep -q "'buildResourceExtractor'" dist/resource-extraction-authority-v192.js
+          grep -q 'resourceKnown' dist/resource-extraction-authority-v192.js
           grep -q "const BUILD = 192" dist/authoritative-simulation-v174.js
           grep -q "const VERSION = '16.8.8'" dist/authoritative-simulation-v174.js
           grep -q 'authoritative-simulation-worker-v174.js?build=192' dist/authoritative-simulation-v174.js
@@ -95,9 +97,12 @@ jobs:
           grep -q "const VERSION = '16.8.8'" dist/authoritative-simulation-worker-v174.js
           grep -q "case 'buildResourceExtractor'" dist/authoritative-simulation-worker-v174.js
           grep -q 'engineer-rocket-parity-v191.js?build=192' dist/authoritative-simulation-worker-v174.js
+          grep -q 'extractor-placement-v190.js?build=192' dist/authoritative-simulation-worker-v174.js
+          grep -q 'payload.resourceKnown !== true' dist/authoritative-simulation-worker-v174.js
+          grep -q 'resourceKnownRadius' dist/authoritative-simulation-worker-v174.js
           ! grep -q 'runtime-stability-v190.js' dist/authoritative-simulation-worker-v174.js
 
-          python -m py_compile scripts/assemble192.py
+          python -m py_compile scripts/assemble192.py scripts/finalize192.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/resource-build192.mjs
 
@@ -150,6 +155,12 @@ jobs:
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
           GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=192"
 
+          # Make the deterministic fixture both explored and currently visible;
+          # the production path itself still uses the scoped resourceKnown gate.
+          sed 's/if (game.explored?.fill) game.explored.fill(1);/if (game.explored?.fill) game.explored.fill(1); if (game.visible?.fill) game.visible.fill(1);/' \
+              tests/resource-build192.mjs > tests/resource-build192.generated.mjs
+          node --check tests/resource-build192.generated.mjs
+
           # Preserve the already-working save/load regression, adapted only to
           # the new canonical shell/build number. Save compatibility remains v191.
           sed -e 's/__FD_RUNTIME_SHELL_191__/__FD_RUNTIME_SHELL_192__/g' \
@@ -158,8 +169,8 @@ jobs:
               tests/save-load191.mjs > tests/save-load192.generated.mjs
           node --check tests/save-load192.generated.mjs
 
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-build192.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-build192.mjs
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-build192.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-build192.generated.mjs
           FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/save-load192.generated.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/save-load192.generated.mjs
 
