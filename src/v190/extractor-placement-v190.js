@@ -27,6 +27,25 @@
     lastType: null,
     lastRotation: null,
     rotationsTested: 0,
+    lastRejectReason: null,
+    lastNodeId: null,
+    lastWorkerCount: 0,
+    lastCandidateResults: [],
+  };
+
+  const reject = (reason, game, node, message = null) => {
+    diagnostics.rejected += 1;
+    diagnostics.lastRejectReason = reason;
+    console.warn('[FD190] extractor placement rejected', {
+      reason,
+      nodeId: node?.id || null,
+      variant: node?.variant || null,
+      typeId: diagnostics.lastType,
+      rotationsTested: diagnostics.rotationsTested,
+      candidates: diagnostics.lastCandidateResults,
+    });
+    if (message) game?.alert?.(message, 'warning', node?.x, node?.y);
+    return false;
   };
 
   const getStats = (typeId, team) => {
@@ -67,40 +86,62 @@
     return result;
   };
 
+  const withPinnedResource190 = (game, node, callback) => {
+    const own = Object.prototype.hasOwnProperty.call(game, 'findResourceAnchor80');
+    const previous = game.findResourceAnchor80;
+    const inherited = typeof previous === 'function' ? previous.bind(game) : null;
+    game._fdPinnedExtractorNode190 = node;
+    game.findResourceAnchor80 = function(typeId, x, y) {
+      const pinned = this._fdPinnedExtractorNode190;
+      const expected = TYPE_FOR_RESOURCE[pinned?.variant];
+      if (pinned?.alive && expected === typeId && nodeAvailable(this, pinned)) return pinned;
+      return inherited?.(typeId, x, y) || null;
+    };
+    try {
+      return callback();
+    } finally {
+      delete game._fdPinnedExtractorNode190;
+      if (own) game.findResourceAnchor80 = previous;
+      else delete game.findResourceAnchor80;
+    }
+  };
+
   Game.prototype.buildExtractorFromResource83 = function buildExtractorFromResource190(node) {
     diagnostics.attempts += 1;
+    diagnostics.lastRejectReason = null;
+    diagnostics.lastCandidateResults = [];
+    diagnostics.lastNodeId = node?.id || null;
     const typeId = TYPE_FOR_RESOURCE[node?.variant];
     diagnostics.lastType = typeId || null;
     if (!nodeAvailable(this, node) || !typeId) {
-      diagnostics.rejected += 1;
-      this.alert?.('На этом месторождении уже работает добывающее предприятие.', 'warning', node?.x, node?.y);
-      return false;
+      return reject('node-unavailable', this, node, 'На этом месторождении уже работает добывающее предприятие.');
     }
 
     const team = this.teams?.player;
     const stats = getStats(typeId, team);
-    if (!team || !stats) {
-      diagnostics.rejected += 1;
-      return false;
-    }
+    if (!team || !stats) return reject('stats-missing', this, node);
 
     const workers = (this.units || [])
       .filter(unit => unit?.alive && unit.team === 'player' && unit.typeId === 'worker' && !unit.embarkedIn)
       .sort((left, right) => distance(left, node) - distance(right, node));
+    diagnostics.lastWorkerCount = workers.length;
     if (!workers.length) {
-      diagnostics.rejected += 1;
-      this.alert?.('Нужен хотя бы один свободный инженер для строительства добывающего предприятия.', 'warning', node.x, node.y);
-      return false;
+      return reject('workers-missing', this, node, 'Нужен хотя бы один свободный инженер для строительства добывающего предприятия.');
     }
-    if (this.requirementsMet?.('player', stats.requires || [], stats.rank || 1) === false) {
-      diagnostics.rejected += 1;
-      this.alert?.('Сначала постройте необходимую энергетическую и технологическую инфраструктуру.', 'warning', node.x, node.y);
-      return false;
+
+    const requirements = stats.requires || [];
+    let requirementsOk = this.requirementsMet?.('player', requirements, stats.rank || 1) !== false;
+    if (!requirementsOk && requirements.length && requirements.every(requirement => requirement === 'power')) {
+      requirementsOk = (this.buildings || []).some(building =>
+        building?.alive && building.team === 'player' && building.completed &&
+        ['power', 'solarArray', 'fusionPlant', 'geothermalPlant'].includes(building.typeId)
+      );
+    }
+    if (!requirementsOk) {
+      return reject('requirements', this, node, 'Сначала постройте необходимую энергетическую и технологическую инфраструктуру.');
     }
     if ((team.credits || 0) < (stats.cost || 0)) {
-      diagnostics.rejected += 1;
-      this.alert?.('Недостаточно ресурсов для строительства добывающего предприятия.', 'warning', node.x, node.y);
-      return false;
+      return reject('credits', this, node, 'Недостаточно ресурсов для строительства добывающего предприятия.');
     }
 
     let rotation = null;
@@ -112,15 +153,14 @@
       try {
         valid = this.isBuildPlacementValid?.(typeId, node.x, node.y, candidate, node) !== false;
       } catch (_) {}
+      diagnostics.lastCandidateResults.push({ rotation: candidate, valid });
       if (valid) {
         rotation = candidate;
         break;
       }
     }
     if (!Number.isFinite(rotation)) {
-      diagnostics.rejected += 1;
-      this.alert?.('Контур месторождения заблокирован другим зданием или рельефом.', 'warning', node.x, node.y);
-      return false;
+      return reject('placement', this, node, 'Контур месторождения заблокирован другим зданием или рельефом.');
     }
 
     const beforeUnits = (this.units || []).filter(unit => unit?.alive).length;
@@ -133,14 +173,11 @@
 
     let placed = false;
     try {
-      placed = this.placeBuilding?.(node.x, node.y, false, rotation) !== false;
+      placed = withPinnedResource190(this, node, () => this.placeBuilding?.(node.x, node.y, false, rotation) !== false);
     } finally {
       if (this.buildMode?.typeId === typeId) this.buildMode = previousMode || null;
     }
-    if (!placed) {
-      diagnostics.rejected += 1;
-      return false;
-    }
+    if (!placed) return reject('place-building', this, node);
 
     diagnostics.placed += 1;
     diagnostics.lastRotation = rotation;
@@ -148,9 +185,6 @@
     if (building?.alive) this.setSelection?.([building], false);
     this.uiDirty = true;
 
-    // A construction command must never consume or delete an engineer. The
-    // runtime-stability owner performs the deeper collection repair; this is a
-    // cheap invariant alarm for the actual user command path.
     const afterUnits = (this.units || []).filter(unit => unit?.alive).length;
     if (afterUnits < beforeUnits) {
       console.error('[FD190] extractor placement reduced live unit count', { beforeUnits, afterUnits, typeId });
@@ -162,6 +196,9 @@
     version: VERSION,
     build: BUILD,
     candidateRotations,
-    diagnostics: () => ({ ...diagnostics }),
+    diagnostics: () => ({
+      ...diagnostics,
+      lastCandidateResults: diagnostics.lastCandidateResults.map(item => ({ ...item })),
+    }),
   };
 })();
