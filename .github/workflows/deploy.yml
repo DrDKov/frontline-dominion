@@ -69,7 +69,7 @@ jobs:
           python scripts/assemble192.py
           python scripts/finalize192.py
 
-          for file in index.html frontline-dominion.html runtime-ui-v192.js runtime-shell-v192.js resource-extraction-authority-v192.js engineer-rocket-parity-v191.js command-watchdog-v191.js save-compat-v191.js resource-extraction-v114.js extractor-placement-v190.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js models/canvas/b-51-views.webp; do
+          for file in index.html frontline-dominion.html runtime-ui-v192.js runtime-shell-v192.js resource-extraction-authority-v192.js resource-ui-stability-v192.js engineer-rocket-parity-v191.js command-watchdog-v191.js save-compat-v191.js resource-extraction-v114.js extractor-placement-v190.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js models/canvas/b-51-views.webp; do
             test -s "dist/$file" || { echo "missing: $file"; exit 1; }
           done
 
@@ -79,6 +79,7 @@ jobs:
           grep -q 'runtime-ui-v192.js?build=192' dist/frontline-dominion.html
           grep -q 'runtime-shell-v192.js?build=192' dist/frontline-dominion.html
           grep -q 'resource-extraction-authority-v192.js?build=192' dist/frontline-dominion.html
+          grep -q 'resource-ui-stability-v192.js?build=192' dist/frontline-dominion.html
           grep -q 'engineer-rocket-parity-v191.js?build=192' dist/frontline-dominion.html
           grep -q 'command-watchdog-v191.js?build=192' dist/frontline-dominion.html
           grep -q 'save-compat-v191.js?build=192' dist/frontline-dominion.html
@@ -87,8 +88,12 @@ jobs:
           ! grep -q 'runtime-ui-v191.js?build=192' dist/frontline-dominion.html
 
           grep -q '__FD_RESOURCE_AUTHORITY_192__' dist/resource-extraction-authority-v192.js
+          grep -q '__fdResourceAuthority192' dist/resource-extraction-authority-v192.js
           grep -q "'buildResourceExtractor'" dist/resource-extraction-authority-v192.js
           grep -q 'resourceKnown' dist/resource-extraction-authority-v192.js
+          grep -q '__FD_RESOURCE_UI_STABILITY_192__' dist/resource-ui-stability-v192.js
+          grep -q 'pinAuthoritativeHandler192' dist/resource-ui-stability-v192.js
+          grep -q 'fdResourceAuthority' dist/resource-ui-stability-v192.js
           grep -q "const BUILD = 192" dist/authoritative-simulation-v174.js
           grep -q "const VERSION = '16.8.8'" dist/authoritative-simulation-v174.js
           grep -q 'authoritative-simulation-worker-v174.js?build=192' dist/authoritative-simulation-v174.js
@@ -104,6 +109,7 @@ jobs:
 
           python -m py_compile scripts/assemble192.py scripts/finalize192.py
           for file in dist/*.js; do node --check "$file"; done
+          node --check tests/resource-dispatch192.mjs
           node --check tests/resource-build192.mjs
 
           python - <<'PY'
@@ -121,6 +127,7 @@ jobs:
               'command-watchdog-v191.js?build=192',
               'save-compat-v191.js?build=192',
               'resource-extraction-authority-v192.js?build=192',
+              'resource-ui-stability-v192.js?build=192',
               'runtime-ui-v192.js?build=192',
               'runtime-shell-v192.js?build=192',
           ]
@@ -131,6 +138,11 @@ jobs:
               raise SystemExit('canonical boot owner count is not one')
           if html.count('data-fd-canonical-build="192"') != 1:
               raise SystemExit('canonical feature strip count is not one')
+          core = html.index('resource-extraction-v114.js?build=192')
+          authority = html.index('resource-extraction-authority-v192.js?build=192')
+          stable_ui = html.index('resource-ui-stability-v192.js?build=192')
+          if not core < authority < stable_ui:
+              raise SystemExit('resource owner load order invalid')
           print('main-thread scripts:', len(sources), 'all build=192')
           PY
 
@@ -169,6 +181,8 @@ jobs:
               tests/save-load191.mjs > tests/save-load192.generated.mjs
           node --check tests/save-load192.generated.mjs
 
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-dispatch192.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-dispatch192.mjs
           FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-build192.generated.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-build192.generated.mjs
           FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/save-load192.generated.mjs
