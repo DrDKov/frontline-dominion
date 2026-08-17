@@ -80,10 +80,11 @@ new_result = """  const rotation = Math.atan2(
   } finally {
     game.alert = baseAlert;
   }
-  return { ok, nodeId: node.id, before, diagnostics, alerts };"""
+  const extractorDiagnostics = globalThis.__FD_EXTRACTOR_PLACEMENT_190__?.diagnostics?.() || null;
+  return { ok, nodeId: node.id, before, diagnostics, alerts, extractorDiagnostics };"""
 if old_result not in gate:
     raise RuntimeError('WebKit resource result anchor missing')
 gate = gate.replace(old_result, new_result, 1)
 
 (ROOT / 'tests' / 'webkit-gate190.generated.mjs').write_text(gate, 'utf-8')
-print('Build 190 browser gates generated with real input, aligned resource rotation and rejection diagnostics')
+print('Build 190 browser gates generated with real input, aligned resource rotation and full rejection diagnostics')
