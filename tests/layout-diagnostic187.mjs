@@ -1,0 +1,16 @@
+import process from 'node:process';
+const port=process.env.FD_DEBUG_PORT||'9222';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let targets=[];
+for(let i=0;i<50;i++){try{targets=await (await fetch(`http://127.0.0.1:${port}/json`)).json();if(targets.length)break;}catch{}await sleep(100);}
+const target=targets.find(t=>t.type==='page'&&t.url.includes('frontline-dominion'))||targets.find(t=>t.type==='page');
+if(!target?.webSocketDebuggerUrl)throw new Error('no target');
+const ws=new WebSocket(target.webSocketDebuggerUrl);await new Promise((r,j)=>{ws.onopen=r;ws.onerror=j});
+let seq=1;const pending=new Map();ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&pending.has(m.id)){pending.get(m.id)(m);pending.delete(m.id);}};
+const call=(method,params={})=>new Promise(resolve=>{const id=seq++;pending.set(id,resolve);ws.send(JSON.stringify({id,method,params}));});
+const ev=async expression=>{const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.result?.exceptionDetails)throw new Error(r.result.exceptionDetails.text||'eval');return r.result?.result?.value;};
+await call('Runtime.enable');await call('Emulation.setDeviceMetricsOverride',{width:1024,height:768,deviceScaleFactor:1,mobile:false});
+for(let i=0;i<60;i++){if(await ev(`!!document.querySelector('#start-game')`))break;await sleep(100);}await ev(`document.querySelector('#start-game').click();true`);
+for(let i=0;i<60;i++){if(await ev(`!!window.__FD_DEBUG__?.game`))break;await sleep(100);}await sleep(700);
+const out=await ev(`(()=>{const box=id=>{const el=document.getElementById(id);if(!el)return null;const r=el.getBoundingClientRect(),s=getComputedStyle(el);return{id,x:r.x,y:r.y,width:r.width,height:r.height,share:(r.width*r.height)/(innerWidth*innerHeight),display:s.display,position:s.position,z:s.zIndex,bg:s.backgroundColor,overflow:s.overflow,pointer:s.pointerEvents}};return{viewport:{w:innerWidth,h:innerHeight},title:document.title,selected:(window.__FD_DEBUG__.game.selected||[]).length,selection:box('selection-panel'),action:box('action-panel'),canvas:box('game-canvas'),minimap:box('minimap'),center:document.elementsFromPoint(innerWidth/2,innerHeight/2).slice(0,6).map(el=>el.id||el.className||el.tagName)};})()`);
+console.log('LAYOUT187 '+JSON.stringify(out));ws.close();throw new Error('layout diagnostic complete');
