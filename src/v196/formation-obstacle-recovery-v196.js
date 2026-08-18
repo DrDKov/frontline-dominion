@@ -10,10 +10,10 @@
   const VERSION = '16.8.12';
   const BUILD = 196;
   const FINAL_TYPES = new Set(['move', 'attackMove']);
-  const BLOCKED_TRIGGER_TICKS = 4;
-  const NO_PROGRESS_TRIGGER_TICKS = 12;
-  const MIN_RECOVERY_TICKS = 8;
-  const ALT_WAYPOINT_TICKS = 28;
+  const BLOCKED_TRIGGER_TICKS = 3;
+  const NO_PROGRESS_TRIGGER_TICKS = 9;
+  const MIN_RECOVERY_TICKS = 10;
+  const ALT_WAYPOINT_TICKS = 24;
   const WORLD = D?.WORLD || { width: 32000, height: 22000 };
   const baseProcessFormationCommand = Unit.prototype.processFormationCommand;
   if (typeof baseProcessFormationCommand !== 'function') return;
@@ -25,6 +25,7 @@
     dynamicMoveCalls: 0,
     alternateWaypoints: 0,
     rejoins: 0,
+    prematureRejoinsPrevented: 0,
     orphanGroupsIgnored: 0,
     maxBlockedTicks: 0,
     lastGroupId: null,
@@ -122,8 +123,12 @@
     const members = liveMembers(game, group);
     if (members.length < 2) return null;
     const center = centerOf(members, { x: group.anchorX, y: group.anchorY });
-    const clearance = Math.max(110, finite(group.maxRadius, 12) * 1.35);
-    const target = desiredAnchor(game, group, command, center, clearance * 1.45);
+    // The old recovery could re-form after moving only ~110 world units. That
+    // is shorter than several building footprints and caused the rigid column
+    // to reassemble while still beside the same wall. Keep a larger clearance
+    // envelope and aim for a path point decisively beyond the obstacle zone.
+    const clearance = Math.max(150, finite(group.maxRadius, 12) * 1.75);
+    const target = desiredAnchor(game, group, command, center, clearance * 2.5);
     const tick = tickOf(game);
     const recovery = setRecovery(group, {
       active: true,
@@ -142,6 +147,7 @@
       pathIndex: target.index,
       clearance,
       alternate: 0,
+      clearedOriginReported: false,
     });
     if (Number.isFinite(target.index) && target.index >= finite(group.pathIndex)) group.pathIndex = target.index;
     diagnostics.activations += 1;
@@ -171,8 +177,8 @@
     const uy = dy / length;
     const sideSeed = String(group?.id || '').split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
     const side = ((sideSeed + recovery.alternate) & 1) ? 1 : -1;
-    const lateral = Math.max(150, finite(group?.maxRadius, 12) * 1.55);
-    const forward = Math.max(180, recovery.clearance * 1.25);
+    const lateral = Math.max(220, finite(group?.maxRadius, 12) * 2.2, recovery.clearance * 1.6);
+    const forward = Math.max(280, recovery.clearance * 2.0);
     const candidates = [side, -side].map(direction => ({
       x: clamp(center.x + ux * forward - uy * lateral * direction, 40, WORLD.width - 40),
       y: clamp(center.y + uy * forward + ux * lateral * direction, 40, WORLD.height - 40),
@@ -234,8 +240,16 @@
 
     const elapsed = tick - recovery.startedTick;
     const clearedOrigin = Math.hypot(center.x - recovery.startX, center.y - recovery.startY) >= recovery.clearance;
-    const reachedWaypoint = Math.hypot(center.x - recovery.targetX, center.y - recovery.targetY) <= recovery.clearance * 0.62;
-    if (elapsed >= MIN_RECOVERY_TICKS && (clearedOrigin || reachedWaypoint)) {
+    const reachedWaypoint = Math.hypot(center.x - recovery.targetX, center.y - recovery.targetY) <= Math.max(48, recovery.clearance * 0.72);
+    if (elapsed >= MIN_RECOVERY_TICKS && clearedOrigin && !reachedWaypoint && !recovery.clearedOriginReported) {
+      recovery.clearedOriginReported = true;
+      diagnostics.prematureRejoinsPrevented += 1;
+    }
+    // Do not re-form merely because the group moved one clearance radius. A
+    // wide building can still be beside/behind the group at that point. Keep
+    // individual dynamic navigation active until the bypass waypoint itself is
+    // reached, then rebuild the shared column on clear ground.
+    if (elapsed >= MIN_RECOVERY_TICKS && reachedWaypoint) {
       finishRecovery(game, group, recovery, members, center);
     }
   };
