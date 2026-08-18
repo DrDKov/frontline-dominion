@@ -3,17 +3,22 @@ import { chromium, webkit, devices } from 'playwright';
 const browserName = process.env.FD_BROWSER || 'chromium';
 const url = process.env.FD_GAME_URL || 'http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=191';
 const CREDIT_SENTINEL = 7654321;
+const LEGACY_KEY = 'frontline-dominion-save-v3';
 const browserType = browserName === 'webkit' ? webkit : chromium;
 const browser = await browserType.launch({ headless: true });
-const context = browserName === 'webkit'
-  ? await browser.newContext({ ...devices['iPad Pro 11'] })
-  : await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
-const page = await context.newPage();
+const baseContextOptions = browserName === 'webkit'
+  ? { ...devices['iPad Pro 11'] }
+  : { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 };
 const errors = [];
-page.on('pageerror', error => errors.push(String(error?.stack || error)));
-page.on('console', message => {
-  if (message.type() === 'error' && !/favicon|404/i.test(message.text())) errors.push(`console:${message.text()}`);
-});
+let context = null;
+let page = null;
+
+const attachPageDiagnostics = currentPage => {
+  currentPage.on('pageerror', error => errors.push(String(error?.stack || error)));
+  currentPage.on('console', message => {
+    if (message.type() === 'error' && !/favicon|404/i.test(message.text())) errors.push(`console:${message.text()}`);
+  });
+};
 
 const waitFor = async (fn, timeout = 15000, interval = 80) => {
   const started = Date.now();
@@ -25,9 +30,14 @@ const waitFor = async (fn, timeout = 15000, interval = 80) => {
   throw new Error(`Timed out after ${timeout} ms`);
 };
 
+// Phase 1: create a structurally real save using the current game. This
+// context is only a fixture factory; it is deliberately not the context in
+// which legacy migration is tested, because closing/reloading a running game
+// correctly triggers pagehide autosave of that active game.
+context = await browser.newContext(baseContextOptions);
+page = await context.newPage();
+attachPageDiagnostics(page);
 await page.goto(url, { waitUntil: 'load', timeout: 60000 });
-await page.evaluate(() => localStorage.clear());
-await page.reload({ waitUntil: 'load', timeout: 60000 });
 
 await waitFor(() => page.evaluate(() => {
   const button = document.getElementById('start-game');
@@ -53,15 +63,15 @@ if (newGame.build !== 191 || !newGame.units || !newGame.buildings) {
   throw new Error(`new game did not initialize correctly: ${JSON.stringify(newGame)}`);
 }
 
-const checkpoint = await page.evaluate((creditSentinel) => {
+const generated = await page.evaluate((creditSentinel) => {
   const api = globalThis.__FD_DEBUG__;
   const shell = globalThis.__FD_RUNTIME_SHELL_191__;
   const key = api?.SAVE_KEY || 'frontline-dominion-save-v5';
   const ok = shell?.saveNow?.('browser-save-load-regression') === true;
   const raw = localStorage.getItem(key);
-  if (!ok || !raw) return { ok, key, bytes: raw?.length || 0 };
+  if (!ok || !raw) return { ok, key, bytes: raw?.length || 0, wrapped: null };
   const parsed = JSON.parse(raw);
-  if (!parsed?.teams?.player) return { ok: false, key, bytes: raw.length, reason: 'player-team-missing' };
+  if (!parsed?.teams?.player) return { ok: false, key, bytes: raw.length, reason: 'player-team-missing', wrapped: null };
   const originalCredits = Number(parsed.teams.player.credits || 0);
   parsed.teams.player.credits = creditSentinel;
   parsed._fdRegressionSaveLoad191 = {
@@ -69,40 +79,52 @@ const checkpoint = await page.evaluate((creditSentinel) => {
     savedAt: Date.now(),
     units: globalThis.__FD_DEBUG__?.game?.units?.filter(unit => unit?.alive).length || 0,
   };
-  const legacyKey = 'frontline-dominion-save-v3';
   const wrapped = JSON.stringify({
     savedAt: Date.now(),
     payload: {
       saveData: parsed,
     },
   });
-  localStorage.setItem(legacyKey, wrapped);
-  localStorage.removeItem(key);
-  for (let index = localStorage.length - 1; index >= 0; index -= 1) {
-    const candidate = localStorage.key(index);
-    if (candidate?.startsWith(`${key}-backup-build`) || candidate === `${key}-legacy-source-build191`) {
-      localStorage.removeItem(candidate);
-    }
-  }
-  // pagehide/visibility autosave would otherwise recreate the current key and
-  // hide the legacy migration path this regression is intended to exercise.
-  if (shell?.state) shell.state.launching = true;
   return {
     ok,
     key,
-    legacyKey,
+    legacyKey: 'frontline-dominion-save-v3',
     bytes: raw.length,
     wrappedBytes: wrapped.length,
-    sentinel: parsed._fdRegressionSaveLoad191.sentinel,
     originalCredits,
     creditSentinel,
+    wrapped,
   };
 }, CREDIT_SENTINEL);
-if (!checkpoint.ok || checkpoint.bytes < 100 || checkpoint.creditSentinel !== CREDIT_SENTINEL) {
+
+const legacyWrapped = generated.wrapped;
+const checkpoint = { ...generated, wrapped: undefined };
+delete checkpoint.wrapped;
+if (!checkpoint.ok || checkpoint.bytes < 100 || checkpoint.creditSentinel !== CREDIT_SENTINEL || !legacyWrapped) {
   throw new Error(`checkpoint was not produced: ${JSON.stringify(checkpoint)}`);
 }
 
-await page.reload({ waitUntil: 'load', timeout: 60000 });
+// Phase 2: emulate a returning user whose browser storage contains only a
+// legacy save. This is the production migration case. It has no running game
+// capable of writing a newer v5 during pagehide, so the result measures the
+// migration/loading pipeline rather than autosave ordering from the fixture.
+await context.close();
+errors.length = 0;
+const origin = new URL(url).origin;
+context = await browser.newContext({
+  ...baseContextOptions,
+  storageState: {
+    cookies: [],
+    origins: [{
+      origin,
+      localStorage: [{ name: LEGACY_KEY, value: legacyWrapped }],
+    }],
+  },
+});
+page = await context.newPage();
+attachPageDiagnostics(page);
+await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+
 let loadReady;
 try {
   loadReady = await waitFor(() => page.evaluate((creditSentinel) => {
@@ -120,6 +142,7 @@ try {
       sentinel: candidate?.data?._fdRegressionSaveLoad191?.sentinel || null,
       compat: { ...compat.state, invalidKeys: [...(compat.state?.invalidKeys || [])] },
       currentBytes: localStorage.getItem(globalThis.__FD_DEBUG__?.SAVE_KEY || 'frontline-dominion-save-v5')?.length || 0,
+      keys: Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index)),
     };
   }, CREDIT_SENTINEL), 20000);
 } catch (error) {
@@ -175,10 +198,11 @@ const loadedGame = await waitFor(() => page.evaluate((creditSentinel) => {
     launchCount: shell.state.launchCount,
     saveSourceKey: shell.state.saveSourceKey,
     bridgeFailed: Boolean(bridge?.failed),
+    actionErrors: Number(bridge?.actionErrors || 0),
   };
 }, CREDIT_SENTINEL), 25000);
 
-if (!loadedGame.units || !loadedGame.buildings || loadedGame.credits !== CREDIT_SENTINEL || loadedGame.bridgeFailed) {
+if (!loadedGame.units || !loadedGame.buildings || loadedGame.credits !== CREDIT_SENTINEL || loadedGame.bridgeFailed || loadedGame.actionErrors !== 0) {
   throw new Error(`saved game did not restore: ${JSON.stringify(loadedGame)}`);
 }
 if (errors.length) throw new Error(`browser errors: ${errors.join(' | ')}`);
@@ -191,4 +215,5 @@ console.log(JSON.stringify({
   loadReady,
   loadedGame,
 }));
+await context.close();
 await browser.close();
