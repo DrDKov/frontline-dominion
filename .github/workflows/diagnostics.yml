@@ -1,0 +1,66 @@
+name: Frontline Build Diagnostics
+
+on:
+  workflow_run:
+    workflows: ["Build Frontline Dominion"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record latest build result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          STATUS: ${{ github.event.workflow_run.status }}
+          HTML_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          set -euo pipefail
+          mkdir diag
+          curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?per_page=100" > diag/jobs.json
+          python - <<'PY'
+          import json, os, pathlib
+          jobs = json.loads(pathlib.Path('diag/jobs.json').read_text())
+          payload = {
+              'run_id': int(os.environ['RUN_ID']),
+              'head_sha': os.environ['HEAD_SHA'],
+              'status': os.environ['STATUS'],
+              'conclusion': os.environ['CONCLUSION'],
+              'html_url': os.environ['HTML_URL'],
+              'jobs': [],
+          }
+          for job in jobs.get('jobs', []):
+              payload['jobs'].append({
+                  'id': job.get('id'),
+                  'name': job.get('name'),
+                  'status': job.get('status'),
+                  'conclusion': job.get('conclusion'),
+                  'steps': [
+                      {
+                          'name': step.get('name'),
+                          'status': step.get('status'),
+                          'conclusion': step.get('conclusion'),
+                          'number': step.get('number'),
+                      }
+                      for step in job.get('steps', [])
+                  ],
+              })
+          pathlib.Path('diag/latest.json').write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
+          PY
+          cd diag
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b diagnostics
+          git add latest.json jobs.json
+          git commit -m "Build diagnostics ${RUN_ID} ${CONCLUSION}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin diagnostics
