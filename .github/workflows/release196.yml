@@ -1,0 +1,76 @@
+name: Release Frontline Dominion build 196
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontline-release-196
+  cancel-in-progress: true
+
+jobs:
+  release196:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Assemble and harden build 196
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+
+      - name: Release integrity gates
+        run: |
+          set -euo pipefail
+          test -s dist/index.html
+          test -s dist/frontline-dominion.html
+          test -s dist/authoritative-simulation-worker-v174.js
+          grep -q 'frontline-dominion.html?build=196' dist/index.html
+          grep -q 'v16.8.12' dist/index.html
+          grep -q 'formationInstalled196' dist/formation-obstacle-recovery-v196.js
+          grep -q 'hasDocument && typeof baseHydrate' dist/post-load-command-recovery-v196.js
+          ! grep -q 'post-load-command-recovery-v196.js?build=196' dist/authoritative-simulation-worker-v174.js
+          grep -q 'formation-obstacle-recovery-v196.js?build=196' dist/authoritative-simulation-worker-v174.js
+          for file in dist/*.js; do node --check "$file"; done
+          node tests/formation-obstacle196.unit.mjs
+          count=$(find dist/models -type f | wc -l)
+          test "$count" -gt 700
+
+      - name: Publish build 196 to gh-pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd dist
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Frontline Dominion v16.8.12 build 196"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin gh-pages
