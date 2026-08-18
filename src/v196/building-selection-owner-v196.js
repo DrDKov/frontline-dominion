@@ -11,6 +11,7 @@
   const state = {
     flagsCleared: 0,
     selectionCanonicalizations: 0,
+    renderSelectionMasks: 0,
     overlayFrames: 0,
     overlayDraws: 0,
     duplicateSelectedIdsRemoved: 0,
@@ -99,14 +100,29 @@
   const baseRender = Game.prototype.render;
   if (typeof baseRender === 'function') {
     Game.prototype.render = function renderWithSingleBuildingSelection196(...args) {
-      const buildings = selectedBuildings(this);
+      const fullSelection = canonicalizeSelected(this);
+      const buildings = fullSelection.filter(entity => entity?.alive && entity.kind === 'building');
       clearBuildingVisualFlags(this);
+
+      // Some historical selection renderers never consult building.selected;
+      // they iterate game.selected and repaint a highlighted/high-detail model
+      // directly. That bypassed build 195's drawBuilding3D guard and produced
+      // the larger second copy reported by the player. Hide only buildings from
+      // the render-time selection list, then restore the authoritative list in
+      // the same frame. Commands/UI outside render continue to see the selection.
+      if (buildings.length) {
+        this.selected = fullSelection.filter(entity => entity?.kind !== 'building');
+        state.renderSelectionMasks += 1;
+      }
+
       let result;
       try {
         result = baseRender.apply(this, args);
         return result;
       } finally {
+        this.selected = fullSelection;
         clearBuildingVisualFlags(this);
+        state.lastSelectedIds = fullSelection.map(entity => entity?.id).filter(Boolean);
         if (buildings.length) {
           state.overlayFrames += 1;
           for (const building of buildings) {
