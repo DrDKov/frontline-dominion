@@ -57,10 +57,11 @@ worker = re.sub(
     '',
     worker,
 )
-anchor_pattern = rf"(importScripts\('/frontline-dominion/formation-march-core-v183\.js\?build={BUILD}'\);)"
+anchor_pattern = r"importScripts\('/frontline-dominion/formation-march-core-v183\.js\?build=\d+'\);"
 if not re.search(anchor_pattern, worker):
     raise RuntimeError('build 196 Worker formation import anchor missing')
-worker = re.sub(anchor_pattern, rf"\1\n{formation_import}\n{load_import}", worker, count=1)
+formation_anchor = f"importScripts('/frontline-dominion/formation-march-core-v183.js?build={BUILD}');"
+worker = re.sub(anchor_pattern, f"{formation_anchor}\n{formation_import}\n{load_import}", worker, count=1)
 worker_path.write_text(worker, 'utf-8')
 
 profiler = profiler_path.read_text('utf-8')
