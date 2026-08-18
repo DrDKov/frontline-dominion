@@ -47,10 +47,6 @@
     let y2 = -Infinity;
     let source = 'projected-footprint';
 
-    // Match the approved model-pilot sprite rectangle exactly whenever the
-    // manifest is ready. This makes the whole visible building clickable,
-    // including roofs and asymmetric overhangs, instead of only its ground
-    // centre/radius.
     if (sprite) {
       const width = radius * zoom * (Number(sprite.worldWidthFactor) || 3.2) * 1.34;
       const aspect = Math.max(0.2, Number(sprite.cellHeight) || 384) /
@@ -65,9 +61,6 @@
       source = 'approved-sprite';
     }
 
-    // Union with the exact projected gameplay footprint and height. This keeps
-    // selection correct before the sprite manifest finishes loading and for
-    // any building without a baked atlas entry.
     const footprint = this.getEntityBuildingFootprintAt?.(building, 0);
     if (footprint?.corners?.length) {
       const height = Math.max(1, Number(footprint.height) || radius * 1.45);
@@ -122,8 +115,6 @@
       const depth = this.worldToScreen(building.x, building.y, 0).y;
       hits.push({ building, bounds, score: nx * nx + ny * ny, depth });
     }
-    // Prefer the visually closest/lowest overlapping building, then the point
-    // nearest its visible centre. This makes stacked bases deterministic.
     hits.sort((a, b) => b.depth - a.depth || a.score - b.score ||
       String(a.building.id).localeCompare(String(b.building.id)));
     state.lastHitCount = hits.length;
@@ -150,8 +141,6 @@
   Game.prototype.selectAt = function buildingFirstSelect193(worldX, worldY, additive = false) {
     state.clicks += 1;
 
-    // Preserve the precise visible-figure unit/aircraft picker from v140. A
-    // soldier drawn over a building remains selectable as a soldier.
     let unitHit = null;
     try { unitHit = this.getUnitFigureHits140?.(worldX, worldY)?.[0]?.unit || null; } catch (_) {}
     if (unitHit) {
@@ -186,16 +175,16 @@
   };
   Object.defineProperty(Game.prototype.selectAt, '__fdBuildingSelection193', { value: true });
 
-  // A full building model may only be drawn once in one world-object pass.
-  // Selection rings/health bars remain inside that single draw call. If a
-  // stale mirror ever leaves duplicate building objects/IDs in a collection,
-  // the second full sprite is suppressed instead of appearing as a ghost copy.
+  // Guard the entire render frame rather than only drawWorldObjects3D. Some
+  // compatibility/selection renderers can ask for a building again after the
+  // normal world pass; the same building id must still have only one full
+  // model/sprite draw in that frame.
   const baseDrawBuilding = Game.prototype.drawBuilding3D;
-  const baseDrawWorldObjects = Game.prototype.drawWorldObjects3D;
-  if (typeof baseDrawBuilding === 'function' && typeof baseDrawWorldObjects === 'function') {
-    Game.prototype.drawWorldObjects3D = function singleBuildingPass193(...args) {
+  const baseRender = Game.prototype.render;
+  if (typeof baseDrawBuilding === 'function' && typeof baseRender === 'function') {
+    Game.prototype.render = function singleBuildingFrame193(...args) {
       this._fdBuildingDrawIds193 = new Set();
-      try { return baseDrawWorldObjects.apply(this, args); }
+      try { return baseRender.apply(this, args); }
       finally { this._fdBuildingDrawIds193 = null; }
     };
     Game.prototype.drawBuilding3D = function singleBuildingDraw193(building, ...rest) {
