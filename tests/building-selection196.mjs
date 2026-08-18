@@ -24,19 +24,76 @@ const waitFor = async (fn, timeout = 18000, interval = 70) => {
   throw new Error(`Timed out after ${timeout} ms`);
 };
 
+const readinessSnapshot = () => page.evaluate(() => {
+  const start = document.getElementById('start-game');
+  const shell = globalThis.__FD_RUNTIME_SHELL_196__;
+  const owner = globalThis.__FD_BUILDING_SELECTION_OWNER_196__;
+  const bridge = globalThis.__FD_STABLE_STATE165__?.bridge;
+  const debug = globalThis.__FD_DEBUG__;
+  return {
+    readyState: document.readyState,
+    datasetBuild: document.documentElement.dataset.fdBuild || null,
+    datasetVersion: document.documentElement.dataset.fdVersion || null,
+    debug: {
+      exists: Boolean(debug),
+      startGame: typeof debug?.startGame,
+      Game: typeof debug?.Game,
+      game: Boolean(debug?.game),
+    },
+    shell: shell ? {
+      build: shell.build,
+      version: shell.version,
+      installed: Boolean(shell.state?.installed),
+      launching: Boolean(shell.state?.launching),
+      lastError: shell.state?.lastError || null,
+    } : null,
+    owner: owner ? {
+      build: owner.build,
+      version: owner.version,
+      overlayDraws: Number(owner.state?.overlayDraws || 0),
+    } : null,
+    boot: Boolean(globalThis.__FD_BOOT_196__),
+    start: start ? {
+      disabled: Boolean(start.disabled),
+      connected: Boolean(start.isConnected),
+      text: start.textContent?.trim() || null,
+    } : null,
+    bridge: bridge ? {
+      ready: Boolean(bridge.ready),
+      failed: Boolean(bridge.failed),
+      tick: Number(bridge.workerTick || 0),
+      actionErrors: Number(bridge.actionErrors || 0),
+      lastError: bridge.lastError || null,
+    } : null,
+    scripts: [...document.scripts].map(script => script.src || '[inline]').slice(-18),
+  };
+});
+
+const waitForStage = async (label, fn, timeout) => {
+  try {
+    return await waitFor(fn, timeout);
+  } catch (error) {
+    const readiness = await readinessSnapshot();
+    throw new Error(`${label} failed: ${JSON.stringify({ error: String(error?.stack || error), readiness, errors })}`);
+  }
+};
+
 await page.goto(url, { waitUntil: 'load', timeout: 60000 });
-await waitFor(() => page.evaluate(() => Boolean(
+await waitForStage('build 196 launch shell readiness', () => page.evaluate(() => Boolean(
   globalThis.__FD_DEBUG__?.startGame &&
-  globalThis.__FD_BUILDING_SELECTION_OWNER_196__?.build === 196 &&
   globalThis.__FD_RUNTIME_SHELL_196__?.build === 196 &&
   document.documentElement.dataset.fdBuild === '196' &&
   !document.getElementById('start-game')?.disabled
 )), 25000);
 await page.locator('#start-game').click();
-await waitFor(() => page.evaluate(() => {
+await waitForStage('build 196 game/selection owner readiness', () => page.evaluate(() => {
   const game = globalThis.__FD_DEBUG__?.game;
   const bridge = globalThis.__FD_STABLE_STATE165__?.bridge;
-  return Boolean(game && bridge?.ready && !bridge.failed && Number(bridge.workerTick || 0) >= 8);
+  const owner = globalThis.__FD_BUILDING_SELECTION_OWNER_196__;
+  return Boolean(
+    game && owner?.build === 196 && bridge?.ready && !bridge.failed &&
+    Number(bridge.workerTick || 0) >= 8
+  );
 }), 25000);
 
 const fixture = await page.evaluate(() => {
@@ -76,7 +133,7 @@ if (!fixture || fixture.error) throw new Error(`building fixture unavailable: ${
 if (browserName === 'webkit') await page.touchscreen.tap(fixture.point.x, fixture.point.y);
 else await page.mouse.click(fixture.point.x, fixture.point.y, { button: 'left' });
 
-const selected = await waitFor(() => page.evaluate(id => {
+const selected = await waitForStage('selected building state', () => page.evaluate(id => {
   const game = globalThis.__FD_DEBUG__?.game;
   const owner = globalThis.__FD_BUILDING_SELECTION_OWNER_196__;
   const building = game?.getEntity?.(id);
