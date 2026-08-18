@@ -146,6 +146,43 @@ for (let index = 0; index < fixture.points.length; index += 1) {
   attempts.push({ input: browserName === 'webkit' ? 'touchscreen.tap' : 'mouse.click', point, before, selected });
 }
 
+// The selected flag must remain true for UI/commands outside render, but every
+// full building draw in the frame must see it neutralised. Otherwise legacy
+// selected-building layers repaint the same structure as a larger ghost copy.
+const renderSelectionGuard = await page.evaluate(buildingId => {
+  const game = globalThis.__FD_DEBUG__?.game;
+  const api = globalThis.__FD_BUILDING_SELECTION_193__;
+  const building = game?.getEntity?.(buildingId);
+  if (!game || !api || !building) return null;
+  const beforeSelected = building.selected === true;
+  const beforeNeutralized = Number(api.state.selectedBuildingRenderFlagsNeutralized || 0);
+  const beforeOverlay = Number(api.state.selectionOverlayDraws || 0);
+  const hadOwnDraw = Object.prototype.hasOwnProperty.call(game, 'drawBuilding3D');
+  const originalDraw = game.drawBuilding3D;
+  const observedSelectedFlags = [];
+  game.drawBuilding3D = function guardedSelectionProbe(target, ...rest) {
+    if (String(target?.id) === String(buildingId)) observedSelectedFlags.push(target?.selected === true);
+    return originalDraw.call(this, target, ...rest);
+  };
+  try { game.render?.(); }
+  finally {
+    if (hadOwnDraw) game.drawBuilding3D = originalDraw;
+    else delete game.drawBuilding3D;
+  }
+  return {
+    beforeSelected,
+    afterSelected: building.selected === true,
+    observedSelectedFlags,
+    neutralizedDelta: Number(api.state.selectedBuildingRenderFlagsNeutralized || 0) - beforeNeutralized,
+    overlayDelta: Number(api.state.selectionOverlayDraws || 0) - beforeOverlay,
+  };
+}, fixture.buildingId);
+if (!renderSelectionGuard || !renderSelectionGuard.beforeSelected || !renderSelectionGuard.afterSelected ||
+    !renderSelectionGuard.observedSelectedFlags.length || renderSelectionGuard.observedSelectedFlags.some(Boolean) ||
+    renderSelectionGuard.neutralizedDelta < 1 || renderSelectionGuard.overlayDelta < 1) {
+  throw new Error(`selected building render neutralisation failed: ${JSON.stringify({ renderSelectionGuard, fixture, attempts })}`);
+}
+
 // Prove the full-model draw guard itself, without altering simulation state:
 // insert one temporary duplicate array reference for one render and restore it
 // immediately. The second full draw for the same building id must be skipped.
@@ -179,6 +216,8 @@ const finalState = await page.evaluate(() => {
     selectedIds: (game?.selected || []).map(entity => entity?.id).filter(Boolean),
     duplicateSelectionIdsPrevented: Number(api?.state?.duplicateSelectionIdsPrevented || 0),
     duplicateBuildingDrawsPrevented: Number(api?.state?.duplicateBuildingDrawsPrevented || 0),
+    selectedBuildingRenderFlagsNeutralized: Number(api?.state?.selectedBuildingRenderFlagsNeutralized || 0),
+    selectionOverlayDraws: Number(api?.state?.selectionOverlayDraws || 0),
     workerTick: Number(bridge?.workerTick || 0),
     bridgeFailed: Boolean(bridge?.failed),
     actionErrors: Number(bridge?.actionErrors || 0),
@@ -187,5 +226,5 @@ const finalState = await page.evaluate(() => {
 if (finalState.bridgeFailed || finalState.actionErrors !== 0) throw new Error(`simulation damaged by selection test: ${JSON.stringify(finalState)}`);
 if (errors.length) throw new Error(`browser errors: ${errors.join(' | ')}`);
 
-console.log(JSON.stringify({ ok: true, browserName, fixture, attempts, drawGuard, finalState }));
+console.log(JSON.stringify({ ok: true, browserName, fixture, attempts, renderSelectionGuard, drawGuard, finalState }));
 await browser.close();
