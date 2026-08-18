@@ -224,6 +224,9 @@ const finalState = await page.evaluate(() => {
   };
 });
 if (finalState.bridgeFailed || finalState.actionErrors !== 0) throw new Error(`simulation damaged by selection test: ${JSON.stringify(finalState)}`);
+if (finalState.selectedBuildingRenderFlagsNeutralized < 1 || finalState.selectionOverlayDraws < 1) {
+  throw new Error(`selected-building render gate was not exercised: ${JSON.stringify(finalState)}`);
+}
 if (errors.length) throw new Error(`browser errors: ${errors.join(' | ')}`);
 
 console.log(JSON.stringify({ ok: true, browserName, fixture, attempts, renderSelectionGuard, drawGuard, finalState }));
