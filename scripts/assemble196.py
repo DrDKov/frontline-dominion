@@ -15,16 +15,17 @@ profiler_path = OUT / 'simulation-profiler-v166.js'
 formation_source = ROOT / 'src' / 'v196' / 'formation-obstacle-recovery-v196.js'
 load_source = ROOT / 'src' / 'v196' / 'post-load-command-recovery-v196.js'
 building_source = ROOT / 'src' / 'v196' / 'building-selection-owner-v196.js'
+bootstrap_source = ROOT / 'src' / 'v196' / 'recovery-bootstrap-v196.js'
 
 required_paths = (
     html_path, bridge_path, worker_path, ui195, shell195, profiler_path,
-    formation_source, load_source, building_source,
+    formation_source, load_source, building_source, bootstrap_source,
 )
 for path in required_paths:
     if not path.exists():
         raise RuntimeError(f'build 196 required file missing: {path}')
 
-for source in (formation_source, load_source, building_source):
+for source in (formation_source, load_source, building_source, bootstrap_source):
     (OUT / source.name).write_text(source.read_text('utf-8'), 'utf-8')
 
 ui = ui195.read_text('utf-8')
@@ -77,7 +78,7 @@ for path in sorted(OUT.glob('*.js')):
 
 html = html_path.read_text('utf-8')
 html = re.sub(
-    r'\s*<script\b[^>]*src=["\'](?:\./|/frontline-dominion/)(?:runtime-ui-v19[456]|runtime-shell-v19[56]|formation-obstacle-recovery-v196|post-load-command-recovery-v196|building-selection-owner-v196)\.js(?:\?build=\d+)?["\'][^>]*></script>',
+    r'\s*<script\b[^>]*src=["\'](?:\./|/frontline-dominion/)(?:runtime-ui-v19[456]|runtime-shell-v19[56]|formation-obstacle-recovery-v196|post-load-command-recovery-v196|building-selection-owner-v196|recovery-bootstrap-v196)\.js(?:\?build=\d+)?["\'][^>]*></script>',
     '',
     html,
     flags=re.I,
@@ -123,6 +124,7 @@ block = (
     f'<script src="./formation-obstacle-recovery-v196.js?build={BUILD}"></script>\n'
     f'<script src="./post-load-command-recovery-v196.js?build={BUILD}"></script>\n'
     f'<script src="./building-selection-owner-v196.js?build={BUILD}"></script>\n'
+    f'<script src="./recovery-bootstrap-v196.js?build={BUILD}"></script>\n'
     f'<script src="./runtime-ui-v196.js?build={BUILD}"></script>\n'
 )
 html = html[:profiler_tag.start()] + block + html[profiler_tag.start():]
@@ -156,6 +158,7 @@ required = [
     f'formation-obstacle-recovery-v196.js?build={BUILD}',
     f'post-load-command-recovery-v196.js?build={BUILD}',
     f'building-selection-owner-v196.js?build={BUILD}',
+    f'recovery-bootstrap-v196.js?build={BUILD}',
     f'runtime-ui-v196.js?build={BUILD}',
     f'simulation-profiler-v166.js?build={BUILD}',
     f'runtime-shell-v196.js?build={BUILD}',
@@ -181,6 +184,7 @@ for path, markers in (
     (OUT / formation_source.name, ('__FD_FORMATION_OBSTACLE_RECOVERY_196__', 'dynamic: true', 'blockedTicks')),
     (OUT / load_source.name, ('__FD_POST_LOAD_COMMAND_RECOVERY_196__', 'formationCounter', "routeAction('issueMove'")),
     (OUT / building_source.name, ('__FD_BUILDING_SELECTION_OWNER_196__', 'clearBuildingVisualFlags', 'overlayDraws')),
+    (OUT / bootstrap_source.name, ('__FD_RECOVERY_BOOTSTRAP_196__', 'setInterval(inspect, 25)', 'fdRecoveryRetry196')),
 ):
     text = path.read_text('utf-8')
     for marker in markers:
