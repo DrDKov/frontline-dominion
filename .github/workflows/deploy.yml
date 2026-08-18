@@ -38,7 +38,7 @@ jobs:
           python scripts/install190_runtime.py
           node tests/verify190.js dist
 
-      - name: Assemble v16.8.7 through v16.8.10 recovery and performance layers
+      - name: Assemble v16.8.7 through v16.8.11 recovery performance and LOD layers
         run: |
           set -euo pipefail
           python scripts/assemble191.py
@@ -47,90 +47,96 @@ jobs:
           python scripts/finalize192.py
           python scripts/assemble193.py
           python scripts/assemble194.py
+          python scripts/assemble195.py
 
-          for file in index.html frontline-dominion.html runtime-ui-v194.js runtime-shell-v194.js performance-observability-v194.js building-selection-v193.js resource-extraction-authority-v192.js resource-ui-stability-v192.js render-state-guard-v192.js engineer-rocket-parity-v191.js command-watchdog-v191.js save-compat-v191.js simulation-profiler-v166.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js models/pilot/manifest.json models/canvas/b-51-views.webp; do
+          for file in index.html frontline-dominion.html runtime-ui-v195.js runtime-shell-v195.js performance-observability-v194.js adaptive-visual-lod-v195.js building-selection-v193.js resource-extraction-authority-v192.js resource-ui-stability-v192.js render-state-guard-v192.js engineer-rocket-parity-v191.js command-watchdog-v191.js save-compat-v191.js simulation-profiler-v166.js authoritative-simulation-v174.js authoritative-simulation-worker-v174.js models/pilot/manifest.json models/canvas/b-51-views.webp; do
             test -s "dist/$file" || { echo "missing: $file"; exit 1; }
           done
 
-          grep -q 'frontline-dominion.html?build=194' dist/index.html
-          grep -q 'v16.8.10' dist/index.html
-          grep -q 'fd-boot194-script' dist/frontline-dominion.html
-          grep -q 'building-selection-v193.js?build=194' dist/frontline-dominion.html
-          grep -q 'performance-observability-v194.js?build=194' dist/frontline-dominion.html
-          grep -q 'runtime-ui-v194.js?build=194' dist/frontline-dominion.html
-          grep -q 'runtime-shell-v194.js?build=194' dist/frontline-dominion.html
-          grep -q 'resource-extraction-authority-v192.js?build=194' dist/frontline-dominion.html
-          grep -q 'resource-ui-stability-v192.js?build=194' dist/frontline-dominion.html
-          grep -q 'engineer-rocket-parity-v191.js?build=194' dist/frontline-dominion.html
-          grep -q 'command-watchdog-v191.js?build=194' dist/frontline-dominion.html
-          grep -q 'save-compat-v191.js?build=194' dist/frontline-dominion.html
-          grep -q 'simulation-profiler-v166.js?build=194' dist/frontline-dominion.html
-          ! grep -q 'runtime-ui-v193.js?build=194' dist/frontline-dominion.html
-          ! grep -q 'runtime-shell-v193.js?build=194' dist/frontline-dominion.html
+          grep -q 'frontline-dominion.html?build=195' dist/index.html
+          grep -q 'v16.8.11' dist/index.html
+          grep -q 'fd-boot195-script' dist/frontline-dominion.html
+          grep -q 'building-selection-v193.js?build=195' dist/frontline-dominion.html
+          grep -q 'performance-observability-v194.js?build=195' dist/frontline-dominion.html
+          grep -q 'adaptive-visual-lod-v195.js?build=195' dist/frontline-dominion.html
+          grep -q 'runtime-ui-v195.js?build=195' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v195.js?build=195' dist/frontline-dominion.html
+          grep -q 'resource-extraction-authority-v192.js?build=195' dist/frontline-dominion.html
+          grep -q 'resource-ui-stability-v192.js?build=195' dist/frontline-dominion.html
+          grep -q 'engineer-rocket-parity-v191.js?build=195' dist/frontline-dominion.html
+          grep -q 'command-watchdog-v191.js?build=195' dist/frontline-dominion.html
+          grep -q 'save-compat-v191.js?build=195' dist/frontline-dominion.html
+          grep -q 'simulation-profiler-v166.js?build=195' dist/frontline-dominion.html
+          ! grep -q 'runtime-ui-v194.js?build=195' dist/frontline-dominion.html
+          ! grep -q 'runtime-shell-v194.js?build=195' dist/frontline-dominion.html
           ! grep -q 'runtime-stability-v190.js' dist/frontline-dominion.html
 
           grep -q '__FD_BUILDING_SELECTION_193__' dist/building-selection-v193.js
           grep -q '__FD_PERFORMANCE_194__' dist/performance-observability-v194.js
-          grep -q 'enableRenderStress' dist/performance-observability-v194.js
-          grep -q 'performance194:' dist/simulation-profiler-v166.js
-          grep -q 'Frame avg / p95' dist/simulation-profiler-v166.js
-          grep -q "const BUILD = 194" dist/simulation-profiler-v166.js
-          grep -q "const VERSION = '16.8.10'" dist/simulation-profiler-v166.js
-          grep -q "const BUILD = 194" dist/authoritative-simulation-v174.js
-          grep -q "const VERSION = '16.8.10'" dist/authoritative-simulation-v174.js
-          grep -q 'authoritative-simulation-worker-v174.js?build=194' dist/authoritative-simulation-v174.js
-          grep -q "const BUILD = 194" dist/authoritative-simulation-worker-v174.js
-          grep -q "const VERSION = '16.8.10'" dist/authoritative-simulation-worker-v174.js
+          grep -q '__FD_ADAPTIVE_LOD_195__' dist/adaptive-visual-lod-v195.js
+          grep -q 'if (unit.air) return true' dist/adaptive-visual-lod-v195.js
+          grep -q 'clusters94' dist/adaptive-visual-lod-v195.js
+          grep -q 'lod195:' dist/simulation-profiler-v166.js
+          grep -q 'Visual LOD' dist/simulation-profiler-v166.js
+          grep -q "const BUILD = 195" dist/simulation-profiler-v166.js
+          grep -q "const VERSION = '16.8.11'" dist/simulation-profiler-v166.js
+          grep -q "const BUILD = 195" dist/authoritative-simulation-v174.js
+          grep -q "const VERSION = '16.8.11'" dist/authoritative-simulation-v174.js
+          grep -q 'authoritative-simulation-worker-v174.js?build=195' dist/authoritative-simulation-v174.js
+          grep -q "const BUILD = 195" dist/authoritative-simulation-worker-v174.js
+          grep -q "const VERSION = '16.8.11'" dist/authoritative-simulation-worker-v174.js
           grep -q "case 'buildResourceExtractor'" dist/authoritative-simulation-worker-v174.js
-          grep -q 'extractor-placement-v190.js?build=194' dist/authoritative-simulation-worker-v174.js
-          grep -q 'engineer-rocket-parity-v191.js?build=194' dist/authoritative-simulation-worker-v174.js
+          grep -q 'extractor-placement-v190.js?build=195' dist/authoritative-simulation-worker-v174.js
+          grep -q 'engineer-rocket-parity-v191.js?build=195' dist/authoritative-simulation-worker-v174.js
 
-          python -m py_compile scripts/assemble194.py
+          python -m py_compile scripts/assemble195.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/building-selection193.mjs
           node --check tests/resource-dispatch192.mjs
           node --check tests/resource-build192.mjs
           node --check tests/save-load191.mjs
-          node --check tests/performance194.mjs
+          node --check tests/visual-lod195.mjs
 
           python - <<'PY'
           from pathlib import Path
           import re
           html = Path('dist/frontline-dominion.html').read_text('utf-8')
           sources = re.findall(r'<script\b[^>]*\bsrc=["\']([^"\']+\.js(?:\?build=\d+)?)["\']', html, flags=re.I)
-          bad = [source for source in sources if not source.endswith('?build=194')]
+          bad = [source for source in sources if not source.endswith('?build=195')]
           if bad:
               raise SystemExit(f'mixed cache generations: {bad}')
-          if not sources or 'runtime-shell-v194.js?build=194' not in sources[-1]:
+          if not sources or 'runtime-shell-v195.js?build=195' not in sources[-1]:
               raise SystemExit(f'canonical shell not last: {sources[-5:]}')
           required = [
-              'engineer-rocket-parity-v191.js?build=194',
-              'command-watchdog-v191.js?build=194',
-              'save-compat-v191.js?build=194',
-              'resource-extraction-authority-v192.js?build=194',
-              'resource-ui-stability-v192.js?build=194',
-              'render-state-guard-v192.js?build=194',
-              'building-selection-v193.js?build=194',
-              'performance-observability-v194.js?build=194',
-              'runtime-ui-v194.js?build=194',
-              'simulation-profiler-v166.js?build=194',
-              'runtime-shell-v194.js?build=194',
+              'engineer-rocket-parity-v191.js?build=195',
+              'command-watchdog-v191.js?build=195',
+              'save-compat-v191.js?build=195',
+              'resource-extraction-authority-v192.js?build=195',
+              'resource-ui-stability-v192.js?build=195',
+              'render-state-guard-v192.js?build=195',
+              'building-selection-v193.js?build=195',
+              'performance-observability-v194.js?build=195',
+              'adaptive-visual-lod-v195.js?build=195',
+              'runtime-ui-v195.js?build=195',
+              'simulation-profiler-v166.js?build=195',
+              'runtime-shell-v195.js?build=195',
           ]
           for source in required:
               if html.count(source) != 1:
                   raise SystemExit(f'owner count invalid: {source}')
-          if html.count('id="fd-boot194-script"') != 1:
+          if html.count('id="fd-boot195-script"') != 1:
               raise SystemExit('canonical boot owner count is not one')
-          if html.count('data-fd-canonical-build="194"') != 1:
+          if html.count('data-fd-canonical-build="195"') != 1:
               raise SystemExit('canonical feature strip count is not one')
-          render_guard = html.index('render-state-guard-v192.js?build=194')
-          building = html.index('building-selection-v193.js?build=194')
-          perf = html.index('performance-observability-v194.js?build=194')
-          runtime_ui = html.index('runtime-ui-v194.js?build=194')
-          profiler = html.index('simulation-profiler-v166.js?build=194')
-          if not render_guard < building < perf < runtime_ui < profiler:
-              raise SystemExit('build 194 runtime owner load order invalid')
-          print('main-thread scripts:', len(sources), 'all build=194')
+          render_guard = html.index('render-state-guard-v192.js?build=195')
+          building = html.index('building-selection-v193.js?build=195')
+          perf = html.index('performance-observability-v194.js?build=195')
+          lod = html.index('adaptive-visual-lod-v195.js?build=195')
+          runtime_ui = html.index('runtime-ui-v195.js?build=195')
+          profiler = html.index('simulation-profiler-v166.js?build=195')
+          if not render_guard < building < perf < lod < runtime_ui < profiler:
+              raise SystemExit('build 195 runtime owner load order invalid')
+          print('main-thread scripts:', len(sources), 'all build=195')
           PY
 
           count=$(find dist/models -type f | wc -l)
@@ -143,7 +149,7 @@ jobs:
           npm install --no-save playwright
           npx playwright install --with-deps chromium webkit
 
-      - name: Gameplay regressions and live performance baseline
+      - name: Gameplay regressions and adaptive visual LOD gate
         run: |
           set -euo pipefail
           rm -rf smoke-root
@@ -152,40 +158,40 @@ jobs:
           python -m http.server 8765 --directory smoke-root >/tmp/fd-http.log 2>&1 &
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
-          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=194"
+          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=195"
 
-          sed -e 's/frontline-dominion.html?build=193/frontline-dominion.html?build=194/g' \
-              -e "s/dataset.fdBuild === '193'/dataset.fdBuild === '194'/g" \
-              tests/building-selection193.mjs > tests/building-selection194.generated.mjs
-          node --check tests/building-selection194.generated.mjs
+          sed -e 's/frontline-dominion.html?build=193/frontline-dominion.html?build=195/g' \
+              -e "s/dataset.fdBuild === '193'/dataset.fdBuild === '195'/g" \
+              tests/building-selection193.mjs > tests/building-selection195.generated.mjs
+          node --check tests/building-selection195.generated.mjs
 
-          sed -e 's/build=192/build=194/g' \
-              -e "s/dataset.fdBuild === '192'/dataset.fdBuild === '194'/g" \
-              tests/resource-dispatch192.mjs > tests/resource-dispatch194.generated.mjs
-          node --check tests/resource-dispatch194.generated.mjs
+          sed -e 's/build=192/build=195/g' \
+              -e "s/dataset.fdBuild === '192'/dataset.fdBuild === '195'/g" \
+              tests/resource-dispatch192.mjs > tests/resource-dispatch195.generated.mjs
+          node --check tests/resource-dispatch195.generated.mjs
 
-          sed -e 's/build=192/build=194/g' \
-              -e "s/dataset.fdBuild === '192'/dataset.fdBuild === '194'/g" \
+          sed -e 's/build=192/build=195/g' \
+              -e "s/dataset.fdBuild === '192'/dataset.fdBuild === '195'/g" \
               -e 's/if (game.explored?.fill) game.explored.fill(1);/if (game.explored?.fill) game.explored.fill(1); if (game.visible?.fill) game.visible.fill(1);/' \
-              tests/resource-build192.mjs > tests/resource-build194.generated.mjs
-          node --check tests/resource-build194.generated.mjs
+              tests/resource-build192.mjs > tests/resource-build195.generated.mjs
+          node --check tests/resource-build195.generated.mjs
 
-          sed -e 's/__FD_RUNTIME_SHELL_191__/__FD_RUNTIME_SHELL_194__/g' \
-              -e 's/newGame.build !== 191/newGame.build !== 194/g' \
-              -e 's/frontline-dominion.html?build=191/frontline-dominion.html?build=194/g' \
-              tests/save-load191.mjs > tests/save-load194.generated.mjs
-          node --check tests/save-load194.generated.mjs
+          sed -e 's/__FD_RUNTIME_SHELL_191__/__FD_RUNTIME_SHELL_195__/g' \
+              -e 's/newGame.build !== 191/newGame.build !== 195/g' \
+              -e 's/frontline-dominion.html?build=191/frontline-dominion.html?build=195/g' \
+              tests/save-load191.mjs > tests/save-load195.generated.mjs
+          node --check tests/save-load195.generated.mjs
 
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/building-selection194.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/building-selection194.generated.mjs
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-dispatch194.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-dispatch194.generated.mjs
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-build194.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-build194.generated.mjs
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/save-load194.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/save-load194.generated.mjs
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/performance194.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/performance194.mjs
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/building-selection195.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/building-selection195.generated.mjs
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-dispatch195.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-dispatch195.generated.mjs
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/resource-build195.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/resource-build195.generated.mjs
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/save-load195.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/save-load195.generated.mjs
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/visual-lod195.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/visual-lod195.mjs
 
       - name: Publish complete static build to gh-pages branch
         env:
@@ -198,6 +204,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.8.10 build 194"
+          git commit -m "Frontline Dominion v16.8.11 build 195"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
