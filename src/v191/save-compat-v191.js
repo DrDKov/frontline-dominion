@@ -25,8 +25,6 @@
     invalidKeys: [],
     lastError: null,
     lastMigrationAt: null,
-    selectedTimestamp: 0,
-    selectedPriority: 0,
   };
 
   const isObject = value => Boolean(value && typeof value === 'object' && !Array.isArray(value));
@@ -161,48 +159,19 @@
     return data;
   };
 
-  const timestampValue = value => {
-    const numeric = Number(value);
-    if (Number.isFinite(numeric) && numeric > 0) return numeric;
-    const parsed = Date.parse(String(value || ''));
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-  };
-
   const saveTimestamp = data => {
     const values = [
       data?.savedAt, data?.timestamp, data?.updatedAt, data?.createdAt,
-      data?.meta?.savedAt, data?.meta?.timestamp, data?.meta?.updatedAt,
-      data?.metadata?.savedAt, data?.metadata?.timestamp, data?.metadata?.updatedAt,
+      data?.meta?.savedAt, data?.metadata?.savedAt,
       data?.authoritative172?.savedAt, data?.authoritative174?.savedAt,
     ];
-    let newest = 0;
-    for (const value of values) newest = Math.max(newest, timestampValue(value));
-    return newest;
-  };
-
-  // Legacy saves were sometimes wrapped by launchers/exporters that kept the
-  // only reliable savedAt/timestamp on an outer envelope. Preserve that time
-  // signal while unwrapping; otherwise a freshly recreated but stale current
-  // key can always win merely because it is named v5.
-  const envelopeTimestamp = raw => {
-    const parsed = parseMaybeJson(raw);
-    if (!parsed || typeof parsed !== 'object') return 0;
-    const queue = [{ value: parsed, depth: 0 }];
-    const visited = new Set();
-    let newest = 0;
-    while (queue.length) {
-      const entry = queue.shift();
-      const candidate = parseMaybeJson(entry.value);
-      if (!candidate || typeof candidate !== 'object' || visited.has(candidate)) continue;
-      visited.add(candidate);
-      newest = Math.max(newest, saveTimestamp(candidate));
-      if (entry.depth >= 5 || !isObject(candidate)) continue;
-      for (const key of WRAPPER_KEYS) {
-        if (candidate[key] !== undefined) queue.push({ value: candidate[key], depth: entry.depth + 1 });
-      }
-      if (candidate.world !== undefined) queue.push({ value: candidate.world, depth: entry.depth + 1 });
+    for (const value of values) {
+      const numeric = Number(value);
+      if (Number.isFinite(numeric) && numeric > 0) return numeric;
+      const parsed = Date.parse(String(value || ''));
+      if (Number.isFinite(parsed)) return parsed;
     }
-    return newest;
+    return 0;
   };
 
   const findCandidates = () => {
@@ -218,23 +187,17 @@
         state.invalidKeys.push(key);
         continue;
       }
-      const dataTimestamp = saveTimestamp(normalized);
-      const sourceTimestamp = envelopeTimestamp(raw);
       candidates.push({
         key,
         raw,
         data: normalized,
         normalizedRaw: JSON.stringify(normalized),
-        timestamp: Math.max(dataTimestamp, sourceTimestamp),
-        dataTimestamp,
-        sourceTimestamp,
+        timestamp: saveTimestamp(normalized),
         priority: key === current ? 3 : key.includes('-backup-build') ? 2 : 1,
       });
     }
-    // Explicit recency wins. The current key/backup priority is only a
-    // tie-breaker when candidates carry the same timestamp or none at all.
     candidates.sort((left, right) =>
-      right.timestamp - left.timestamp || right.priority - left.priority || left.key.localeCompare(right.key)
+      right.priority - left.priority || right.timestamp - left.timestamp || left.key.localeCompare(right.key)
     );
     state.candidateCount = candidates.length;
     return candidates;
@@ -252,13 +215,9 @@
     if (!selected) {
       state.migrated = false;
       state.sourceKey = null;
-      state.selectedTimestamp = 0;
-      state.selectedPriority = 0;
       return false;
     }
 
-    state.selectedTimestamp = Number(selected.timestamp || 0);
-    state.selectedPriority = Number(selected.priority || 0);
     const existingCurrent = storageGet(current);
     if (existingCurrent && existingCurrent !== selected.normalizedRaw) {
       const existing = normalizeSave(unwrapSave(existingCurrent));
@@ -276,8 +235,6 @@
       console.info('[FD191] Save compatibility checkpoint ready', {
         sourceKey: selected.key,
         currentKey: current,
-        selectedTimestamp: selected.timestamp,
-        selectedPriority: selected.priority,
         candidates: candidates.length,
         invalidKeys: [...state.invalidKeys],
       });
@@ -293,8 +250,6 @@
     findCandidates,
     normalizeSave,
     unwrapSave,
-    saveTimestamp,
-    envelopeTimestamp,
   };
 
   migrate();
