@@ -14,6 +14,8 @@
     directSelections: 0,
     duplicateSelectionIdsPrevented: 0,
     duplicateBuildingDrawsPrevented: 0,
+    selectedBuildingRenderFlagsNeutralized: 0,
+    selectionOverlayDraws: 0,
     lastBuildingId: null,
     lastBoundsSource: null,
     lastHitCount: 0,
@@ -224,6 +226,58 @@
     if (unique.length !== game.selected.length) game.selected = unique;
   };
 
+  // Legacy visual layers use building.selected not only for the footprint
+  // outline but also as a request to repaint a high-detail/full-size building.
+  // Selection itself is already authoritative in game.selected. Temporarily
+  // neutralise only the per-building visual flag during the world frame, then
+  // restore it exactly so UI, commands and save state keep normal semantics.
+  const neutralizeSelectedBuildingRenderFlags193 = (game) => {
+    const records = [];
+    const seen = new Set();
+    for (const building of game.buildings || []) {
+      if (!building?.selected || building.kind !== 'building') continue;
+      const key = building.id || building;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      records.push({
+        building,
+        own: Object.prototype.hasOwnProperty.call(building, 'selected'),
+        value: building.selected,
+      });
+      building.selected = false;
+      state.selectedBuildingRenderFlagsNeutralized += 1;
+    }
+    return records;
+  };
+
+  const restoreSelectedBuildingRenderFlags193 = (records) => {
+    for (const record of records || []) {
+      if (!record?.building) continue;
+      if (record.own) record.building.selected = record.value;
+      else delete record.building.selected;
+    }
+  };
+
+  const drawSelectionOverlay193 = (game, records) => {
+    if (!records?.length) return;
+    for (const record of records) {
+      const building = record?.building;
+      if (!allowedBuilding(game, building) || !game.isOnScreen?.(building.x, building.y, (building.radius || 24) + 180)) continue;
+      const footprint = game.getEntityBuildingFootprintAt?.(building, 0);
+      const color = game.teamColor?.(building.team) || '#7dd3fc';
+      if (footprint?.corners?.length >= 3 && typeof game.screenPolygon === 'function') {
+        const points = footprint.corners.map(point => game.worldToScreen(point.x, point.y, 0.04));
+        game.screenPolygon(points, null, color, 2);
+        state.selectionOverlayDraws += 1;
+      } else if (typeof game.groundEllipse3D === 'function') {
+        const radius = Math.max(8, Number(building.radius) || 24);
+        game.groundEllipse3D(building.x, building.y, radius + 5, (radius + 5) * 0.72,
+          Number(building.rotation) || 0, null, color, 2);
+        state.selectionOverlayDraws += 1;
+      }
+    }
+  };
+
   const baseSelectAt = Game.prototype.selectAt;
   Game.prototype.selectAt = function buildingFirstSelect193(worldX, worldY, additive = false) {
     state.clicks += 1;
@@ -265,14 +319,25 @@
   // Guard the entire render frame rather than only drawWorldObjects3D. Some
   // compatibility/selection renderers can ask for a building again after the
   // normal world pass; the same building id must still have only one full
-  // model/sprite draw in that frame.
+  // model/sprite draw in that frame. During that same frame, selected building
+  // flags are muted so legacy selection passes cannot paint a second enlarged
+  // model. A lightweight footprint outline is drawn once after the frame.
   const baseDrawBuilding = Game.prototype.drawBuilding3D;
   const baseRender = Game.prototype.render;
   if (typeof baseDrawBuilding === 'function' && typeof baseRender === 'function') {
     Game.prototype.render = function singleBuildingFrame193(...args) {
+      const selectedRecords = neutralizeSelectedBuildingRenderFlags193(this);
       this._fdBuildingDrawIds193 = new Set();
-      try { return baseRender.apply(this, args); }
-      finally { this._fdBuildingDrawIds193 = null; }
+      let rendered = false;
+      try {
+        const result = baseRender.apply(this, args);
+        rendered = true;
+        return result;
+      } finally {
+        this._fdBuildingDrawIds193 = null;
+        restoreSelectedBuildingRenderFlags193(selectedRecords);
+        if (rendered) drawSelectionOverlay193(this, selectedRecords);
+      }
     };
     Game.prototype.drawBuilding3D = function singleBuildingDraw193(building, ...rest) {
       const ids = this._fdBuildingDrawIds193;
