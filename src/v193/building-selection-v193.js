@@ -8,6 +8,7 @@
 
   const VERSION = '16.8.9';
   const BUILD = 193;
+  const clamp193 = (value, min, max) => Math.max(min, Math.min(max, value));
   const state = {
     clicks: 0,
     directSelections: 0,
@@ -16,6 +17,9 @@
     lastBuildingId: null,
     lastBoundsSource: null,
     lastHitCount: 0,
+    lastPointerSource: null,
+    lastPointerScaleX: 1,
+    lastPointerScaleY: 1,
   };
 
   const pilotModel = (building) => {
@@ -30,6 +34,57 @@
     if (building.team === 'enemy' && !game.isVisibleAt?.(building.x, building.y)) return false;
     if (building.team === 'neutral' && !game.isExploredAt?.(building.x, building.y)) return false;
     return true;
+  };
+
+  // Pointer events are expressed in CSS pixels while the game canvas is drawn
+  // at native backing-store resolution. On Retina/iPad that backing store is
+  // typically 2x in both dimensions. Legacy worldX/worldY therefore project
+  // back to half-sized screen coordinates. Recover the original pointer from
+  // the live input state and explicitly scale CSS -> canvas pixels whenever the
+  // selectAt arguments came from that same physical pointer event.
+  const selectionPointer193 = (game, worldX, worldY) => {
+    const projected = game.worldToScreen(worldX, worldY, 0);
+    const mouse = game.input?.mouse;
+    const canvas = document.getElementById('game-canvas');
+    const rect = canvas?.getBoundingClientRect?.();
+    const inputWorldMatches = mouse && Number.isFinite(mouse.worldX) && Number.isFinite(mouse.worldY) &&
+      Number.isFinite(worldX) && Number.isFinite(worldY) &&
+      Math.hypot(mouse.worldX - worldX, mouse.worldY - worldY) < 0.5;
+
+    if (!inputWorldMatches || !Number.isFinite(mouse?.x) || !Number.isFinite(mouse?.y) ||
+        !canvas || !rect || rect.width <= 0 || rect.height <= 0) {
+      state.lastPointerSource = 'world-projection';
+      state.lastPointerScaleX = 1;
+      state.lastPointerScaleY = 1;
+      return { ...projected, source: 'world-projection', scaleX: 1, scaleY: 1 };
+    }
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    let cssX = mouse.x;
+    let cssY = mouse.y;
+    // Input normally stores canvas-relative CSS coordinates. If a browser or a
+    // future input owner stores client coordinates instead, detect that by the
+    // range and remove the canvas offset before scaling.
+    if (cssX < -1 || cssX > rect.width + 1 || cssY < -1 || cssY > rect.height + 1) {
+      cssX -= rect.left;
+      cssY -= rect.top;
+    }
+    const pointer = {
+      x: cssX * scaleX,
+      y: cssY * scaleY,
+      source: 'input-css-scaled',
+      scaleX,
+      scaleY,
+    };
+    state.lastPointerSource = pointer.source;
+    state.lastPointerScaleX = scaleX;
+    state.lastPointerScaleY = scaleY;
+    return pointer;
+  };
+
+  Game.prototype.getSelectionPointerScreen193 = function(worldX, worldY) {
+    return selectionPointer193(this, worldX, worldY);
   };
 
   Game.prototype.getBuildingFigureScreenBounds193 = function(building) {
@@ -98,7 +153,7 @@
   };
 
   Game.prototype.getBuildingFigureHits193 = function(worldX, worldY) {
-    const pointer = this.worldToScreen(worldX, worldY, 0);
+    const pointer = selectionPointer193(this, worldX, worldY);
     const touch = document.documentElement.classList.contains('fd-touch') || navigator.maxTouchPoints > 0;
     const hits = [];
     for (const building of this.buildings || []) {
@@ -120,6 +175,38 @@
     state.lastHitCount = hits.length;
     return hits;
   };
+
+  // v140 already selects units by their visible sprite, but its pointer was
+  // derived from the same Retina-misaligned world coordinates. Replace only
+  // the hit list calculation; v140's click cycling, double click and selection
+  // semantics continue to run unchanged through the captured base selectAt.
+  const baseUnitFigureHits140 = Game.prototype.getUnitFigureHits140;
+  if (typeof baseUnitFigureHits140 === 'function' && typeof Game.prototype.getUnitFigureScreenBounds140 === 'function') {
+    Game.prototype.getUnitFigureHits140 = function retinaSafeUnitFigureHits193(worldX, worldY) {
+      const pointer = selectionPointer193(this, worldX, worldY);
+      const hits = [];
+      for (const unit of this.units || []) {
+        if (!unit?.alive || unit.embarkedIn) continue;
+        if (unit.team === 'enemy' && !this.isTargetableBy?.(unit, 'player')) continue;
+        const bounds = this.getUnitFigureScreenBounds140(unit);
+        if (!bounds) continue;
+        const width = Math.max(1, bounds.x2 - bounds.x1);
+        const height = Math.max(1, bounds.y2 - bounds.y1);
+        const pad = clamp193(Math.min(width, height) * 0.045, 2, unit.air ? 7 : 5);
+        if (pointer.x < bounds.x1 - pad || pointer.x > bounds.x2 + pad ||
+            pointer.y < bounds.y1 - pad || pointer.y > bounds.y2 + pad) continue;
+        const centerX = (bounds.x1 + bounds.x2) * 0.5;
+        const centerY = (bounds.y1 + bounds.y2) * 0.5;
+        const nx = (pointer.x - centerX) / Math.max(1, width * 0.5 + pad);
+        const ny = (pointer.y - centerY) / Math.max(1, height * 0.5 + pad);
+        hits.push({ unit, bounds, score: nx * nx + ny * ny, area: width * height });
+      }
+      hits.sort((left, right) => left.score - right.score || left.area - right.area ||
+        String(left.unit.id).localeCompare(String(right.unit.id)));
+      return hits;
+    };
+    Object.defineProperty(Game.prototype.getUnitFigureHits140, '__fdRetinaSelection193', { value: true });
+  }
 
   const dedupeSelected193 = (game) => {
     if (!Array.isArray(game.selected) || game.selected.length < 2) return;
@@ -204,6 +291,7 @@
     version: VERSION,
     build: BUILD,
     state,
+    pointer: (worldX, worldY) => D?.game?.getSelectionPointerScreen193?.(worldX, worldY) || null,
     bounds: building => D?.game?.getBuildingFigureScreenBounds193?.(building) || null,
   };
 })();
