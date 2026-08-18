@@ -12,11 +12,13 @@
   const state = {
     hydrateRepairs: 0,
     launchRepairs: 0,
+    loadButtonRepairs: 0,
     entitiesRebound: 0,
     selectionsCanonicalized: 0,
     orphanFormationCommandsRepaired: 0,
     formationCountersRaised: 0,
     transientModesCleared: 0,
+    bridgeRebinds: 0,
     bridgeUnpauses: 0,
     routedActions: 0,
     routeFallbacks: 0,
@@ -188,17 +190,36 @@
     }
   };
 
-  const currentBridge = game => {
+  // A loaded game can be a freshly hydrated Game instance while the stable
+  // bridge still retains the pre-load instance in bridge.game. In that state
+  // every recovered action falls back before it ever reaches the Worker. Only
+  // rebind when this is the currently exported game and the bridge itself is
+  // healthy; the Worker/transport are kept intact.
+  const bindBridgeToGame = game => {
     const bridge = root.__FD_STABLE_STATE165__?.bridge || null;
-    if (!bridge || bridge.failed || bridge.applying) return null;
-    if (bridge.game && bridge.game !== game) return null;
+    if (!game || !bridge || bridge.failed) return null;
+    if (hasDocument && D?.game && D.game !== game) return null;
+    if (bridge.game !== game) {
+      try {
+        bridge.game = game;
+        state.bridgeRebinds += 1;
+      } catch (_) {
+        return null;
+      }
+    }
+    return bridge;
+  };
+
+  const currentBridge = game => {
+    const bridge = bindBridgeToGame(game);
+    if (!bridge || bridge.applying) return null;
     return bridge;
   };
 
   const unpause = game => {
     if (!game) return;
     try { game.paused = false; } catch (_) {}
-    const bridge = currentBridge(game);
+    const bridge = bindBridgeToGame(game);
     if (!bridge) return;
     try {
       bridge._paused = false;
@@ -212,6 +233,7 @@
     repairFormationState(game);
     canonicalizeSelected(game);
     clearTransientModes(game);
+    bindBridgeToGame(game);
     unpause(game);
     game.uiDirty = true;
     try { game.rebuildSpatialIndexes?.(); } catch (_) {}
@@ -291,22 +313,38 @@
   routeAction('issueStop', 'stop', () => ({}));
   routeAction('issueHold', 'hold', () => ({}));
 
+  const scheduleLoadRepairs = reasonPrefix => {
+    const runRepair = suffix => {
+      const game = D?.game;
+      if (repairLoadedGame(game, `${reasonPrefix}-${suffix}`)) state.launchRepairs += 1;
+    };
+    queueMicrotask(() => runRepair('microtask'));
+    setTimeout(() => runRepair('80ms'), 80);
+    setTimeout(() => runRepair('320ms'), 320);
+    setTimeout(() => runRepair('1100ms'), 1100);
+  };
+
   if (hasDocument && typeof D.startGame === 'function') {
     const baseStartGame = D.startGame;
     D.startGame = function repairedStartGame196(options = {}, ...rest) {
       const result = baseStartGame.call(this, options, ...rest);
-      if (!options?.loadData) return result;
-      const runRepair = label => {
-        const game = D.game;
-        if (repairLoadedGame(game, label)) state.launchRepairs += 1;
-      };
-      queueMicrotask(() => runRepair('start-microtask'));
-      setTimeout(() => runRepair('start-80ms'), 80);
-      setTimeout(() => runRepair('start-320ms'), 320);
-      setTimeout(() => runRepair('start-1100ms'), 1100);
+      if (options?.loadData) scheduleLoadRepairs('start');
       return result;
     };
     Object.defineProperty(D.startGame, '__fdPostLoadStart196', { value: true });
+  }
+
+  // Some historical UI layers captured the old startGame function when their
+  // click listener was registered. A capture listener gives the load button an
+  // independent repair schedule even if that closure bypasses D.startGame's
+  // later wrapper.
+  if (hasDocument) {
+    document.addEventListener('click', event => {
+      const load = event.target?.closest?.('#load-game');
+      if (!load) return;
+      state.loadButtonRepairs += 1;
+      scheduleLoadRepairs('load-button');
+    }, true);
   }
 
   root.__FD_POST_LOAD_COMMAND_RECOVERY_196__ = {
@@ -315,5 +353,6 @@
     state,
     repairLoadedGame,
     canonicalizeSelected,
+    bindBridgeToGame,
   };
 })();
