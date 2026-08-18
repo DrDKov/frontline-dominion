@@ -9,6 +9,7 @@ const context = browserName === 'webkit'
   : await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 const page = await context.newPage();
 const errors = [];
+const INDEPENDENT_TAP_GAP_MS = 420; // command-input-v190 double-tap window is 340 ms.
 page.on('pageerror', error => errors.push(String(error?.stack || error)));
 page.on('console', message => {
   if (message.type() === 'error' && !/favicon|404/i.test(message.text())) errors.push(`console:${message.text()}`);
@@ -40,6 +41,9 @@ async function selectionSnapshot(expectedId) {
       lastBuildingId: api?.state?.lastBuildingId || null,
       lastHitCount: Number(api?.state?.lastHitCount || 0),
       boundsSource: api?.state?.lastBoundsSource || null,
+      pointerSource: api?.state?.lastPointerSource || null,
+      pointerScaleX: Number(api?.state?.lastPointerScaleX || 1),
+      pointerScaleY: Number(api?.state?.lastPointerScaleY || 1),
       inputMouse: {
         x: Number.isFinite(mouse.x) ? mouse.x : null,
         y: Number.isFinite(mouse.y) ? mouse.y : null,
@@ -117,22 +121,29 @@ const fixture = await page.evaluate(() => {
 if (!fixture || fixture.error) throw new Error(`building fixture unavailable: ${JSON.stringify(fixture)}`);
 
 const attempts = [];
-for (const point of fixture.points) {
+for (let index = 0; index < fixture.points.length; index += 1) {
+  const point = fixture.points[index];
   await page.evaluate(() => {
     const game = globalThis.__FD_DEBUG__?.game;
     game?.clearSelection?.();
     if (game) { game.uiDirty = true; game.updateUI?.(true); }
   });
+  // Each sample must be an independent single tap/click. Without this gap,
+  // command-input-v190 intentionally consumes the next touch as a double-tap
+  // movement gesture and stops propagation before normal selection.
+  if (index > 0) await page.waitForTimeout(INDEPENDENT_TAP_GAP_MS);
 
   const before = await selectionSnapshot(fixture.buildingId);
   if (browserName === 'webkit') await page.touchscreen.tap(point.x, point.y);
   else await page.mouse.click(point.x, point.y, { button: 'left' });
 
   const selected = await waitForSelection(fixture.buildingId);
-  if (!selected || selected.ids.length !== 1 || selected.unique !== 1 || selected.ids[0] !== fixture.buildingId || !selected.selectedBuilding) {
-    throw new Error(`single building ${browserName === 'webkit' ? 'tap' : 'click'} failed: ${JSON.stringify({ point, before, selected, fixture, errors })}`);
+  const routedOnce = selected && selected.clicks === before.clicks + 1;
+  const selectedOnce = selected && selected.directSelections === before.directSelections + 1;
+  if (!selected || !routedOnce || !selectedOnce || selected.ids.length !== 1 || selected.unique !== 1 || selected.ids[0] !== fixture.buildingId || !selected.selectedBuilding) {
+    throw new Error(`single building ${browserName === 'webkit' ? 'tap' : 'click'} failed: ${JSON.stringify({ index, point, before, selected, fixture, errors })}`);
   }
-  attempts.push({ input: browserName === 'webkit' ? 'touchscreen.tap' : 'mouse.click', point, selected });
+  attempts.push({ input: browserName === 'webkit' ? 'touchscreen.tap' : 'mouse.click', point, before, selected });
 }
 
 // Prove the full-model draw guard itself, without altering simulation state:
