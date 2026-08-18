@@ -24,6 +24,45 @@ async function waitFor(fn, timeout = 15000, interval = 70) {
   throw new Error(`Timed out after ${timeout} ms`);
 }
 
+async function selectionSnapshot(expectedId) {
+  return page.evaluate(expected => {
+    const game = globalThis.__FD_DEBUG__?.game;
+    const api = globalThis.__FD_BUILDING_SELECTION_193__;
+    if (!game) return null;
+    const ids = (game.selected || []).map(entity => entity?.id).filter(Boolean);
+    const mouse = game.input?.mouse || {};
+    return {
+      ids,
+      unique: new Set(ids).size,
+      selectedBuilding: Boolean(game.getEntity?.(expected)?.selected),
+      clicks: Number(api?.state?.clicks || 0),
+      directSelections: Number(api?.state?.directSelections || 0),
+      lastBuildingId: api?.state?.lastBuildingId || null,
+      lastHitCount: Number(api?.state?.lastHitCount || 0),
+      boundsSource: api?.state?.lastBoundsSource || null,
+      inputMouse: {
+        x: Number.isFinite(mouse.x) ? mouse.x : null,
+        y: Number.isFinite(mouse.y) ? mouse.y : null,
+        worldX: Number.isFinite(mouse.worldX) ? mouse.worldX : null,
+        worldY: Number.isFinite(mouse.worldY) ? mouse.worldY : null,
+      },
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      touchClass: document.documentElement.classList.contains('fd-touch'),
+    };
+  }, expectedId);
+}
+
+async function waitForSelection(expectedId, timeout = 3500, interval = 60) {
+  const started = Date.now();
+  let latest = null;
+  while (Date.now() - started < timeout) {
+    latest = await selectionSnapshot(expectedId);
+    if (latest?.ids?.length) return latest;
+    await page.waitForTimeout(interval);
+  }
+  return latest || selectionSnapshot(expectedId);
+}
+
 await page.goto(url, { waitUntil: 'load', timeout: 60000 });
 await waitFor(() => page.evaluate(() => Boolean(
   globalThis.__FD_DEBUG__?.startGame &&
@@ -84,25 +123,16 @@ for (const point of fixture.points) {
     game?.clearSelection?.();
     if (game) { game.uiDirty = true; game.updateUI?.(true); }
   });
-  await page.mouse.click(point.x, point.y, { button: 'left' });
-  const selected = await waitFor(() => page.evaluate(expectedId => {
-    const game = globalThis.__FD_DEBUG__?.game;
-    if (!game) return null;
-    const ids = (game.selected || []).map(entity => entity?.id).filter(Boolean);
-    if (!ids.length) return null;
-    return {
-      ids,
-      unique: new Set(ids).size,
-      selectedBuilding: Boolean(game.getEntity?.(expectedId)?.selected),
-      directSelections: Number(globalThis.__FD_BUILDING_SELECTION_193__?.state?.directSelections || 0),
-      lastBuildingId: globalThis.__FD_BUILDING_SELECTION_193__?.state?.lastBuildingId || null,
-      boundsSource: globalThis.__FD_BUILDING_SELECTION_193__?.state?.lastBoundsSource || null,
-    };
-  }, fixture.buildingId), 3000);
-  if (selected.ids.length !== 1 || selected.unique !== 1 || selected.ids[0] !== fixture.buildingId || !selected.selectedBuilding) {
-    throw new Error(`single building click failed: ${JSON.stringify({ point, selected, fixture })}`);
+
+  const before = await selectionSnapshot(fixture.buildingId);
+  if (browserName === 'webkit') await page.touchscreen.tap(point.x, point.y);
+  else await page.mouse.click(point.x, point.y, { button: 'left' });
+
+  const selected = await waitForSelection(fixture.buildingId);
+  if (!selected || selected.ids.length !== 1 || selected.unique !== 1 || selected.ids[0] !== fixture.buildingId || !selected.selectedBuilding) {
+    throw new Error(`single building ${browserName === 'webkit' ? 'tap' : 'click'} failed: ${JSON.stringify({ point, before, selected, fixture, errors })}`);
   }
-  attempts.push(selected);
+  attempts.push({ input: browserName === 'webkit' ? 'touchscreen.tap' : 'mouse.click', point, selected });
 }
 
 // Prove the full-model draw guard itself, without altering simulation state:
@@ -127,7 +157,7 @@ const drawGuard = await page.evaluate(buildingId => {
   };
 }, fixture.buildingId);
 if (!drawGuard || drawGuard.after <= drawGuard.before) {
-  throw new Error(`duplicate building draw guard failed: ${JSON.stringify(drawGuard)}`);
+  throw new Error(`duplicate building draw guard failed: ${JSON.stringify({ drawGuard, fixture, attempts })}`);
 }
 
 const finalState = await page.evaluate(() => {
