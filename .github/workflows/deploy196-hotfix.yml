@@ -40,10 +40,12 @@ jobs:
           python scripts/assemble195.py
           python scripts/assemble196.py
           python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
           grep -q 'frontline-dominion.html?build=196' dist/index.html
           grep -q 'v16.8.12' dist/index.html
           grep -q 'formationInstalled196' dist/formation-obstacle-recovery-v196.js
           grep -q 'hasDocument && typeof baseHydrate' dist/post-load-command-recovery-v196.js
+          ! grep -q 'post-load-command-recovery-v196.js?build=196' dist/authoritative-simulation-worker-v174.js
           for file in dist/*.js; do node --check "$file"; done
           node tests/formation-obstacle196.unit.mjs
 
