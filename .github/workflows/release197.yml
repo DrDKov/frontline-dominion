@@ -44,6 +44,7 @@ jobs:
           python scripts/hotfix196_worker_scope.py
           python scripts/assemble197.py
           python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
 
       - name: Static and deterministic regression gates
         run: |
@@ -52,6 +53,7 @@ jobs:
           test -s dist/frontline-dominion.html
           test -s dist/building-selection-invariance-v197.js
           test -s dist/formation-target-fidelity-v197.js
+          test -s dist/right-click-authority-v197.js
           test -s dist/runtime-ui-v197.js
           test -s dist/runtime-shell-v197.js
           grep -q 'frontline-dominion.html?build=197' dist/index.html
@@ -59,17 +61,21 @@ jobs:
           grep -q 'data-fd-canonical-build="197"' dist/frontline-dominion.html
           grep -q 'building-selection-invariance-v197.js?build=197' dist/frontline-dominion.html
           grep -q 'formation-target-fidelity-v197.js?build=197' dist/frontline-dominion.html
+          grep -q 'right-click-authority-v197.js?build=197' dist/frontline-dominion.html
           grep -q 'runtime-ui-v197.js?build=197' dist/frontline-dominion.html
           grep -q 'runtime-shell-v197.js?build=197' dist/frontline-dominion.html
           grep -q 'formation-target-fidelity-v197.js?build=197' dist/authoritative-simulation-worker-v174.js
           ! grep -q 'post-load-command-recovery-v196.js' dist/authoritative-simulation-worker-v174.js
           grep -q '__FD_BUILDING_SELECTION_INVARIANCE_197__' dist/building-selection-invariance-v197.js
           grep -q '__FD_FORMATION_TARGET_FIDELITY_197__' dist/formation-target-fidelity-v197.js
+          grep -q '__FD_RIGHT_CLICK_AUTHORITY_197__' dist/right-click-authority-v197.js
           grep -q 'tagIssuedOrder(game, unitIds' dist/formation-target-fidelity-v197.js
+          grep -q 'stopImmediatePropagation' dist/right-click-authority-v197.js
+          grep -q 'authority197-pointer-right' dist/right-click-authority-v197.js
           grep -q 'Build 197 move target was not attached to authoritative commands' dist/authoritative-simulation-worker-v174.js
           grep -q 'Build 197 attack-move target was not attached to authoritative commands' dist/authoritative-simulation-worker-v174.js
           grep -q 'Build 197 context move target was not attached to authoritative commands' dist/authoritative-simulation-worker-v174.js
-          python -m py_compile scripts/assemble197.py scripts/hotfix197_worker_action_target.py
+          python -m py_compile scripts/assemble197.py scripts/hotfix197_worker_action_target.py scripts/hotfix197_input_authority.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/building-selection197.unit.mjs
           node --check tests/formation-target197.unit.mjs
