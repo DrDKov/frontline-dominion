@@ -15,6 +15,7 @@
     modesCleared: 0,
     intentionalClicksPreserved: 0,
     physicalEmptyClicks: 0,
+    clickFallbacks: 0,
     lastReason: null,
   };
 
@@ -68,8 +69,9 @@
   let lastResetX = NaN;
   let lastResetY = NaN;
   const resetEmptyTerrain = (game, worldX, worldY, reason) => {
+    if (!game) return false;
     const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
-    const duplicate = now - lastResetAt < 80 && Math.hypot(worldX - lastResetX, worldY - lastResetY) < 4;
+    const duplicate = now - lastResetAt < 120 && Math.hypot(worldX - lastResetX, worldY - lastResetY) < 4;
     if (duplicate) return false;
     lastResetAt = now;
     lastResetX = worldX;
@@ -107,52 +109,106 @@
 
   const canvas = document.getElementById('game-canvas');
   const pointerStarts = new Map();
+  let completedPrimary = null;
+
+  const worldFromClient = (game, clientX, clientY) => {
+    const rect = canvas?.getBoundingClientRect?.();
+    if (!game || !canvas || !rect?.width || !rect?.height) return null;
+    const screenX = (clientX - rect.left) * canvas.width / rect.width;
+    const screenY = (clientY - rect.top) * canvas.height / rect.height;
+    const world = game.screenToWorld?.(screenX, screenY, 0) || game.screenToWorld?.(screenX, screenY);
+    return world && Number.isFinite(world.x) && Number.isFinite(world.y) ? world : null;
+  };
+
+  const finishPhysicalEmptyClick = (gameAtRelease, world, reason) => {
+    setTimeout(() => {
+      const game = D?.game;
+      if (!game || game !== gameAtRelease || intentionalMode(game)) return;
+      if (figureHit(game, world.x, world.y)) return;
+      if (resetEmptyTerrain(game, world.x, world.y, reason)) state.physicalEmptyClicks += 1;
+    }, 0);
+  };
+
   if (canvas) {
     canvas.addEventListener('pointerdown', event => {
       if (event.button !== 0) return;
       const game = D?.game;
-      pointerStarts.set(event.pointerId, {
+      const gesture = {
+        pointerId: event.pointerId,
         clientX: event.clientX,
         clientY: event.clientY,
+        lastClientX: event.clientX,
+        lastClientY: event.clientY,
+        maxMovement: 0,
         intentional: intentionalMode(game),
         modified: Boolean(event.shiftKey || event.ctrlKey || event.metaKey || event.altKey),
-      });
+        completedAt: 0,
+      };
+      pointerStarts.set(event.pointerId, gesture);
+      completedPrimary = null;
+    }, true);
+
+    canvas.addEventListener('pointermove', event => {
+      const gesture = pointerStarts.get(event.pointerId);
+      if (!gesture) return;
+      gesture.lastClientX = event.clientX;
+      gesture.lastClientY = event.clientY;
+      gesture.maxMovement = Math.max(
+        gesture.maxMovement,
+        Math.hypot(event.clientX - gesture.clientX, event.clientY - gesture.clientY),
+      );
     }, true);
 
     canvas.addEventListener('pointerup', event => {
-      if (event.button !== 0) return;
       const start = pointerStarts.get(event.pointerId);
       pointerStarts.delete(event.pointerId);
       if (!start) return;
-      const movement = Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY);
-      if (movement > 7 || start.modified || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey) return;
+      start.lastClientX = event.clientX;
+      start.lastClientY = event.clientY;
+      start.maxMovement = Math.max(
+        start.maxMovement,
+        Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY),
+      );
+      start.completedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      completedPrimary = start;
+
+      // Some browsers report -1 on pointerup after the primary button has
+      // already been released. Accept both 0 and -1; the pointerdown record is
+      // the authoritative proof that this was a primary-button gesture.
+      if (event.button !== 0 && event.button !== -1) return;
+      if (start.maxMovement > 7 || start.modified || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey) return;
       const gameAtRelease = D?.game;
       if (start.intentional || intentionalMode(gameAtRelease)) {
         state.intentionalClicksPreserved += 1;
         return;
       }
-
-      const rect = canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const screenX = (event.clientX - rect.left) * canvas.width / rect.width;
-      const screenY = (event.clientY - rect.top) * canvas.height / rect.height;
-      const world = gameAtRelease?.screenToWorld?.(screenX, screenY, 0) || gameAtRelease?.screenToWorld?.(screenX, screenY);
-      if (!world || !Number.isFinite(world.x) || !Number.isFinite(world.y)) return;
-
-      // Run after the historical selection owner has processed pointerup. This
-      // makes a physical click deterministic even when that owner bypasses
-      // Game.selectAt and manipulates selection directly.
-      setTimeout(() => {
-        const game = D?.game;
-        if (!game || game !== gameAtRelease || intentionalMode(game)) return;
-        if (figureHit(game, world.x, world.y)) return;
-        if (resetEmptyTerrain(game, world.x, world.y, 'physical-primary-empty-terrain')) {
-          state.physicalEmptyClicks += 1;
-        }
-      }, 0);
+      const world = worldFromClient(gameAtRelease, event.clientX, event.clientY);
+      if (world) finishPhysicalEmptyClick(gameAtRelease, world, 'physical-pointerup-empty-terrain');
     }, true);
 
-    canvas.addEventListener('pointercancel', event => pointerStarts.delete(event.pointerId), true);
+    // Browser click is the final, cross-engine fallback. It runs after the
+    // historical pointer/mouse selection listeners, so it also covers code
+    // paths that bypass Game.selectAt or report a nonstandard pointerup button.
+    canvas.addEventListener('click', event => {
+      if (event.button !== 0 || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey) return;
+      const gesture = completedPrimary;
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      if (!gesture || now - gesture.completedAt > 600 || gesture.maxMovement > 7 || gesture.modified) return;
+      const gameAtRelease = D?.game;
+      if (gesture.intentional || intentionalMode(gameAtRelease)) {
+        state.intentionalClicksPreserved += 1;
+        return;
+      }
+      const world = worldFromClient(gameAtRelease, event.clientX, event.clientY);
+      if (!world) return;
+      state.clickFallbacks += 1;
+      finishPhysicalEmptyClick(gameAtRelease, world, 'physical-click-empty-terrain');
+    }, true);
+
+    canvas.addEventListener('pointercancel', event => {
+      pointerStarts.delete(event.pointerId);
+      if (completedPrimary?.pointerId === event.pointerId) completedPrimary = null;
+    }, true);
     canvas.addEventListener('pointerleave', event => {
       if ((event.buttons & 1) === 0) pointerStarts.delete(event.pointerId);
     }, true);
