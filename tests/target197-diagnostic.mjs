@@ -79,6 +79,22 @@ const fixture = await page.evaluate(() => {
     if (!selectableOnly && near(x, y)) return null;
     return typeof originalHit === 'function' ? originalHit.call(this, x, y, selectableOnly, ...rest) : null;
   };
+
+  globalThis.__FD_TARGET197_ACTIONS__ = [];
+  const originalPostMessage = bridge.worker?.postMessage?.bind(bridge.worker);
+  if (originalPostMessage) {
+    bridge.worker.postMessage = function(message, transfer) {
+      if (message?.type === 'action') {
+        let plain = null;
+        try { plain = JSON.parse(JSON.stringify(message)); } catch (_) { plain = { type: message?.type, action: message?.action }; }
+        globalThis.__FD_TARGET197_ACTIONS__.push(plain);
+      }
+      return transfer === undefined ? originalPostMessage(message) : originalPostMessage(message, transfer);
+    };
+  }
+
+  const preHitContext = game.hitTestForContext?.(target.x, target.y)?.id || null;
+  const preHit = game.hitTest?.(target.x, target.y, false)?.id || null;
   globalThis.__FD_TARGET197_RESTORE__ = () => {
     if (hadOwnContext) game.hitTestForContext = originalContext; else delete game.hitTestForContext;
     if (hadOwnHit) game.hitTest = originalHit; else delete game.hitTest;
@@ -89,11 +105,14 @@ const fixture = await page.evaluate(() => {
     before: Object.fromEntries(units.map(unit => [unit.id, { x: unit.x, y: unit.y }])),
     center,
     target,
+    preHitContext,
+    preHit,
     beforeSeq: Number(bridge.seq || 0),
     beforeErrors: Number(bridge.actionErrors || 0),
   };
 });
 if (fixture.error) throw new Error(JSON.stringify(fixture));
+console.log('FD197_FIXTURE ' + JSON.stringify(fixture));
 
 await page.mouse.click(fixture.target.cssX, fixture.target.cssY, { button: 'right' });
 await waitFor(() => page.evaluate(beforeSeq => Number(globalThis.__FD_STABLE_STATE165__?.bridge?.seq || 0) > beforeSeq, fixture.beforeSeq), 6000);
@@ -137,6 +156,7 @@ const snapshot = async label => page.evaluate(({ label, ids, before, target, bef
   }
   return {
     label,
+    actions: [...(globalThis.__FD_TARGET197_ACTIONS__ || [])],
     bridge: bridge ? {
       seq: Number(bridge.seq || 0),
       lastAck: Number(bridge.lastAck || 0),
@@ -158,6 +178,7 @@ const snapshot = async label => page.evaluate(({ label, ids, before, target, bef
         type: unit.currentCommand.type,
         x: unit.currentCommand.x,
         y: unit.currentCommand.y,
+        targetId: unit.currentCommand.targetId,
         formationGroupId: unit.currentCommand.formationGroupId,
         formationId: unit.currentCommand.formationId,
       } : null,
