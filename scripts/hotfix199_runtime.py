@@ -103,4 +103,11 @@ for marker, label in checks.items():
 if 'unit.currentCommand = null' in gameplay_path.read_text('utf-8'):
     raise RuntimeError('build 199 readonly currentCommand assignment remains')
 
-print('Frontline Dominion build 199 canonical saved-game and transport runtime hotfix installed')
+# Patch the browser fixture after checkout so the physical click cannot land on
+# a HUD panel that geometrically overlaps an empty world-space coordinate.
+test_hotfix = Path('scripts/hotfix199_tests.py')
+if not test_hotfix.exists():
+    raise RuntimeError('build 199 test hotfix is missing')
+exec(compile(test_hotfix.read_text('utf-8'), str(test_hotfix), 'exec'), {'__name__': '__main__'})
+
+print('Frontline Dominion build 199 canonical saved-game, transport and physical-click hotfixes installed')
