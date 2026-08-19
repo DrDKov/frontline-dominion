@@ -64,6 +64,7 @@ jobs:
           GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197"
           FD_GAME_URL="$GAME_URL" FD_DIAG_DIR=diagnostics-building197 node tests/building-ghost197-diagnostic.mjs | tee diagnostics-building197/console.log
           FD_GAME_URL="$GAME_URL" FD_DIAG_DIR=diagnostics-building197 node tests/building-physical197-v2.mjs | tee -a diagnostics-building197/console.log
+          FD_GAME_URL="$GAME_URL" FD_DIAG_DIR=diagnostics-building197 node tests/building-stack197.mjs | tee -a diagnostics-building197/console.log
 
       - name: Upload diagnostic report and screenshots
         if: always()
