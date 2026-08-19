@@ -15,6 +15,7 @@ concurrency:
 jobs:
   release199:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -85,7 +86,8 @@ jobs:
           set -euo pipefail
           npm install --no-save playwright
           npx playwright install --with-deps chromium webkit
-          sed 's/198/199/g' tests/movement198.mjs > /tmp/movement199.mjs
+          sed 's/198/199/g' tests/movement198.mjs > tests/movement199.generated.mjs
+          node --check tests/movement199.generated.mjs
 
       - name: Physical reliability gates
         run: |
@@ -99,8 +101,8 @@ jobs:
           GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=199"
           FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/reliability199.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability199.mjs
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node /tmp/movement199.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node /tmp/movement199.mjs
+          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/movement199.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement199.generated.mjs
 
       - name: Publish build 199 to GitHub Pages
         env:
@@ -134,4 +136,4 @@ jobs:
           done
           test "$ok" -eq 1
           FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability199.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node /tmp/movement199.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement199.generated.mjs
