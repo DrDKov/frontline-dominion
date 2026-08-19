@@ -97,7 +97,11 @@ for marker, label in checks.items():
 if 'unit.currentCommand = null' in gameplay_path.read_text('utf-8'):
     raise RuntimeError('build 199 readonly currentCommand assignment remains')
 
-for patch_script in ('scripts/hotfix199_tests.py', 'scripts/diagnose199_waitgame.py'):
+for patch_script in (
+    'scripts/hotfix199_tests.py',
+    'scripts/diagnose199_waitgame.py',
+    'scripts/hotfix199_reliability_saveload.py',
+):
     patch = Path(patch_script)
     if not patch.exists():
         raise RuntimeError(f'build 199 patch script missing: {patch_script}')
