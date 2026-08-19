@@ -74,6 +74,7 @@ jobs:
           node --check tests/building-selection197.unit.mjs
           node --check tests/formation-target197.unit.mjs
           node --check tests/selection-target197.mjs
+          node --check tests/target197-diagnostic.mjs
           node tests/building-selection197.unit.mjs
           node tests/formation-target197.unit.mjs
           count=$(find dist/models -type f | wc -l)
@@ -95,6 +96,7 @@ jobs:
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
           GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197"
+          FD_GAME_URL="$GAME_URL" node tests/target197-diagnostic.mjs
           FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/selection-target197.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/selection-target197.mjs
 
