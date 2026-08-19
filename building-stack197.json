@@ -1,0 +1,454 @@
+{
+  "calls": [
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroUnitSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:310:9)",
+        "at GameClass.drawUnit3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:627:9)",
+        "at Game.guardedDrawUnit192 (http://127.0.0.1:8765/frontline-dominion/render-state-guard-v192.js?build=197:56:25)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:97:19)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroUnitSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:310:9)",
+        "at GameClass.drawUnit3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:627:9)",
+        "at Game.guardedDrawUnit192 (http://127.0.0.1:8765/frontline-dominion/render-state-guard-v192.js?build=197:56:25)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:97:19)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroUnitSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:310:9)",
+        "at GameClass.drawUnit3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:627:9)",
+        "at Game.guardedDrawUnit192 (http://127.0.0.1:8765/frontline-dominion/render-state-guard-v192.js?build=197:56:25)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:97:19)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroUnitSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:310:9)",
+        "at GameClass.drawUnit3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:627:9)",
+        "at Game.guardedDrawUnit192 (http://127.0.0.1:8765/frontline-dominion/render-state-guard-v192.js?build=197:56:25)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:97:19)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroUnitSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:310:9)",
+        "at GameClass.drawUnit3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:627:9)",
+        "at Game.guardedDrawUnit192 (http://127.0.0.1:8765/frontline-dominion/render-state-guard-v192.js?build=197:56:25)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:97:19)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroUnitSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:310:9)",
+        "at GameClass.drawUnit3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:627:9)",
+        "at Game.guardedDrawUnit192 (http://127.0.0.1:8765/frontline-dominion/render-state-guard-v192.js?build=197:56:25)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:97:19)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18)"
+      ]
+    },
+    {
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ],
+      "stack": [
+        "at proto.drawImage (eval at evaluate (:311:30), <anonymous>:14:23)",
+        "at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9)",
+        "at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9)",
+        "at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31)",
+        "at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39)",
+        "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5)",
+        "at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23)",
+        "at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107)",
+        "at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8347 @@
+{
+  "fixture": {
+    "id": "e2",
+    "typeId": "power",
+    "radius": 48.1,
+    "bounds": {
+      "x1": 464.45924624072444,
+      "y1": 261.3964510615697,
+      "x2": 719.6847033382444,
+      "y2": 515.9908557649617,
+      "width": 255.22545709751995,
+      "height": 254.594404703392
+    },
+    "point": {
+      "sx": 592.0719747894844,
+      "sy": 303.82885184546836,
+      "worldX": 1484.3137202754456,
+      "worldY": 10355.686279724554,
+      "distance": 84.86480156779731,
+      "hitIds": [
+        "e2"
+      ]
+    },
+    "isolatedForClick": false,
+    "clickCssX": 592.0719747894844,
+    "clickCssY": 303.82885184546836,
+    "canvasWidth": 1280,
+    "canvasHeight": 800,
+    "rect": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "selectedIds": [
+    "e2"
+  ],
+  "selectedFlag": false,
+  "geometry": {
+    "radius": 48.1
+  },
+  "pixelDiff": {
+    "region": {
+      "x": 484,
+      "y": 281,
+      "width": 215,
+      "height": 214
+    },
+    "changed": 15222,
+    "strong": 5662,
+    "total": 46010,
+    "changedRatio": 0.33084112149532713,
+    "strongRatio": 0.1230602043034123,
+    "meanAbsoluteDelta": 6.270767224516409
+  },
+  "frameSummary": [
+    {
+      "frame": 1,
+      "selectedIds": [],
+      "targetSpriteDraws": 1,
+      "allBuildingSpriteDraws": 3,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 8,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1,
+        "selectAt:enter": 1,
+        "setSelection:enter": 1,
+        "setSelection:exit": 1,
+        "selectAt:exit": 1
+      }
+    },
+    {
+      "frame": 2,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 1,
+      "allBuildingSpriteDraws": 3,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 8,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 3,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 4,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 5,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 6,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 7,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 8,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 9,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 10,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 11,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 12,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 13,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 14,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 15,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 16,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 17,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 18,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 19,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 20,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 21,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 22,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 23,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 24,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 25,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 26,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 27,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 28,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 29,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 30,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 31,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    },
+    {
+      "frame": 32,
+      "selectedIds": [
+        "e2"
+      ],
+      "targetSpriteDraws": 2,
+      "allBuildingSpriteDraws": 4,
+      "target3DCalls": 1,
+      "targetLegacyCalls": 0,
+      "clearCalls": 0,
+      "kinds": {
+        "frame:start": 1,
+        "drawTerrain:enter": 1,
+        "drawImage": 9,
+        "drawTerrain:exit": 1,
+        "drawWorldObjects3D:enter": 1,
+        "drawBuilding3D:enter": 3,
+        "drawBuilding3D:exit": 3,
+        "drawWorldObjects3D:exit": 1,
+        "frame:end": 1
+      }
+    }
+  ],
+  "events": [
+    {
+      "frame": 1,
+      "at": 2911.2000000000116,
+      "kind": "frame:start",
+      "selectedIds": []
+    },
+    {
+      "frame": 1,
+      "at": 2911.4000000000233,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 1,
+      "at": 2911.600000000006,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2911.600000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 1,
+      "at": 2911.600000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 1,
+      "at": 2912,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 1,
+      "at": 2912,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2912,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 1,
+      "at": 2912,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2912.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2912.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 1,
+      "at": 2912.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2912.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 1,
+      "at": 2912.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2912.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2912.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 1,
+      "at": 2912.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2912.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 1,
+      "at": 2912.3000000000175,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 1,
+      "at": 2912.600000000006,
+      "kind": "frame:end",
+      "selectedIds": []
+    },
+    {
+      "frame": 1,
+      "at": 2921.5,
+      "kind": "selectAt:enter",
+      "x": 1484.3136996186493,
+      "y": 10355.686275649401
+    },
+    {
+      "frame": 1,
+      "at": 2923.3000000000175,
+      "kind": "setSelection:enter",
+      "requestedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2924.100000000006,
+      "kind": "setSelection:exit",
+      "requestedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 1,
+      "at": 2927.5,
+      "kind": "selectAt:exit",
+      "x": 1484.3136996186493,
+      "y": 10355.686275649401
+    },
+    {
+      "frame": 2,
+      "at": 2953.100000000006,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2953.4000000000233,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 2,
+      "at": 2953.5,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2953.5,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 2,
+      "at": 2953.5,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 2,
+      "at": 2953.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 2,
+      "at": 2953.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2954,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 2,
+      "at": 2954,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2954,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2954.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 2,
+      "at": 2954.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2954.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 2,
+      "at": 2954.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2954.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2954.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 2,
+      "at": 2954.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 2,
+      "at": 2954.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 2,
+      "at": 2954.4000000000233,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 2,
+      "at": 2959.5,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2997.5,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2998,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 3,
+      "at": 2998,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2998,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 3,
+      "at": 2998.100000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 3,
+      "at": 2998.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 3,
+      "at": 2998.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2998.7000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 3,
+      "at": 2998.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2998.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2999.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2999.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 3,
+      "at": 2999.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2999.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 3,
+      "at": 2999.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2999.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2999.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 3,
+      "at": 2999.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 3,
+      "at": 2999.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 3,
+      "at": 2999.2000000000116,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 3,
+      "at": 3000.7000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3030.8000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3031.3000000000175,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 4,
+      "at": 3031.3000000000175,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3031.4000000000233,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 4,
+      "at": 3031.4000000000233,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 4,
+      "at": 3031.8000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 4,
+      "at": 3031.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3032,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 4,
+      "at": 3032,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3032,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3032.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3032.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 4,
+      "at": 3032.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3032.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 4,
+      "at": 3032.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3032.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3032.5,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 4,
+      "at": 3032.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 4,
+      "at": 3032.5,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 4,
+      "at": 3032.600000000006,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 4,
+      "at": 3033.100000000006,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3064.2000000000116,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3064.8000000000175,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 5,
+      "at": 3064.8000000000175,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3064.8000000000175,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 5,
+      "at": 3064.8000000000175,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 5,
+      "at": 3065.4000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 5,
+      "at": 3065.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3065.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 5,
+      "at": 3065.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3065.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3065.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3065.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 5,
+      "at": 3065.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3065.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 5,
+      "at": 3065.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3065.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3065.7000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 5,
+      "at": 3065.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 5,
+      "at": 3065.7000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 5,
+      "at": 3065.8000000000175,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 5,
+      "at": 3067.3000000000175,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3098.5,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3098.8000000000175,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 6,
+      "at": 3098.8000000000175,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3098.8000000000175,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 6,
+      "at": 3098.8000000000175,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 6,
+      "at": 3099,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 6,
+      "at": 3099.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3099.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 6,
+      "at": 3099.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3099.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 6,
+      "at": 3099.3000000000175,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 6,
+      "at": 3100.9000000000233,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3128.9000000000233,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3129.100000000006,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 7,
+      "at": 3129.100000000006,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3129.2000000000116,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 7,
+      "at": 3129.2000000000116,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 7,
+      "at": 3129.5,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 7,
+      "at": 3129.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3129.7000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 7,
+      "at": 3129.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3129.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3129.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3129.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 7,
+      "at": 3129.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3129.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 7,
+      "at": 3130,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3130,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3130,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 7,
+      "at": 3130.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 7,
+      "at": 3130.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 7,
+      "at": 3130.100000000006,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 7,
+      "at": 3130.600000000006,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3159.8000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 8,
+      "at": 3160,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.100000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 8,
+      "at": 3160.100000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 8,
+      "at": 3160.4000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 8,
+      "at": 3160.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.5,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 8,
+      "at": 3160.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.7000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 8,
+      "at": 3160.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.8000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 8,
+      "at": 3160.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.8000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 8,
+      "at": 3160.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 8,
+      "at": 3160.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 8,
+      "at": 3160.9000000000233,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 8,
+      "at": 3161.4000000000233,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3196.100000000006,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3196.4000000000233,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 9,
+      "at": 3196.5,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3196.5,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 9,
+      "at": 3196.5,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 9,
+      "at": 3196.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 9,
+      "at": 3196.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3197,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 9,
+      "at": 3197,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3197,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3197.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3197.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 9,
+      "at": 3197.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3197.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 9,
+      "at": 3197.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3197.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3197.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 9,
+      "at": 3197.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 9,
+      "at": 3197.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 9,
+      "at": 3197.4000000000233,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 9,
+      "at": 3198.7000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3231.4000000000233,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3231.5,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 10,
+      "at": 3231.600000000006,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3231.600000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 10,
+      "at": 3231.600000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 10,
+      "at": 3231.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 10,
+      "at": 3231.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3231.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 10,
+      "at": 3231.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3231.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3232.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3232.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 10,
+      "at": 3232.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3232.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 10,
+      "at": 3232.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3232.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3232.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 10,
+      "at": 3232.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 10,
+      "at": 3232.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 10,
+      "at": 3232.2000000000116,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 10,
+      "at": 3233.8000000000175,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3263.4000000000233,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3263.600000000006,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 11,
+      "at": 3263.600000000006,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3263.600000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 11,
+      "at": 3263.600000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 11,
+      "at": 3263.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 11,
+      "at": 3263.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3264,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 11,
+      "at": 3264,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3264,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3264.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3264.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 11,
+      "at": 3264.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3264.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 11,
+      "at": 3264.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3264.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3264.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 11,
+      "at": 3264.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 11,
+      "at": 3264.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 11,
+      "at": 3264.3000000000175,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 11,
+      "at": 3265.2000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3292.9000000000233,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3293.3000000000175,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 12,
+      "at": 3293.3000000000175,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3293.4000000000233,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 12,
+      "at": 3293.4000000000233,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 12,
+      "at": 3293.7000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 12,
+      "at": 3293.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3293.8000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 12,
+      "at": 3293.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3293.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3294,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3294.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 12,
+      "at": 3294.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3294.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 12,
+      "at": 3294.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3294.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3294.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 12,
+      "at": 3294.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 12,
+      "at": 3294.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 12,
+      "at": 3294.2000000000116,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 12,
+      "at": 3294.7000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3323.8000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 13,
+      "at": 3324,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 13,
+      "at": 3324,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 13,
+      "at": 3324.4000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 13,
+      "at": 3324.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324.5,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 13,
+      "at": 3324.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324.7000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 13,
+      "at": 3324.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324.8000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 13,
+      "at": 3324.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3324.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 13,
+      "at": 3324.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 13,
+      "at": 3325,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 13,
+      "at": 3325,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 13,
+      "at": 3327.2000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3362.8000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 14,
+      "at": 3363,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.100000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 14,
+      "at": 3363.100000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 14,
+      "at": 3363.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 14,
+      "at": 3363.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 14,
+      "at": 3363.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 14,
+      "at": 3363.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 14,
+      "at": 3363.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.8000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 14,
+      "at": 3363.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 14,
+      "at": 3363.8000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 14,
+      "at": 3363.8000000000175,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 14,
+      "at": 3364.600000000006,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3393.9000000000233,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 15,
+      "at": 3394,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 15,
+      "at": 3394.100000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 15,
+      "at": 3394.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 15,
+      "at": 3394.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 15,
+      "at": 3394.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 15,
+      "at": 3394.600000000006,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 15,
+      "at": 3395.5,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3424.3000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3424.3000000000175,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 16,
+      "at": 3424.4000000000233,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3424.4000000000233,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 16,
+      "at": 3424.4000000000233,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 16,
+      "at": 3424.7000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 16,
+      "at": 3424.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3424.8000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 16,
+      "at": 3424.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3424.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3424.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3425,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 16,
+      "at": 3425,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3425,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 16,
+      "at": 3425,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3425,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3425.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 16,
+      "at": 3425.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 16,
+      "at": 3425.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 16,
+      "at": 3425.100000000006,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 16,
+      "at": 3426,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3454.3000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3454.5,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 17,
+      "at": 3454.5,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3454.600000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 17,
+      "at": 3454.600000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 17,
+      "at": 3454.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 17,
+      "at": 3454.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3454.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 17,
+      "at": 3454.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3455,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3455,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3455,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 17,
+      "at": 3455.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3455.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 17,
+      "at": 3455.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3455.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3455.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 17,
+      "at": 3455.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 17,
+      "at": 3455.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 17,
+      "at": 3455.2000000000116,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 17,
+      "at": 3456.600000000006,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3483.4000000000233,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3483.600000000006,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 18,
+      "at": 3483.600000000006,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3483.600000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 18,
+      "at": 3483.600000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 18,
+      "at": 3483.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 18,
+      "at": 3483.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3484,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 18,
+      "at": 3484,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3484,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3484.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3484.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 18,
+      "at": 3484.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3484.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 18,
+      "at": 3484.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3484.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3484.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 18,
+      "at": 3484.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 18,
+      "at": 3484.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 18,
+      "at": 3484.2000000000116,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 18,
+      "at": 3484.600000000006,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.2000000000116,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.4000000000233,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 19,
+      "at": 3514.4000000000233,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.4000000000233,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 19,
+      "at": 3514.4000000000233,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 19,
+      "at": 3514.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 19,
+      "at": 3514.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.7000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 19,
+      "at": 3514.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.8000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 19,
+      "at": 3514.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 19,
+      "at": 3514.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3514.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 19,
+      "at": 3515,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 19,
+      "at": 3515,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 19,
+      "at": 3515,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 19,
+      "at": 3515.9000000000233,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.100000000006,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 20,
+      "at": 3545.2000000000116,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.2000000000116,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 20,
+      "at": 3545.2000000000116,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 20,
+      "at": 3545.5,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 20,
+      "at": 3545.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.5,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 20,
+      "at": 3545.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 20,
+      "at": 3545.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.7000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 20,
+      "at": 3545.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 20,
+      "at": 3545.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 20,
+      "at": 3545.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 20,
+      "at": 3546,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 20,
+      "at": 3547.7000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.2000000000116,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 21,
+      "at": 3575.2000000000116,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.3000000000175,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 21,
+      "at": 3575.3000000000175,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 21,
+      "at": 3575.5,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 21,
+      "at": 3575.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 21,
+      "at": 3575.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 21,
+      "at": 3575.8000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 21,
+      "at": 3575.9000000000233,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 21,
+      "at": 3576.100000000006,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3605.7000000000116,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 22,
+      "at": 3606,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 22,
+      "at": 3606,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 22,
+      "at": 3606.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 22,
+      "at": 3606.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 22,
+      "at": 3606.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606.4000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 22,
+      "at": 3606.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 22,
+      "at": 3606.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 22,
+      "at": 3606.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 22,
+      "at": 3606.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 22,
+      "at": 3606.7000000000116,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 22,
+      "at": 3607.8000000000175,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.2000000000116,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 23,
+      "at": 3637.2000000000116,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.3000000000175,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 23,
+      "at": 3637.3000000000175,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 23,
+      "at": 3637.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 23,
+      "at": 3637.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.7000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 23,
+      "at": 3637.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 23,
+      "at": 3637.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 23,
+      "at": 3638,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 23,
+      "at": 3638.8000000000175,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3667.3000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3667.7000000000116,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 24,
+      "at": 3667.7000000000116,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3667.8000000000175,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 24,
+      "at": 3667.8000000000175,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 24,
+      "at": 3668,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 24,
+      "at": 3668,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3668.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 24,
+      "at": 3668.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3668.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3668.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3668.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 24,
+      "at": 3668.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3668.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 24,
+      "at": 3668.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3668.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3668.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 24,
+      "at": 3668.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 24,
+      "at": 3668.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 24,
+      "at": 3668.3000000000175,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 24,
+      "at": 3670,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3698.5,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3698.8000000000175,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 25,
+      "at": 3698.8000000000175,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3698.9000000000233,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 25,
+      "at": 3698.9000000000233,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 25,
+      "at": 3699.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 25,
+      "at": 3699.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3699.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 25,
+      "at": 3699.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3699.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3699.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3699.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 25,
+      "at": 3699.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3699.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 25,
+      "at": 3699.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3699.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3699.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 25,
+      "at": 3699.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 25,
+      "at": 3699.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 25,
+      "at": 3699.4000000000233,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 25,
+      "at": 3700.2000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3728.4000000000233,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3728.7000000000116,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 26,
+      "at": 3728.7000000000116,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3728.7000000000116,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 26,
+      "at": 3728.7000000000116,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 26,
+      "at": 3729,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 26,
+      "at": 3729,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3729,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 26,
+      "at": 3729.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3729.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3729.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3729.2000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 26,
+      "at": 3729.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3729.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 26,
+      "at": 3729.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3729.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3729.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 26,
+      "at": 3729.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 26,
+      "at": 3729.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 26,
+      "at": 3729.4000000000233,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 26,
+      "at": 3729.600000000006,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3758.8000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3758.9000000000233,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 27,
+      "at": 3759,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 27,
+      "at": 3759,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 27,
+      "at": 3759.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 27,
+      "at": 3759.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 27,
+      "at": 3759.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759.5,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 27,
+      "at": 3759.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 27,
+      "at": 3759.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 27,
+      "at": 3759.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 27,
+      "at": 3759.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 27,
+      "at": 3759.600000000006,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 27,
+      "at": 3760.5,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3790.3000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3790.5,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 28,
+      "at": 3790.5,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3790.600000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 28,
+      "at": 3790.600000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 28,
+      "at": 3790.8000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 28,
+      "at": 3790.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3790.9000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 28,
+      "at": 3790.9000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3791,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3791,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3791,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 28,
+      "at": 3791,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3791.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 28,
+      "at": 3791.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3791.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3791.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 28,
+      "at": 3791.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 28,
+      "at": 3791.100000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 28,
+      "at": 3791.100000000006,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 28,
+      "at": 3791.9000000000233,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3820.8000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.100000000006,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 29,
+      "at": 3821.100000000006,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.100000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 29,
+      "at": 3821.100000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 29,
+      "at": 3821.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 29,
+      "at": 3821.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 29,
+      "at": 3821.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.5,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 29,
+      "at": 3821.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.5,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 29,
+      "at": 3821.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 29,
+      "at": 3821.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 29,
+      "at": 3821.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 29,
+      "at": 3821.600000000006,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 29,
+      "at": 3822.5,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3852.600000000006,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3852.8000000000175,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 30,
+      "at": 3852.8000000000175,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3852.8000000000175,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 30,
+      "at": 3852.8000000000175,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 30,
+      "at": 3853.100000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 30,
+      "at": 3853.100000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3853.2000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 30,
+      "at": 3853.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3853.2000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3853.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3853.3000000000175,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 30,
+      "at": 3853.3000000000175,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3853.3000000000175,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 30,
+      "at": 3853.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3853.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3853.4000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 30,
+      "at": 3853.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 30,
+      "at": 3853.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 30,
+      "at": 3853.4000000000233,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 30,
+      "at": 3854.2000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3881.8000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.100000000006,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 31,
+      "at": 3882.100000000006,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.2000000000116,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 31,
+      "at": 3882.2000000000116,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 31,
+      "at": 3882.4000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 31,
+      "at": 3882.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 31,
+      "at": 3882.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 31,
+      "at": 3882.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 31,
+      "at": 3882.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.7000000000116,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 31,
+      "at": 3882.7000000000116,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 31,
+      "at": 3882.7000000000116,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 31,
+      "at": 3882.8000000000175,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 31,
+      "at": 3883.7000000000116,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3912.8000000000175,
+      "kind": "frame:start",
+      "selectedIds": [
+        "e2"
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913,
+      "kind": "drawTerrain:enter"
+    },
+    {
+      "frame": 32,
+      "at": 3913,
+      "kind": "drawImage",
+      "source": "HTMLCanvasElement",
+      "args": [
+        0,
+        0
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.100000000006,
+      "kind": "drawTerrain:exit"
+    },
+    {
+      "frame": 32,
+      "at": 3913.100000000006,
+      "kind": "drawWorldObjects3D:enter",
+      "count": 38
+    },
+    {
+      "frame": 32,
+      "at": 3913.4000000000233,
+      "kind": "drawBuilding3D:enter",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 32,
+      "at": 3913.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        983.738646526096,
+        24.386805954525485,
+        283.54936798103995,
+        212.66202598577996
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.4000000000233,
+      "kind": "drawBuilding3D:exit",
+      "id": "e4",
+      "typeId": "barracks",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 52.7
+    },
+    {
+      "frame": 32,
+      "at": 3913.4000000000233,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1378.598365975514,
+        115.1162038955518,
+        73.65748965517241,
+        55.24311724137931
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        838.6023858816986,
+        295.50917011044714,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        406.57438535219444,
+        277.74844696953807,
+        370.99517887457995,
+        278.24638415593495
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.5,
+      "kind": "drawBuilding3D:enter",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 32,
+      "at": 3913.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        464.45924624072444,
+        324.5717629418217,
+        255.22545709752,
+        191.41909282314
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.5,
+      "kind": "drawBuilding3D:exit",
+      "id": "e2",
+      "typeId": "power",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 48.1
+    },
+    {
+      "frame": 32,
+      "at": 3913.5,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1383.6402928202895,
+        409.85116505543664,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/c-u01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        192,
+        144,
+        1192.2971978312098,
+        534.2821595543958,
+        98.36328959999999,
+        61.03049142857143
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.600000000006,
+      "kind": "drawBuilding3D:enter",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 32,
+      "at": 3913.600000000006,
+      "kind": "drawImage",
+      "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+      "args": [
+        0,
+        0,
+        512,
+        384,
+        682.9908486022392,
+        414.5601917539209,
+        386.39326173599994,
+        289.79494630199997
+      ]
+    },
+    {
+      "frame": 32,
+      "at": 3913.600000000006,
+      "kind": "drawBuilding3D:exit",
+      "id": "e1",
+      "typeId": "hq",
+      "selectedFlag": false,
+      "selectedInArray": false,
+      "radius": 71
+    },
+    {
+      "frame": 32,
+      "at": 3913.600000000006,
+      "kind": "drawWorldObjects3D:exit",
+      "count": 38
+    },
+    {
+      "frame": 32,
+      "at": 3914.4000000000233,
+      "kind": "frame:end",
+      "selectedIds": [
+        "e2"
+      ]
+    }
+  ],
+  "invariance": {
+    "selectionMutationsReverted": 0,
+    "renderMutationsReverted": 0,
+    "selectedFlagsCleared": 54,
+    "legacyOverlaysSuppressed": 0,
+    "bracketOverlays": 66,
+    "maxScaleDelta": 0,
+    "lastBuildingId": null,
+    "lastReason": null
+  },
+  "owner196": {
+    "flagsCleared": 2,
+    "selectionCanonicalizations": 270,
+    "renderSelectionMasks": 0,
+    "overlayFrames": 0,
+    "overlayDraws": 0,
+    "duplicateSelectedIdsRemoved": 0,
+    "lastSelectedIds": []
+  },
+  "selection193": {
+    "clicks": 1,
+    "directSelections": 1,
+    "duplicateSelectionIdsPrevented": 0,
+    "duplicateBuildingDrawsPrevented": 0,
+    "selectedBuildingRenderFlagsNeutralized": 0,
+    "selectionOverlayDraws": 0,
+    "lastBuildingId": "e2",
+    "lastBoundsSource": "approved-sprite",
+    "lastHitCount": 1,
+    "lastPointerSource": "input-css-scaled",
+    "lastPointerScaleX": 1,
+    "lastPointerScaleY": 1
+  },
+  "browserErrors": []
+}

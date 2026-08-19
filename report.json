@@ -1,0 +1,2219 @@
+{
+  "ok": true,
+  "url": "http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197",
+  "inventory": {
+    "count": 38,
+    "player": [
+      {
+        "id": "e1",
+        "typeId": "hq",
+        "x": 1330,
+        "y": 11000,
+        "radius": 71,
+        "selected": false,
+        "kind": "building"
+      },
+      {
+        "id": "e2",
+        "typeId": "power",
+        "x": 1300,
+        "y": 10540,
+        "radius": 48.1,
+        "selected": false,
+        "kind": "building"
+      },
+      {
+        "id": "e3",
+        "typeId": "refinery",
+        "x": 2160,
+        "y": 11470,
+        "radius": 59.5,
+        "selected": false,
+        "kind": "building"
+      },
+      {
+        "id": "e4",
+        "typeId": "barracks",
+        "x": 2190,
+        "y": 10570,
+        "radius": 52.7,
+        "selected": false,
+        "kind": "building"
+      }
+    ],
+    "allIds": [
+      "e1",
+      "e2",
+      "e3",
+      "e4",
+      "e10",
+      "e11",
+      "e12",
+      "e13",
+      "e166",
+      "e167",
+      "e168",
+      "e169",
+      "e170",
+      "e171",
+      "e172",
+      "e173",
+      "e174",
+      "e175",
+      "e176",
+      "e177",
+      "e178",
+      "e179",
+      "e180",
+      "e181",
+      "e182",
+      "e183",
+      "e184",
+      "e185",
+      "e186",
+      "e187",
+      "e188",
+      "e189",
+      "e190",
+      "e191",
+      "e192",
+      "e193",
+      "e194",
+      "e195"
+    ],
+    "duplicateIds": [],
+    "nearDuplicates": [],
+    "ownKeys": [
+      "_fdBuildingDrawIds193",
+      "_fdWorkerRenderUnitIds172",
+      "_spriteDepthBuckets123",
+      "_terrainSpriteCache123",
+      "_v94MiniRenderAt",
+      "_v94RenderAt",
+      "_v94RenderCamera",
+      "buildCategory",
+      "buildMode",
+      "buildingSpatial",
+      "buildingSpriteCache",
+      "buildings",
+      "lastBuildOrientations",
+      "renderAlpha",
+      "renderBackend",
+      "renderSnapshot",
+      "renderer",
+      "selected",
+      "unitSpriteCache"
+    ],
+    "protoKeys": [
+      "rebuildSpatialIndexes",
+      "queryBuildings",
+      "getBuildingWeaponMuzzle",
+      "findBuildingCollision",
+      "collidesWithBuilding",
+      "findFirstBuildingOnSegment",
+      "resolveUnitBuildingOverlap",
+      "renderFormationEditor",
+      "drawFormationPreview",
+      "findAiBuildSpot",
+      "hasBuilding",
+      "clearSelection",
+      "setSelection",
+      "selectAt",
+      "selectRect",
+      "getSelectedUnits",
+      "getSelectedWorkers",
+      "getPrimarySelection",
+      "beginBuild",
+      "isBuildPlacementValid",
+      "placeBuilding",
+      "sellSelectedBuilding",
+      "getSelectedStrategicLauncher",
+      "renderPowersUI",
+      "renderSelectionUI",
+      "renderUnitCommandButtons",
+      "renderBuildingCommandButtons",
+      "renderActionUI",
+      "renderQueue",
+      "getUnitSprite",
+      "paintUnitSprite",
+      "paintInfantrySprite",
+      "paintVehicleSprite",
+      "paintAircraftSprite",
+      "paintModernVehicleSprite",
+      "paintModernAircraftSprite",
+      "drawUnitDynamicDetails",
+      "getBuildingSprite",
+      "paintBuildingSprite",
+      "drawBuildingDynamicDetails",
+      "drawWorldObjects3D",
+      "drawDecoration3D",
+      "drawResource3D",
+      "drawCompactDefense3D",
+      "drawBuilding3D",
+      "drawUnit3D",
+      "drawInfantryUnit3D",
+      "drawVehicleUnit3D",
+      "drawAirUnit3D",
+      "drawScreenHealthBar",
+      "drawProjectiles3D",
+      "drawEffects3D",
+      "drawBuildGhost3D",
+      "drawCameraCompass",
+      "render",
+      "drawTerrain",
+      "drawScorchMarks",
+      "drawDecorations",
+      "drawResources",
+      "drawAbilityZones",
+      "drawBuildings",
+      "drawBuilding",
+      "drawModernInfantry",
+      "drawModernBuildingGroundPad",
+      "drawModernBuildingRoofDetails",
+      "drawUnits",
+      "drawUnit",
+      "drawSelectionRing",
+      "drawHealthBar",
+      "drawProjectiles",
+      "drawEffects",
+      "drawFog",
+      "drawSelectedCommands",
+      "drawBuildGhost",
+      "drawScreenOverlay",
+      "renderMinimap",
+      "buildFormationSlots",
+      "renderUnitModificationPanel",
+      "loadSelectedTransports78",
+      "unloadSelectedTransports78",
+      "drawRallyFlags80",
+      "buildExtractorFromResource83",
+      "updateSelectionPanel",
+      "remainingCombatBuildings84",
+      "buildingIntervalTicksV9",
+      "buildRenderSnapshotV9",
+      "selectAirRosterUnits93",
+      "renderAirfieldRoster93",
+      "selectAirWing93",
+      "getBuildingFootprint",
+      "getBuildingFootprintAt",
+      "getEntityBuildingFootprintAt",
+      "unitCollidesWithBuilding115",
+      "getBuildingSurfaceDistance117",
+      "isBuildingInteractionReady117",
+      "getTallestBuildingHeight119",
+      "assignEnemyBuilders127",
+      "renderUnitModificationBatch132",
+      "rebuildTerrainNavigation133",
+      "drawFriendlyAircraftOverFog137",
+      "getInfantryRenderGeometry190",
+      "getInfantryRenderGeometry191",
+      "getSelectionPointerScreen193",
+      "getBuildingFigureScreenBounds193",
+      "getBuildingFigureHits193",
+      "__fdBuildingDrawDiag197Installed"
+    ]
+  },
+  "cases": [
+    {
+      "fixture": {
+        "id": "e1",
+        "typeId": "hq",
+        "x": 1330,
+        "y": 11000,
+        "radius": 71,
+        "bounds": {
+          "width": 386.3932617359999,
+          "height": 422.7106118140733
+        }
+      },
+      "plain": {
+        "label": "e1:plain:normal",
+        "selectedInArray": false,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 10,
+        "spriteCalls": [
+          {
+            "label": "e1:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              717.0179686625303,
+              -130.3111872063427,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e1:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              197.73856837715874,
+              169.87376978095358,
+              255.22545709752,
+              191.41909282314
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e1:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              1206.2420026613331,
+              168.40298944647068,
+              314.0012553804,
+              235.5009415353
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e1:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              416.2701707386735,
+              259.8621985930528,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e1:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e1:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 5,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e1:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 7,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e1:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 9,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 71
+        }
+      },
+      "selected": {
+        "label": "e1:selected:normal",
+        "selectedInArray": true,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 10,
+        "spriteCalls": [
+          {
+            "label": "e1:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              717.0179686625303,
+              -130.3111872063427,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e1:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              197.73856837715874,
+              169.87376978095358,
+              255.22545709752,
+              191.41909282314
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e1:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              1206.2420026613331,
+              168.40298944647068,
+              314.0012553804,
+              235.5009415353
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e1:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              416.2701707386735,
+              259.8621985930528,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e1:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e1:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 5,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e1:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 7,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e1:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 9,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 71
+        }
+      },
+      "isolatedPlain": {
+        "label": "e1:plain:isolated",
+        "selectedInArray": false,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 7,
+        "spriteCalls": [
+          {
+            "label": "e1:plain:isolated",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              416.2701707386735,
+              259.8621985930528,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e1:plain:isolated",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 6,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 71
+        }
+      },
+      "isolatedSelected": {
+        "label": "e1:selected:isolated",
+        "selectedInArray": true,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 8,
+        "spriteCalls": [
+          {
+            "label": "e1:selected:isolated",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              416.2701707386735,
+              259.8621985930528,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e1:selected:isolated",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 6,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 71
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "e2",
+        "typeId": "power",
+        "x": 1300,
+        "y": 10540,
+        "radius": 48.1,
+        "bounds": {
+          "width": 255.22545709752012,
+          "height": 254.59440470339197
+        }
+      },
+      "plain": {
+        "label": "e2:plain:normal",
+        "selectedInArray": false,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 7,
+        "spriteCalls": [
+          {
+            "label": "e2:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              1031.6666717366115,
+              -3.411448667573538,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e2:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              512.3872714512399,
+              296.7735083197227,
+              255.22545709752,
+              191.41909282314
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e2:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              730.9188738127548,
+              386.7619371318219,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e2:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e2:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 4,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e2:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 6,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 48.1
+        }
+      },
+      "selected": {
+        "label": "e2:selected:normal",
+        "selectedInArray": true,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 7,
+        "spriteCalls": [
+          {
+            "label": "e2:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              1031.6666717366115,
+              -3.411448667573538,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e2:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              512.3872714512399,
+              296.7735083197227,
+              255.22545709752,
+              191.41909282314
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e2:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              730.9188738127548,
+              386.7619371318219,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e2:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e2:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 4,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e2:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 6,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 48.1
+        }
+      },
+      "isolatedPlain": {
+        "label": "e2:plain:isolated",
+        "selectedInArray": false,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 5,
+        "spriteCalls": [
+          {
+            "label": "e2:plain:isolated",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              512.3872714512399,
+              296.7735083197227,
+              255.22545709752,
+              191.41909282314
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e2:plain:isolated",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 3,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 48.1
+        }
+      },
+      "isolatedSelected": {
+        "label": "e2:selected:isolated",
+        "selectedInArray": true,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 5,
+        "spriteCalls": [
+          {
+            "label": "e2:selected:isolated",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              512.3872714512399,
+              296.7735083197227,
+              255.22545709752,
+              191.41909282314
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e2:selected:isolated",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 3,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 48.1
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "e3",
+        "typeId": "refinery",
+        "x": 2160,
+        "y": 11470,
+        "radius": 59.5,
+        "bounds": {
+          "width": 314.0012553803999,
+          "height": 337.7274970962604
+        }
+      },
+      "plain": {
+        "label": "e3:plain:normal",
+        "selectedInArray": false,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 9,
+        "spriteCalls": [
+          {
+            "label": "e3:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              -6.2246616890029145,
+              -26.952447626836133,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e3:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              482.99937230980004,
+              271.76172902597716,
+              314.0012553804,
+              235.5009415353
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e3:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              -306.97245961285955,
+              363.2209381725594,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e3:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e3:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 6,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e3:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 7,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 59.5
+        }
+      },
+      "selected": {
+        "label": "e3:selected:normal",
+        "selectedInArray": true,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 9,
+        "spriteCalls": [
+          {
+            "label": "e3:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              -6.2246616890029145,
+              -26.952447626836133,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e3:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              482.99937230980004,
+              271.76172902597716,
+              314.0012553804,
+              235.5009415353
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e3:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              -306.97245961285955,
+              363.2209381725594,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e3:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e3:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 6,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e3:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 7,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 59.5
+        }
+      },
+      "isolatedPlain": {
+        "label": "e3:plain:isolated",
+        "selectedInArray": false,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 7,
+        "spriteCalls": [
+          {
+            "label": "e3:plain:isolated",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              482.99937230980004,
+              271.76172902597716,
+              314.0012553804,
+              235.5009415353
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e3:plain:isolated",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 5,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 59.5
+        }
+      },
+      "isolatedSelected": {
+        "label": "e3:selected:isolated",
+        "selectedInArray": true,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 7,
+        "spriteCalls": [
+          {
+            "label": "e3:selected:isolated",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              482.99937230980004,
+              271.76172902597716,
+              314.0012553804,
+              235.5009415353
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e3:selected:isolated",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 5,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 59.5
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "e4",
+        "typeId": "barracks",
+        "x": 2190,
+        "y": 10570,
+        "radius": 52.7,
+        "bounds": {
+          "width": 283.54936798103995,
+          "height": 260.3981072756536
+        }
+      },
+      "plain": {
+        "label": "e4:plain:normal",
+        "selectedInArray": false,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 10,
+        "spriteCalls": [
+          {
+            "label": "e4:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              498.22531600948,
+              285.8065385462233,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e4:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              -21.054084275891398,
+              585.9914955335195,
+              255.22545709752,
+              191.41909282314
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e4:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              987.4493500082831,
+              584.5207151990365,
+              314.0012553804,
+              235.5009415353
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e4:plain:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              197.47751808562336,
+              675.9799243456188,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e4:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e4:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 5,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e4:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 7,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e4:plain:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 8,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 52.7
+        }
+      },
+      "selected": {
+        "label": "e4:selected:normal",
+        "selectedInArray": true,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 10,
+        "spriteCalls": [
+          {
+            "label": "e4:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              498.22531600948,
+              285.8065385462233,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e4:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              -21.054084275891398,
+              585.9914955335195,
+              255.22545709752,
+              191.41909282314
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e4:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              987.4493500082831,
+              584.5207151990365,
+              314.0012553804,
+              235.5009415353
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          },
+          {
+            "label": "e4:selected:normal",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              197.47751808562336,
+              675.9799243456188,
+              386.39326173599994,
+              289.79494630199997
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-02-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-07-views.webp?build=190",
+            "count": 1
+          },
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-01-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e4:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e4:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 5,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e4:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 7,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          },
+          {
+            "label": "e4:selected:normal",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 8,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 52.7
+        }
+      },
+      "isolatedPlain": {
+        "label": "e4:plain:isolated",
+        "selectedInArray": false,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 7,
+        "spriteCalls": [
+          {
+            "label": "e4:plain:isolated",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              498.22531600948,
+              285.8065385462233,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e4:plain:isolated",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 52.7
+        }
+      },
+      "isolatedSelected": {
+        "label": "e4:selected:isolated",
+        "selectedInArray": true,
+        "buildingSelectedFlag": false,
+        "totalImageCalls": 7,
+        "spriteCalls": [
+          {
+            "label": "e4:selected:isolated",
+            "canvasId": "game-canvas",
+            "canvasWidth": 1280,
+            "canvasHeight": 800,
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "imageWidth": 512,
+            "imageHeight": 384,
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              498.22531600948,
+              285.8065385462233,
+              283.54936798103995,
+              212.66202598577996
+            ],
+            "transform": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "e": 0,
+              "f": 0
+            },
+            "alpha": 1,
+            "composite": "source-over",
+            "stack": "at prototype.drawImage (<anonymous>:47:18) | at CanvasRenderingContext2D.<computed> [as drawImage] (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:18992:404) | at drawHeroBuildingSprite (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:219:9) | at GameClass.drawBuilding3D (http://127.0.0.1:8765/frontline-dominion/model-pilot-v101.js?build=197:679:9) | at Game.singleBuildingDraw193 (http://127.0.0.1:8765/frontline-dominion/building-selection-v193.js?build=197:350:31) | at Game.invariantBuildingDraw197 (http://127.0.0.1:8765/frontline-dominion/building-selection-invariance-v197.js?build=197:202:39) | at proto.drawBuilding3D (eval at evaluate (:311:30), <anonymous>:28:31) | at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47)"
+          }
+        ],
+        "sourceSummary": [
+          {
+            "source": "http://127.0.0.1:8765/frontline-dominion/models/canvas/b-13-views.webp?build=190",
+            "count": 1
+          }
+        ],
+        "targetBuildingCalls": [],
+        "allBuildingEntries": [
+          {
+            "label": "e4:selected:isolated",
+            "phase": "enter",
+            "id": null,
+            "typeId": null,
+            "x": 0,
+            "y": 0,
+            "selected": false,
+            "alive": true,
+            "radius": 0,
+            "start": 1,
+            "stack": "at drawDepthBuckets123 (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:96:47) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/sprite-scale-v123.js?build=197:145:5) | at Game.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/mass-scale-v94.js?build=197:1506:23) | at GameClass.drawWorldObjects3D (http://127.0.0.1:8765/frontline-dominion/legion-render-v125.js?build=197:550:107) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:11567:12) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:16760:18) | at Game.render (http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197:17635:18)"
+          }
+        ],
+        "geometry": {
+          "radius": 52.7
+        }
+      }
+    }
+  ],
+  "errors": []
+}
