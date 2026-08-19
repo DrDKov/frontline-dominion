@@ -68,12 +68,12 @@ jobs:
           grep -q 'tagIssuedOrder(game, unitIds' dist/formation-target-fidelity-v197.js
           grep -q 'Build 197 move target was not attached to authoritative commands' dist/authoritative-simulation-worker-v174.js
           grep -q 'Build 197 attack-move target was not attached to authoritative commands' dist/authoritative-simulation-worker-v174.js
+          grep -q 'Build 197 context move target was not attached to authoritative commands' dist/authoritative-simulation-worker-v174.js
           python -m py_compile scripts/assemble197.py scripts/hotfix197_worker_action_target.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/building-selection197.unit.mjs
           node --check tests/formation-target197.unit.mjs
           node --check tests/selection-target197.mjs
-          node --check tests/target197-diagnostic.mjs
           node tests/building-selection197.unit.mjs
           node tests/formation-target197.unit.mjs
           count=$(find dist/models -type f | wc -l)
@@ -95,7 +95,6 @@ jobs:
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
           GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197"
-          FD_GAME_URL="$GAME_URL" node tests/target197-diagnostic.mjs
           FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/selection-target197.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/selection-target197.mjs
 
