@@ -1,0 +1,74 @@
+name: Diagnose selected building rendering
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: diagnose-building197
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Assemble current build 197
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+          python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
+
+      - name: Install Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Capture selected building render diagnostics
+        run: |
+          set -euo pipefail
+          rm -rf smoke-root diagnostics-building197
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd-building197-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=197"
+          FD_GAME_URL="$GAME_URL" FD_DIAG_DIR=diagnostics-building197 node tests/building-ghost197-diagnostic.mjs | tee diagnostics-building197/console.log
+
+      - name: Upload diagnostic report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selected-building-render-diagnostics
+          path: diagnostics-building197
+          if-no-files-found: warn
+          retention-days: 7
