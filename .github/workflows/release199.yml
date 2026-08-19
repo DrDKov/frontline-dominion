@@ -105,7 +105,7 @@ jobs:
           grep -q 'bridge.ready && tick > 0' dist/runtime-shell-v199.js
           grep -q 'startButton.disabled = false' dist/runtime-shell-v199.js
           grep -q 'loadButton.disabled = !candidate' dist/runtime-shell-v199.js
-          python -m py_compile scripts/assemble199.py scripts/hotfix199_runtime.py
+          python -m py_compile scripts/assemble199.py scripts/hotfix199_runtime.py scripts/generate199_save_load.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/reliability199.mjs
           node tests/building-selection197.unit.mjs
@@ -119,7 +119,9 @@ jobs:
           npm install --no-save playwright
           npx playwright install chromium
           sed 's/198/199/g' tests/movement198.mjs > tests/movement199.generated.mjs
+          python scripts/generate199_save_load.py
           node --check tests/movement199.generated.mjs
+          node --check tests/save-load199.generated.mjs
 
       - name: Physical Chromium reliability gates
         run: |
@@ -133,6 +135,7 @@ jobs:
           GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=199"
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability199.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement199.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/save-load199.generated.mjs
 
       - name: Publish build 199 to GitHub Pages
         env:
@@ -167,6 +170,7 @@ jobs:
           test "$ok" -eq 1
           FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability199.mjs
           FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement199.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/save-load199.generated.mjs
 
       - name: Publish final run result
         if: always()
