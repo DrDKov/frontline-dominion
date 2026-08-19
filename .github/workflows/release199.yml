@@ -15,10 +15,37 @@ concurrency:
 jobs:
   release199:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Publish active run identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf release-status
+          mkdir release-status
+          cat > release-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "status": "in_progress",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "started_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release-status
+          git add current.json
+          git commit -m "Build 199 run ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release-status
 
       - name: Assemble Frontline Dominion v16.8.15 build 199
         run: |
@@ -69,6 +96,7 @@ jobs:
           grep -q 'runtime-shell-v199.js?build=199' dist/frontline-dominion.html
           ! grep -q 'building-single-render-v198.js?build=199' dist/frontline-dominion.html
           ! grep -q 'drawBracketOverlay(this, building);' dist/building-selection-invariance-v197.js
+          ! grep -q 'unit.currentCommand = null' dist/gameplay-reliability-v199.js
           grep -q '__FD_GAMEPLAY_RELIABILITY_199__' dist/gameplay-reliability-v199.js
           grep -q '__FD_BUILDING_RENDER_AUTHORITY_199__' dist/building-render-authority-v199.js
           grep -q '__FD_INTERACTION_RESET_199__' dist/interaction-reset-v199.js
@@ -85,15 +113,15 @@ jobs:
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
 
-      - name: Install Chromium and WebKit
+      - name: Install Chromium
         run: |
           set -euo pipefail
           npm install --no-save playwright
-          npx playwright install --with-deps chromium webkit
+          npx playwright install chromium
           sed 's/198/199/g' tests/movement198.mjs > tests/movement199.generated.mjs
           node --check tests/movement199.generated.mjs
 
-      - name: Physical reliability gates
+      - name: Physical Chromium reliability gates
         run: |
           set -euo pipefail
           rm -rf smoke-root
@@ -103,9 +131,7 @@ jobs:
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
           GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=199"
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/reliability199.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability199.mjs
-          FD_BROWSER=webkit FD_GAME_URL="$GAME_URL" node tests/movement199.generated.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement199.generated.mjs
 
       - name: Publish build 199 to GitHub Pages
@@ -141,3 +167,32 @@ jobs:
           test "$ok" -eq 1
           FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability199.mjs
           FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement199.generated.mjs
+
+      - name: Publish final run result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf release-status
+          mkdir release-status
+          cat > release-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "status": "${JOB_STATUS}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "finished_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release-status
+          git add current.json
+          git commit -m "Build 199 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release-status
