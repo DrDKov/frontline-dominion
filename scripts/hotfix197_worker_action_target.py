@@ -64,6 +64,50 @@ attack_replacement = """      case 'attackMove': {
 if worker.count(attack_anchor) != 1:
     raise RuntimeError(f'v197 Worker attack-move action anchor mismatch: {worker.count(attack_anchor)}')
 worker = worker.replace(attack_anchor, attack_replacement, 1)
+
+# The presentation thread has already resolved whether the physical right-click hit
+# an entity. Re-running issueContext in the Worker for a target-less click performs a
+# second hit-test against a different authoritative snapshot. That allowed perceived
+# open terrain to be reclassified as guard/repair/etc. Preserve the user's intent:
+# targetId present => context command; no targetId => an explicit move to the exact
+# world coordinate that the presentation thread sent.
+context_anchor = """      case 'context': {
+        if (!target) result = game.issueContext(payload.x, payload.y, payload.append);
+        else {
+          const previousContext = game.hitTestForContext;
+          const previousHit = game.hitTest;
+          game.hitTestForContext = () => target;
+          game.hitTest = (_x, _y, selectableOnly = true) => selectableOnly ? previousHit.call(game, _x, _y, selectableOnly) : target;
+          try { result = game.issueContext(payload.x, payload.y, payload.append); }
+          finally { game.hitTestForContext = previousContext; game.hitTest = previousHit; }
+        }
+        break;
+      }"""
+context_replacement = """      case 'context': {
+        if (!target) {
+          result = game.issueMove(payload.x, payload.y, payload.append);
+          if (result !== false) {
+            const tagged197 = self.__FD_FORMATION_TARGET_FIDELITY_197__?.tagIssuedOrder?.(
+              game,
+              event.selectedIds || [],
+              { x: payload.x, y: payload.y },
+              payload.append
+            ) || 0;
+            if (!tagged197) throw new Error('Build 197 context move target was not attached to authoritative commands');
+          }
+        } else {
+          const previousContext = game.hitTestForContext;
+          const previousHit = game.hitTest;
+          game.hitTestForContext = () => target;
+          game.hitTest = (_x, _y, selectableOnly = true) => selectableOnly ? previousHit.call(game, _x, _y, selectableOnly) : target;
+          try { result = game.issueContext(payload.x, payload.y, payload.append); }
+          finally { game.hitTestForContext = previousContext; game.hitTest = previousHit; }
+        }
+        break;
+      }"""
+if worker.count(context_anchor) != 1:
+    raise RuntimeError(f'v197 Worker context action anchor mismatch: {worker.count(context_anchor)}')
+worker = worker.replace(context_anchor, context_replacement, 1)
 worker_path.write_text(worker, 'utf-8')
 
 print('build 197 authoritative action target bridge installed')
