@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: diagnose-building197
@@ -56,7 +56,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf smoke-root diagnostics-building197
-          mkdir -p smoke-root
+          mkdir -p smoke-root diagnostics-building197
           ln -s "$PWD/dist" smoke-root/frontline-dominion
           python -m http.server 8765 --directory smoke-root >/tmp/fd-building197-http.log 2>&1 &
           HTTP_PID=$!
@@ -72,3 +72,21 @@ jobs:
           path: diagnostics-building197
           if-no-files-found: warn
           retention-days: 7
+
+      - name: Publish latest diagnostic report branch
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p diagnostics-building197
+          printf '%s\n' "${GITHUB_SHA}" > diagnostics-building197/head-sha.txt
+          cd diagnostics-building197
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b building-diagnostics
+          git add -A
+          git commit -m "Selected building diagnostics ${GITHUB_SHA}" || true
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin building-diagnostics
