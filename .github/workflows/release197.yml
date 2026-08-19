@@ -1,8 +1,6 @@
 name: Release Frontline Dominion build 197
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
