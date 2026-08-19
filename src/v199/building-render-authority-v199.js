@@ -21,8 +21,9 @@
 
   let renderDepth = 0;
   let canonicalDepth = 0;
-  let activeCanvas = null;
+  let gameCanvas = null;
 
+  const resolveGameCanvas = () => gameCanvas || (gameCanvas = document.getElementById('game-canvas'));
   const sourcePath = image => {
     const raw = String(image?.currentSrc || image?.src || image?.dataset?.src || '');
     if (!raw) return '';
@@ -36,15 +37,26 @@
 
   const baseDrawImage = Context.prototype.drawImage;
   Context.prototype.drawImage = function authoritativeBuildingSprite199(image, ...args) {
-    if (renderDepth <= 0 || !activeCanvas || this.canvas !== activeCanvas) return baseDrawImage.call(this, image, ...args);
+    const canvas = resolveGameCanvas();
+    if (!canvas || this.canvas !== canvas) return baseDrawImage.call(this, image, ...args);
     const path = sourcePath(image);
     if (!isBuildingAtlas(path)) return baseDrawImage.call(this, image, ...args);
     if (canonicalDepth > 0) {
       state.canonicalBuildingSprites += 1;
       return baseDrawImage.call(this, image, ...args);
     }
+
+    // No game-canvas owner other than drawBuilding3D is allowed to paint a
+    // building atlas. This also catches delayed selection snapshots that fire
+    // after Game.render has already returned—the source of the one-frame,
+    // enlarged flash while switching or clearing selection.
     state.suppressedNoncanonicalSprites += 1;
-    state.lastSuppressed = { path, destination: destination(args) };
+    state.lastSuppressed = {
+      path,
+      destination: destination(args),
+      duringRender: renderDepth > 0,
+      at: typeof performance !== 'undefined' ? performance.now() : Date.now(),
+    };
     return undefined;
   };
   Object.defineProperty(Context.prototype.drawImage, '__fdBuildingRenderAuthority199', { value: true });
@@ -65,15 +77,12 @@
     Game.prototype.render = function buildingRenderFrame199(...args) {
       const outer = renderDepth === 0;
       if (outer) {
-        activeCanvas = document.getElementById('game-canvas') || this.canvas || null;
+        gameCanvas = document.getElementById('game-canvas') || this.canvas || gameCanvas;
         state.frames += 1;
       }
       renderDepth += 1;
       try { return baseRender.apply(this, args); }
-      finally {
-        renderDepth -= 1;
-        if (outer) activeCanvas = null;
-      }
+      finally { renderDepth -= 1; }
     };
     Object.defineProperty(Game.prototype.render, '__fdBuildingRenderAuthority199', { value: true });
   }
@@ -82,6 +91,12 @@
     version: VERSION,
     build: BUILD,
     state,
-    diagnostics: () => ({ ...state, lastSuppressed: state.lastSuppressed ? { ...state.lastSuppressed, destination: { ...state.lastSuppressed.destination } } : null }),
+    diagnostics: () => ({
+      ...state,
+      lastSuppressed: state.lastSuppressed ? {
+        ...state.lastSuppressed,
+        destination: { ...state.lastSuppressed.destination },
+      } : null,
+    }),
   };
 })();
