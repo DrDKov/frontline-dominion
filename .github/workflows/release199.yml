@@ -48,6 +48,7 @@ jobs:
           python scripts/hotfix197_input_authority.py
           python scripts/assemble198.py
           python scripts/assemble199.py
+          python scripts/hotfix199_runtime.py
 
       - name: Static and deterministic regression gates
         run: |
@@ -73,7 +74,10 @@ jobs:
           grep -q '__FD_INTERACTION_RESET_199__' dist/interaction-reset-v199.js
           grep -q 'gameplay-reliability-v199.js?build=199' dist/authoritative-simulation-worker-v174.js
           grep -q "data.kind === 'unit' && data.typeId" dist/authoritative-simulation-v174.js
-          python -m py_compile scripts/assemble199.py
+          grep -q 'bridge.ready && tick > 0' dist/runtime-shell-v199.js
+          grep -q 'startButton.disabled = false' dist/runtime-shell-v199.js
+          grep -q 'loadButton.disabled = !candidate' dist/runtime-shell-v199.js
+          python -m py_compile scripts/assemble199.py scripts/hotfix199_runtime.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/reliability199.mjs
           node tests/building-selection197.unit.mjs
