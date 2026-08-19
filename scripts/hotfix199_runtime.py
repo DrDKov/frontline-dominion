@@ -3,9 +3,19 @@ from pathlib import Path
 OUT = Path('dist')
 shell_path = OUT / 'runtime-shell-v199.js'
 html_path = OUT / 'frontline-dominion.html'
+gameplay_path = OUT / 'gameplay-reliability-v199.js'
 
-if not shell_path.exists() or not html_path.exists():
+if not shell_path.exists() or not html_path.exists() or not gameplay_path.exists():
     raise RuntimeError('build 199 runtime output is missing')
+
+# currentCommand is derived from commandQueue by the real Unit class and is a
+# getter-only property in WebKit. Assigning null to it aborts embark/unload.
+gameplay = gameplay_path.read_text('utf-8')
+readonly_assignment = '    unit.currentCommand = null;\n'
+if gameplay.count(readonly_assignment) != 1:
+    raise RuntimeError('build 199 readonly currentCommand assignment count invalid')
+gameplay = gameplay.replace(readonly_assignment, '', 1)
+gameplay_path.write_text(gameplay, 'utf-8')
 
 shell = shell_path.read_text('utf-8')
 
@@ -90,5 +100,7 @@ final_shell = shell_path.read_text('utf-8')
 for marker, label in checks.items():
     if marker not in final_shell:
         raise RuntimeError(f'build 199 runtime hotfix missing: {label}')
+if 'unit.currentCommand = null' in gameplay_path.read_text('utf-8'):
+    raise RuntimeError('build 199 readonly currentCommand assignment remains')
 
-print('Frontline Dominion build 199 canonical saved-game runtime hotfix installed')
+print('Frontline Dominion build 199 canonical saved-game and transport runtime hotfix installed')
