@@ -8,8 +8,6 @@ gameplay_path = OUT / 'gameplay-reliability-v199.js'
 if not shell_path.exists() or not html_path.exists() or not gameplay_path.exists():
     raise RuntimeError('build 199 runtime output is missing')
 
-# currentCommand is derived from commandQueue by the real Unit class and is a
-# getter-only property in WebKit. Assigning null to it aborts embark/unload.
 gameplay = gameplay_path.read_text('utf-8')
 readonly_assignment = '    unit.currentCommand = null;\n'
 if gameplay.count(readonly_assignment) != 1:
@@ -18,7 +16,6 @@ gameplay = gameplay.replace(readonly_assignment, '', 1)
 gameplay_path.write_text(gameplay, 'utf-8')
 
 shell = shell_path.read_text('utf-8')
-
 readiness_anchor = """    if (bridge) {
       const tick = Number(bridge.workerTick || 0);
       return { ready: tick > 0, failed: false, reason: tick > 0 ? null : 'worker-not-ticking' };
@@ -70,8 +67,6 @@ ready_anchor = """    state.installed = true;
 ready_replacement = """    state.installed = true;
     state.installedAt = performance.now();
     boot?.setReady?.(true);
-    // The boot controller captured the historical button nodes. The canonical
-    // owner has replaced them, so apply readiness to the live nodes directly.
     startButton.disabled = false;
     loadButton.disabled = !candidate;
     startButton.setAttribute('aria-disabled', 'false');
@@ -81,7 +76,6 @@ ready_replacement = """    state.installed = true;
 if shell.count(ready_anchor) != 1:
     raise RuntimeError('build 199 live-button readiness anchor count invalid')
 shell = shell.replace(ready_anchor, ready_replacement, 1)
-
 shell_path.write_text(shell, 'utf-8')
 
 html = html_path.read_text('utf-8')
@@ -103,11 +97,10 @@ for marker, label in checks.items():
 if 'unit.currentCommand = null' in gameplay_path.read_text('utf-8'):
     raise RuntimeError('build 199 readonly currentCommand assignment remains')
 
-# Patch the browser fixture after checkout so the physical click cannot land on
-# a HUD panel that geometrically overlaps an empty world-space coordinate.
-test_hotfix = Path('scripts/hotfix199_tests.py')
-if not test_hotfix.exists():
-    raise RuntimeError('build 199 test hotfix is missing')
-exec(compile(test_hotfix.read_text('utf-8'), str(test_hotfix), 'exec'), {'__name__': '__main__'})
+for patch_script in ('scripts/hotfix199_tests.py', 'scripts/diagnose199_waitgame.py'):
+    patch = Path(patch_script)
+    if not patch.exists():
+        raise RuntimeError(f'build 199 patch script missing: {patch_script}')
+    exec(compile(patch.read_text('utf-8'), str(patch), 'exec'), {'__name__': '__main__'})
 
 print('Frontline Dominion build 199 canonical saved-game, transport and physical-click hotfixes installed')
