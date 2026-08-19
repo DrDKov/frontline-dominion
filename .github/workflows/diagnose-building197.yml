@@ -1,8 +1,6 @@
 name: Diagnose selected building rendering
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
