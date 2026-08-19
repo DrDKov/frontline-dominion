@@ -43,6 +43,7 @@ jobs:
           python scripts/hotfix196_worker_descriptors.py
           python scripts/hotfix196_worker_scope.py
           python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
 
       - name: Static and deterministic regression gates
         run: |
@@ -64,7 +65,10 @@ jobs:
           ! grep -q 'post-load-command-recovery-v196.js' dist/authoritative-simulation-worker-v174.js
           grep -q '__FD_BUILDING_SELECTION_INVARIANCE_197__' dist/building-selection-invariance-v197.js
           grep -q '__FD_FORMATION_TARGET_FIDELITY_197__' dist/formation-target-fidelity-v197.js
-          python -m py_compile scripts/assemble197.py
+          grep -q 'tagIssuedOrder(game, unitIds' dist/formation-target-fidelity-v197.js
+          grep -q 'Build 197 move target was not attached to authoritative commands' dist/authoritative-simulation-worker-v174.js
+          grep -q 'Build 197 attack-move target was not attached to authoritative commands' dist/authoritative-simulation-worker-v174.js
+          python -m py_compile scripts/assemble197.py scripts/hotfix197_worker_action_target.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/building-selection197.unit.mjs
           node --check tests/formation-target197.unit.mjs
