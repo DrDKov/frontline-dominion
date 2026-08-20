@@ -1,19 +1,21 @@
-name: Release Frontline Dominion build 199
+name: Release Frontline Dominion build 200
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: frontline-release-199
+  group: frontline-release-200
   cancel-in-progress: true
 
 jobs:
-  release199:
+  release200:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -41,11 +43,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b release-status
           git add current.json
-          git commit -m "Build 199 run ${GITHUB_RUN_ID} started"
+          git commit -m "Build 200 run ${GITHUB_RUN_ID} started"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin release-status
 
-      - name: Assemble Frontline Dominion v16.8.15 build 199
+      - name: Assemble Frontline Dominion v16.8.16 build 200
         run: |
           set -euo pipefail
           rm -rf dist
@@ -74,68 +76,66 @@ jobs:
           python scripts/assemble198.py
           python scripts/assemble199.py
           python scripts/hotfix199_runtime.py
+          python scripts/assemble200.py
 
       - name: Static and deterministic regression gates
         run: |
           set -euo pipefail
           test -s dist/index.html
           test -s dist/frontline-dominion.html
-          test -s dist/gameplay-reliability-v199.js
-          test -s dist/building-render-authority-v199.js
-          test -s dist/interaction-reset-v199.js
-          test -s dist/runtime-ui-v199.js
-          test -s dist/runtime-shell-v199.js
-          grep -q 'frontline-dominion.html?build=199' dist/index.html
-          grep -q 'v16.8.15' dist/index.html
-          grep -q 'data-fd-canonical-build="199"' dist/frontline-dominion.html
-          grep -q 'gameplay-reliability-v199.js?build=199' dist/frontline-dominion.html
-          grep -q 'building-render-authority-v199.js?build=199' dist/frontline-dominion.html
-          grep -q 'interaction-reset-v199.js?build=199' dist/frontline-dominion.html
-          grep -q 'runtime-shell-v199.js?build=199' dist/frontline-dominion.html
-          ! grep -q 'building-single-render-v198.js?build=199' dist/frontline-dominion.html
+          test -s dist/simulation-resilience-v200.js
+          test -s dist/building-selection-contour-v200.js
+          test -s dist/runtime-ui-v200.js
+          test -s dist/runtime-shell-v200.js
+          grep -q 'frontline-dominion.html?build=200' dist/index.html
+          grep -q 'v16.8.16' dist/index.html
+          grep -q 'data-fd-canonical-build="200"' dist/frontline-dominion.html
+          grep -q 'simulation-resilience-v200.js?build=200' dist/frontline-dominion.html
+          grep -q 'building-selection-contour-v200.js?build=200' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v200.js?build=200' dist/frontline-dominion.html
+          grep -q 'simulation-resilience-v200.js?build=200' dist/authoritative-simulation-worker-v174.js
+          grep -q "stage: 'tick'" dist/authoritative-simulation-worker-v174.js
+          grep -q 'this.lastError = String(reason' dist/authoritative-simulation-v174.js
+          grep -q 'current.commandMode || current.buildMode' dist/command-input-v190.js
+          grep -q '__FD_SIMULATION_RESILIENCE_200__' dist/simulation-resilience-v200.js
+          grep -q '__FD_BUILDING_SELECTION_CONTOUR_200__' dist/building-selection-contour-v200.js
           ! grep -q 'drawBracketOverlay(this, building);' dist/building-selection-invariance-v197.js
-          ! grep -q 'unit.currentCommand = null' dist/gameplay-reliability-v199.js
-          grep -q '__FD_GAMEPLAY_RELIABILITY_199__' dist/gameplay-reliability-v199.js
-          grep -q '__FD_BUILDING_RENDER_AUTHORITY_199__' dist/building-render-authority-v199.js
-          grep -q '__FD_INTERACTION_RESET_199__' dist/interaction-reset-v199.js
-          grep -q 'gameplay-reliability-v199.js?build=199' dist/authoritative-simulation-worker-v174.js
-          grep -q "data.kind === 'unit' && data.typeId" dist/authoritative-simulation-v174.js
-          grep -q 'bridge.ready && tick > 0' dist/runtime-shell-v199.js
-          grep -q 'startButton.disabled = false' dist/runtime-shell-v199.js
-          grep -q 'loadButton.disabled = !candidate' dist/runtime-shell-v199.js
-          python -m py_compile scripts/assemble199.py scripts/hotfix199_runtime.py scripts/generate199_save_load.py
+          ! grep -q 'runtime-shell-v199.js?build=200' dist/frontline-dominion.html
+          python -m py_compile scripts/assemble200.py scripts/generate200_tests.py
           for file in dist/*.js; do node --check "$file"; done
-          node --check tests/reliability199.mjs
+          node --check tests/user-fixes200.mjs
+          node --check tests/save-load200.mjs
+          node tests/resilience200.unit.mjs
           node tests/building-selection197.unit.mjs
           node tests/formation-target197.unit.mjs
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
 
-      - name: Install Chromium
+      - name: Install Chromium and generate browser gates
         run: |
           set -euo pipefail
           npm install --no-save playwright
           npx playwright install chromium
-          sed 's/198/199/g' tests/movement198.mjs > tests/movement199.generated.mjs
-          python scripts/generate199_save_load.py
-          node --check tests/movement199.generated.mjs
-          node --check tests/save-load199.generated.mjs
+          python scripts/generate200_tests.py
+          node --check tests/reliability200.generated.mjs
+          node --check tests/movement200.generated.mjs
 
-      - name: Physical Chromium reliability gates
+      - name: Physical Chromium release gates
         run: |
           set -euo pipefail
           rm -rf smoke-root
           mkdir -p smoke-root
           ln -s "$PWD/dist" smoke-root/frontline-dominion
-          python -m http.server 8765 --directory smoke-root >/tmp/fd199-http.log 2>&1 &
+          python -m http.server 8765 --directory smoke-root >/tmp/fd200-http.log 2>&1 &
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
-          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=199"
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability199.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement199.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/save-load199.generated.mjs
+          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=200"
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability200.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement200.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/user-fixes200.mjs
+          FD_GAME_URL="$GAME_URL" node tests/save-load200.mjs
 
-      - name: Publish build 199 to GitHub Pages
+      - name: Publish build 200 to GitHub Pages
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -146,29 +146,31 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.8.15 build 199"
+          git commit -m "Frontline Dominion v16.8.16 build 200"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
 
-      - name: Verify published build 199
+      - name: Verify published build 200
         run: |
           set -euo pipefail
-          PUBLIC_URL="https://drdkov.github.io/frontline-dominion/frontline-dominion.html?build=199&verify=${GITHUB_SHA}"
+          PUBLIC_URL="https://drdkov.github.io/frontline-dominion/frontline-dominion.html?build=200&verify=${GITHUB_SHA}"
           ok=0
           for attempt in $(seq 1 48); do
-            if curl -fsSL "$PUBLIC_URL" > /tmp/fd199-public.html && \
-               grep -q 'data-fd-canonical-build="199"' /tmp/fd199-public.html && \
-               grep -q 'building-render-authority-v199.js?build=199' /tmp/fd199-public.html && \
-               grep -q 'runtime-shell-v199.js?build=199' /tmp/fd199-public.html; then
+            if curl -fsSL "$PUBLIC_URL" > /tmp/fd200-public.html && \
+               grep -q 'data-fd-canonical-build="200"' /tmp/fd200-public.html && \
+               grep -q 'simulation-resilience-v200.js?build=200' /tmp/fd200-public.html && \
+               grep -q 'building-selection-contour-v200.js?build=200' /tmp/fd200-public.html && \
+               grep -q 'runtime-shell-v200.js?build=200' /tmp/fd200-public.html; then
               ok=1
               break
             fi
             sleep 5
           done
           test "$ok" -eq 1
-          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability199.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement199.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/save-load199.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability200.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement200.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/user-fixes200.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/save-load200.mjs
 
       - name: Publish final run result
         if: always()
@@ -195,6 +197,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b release-status
           git add current.json
-          git commit -m "Build 199 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git commit -m "Build 200 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin release-status
