@@ -115,4 +115,11 @@ if (api.state.prematureCompletionsPrevented < 1) {
   throw new Error(`premature completion was not rejected: ${JSON.stringify(api.state)}`);
 }
 
+const freeUnit = units[0];
+freeUnit.currentCommand = { type: 'move', x: 1720, y: 1080, _fdFreeGroup201: true };
+api.tagIssuedOrder(game, [freeUnit.id], { x: 1900, y: 1200 }, false);
+if (freeUnit.currentCommand.x !== 1720 || freeUnit.currentCommand.y !== 1080) {
+  throw new Error(`free-group endpoint was collapsed to the group target: ${JSON.stringify(freeUnit.currentCommand)}`);
+}
+
 console.log(JSON.stringify({ ok: true, requested, center, error, state: api.state }));

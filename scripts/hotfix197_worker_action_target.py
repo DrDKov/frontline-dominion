@@ -23,9 +23,10 @@ replacement = """    processInstalled,
       return tagIssuedOrder(game, unitIds || [], exact, Boolean(append));
     },
     repairGroup(group, target) {"""
-if module.count(anchor) != 1:
+if module.count(anchor) == 1:
+    module = module.replace(anchor, replacement, 1)
+elif module.count('    tagIssuedOrder(game, unitIds, target, append = false) {') != 1:
     raise RuntimeError(f'v197 public order bridge anchor mismatch: {module.count(anchor)}')
-module = module.replace(anchor, replacement, 1)
 module_path.write_text(module, 'utf-8')
 
 worker = worker_path.read_text('utf-8')
