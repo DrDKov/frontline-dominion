@@ -20,6 +20,7 @@
     expiredZonesDropped: 0,
     staleFogEmittersRemoved: 0,
     scanPulsesStarted: 0,
+    plainZonesMadeSerializable: 0,
     workerStallsDetected: 0,
     mainThreadFallbacks: 0,
     lastNormalization: null,
@@ -293,6 +294,46 @@
     Object.defineProperty(Game.prototype.hydrate, '__fdSimulationResilience200', { value: true });
   }
 
+  // Authoritative snapshots intentionally mirror ability zones as plain
+  // objects.  The legacy save layer still calls zone.serialize(), so an
+  // autosave during an active scan used to throw on the main thread.  Attach a
+  // non-enumerable serializer before every save; Worker-side AbilityZone
+  // instances already own one and are left untouched.
+  const ensureSerializableZone = zone => {
+    if (!zone || typeof zone !== 'object' || typeof zone.serialize === 'function') return zone;
+    try {
+      Object.defineProperty(zone, 'serialize', {
+        configurable: true,
+        enumerable: false,
+        value() {
+          return {
+            type: this.type,
+            team: this.team,
+            x: number(this.x),
+            y: number(this.y),
+            radius: positive(this.radius, 300),
+            duration: positive(this.duration, this.type === 'scan' ? 12 : 10),
+            age: Math.max(0, number(this.age)),
+            tick: number(this.tick),
+            triggered: Boolean(this.triggered),
+            seed: Math.floor(number(this.seed)),
+          };
+        },
+      });
+      state.plainZonesMadeSerializable += 1;
+    } catch (_) {}
+    return zone;
+  };
+
+  const baseSave = Game.prototype.save;
+  if (typeof baseSave === 'function') {
+    Game.prototype.save = function serializableZoneSave200(...args) {
+      for (const zone of this.abilityZones || []) ensureSerializableZone(zone);
+      return baseSave.apply(this, args);
+    };
+    Object.defineProperty(Game.prototype.save, '__fdSerializableZoneSave200', { value: true });
+  }
+
   const baseExecutePower = Game.prototype.executePower;
   if (typeof baseExecutePower === 'function') {
     Game.prototype.executePower = function exactReconPulse200(type, ...args) {
@@ -378,6 +419,7 @@
     build: BUILD,
     state,
     normalizeSave,
+    ensureSerializableZone,
     diagnostics: () => ({ ...state, lastNormalization: state.lastNormalization ? { ...state.lastNormalization } : null }),
     dispose() {
       if (watchdogTimer) clearInterval(watchdogTimer);

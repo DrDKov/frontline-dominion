@@ -15,6 +15,11 @@ class MockGame {
   updateVisibilityV9() {
     return true;
   }
+
+  save() {
+    this.savedZones = (this.abilityZones || []).map(zone => zone.serialize());
+    return true;
+  }
 }
 
 globalThis.__FD_DEBUG__ = {
@@ -106,6 +111,16 @@ assert.equal(powerGame.executePower('scan', 1000, 1200), true);
 assert.equal(powerGame.abilityZones[0].duration, 12);
 assert.equal(powerGame.abilityZones[0].age, 0);
 
+const mirrorSaveGame = new MockGame();
+mirrorSaveGame.abilityZones = [{
+  type: 'scan', team: 'player', x: 1400, y: 1600, radius: 620, duration: 12, age: 4.5,
+}];
+assert.equal(mirrorSaveGame.save(), true);
+assert.equal(mirrorSaveGame.savedZones.length, 1);
+assert.equal(mirrorSaveGame.savedZones[0].duration, 12);
+assert.equal(mirrorSaveGame.savedZones[0].age, 4.5);
+assert.equal(Object.keys(mirrorSaveGame.abilityZones[0]).includes('serialize'), false);
+
 const fogGame = new MockGame();
 fogGame.abilityZones = [];
 fogGame._v9FogEmitters = new Map([
@@ -124,6 +139,7 @@ assert.ok(api.state.invalidCommandsDropped >= 2);
 assert.ok(api.state.invalidQueueItemsDropped >= 4);
 assert.ok(api.state.expiredZonesDropped >= 2);
 assert.ok(api.state.staleFogEmittersRemoved >= 1);
+assert.ok(api.state.plainZonesMadeSerializable >= 1);
 
 delete globalThis.__FD_DEBUG__;
 delete globalThis.__FD_SIMULATION_RESILIENCE_200__;
