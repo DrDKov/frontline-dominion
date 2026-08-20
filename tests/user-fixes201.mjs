@@ -81,6 +81,10 @@ const transparentMiss = await page.evaluate(id => {
   const rect = canvas.getBoundingClientRect();
   const bounds = game.getBuildingFigureScreenBounds193(building);
   if (!bounds) return { error: 'building-bounds-missing' };
+  const plainBounds = {
+    x1: bounds.x1, y1: bounds.y1, x2: bounds.x2, y2: bounds.y2,
+    width: bounds.width, height: bounds.height, source: bounds.source,
+  };
   const x1 = Math.max(2, Math.floor(bounds.x1));
   const y1 = Math.max(2, Math.floor(bounds.y1));
   const x2 = Math.min(canvas.width - 3, Math.ceil(bounds.x2));
@@ -97,10 +101,10 @@ const transparentMiss = await page.evaluate(id => {
       if (!world || game.getUnitFigureHits140?.(world.x, world.y)?.length) continue;
       if (game.getBuildingFigureHits193?.(world.x, world.y)?.length) continue;
       if (game.hitTest?.(world.x, world.y, true)) continue;
-      return { cssX, cssY, world, canvasX: x, canvasY: y, bounds };
+      return { cssX, cssY, world, canvasX: x, canvasY: y, bounds: plainBounds };
     }
   }
-  return { error: 'near-model-transparent-pixel-missing', bounds, contour: contour.diagnostics() };
+  return { error: 'near-model-transparent-pixel-missing', bounds: plainBounds, contour: contour.diagnostics() };
 }, selectedBuilding.id);
 if (transparentMiss.error) throw new Error(`Could not build exact deselection fixture: ${JSON.stringify(transparentMiss)}`);
 
