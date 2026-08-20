@@ -1,19 +1,21 @@
-name: Release Frontline Dominion build 201
+name: Release Frontline Dominion build 202
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: frontline-release-201
+  group: frontline-release-202
   cancel-in-progress: true
 
 jobs:
-  release201:
+  release202:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -41,11 +43,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b release-status
           git add current.json
-          git commit -m "Build 201 run ${GITHUB_RUN_ID} started"
+          git commit -m "Build 202 run ${GITHUB_RUN_ID} started"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin release-status
 
-      - name: Assemble Frontline Dominion v16.8.17 build 201
+      - name: Assemble Frontline Dominion v16.8.18 build 202
         run: |
           set -euo pipefail
           rm -rf dist
@@ -76,34 +78,31 @@ jobs:
           python scripts/hotfix199_runtime.py
           python scripts/assemble200.py
           python scripts/assemble201.py
+          python scripts/assemble202.py
 
       - name: Static and deterministic regression gates
         run: |
           set -euo pipefail
           test -s dist/index.html
           test -s dist/frontline-dominion.html
-          test -s dist/building-model-hit-v201.js
-          test -s dist/group-movement-v201.js
-          test -s dist/runtime-ui-v201.js
-          test -s dist/runtime-shell-v201.js
-          grep -q 'frontline-dominion.html?build=201' dist/index.html
-          grep -q 'v16.8.17' dist/index.html
-          grep -q 'data-fd-canonical-build="201"' dist/frontline-dominion.html
-          grep -q 'building-model-hit-v201.js?build=201' dist/frontline-dominion.html
-          grep -q 'group-movement-v201.js?build=201' dist/frontline-dominion.html
-          grep -q 'runtime-shell-v201.js?build=201' dist/frontline-dominion.html
-          grep -q 'data-formation-free="true"' dist/frontline-dominion.html
-          ! grep -q 'formation-chip active" data-formation-mode="balanced"' dist/frontline-dominion.html
-          grep -q 'group-movement-v201.js?build=201' dist/authoritative-simulation-worker-v174.js
-          grep -q 'formationSettings:clonePlain(this.formationSettings)' dist/authoritative-simulation-v174.js
-          grep -q 'recoveryAttempts201' dist/authoritative-simulation-v174.js
-          grep -q 'recovering201 || currentBridge.recoveryTimer201' dist/command-watchdog-v191.js
-          grep -q '__FD_BUILDING_MODEL_HIT_201__' dist/building-model-hit-v201.js
-          grep -q '__FD_GROUP_MOVEMENT_201__' dist/group-movement-v201.js
-          python -m py_compile scripts/assemble201.py scripts/generate201_tests.py scripts/hotfix197_worker_action_target.py
+          test -s dist/command-power-authority-v202.js
+          test -s dist/runtime-ui-v202.js
+          test -s dist/runtime-shell-v202.js
+          grep -q 'frontline-dominion.html?build=202' dist/index.html
+          grep -q 'v16.8.18' dist/index.html
+          grep -q 'data-fd-canonical-build="202"' dist/frontline-dominion.html
+          grep -q 'command-power-authority-v202.js?build=202' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v202.js?build=202' dist/frontline-dominion.html
+          grep -q 'command-power-authority-v202.js?build=202' dist/authoritative-simulation-worker-v174.js
+          grep -q "powerState:this.commandPowerIntent202" dist/authoritative-simulation-v174.js
+          grep -q 'previousPowerIntent202' dist/authoritative-simulation-worker-v174.js
+          grep -q 'commandPower202:' dist/authoritative-simulation-worker-v174.js
+          grep -q '__FD_COMMAND_POWER_AUTHORITY_202__' dist/command-power-authority-v202.js
+          ! grep -q 'runtime-shell-v201.js?build=202' dist/frontline-dominion.html
+          python -m py_compile scripts/assemble202.py scripts/generate202_tests.py
           for file in dist/*.js; do node --check "$file"; done
-          node --check tests/user-fixes201.mjs
-          node --check tests/worker-recovery201.mjs
+          node --check tests/recon-energy202.mjs
+          node tests/command-power202.unit.mjs
           node tests/resilience200.unit.mjs
           node tests/building-selection197.unit.mjs
           node tests/building-model-hit201.unit.mjs
@@ -117,10 +116,13 @@ jobs:
           set -euo pipefail
           npm install --no-save playwright
           npx playwright install chromium
-          python scripts/generate201_tests.py
-          node --check tests/reliability201.generated.mjs
-          node --check tests/movement201.generated.mjs
-          node --check tests/save-load201.generated.mjs
+          python scripts/generate202_tests.py
+          node --check tests/reliability202.generated.mjs
+          node --check tests/movement202.generated.mjs
+          node --check tests/save-load202.generated.mjs
+          node --check tests/user-fixes202.generated.mjs
+          node --check tests/user-fixes202-recon.generated.mjs
+          node --check tests/worker-recovery202.generated.mjs
 
       - name: Physical Chromium release gates
         run: |
@@ -128,17 +130,19 @@ jobs:
           rm -rf smoke-root
           mkdir -p smoke-root
           ln -s "$PWD/dist" smoke-root/frontline-dominion
-          python -m http.server 8765 --directory smoke-root >/tmp/fd201-http.log 2>&1 &
+          python -m http.server 8765 --directory smoke-root >/tmp/fd202-http.log 2>&1 &
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
-          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=201"
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability201.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement201.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/user-fixes201.mjs
-          FD_GAME_URL="$GAME_URL" node tests/save-load201.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/worker-recovery201.mjs
+          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=202"
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability202.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement202.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/user-fixes202.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/user-fixes202-recon.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/save-load202.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/worker-recovery202.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/recon-energy202.mjs
 
-      - name: Publish build 201 to GitHub Pages
+      - name: Publish build 202 to GitHub Pages
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -149,32 +153,33 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.8.17 build 201"
+          git commit -m "Frontline Dominion v16.8.18 build 202"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
 
-      - name: Verify published build 201
+      - name: Verify published build 202
         run: |
           set -euo pipefail
-          PUBLIC_URL="https://drdkov.github.io/frontline-dominion/frontline-dominion.html?build=201&verify=${GITHUB_SHA}"
+          PUBLIC_URL="https://drdkov.github.io/frontline-dominion/frontline-dominion.html?build=202&verify=${GITHUB_SHA}"
           ok=0
           for attempt in $(seq 1 60); do
-            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_URL" > /tmp/fd201-public.html && \
-               grep -q 'data-fd-canonical-build="201"' /tmp/fd201-public.html && \
-               grep -q 'building-model-hit-v201.js?build=201' /tmp/fd201-public.html && \
-               grep -q 'group-movement-v201.js?build=201' /tmp/fd201-public.html && \
-               grep -q 'runtime-shell-v201.js?build=201' /tmp/fd201-public.html; then
+            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_URL" > /tmp/fd202-public.html && \
+               grep -q 'data-fd-canonical-build="202"' /tmp/fd202-public.html && \
+               grep -q 'command-power-authority-v202.js?build=202' /tmp/fd202-public.html && \
+               grep -q 'runtime-shell-v202.js?build=202' /tmp/fd202-public.html; then
               ok=1
               break
             fi
             sleep 5
           done
           test "$ok" -eq 1
-          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability201.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement201.generated.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/user-fixes201.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/save-load201.generated.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/worker-recovery201.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability202.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement202.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/user-fixes202.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/user-fixes202-recon.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/save-load202.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/worker-recovery202.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/recon-energy202.mjs
 
       - name: Publish final run result
         if: always()
@@ -201,6 +206,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b release-status
           git add current.json
-          git commit -m "Build 201 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git commit -m "Build 202 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin release-status
