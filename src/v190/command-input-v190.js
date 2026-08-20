@@ -73,7 +73,10 @@
       return false;
     }
 
-    if (current.buildMode || current.powerMode || current.strategicMode) {
+    // All modern target cursors are represented by commandMode (power:scan,
+    // launcher:*, rally, minefield, and similar tools).  powerMode and
+    // strategicMode are legacy fields kept only for compatibility.
+    if (current.commandMode || current.buildMode || current.powerMode || current.strategicMode) {
       try { current.cancelModes?.(); } catch (_) {}
       diagnostics.cancels += 1;
       diagnostics.lastSource = `${source}:cancel-mode`;

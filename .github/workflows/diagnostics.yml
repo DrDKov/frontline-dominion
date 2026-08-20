@@ -2,7 +2,7 @@ name: Frontline Build Diagnostics
 
 on:
   workflow_run:
-    workflows: ["Build Frontline Dominion", "Release Frontline Dominion build 197", "Release Frontline Dominion build 198", "Release Frontline Dominion build 199"]
+    workflows: ["Build Frontline Dominion", "Release Frontline Dominion build 197", "Release Frontline Dominion build 198", "Release Frontline Dominion build 199", "Release Frontline Dominion build 200"]
     types: [completed]
 
 permissions:
