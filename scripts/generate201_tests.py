@@ -28,8 +28,12 @@ Path('tests/movement201.generated.mjs').write_text(movement, 'utf-8')
 save_load = save_source.read_text('utf-8')
 save_load = save_load.replace('?build=200', '?build=201')
 save_load = save_load.replace('__FD_RUNTIME_SHELL_200__', '__FD_RUNTIME_SHELL_201__')
+save_load = save_load.replace(
+    'globalThis.__FD_RUNTIME_SHELL_201__?.build === 200',
+    'globalThis.__FD_RUNTIME_SHELL_201__?.build === 201',
+)
 save_load = save_load.replace('save-load200', 'save-load201')
-if '__FD_RUNTIME_SHELL_201__' not in save_load or '__FD_SIMULATION_RESILIENCE_200__' not in save_load:
+if 'globalThis.__FD_RUNTIME_SHELL_201__?.build === 201' not in save_load or '__FD_SIMULATION_RESILIENCE_200__' not in save_load:
     raise RuntimeError('build 201 save/load markers missing')
 Path('tests/save-load201.generated.mjs').write_text(save_load, 'utf-8')
 
