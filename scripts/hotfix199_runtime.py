@@ -98,6 +98,7 @@ if 'unit.currentCommand = null' in gameplay_path.read_text('utf-8'):
     raise RuntimeError('build 199 readonly currentCommand assignment remains')
 
 for patch_script in (
+    'scripts/hotfix199_post_load_current_command.py',
     'scripts/hotfix199_tests.py',
     'scripts/diagnose199_waitgame.py',
     'scripts/hotfix199_reliability_saveload.py',
