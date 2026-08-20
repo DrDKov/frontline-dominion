@@ -42,7 +42,7 @@ path.write_text(text, 'utf-8')
 # cache key so public verification cannot execute the stale getter assignment.
 html = html_path.read_text('utf-8')
 old_asset = 'post-load-command-recovery-v196.js?build=199'
-new_asset = 'post-load-command-recovery-v196.js?build=199-loadfix1'
+new_asset = 'post-load-command-recovery-v196.js?rev=199-loadfix1'
 if html.count(old_asset) != 1:
     raise RuntimeError(f'build 199 post-load asset reference count invalid: {html.count(old_asset)}')
 html = html.replace(old_asset, new_asset, 1)
