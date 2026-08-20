@@ -127,8 +127,14 @@
   const tagCommand = (game, command, target) => {
     if (!command || !ORDER_TYPES.has(command.type) || !target) return null;
     defineHidden(command, '_fdRequestedTarget197', { x: target.x, y: target.y });
-    command.x = target.x;
-    command.y = target.y;
+    // Build 201 free-group orders deliberately have distinct destinations.
+    // Keep the shared click target as metadata without collapsing every unit
+    // back onto the same point (which recreated a traffic jam on arrival).
+    const freeGroupOrder = Boolean(command._fdFreeGroup201) && groupIdFor(command) == null;
+    if (!freeGroupOrder) {
+      command.x = target.x;
+      command.y = target.y;
+    }
     state.commandsTagged += 1;
     const group = groupFor(game, groupIdFor(command));
     if (group) {
@@ -278,6 +284,14 @@
     issueAttackMoveInstalled,
     processInstalled,
     state,
+    tagIssuedOrder(game, unitIds, target, append = false) {
+      const exact = targetOf(target);
+      if (!game || !exact) return 0;
+      state.ordersCaptured += 1;
+      state.lastTargetX = exact.x;
+      state.lastTargetY = exact.y;
+      return tagIssuedOrder(game, unitIds || [], exact, Boolean(append));
+    },
     repairGroup(group, target) {
       const exact = targetOf(target) || targetOf(group?._fdRequestedTarget197);
       if (!group || !exact) return false;

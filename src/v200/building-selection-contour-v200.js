@@ -18,6 +18,10 @@
     lastBuildingId: null,
     lastBounds: null,
     lastColor: null,
+    lastBuildingIds: [],
+    alphaHitTests: 0,
+    alphaHits: 0,
+    alphaMisses: 0,
   };
 
   let gameCanvas = null;
@@ -106,6 +110,46 @@
     context.globalCompositeOperation = 'copy';
     context.clearRect(bounds.x1, bounds.y1, bounds.width, bounds.height);
     context.restore();
+  };
+
+  // The contour and the click target must be derived from exactly the same
+  // pixels. This query is intentionally exposed for the late selection owner:
+  // selecting a building for the first time keeps the forgiving model bounds,
+  // while a click outside an already-selected model uses this alpha mask.
+  const alphaAtCanvas = (x, y, tolerance = 1) => {
+    if (!maskContext || !maskCanvas || !state.lastBounds) return null;
+    const px = Math.round(Number(x));
+    const py = Math.round(Number(y));
+    if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
+    const radius = Math.max(0, Math.min(2, Math.round(Number(tolerance) || 0)));
+    const x1 = Math.max(0, px - radius);
+    const y1 = Math.max(0, py - radius);
+    const x2 = Math.min(maskCanvas.width, px + radius + 1);
+    const y2 = Math.min(maskCanvas.height, py + radius + 1);
+    if (x2 <= x1 || y2 <= y1) return false;
+    const bounds = state.lastBounds;
+    if (x2 < bounds.x1 || x1 > bounds.x2 || y2 < bounds.y1 || y1 > bounds.y2) return false;
+    try {
+      const pixels = maskContext.getImageData(x1, y1, x2 - x1, y2 - y1).data;
+      for (let index = 3; index < pixels.length; index += 4) {
+        if (pixels[index] >= 18) return true;
+      }
+      return false;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  const modelHitAtWorld = (game, worldX, worldY, buildingId = null) => {
+    if (!game || !state.lastBounds || !state.lastBuildingIds.length) return null;
+    if (buildingId != null && !state.lastBuildingIds.includes(buildingId)) return null;
+    const pointer = game.getSelectionPointerScreen193?.(worldX, worldY) || game.worldToScreen?.(worldX, worldY, 0);
+    if (!pointer || !Number.isFinite(pointer.x) || !Number.isFinite(pointer.y)) return null;
+    state.alphaHitTests += 1;
+    const hit = alphaAtCanvas(pointer.x, pointer.y, 1);
+    if (hit === true) state.alphaHits += 1;
+    else if (hit === false) state.alphaMisses += 1;
+    return hit;
   };
 
   const baseDrawImage = Context.prototype.drawImage;
@@ -205,6 +249,7 @@
       selectedIds = new Set((this.selected || []).filter(entity => entity?.alive && entity.kind === 'building').map(entity => entity.id));
       state.frames += 1;
       if (selectedIds.size) state.selectedFrames += 1;
+      state.lastBuildingIds = [...selectedIds];
       frameBounds = null;
       if (gameCanvas && ensureBuffers(gameCanvas) && previousBounds) clearRegion(maskContext, previousBounds);
       const result = baseRender.apply(this, args);
@@ -219,6 +264,9 @@
     version: VERSION,
     build: BUILD,
     state,
+    alphaAtCanvas,
+    modelHitAtWorld: (worldX, worldY, buildingId = null, game = D?.game) =>
+      modelHitAtWorld(game, worldX, worldY, buildingId),
     diagnostics: () => ({
       ...state,
       lastBounds: state.lastBounds ? { ...state.lastBounds } : null,
