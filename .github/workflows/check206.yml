@@ -63,6 +63,7 @@ jobs:
           python scripts/hotfix206_multiplayer_hash.py
           python scripts/hotfix206_multiplayer_initial_state.py
           python scripts/hotfix206_network_components.py
+          python scripts/hotfix206_ai_trace_diagnostics.py
           python scripts/install206_ui.py
           python scripts/patch206_invariant_harness.py
 
@@ -81,6 +82,7 @@ jobs:
           grep -q "case 'logisticsEmergencyImport'" dist/authoritative-simulation-worker-v174.js
           grep -q 'networkLogisticsHash206' dist/authoritative-simulation-worker-v174.js
           grep -q 'networkLogisticsComponents206' dist/authoritative-simulation-worker-v174.js
+          grep -q 'aiLogisticsTrace206' dist/authoritative-simulation-worker-v174.js
           grep -q 'lastHashMismatch206' dist/multiplayer-lobby-v206.js
           grep -q 'canonicalFreshNetworkLogistics206' dist/authoritative-simulation-worker-v174.js
           grep -q 'data.logistics206 = game.exportLogistics206' dist/authoritative-simulation-worker-v174.js
@@ -93,7 +95,7 @@ jobs:
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics206-browser.mjs
           node --check tests/logistics206-invariants.mjs
-          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_network_components.py scripts/install206_ui.py scripts/generate206_tests.py scripts/patch206_invariant_harness.py
+          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_network_components.py scripts/hotfix206_ai_trace_diagnostics.py scripts/install206_ui.py scripts/generate206_tests.py scripts/patch206_invariant_harness.py
 
       - name: Install Chromium and generate inherited gates
         run: |
