@@ -38,6 +38,11 @@ runpy.run_path('scripts/patch205_hash_sync.py', run_name='__main__')
 # advance at the intended fixed lag rather than stalling between hash reports.
 runpy.run_path('scripts/patch205_clock_pacing.py', run_name='__main__')
 
+# Diagnostics must be observational. A forced network hash used to advance
+# lastNetworkHashTick independently on host and guest, which changed future
+# checkpoint cadence merely by opening diagnostics/profiling.
+runpy.run_path('scripts/patch205_readonly_diagnostics.py', run_name='__main__')
+
 # While the two-player determinism gate is being hardened, emit one exact
 # checkpoint from both isolated clients and the status-publication source so a
 # failed run identifies the protocol fault rather than only reporting timeout.
