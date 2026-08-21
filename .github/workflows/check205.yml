@@ -1,0 +1,105 @@
+name: Validate Frontline Dominion build 205
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontline-check-205-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  saves-and-multiplayer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Assemble build 205
+        run: |
+          set -euo pipefail
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+          python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
+          python scripts/assemble198.py
+          python scripts/assemble199.py
+          python scripts/hotfix199_runtime.py
+          python scripts/assemble200.py
+          python scripts/assemble201.py
+          python scripts/assemble202.py
+          python scripts/assemble203.py
+          python scripts/assemble204.py
+          python scripts/assemble205.py
+
+      - name: Static and deterministic gates
+        run: |
+          set -euo pipefail
+          test -s dist/frontline-dominion.html
+          test -s dist/multiplayer.html
+          test -s dist/save-slots-v205.js
+          test -s dist/multiplayer-lobby-v205.js
+          grep -q 'data-fd-canonical-build="205"' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v205.js?build=205' dist/frontline-dominion.html
+          grep -q 'save-slots-v205.js?build=205' dist/frontline-dominion.html
+          grep -q 'id="multiplayer-game"' dist/frontline-dominion.html
+          grep -q 'multiplayer-lobby-v205.js?build=205' dist/multiplayer.html
+          grep -q "dispatchEvent(new CustomEvent('fd:authoritative-save205'" dist/authoritative-simulation-v174.js
+          grep -q 'aiEnabled: !(multiplayer.active' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'runtime-shell-v204.js?build=205' dist/frontline-dominion.html
+          python -m py_compile scripts/assemble205.py scripts/generate205_tests.py
+          for file in dist/*.js; do node --check "$file"; done
+          node --check tests/save-slots205.mjs
+          node --check tests/multiplayer205.mjs
+          node tests/recon-memory-queue203.unit.mjs
+          node tests/building-visible-hit204.unit.mjs
+          node tests/rally-point204.unit.mjs
+          node tests/command-power202.unit.mjs
+          node tests/resilience200.unit.mjs
+          count=$(find dist/models -type f | wc -l)
+          test "$count" -gt 700
+
+      - name: Install Chromium and generate inherited gates
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install chromium
+          python scripts/generate205_tests.py
+          node --check tests/input-authority205.generated.mjs
+          node --check tests/reliability205.generated.mjs
+
+      - name: Physical save and two-player gates
+        run: |
+          set -euo pipefail
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd205-check-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          GAME_URL='http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=205'
+          MP_URL='http://127.0.0.1:8765/frontline-dominion/multiplayer.html?build=205'
+          FD_GAME_URL="$GAME_URL" node tests/save-slots205.mjs
+          FD_MULTIPLAYER_URL="$MP_URL" node tests/multiplayer205.mjs
+          FD_GAME_URL="$GAME_URL" node tests/input-authority205.generated.mjs
