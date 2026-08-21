@@ -3,6 +3,8 @@ name: Audit Frontline Dominion build 206 logistics
 on:
   push:
     branches: [build206-logistics]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
