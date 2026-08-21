@@ -59,7 +59,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: audit206
-          path: audit206.txt
+          path: |
+            audit206*.txt
           retention-days: 2
       - name: Publish audit snapshot branch
         if: always() && github.event_name == 'push'
@@ -70,7 +71,9 @@ jobs:
           set -euo pipefail
           rm -rf audit-publish
           mkdir audit-publish
-          if [ -f audit206.txt ]; then cp audit206.txt audit-publish/audit206.txt; else echo 'audit file missing' > audit-publish/audit206.txt; fi
+          shopt -s nullglob
+          reports=(audit206*.txt)
+          if [ ${#reports[@]} -gt 0 ]; then cp "${reports[@]}" audit-publish/; else echo 'audit files missing' > audit-publish/audit206.txt; fi
           cat > audit-publish/status.json <<EOF
           {
             "run_id": ${GITHUB_RUN_ID},
@@ -86,7 +89,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b audit206-runtime
-          git add audit206.txt status.json
+          git add audit206*.txt status.json
           git commit -m "Build 206 runtime audit ${GITHUB_RUN_ID}"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin audit206-runtime
