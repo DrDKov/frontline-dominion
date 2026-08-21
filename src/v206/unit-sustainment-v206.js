@@ -48,12 +48,17 @@
   Unit.prototype.update=function(dt){
     const s=L.ensureUnit(this,false);
     if(s&&!L.isAir(this)&&s.ammoReadyMax>0){
-      if(Number.isFinite(this.magazineReloadRemaining139)&&this.magazineReloadRemaining139>0&&!Number.isFinite(s.reloadRemaining206))s.reloadRemaining206=reloadDuration206(this);
+      if(Number.isFinite(this.magazineReloadRemaining139)&&this.magazineReloadRemaining139>0&&!(s.reloadRemaining206>EPS))startReload206(this,s);
       if(this.magazineReloadRemaining139>0)this.magazineReloadRemaining139=Infinity;
       syncReadyToLegacy206(this,s);
     }
     const result=baseUpdate206.call(this,dt);
-    if(s&&!L.isAir(this)&&s.ammoReadyMax>0){syncReadyFromLegacy206(this,s);if(this.magazineReloadRemaining139>0&&this.magazineReloadRemaining139!==Infinity&&s.ammoReady<=EPS)startReload206(this,s);processReload206(this,s,dt);}
+    if(s&&!L.isAir(this)&&s.ammoReadyMax>0){
+      syncReadyFromLegacy206(this,s);
+      if(this.magazineReloadRemaining139>0&&this.magazineReloadRemaining139!==Infinity&&s.ammoReady<=EPS)startReload206(this,s);
+      if(s.ammoReady<=EPS&&!(s.reloadRemaining206>EPS))startReload206(this,s);
+      processReload206(this,s,dt);
+    }
     return result;
   };
 
