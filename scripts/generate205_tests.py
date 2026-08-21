@@ -35,6 +35,11 @@ runpy.run_path('scripts/patch205_canonical_network_hash.py', run_name='__main__'
 # newer than the snapshot's baseSeq after the replacement Worker is ready.
 runpy.run_path('scripts/patch205_resync_replay.py', run_name='__main__')
 
+# Freeze the network sequence watermark inside the same authoritative Worker
+# save that becomes the resync snapshot. A later UI acknowledgement must never
+# relabel an older snapshot as if it already contained that command.
+runpy.run_path('scripts/patch205_atomic_resync_watermark.py', run_name='__main__')
+
 # Replayed/retransmitted network events are idempotent by sequence watermark:
 # an event already included in the authoritative snapshot is ACKed, not applied
 # a second time.
