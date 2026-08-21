@@ -21,6 +21,10 @@ diag_anchor = """            tick: message.tick,
             actionQueue: message.performance?.actionQueue,
 """
 diag_replacement = """            tick: message.tick,
+            time: message.time,
+            paused: message.paused,
+            running: message.running,
+            manualMode: message.manualMode,
             stateHash: message.stateHash,
             subsystemHashes: message.subsystemHashes,
             networkHash: message.networkHash,
@@ -29,6 +33,7 @@ diag_replacement = """            tick: message.tick,
             deterministicRandomCalls205: message.deterministicRandomCalls205,
             rngSeed205: message.rngSeed205,
             counts: message.counts,
+            performance: message.performance,
             actionQueue: message.performance?.actionQueue,
 """
 if text.count(diag_anchor) != 1:
@@ -42,6 +47,8 @@ pre_instrumented = """const startupCheckpoint205 = {
   guestLobby: await coop.guest.evaluate(() => globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.()),
   hostWorker: await workerDiagnostics(coop.host),
   guestWorker: await workerDiagnostics(coop.guest),
+  hostPage: await coop.host.evaluate(() => ({ visibility: document.visibilityState, now: performance.now() })),
+  guestPage: await coop.guest.evaluate(() => ({ visibility: document.visibilityState, now: performance.now() })),
 };
 console.log('FD205_CHECKPOINT_BEFORE_FIRST_COMMAND ' + JSON.stringify(startupCheckpoint205));
 
@@ -102,7 +109,7 @@ test_path.write_text(text.replace(anchor, instrumented, 1), 'utf-8')
 queries = {
     'multiplayer': ['function replay', "case 'fd:mp-snapshot'", "case 'fd:mp-resynced'"],
     'bridge': ['actionErrors', 'postMessage({ type: \'action\'', "type: 'action'", 'lastAck'],
-    'worker': ['actionQueue', "case 'action'", 'function subsystemHashes', 'function networkStateHash', 'deterministicRandomCalls205'],
+    'worker': ['actionQueue', "case 'action'", 'function subsystemHashes', 'function networkStateHash', 'deterministicRandomCalls205', 'function startClock'],
 }
 for label, path in paths.items():
     lines = path.read_text('utf-8').splitlines()
@@ -120,4 +127,4 @@ for label, path in paths.items():
                 print(f'{number + 1}: {lines[number]}')
             print(f'FD205_{label}_{tag}_{occurrence}_SOURCE_END')
 
-print('Build 205 deterministic startup, Worker and resync diagnostics instrumented')
+print('Build 205 deterministic startup, Worker clock and resync diagnostics instrumented')
