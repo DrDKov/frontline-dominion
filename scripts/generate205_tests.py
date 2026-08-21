@@ -8,10 +8,20 @@ BUILD = 205
 runpy.run_path('scripts/generate204_tests.py', run_name='__main__')
 
 # Network commands must be delivered to the authoritative Worker immediately,
-# while their canonical atTick is still in the future.  Otherwise presentation
+# while their canonical atTick is still in the future. Otherwise presentation
 # timing becomes part of the simulation and two browsers can execute the same
 # command on adjacent ticks.
 runpy.run_path('scripts/patch205_command_tick.py', run_name='__main__')
+
+# Legacy AI modules must not use browser-local ambient randomness. Fold every
+# Math.random() call inside an active multiplayer Worker into the persisted
+# authoritative RNG seed so equal simulation ticks stay deterministic.
+runpy.run_path('scripts/patch205_deterministic_ai.py', run_name='__main__')
+
+# A recovery snapshot may arrive while already-authorized future commands are
+# waiting for their atTick. Keep a bounded event journal and replay every event
+# newer than the snapshot's baseSeq after the replacement Worker is ready.
+runpy.run_path('scripts/patch205_resync_replay.py', run_name='__main__')
 
 # The lobby receives host and guest status callbacks asynchronously. Apply the
 # deterministic tick-pair matcher before any physical multiplayer gate runs;
