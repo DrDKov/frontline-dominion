@@ -1,0 +1,25 @@
+name: Validate build 206 development
+
+on:
+  push:
+    branches: [build206-logistics]
+  workflow_dispatch:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check build 206 modules
+        run: |
+          set -euo pipefail
+          for f in src/v206/*.js; do
+            echo "checking $f"
+            node --check "$f"
+          done
+      - name: Python syntax check
+        run: python -m py_compile scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py
