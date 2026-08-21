@@ -47,8 +47,8 @@ runpy.run_path('scripts/patch205_resync_replay.py', run_name='__main__')
 runpy.run_path('scripts/patch205_atomic_resync_watermark.py', run_name='__main__')
 
 # Replacement Workers must inherit the snapshot's authoritative tick/RNG and
-# base sequence before launch. Replay is released only after the new bridge is
-# ready and has received the current host clock.
+# base sequence before launch. Replay is released only after the actual new
+# bridge is ready and has received the current host clock.
 runpy.run_path('scripts/patch205_resync_worker_handoff.py', run_name='__main__')
 
 # Replayed/retransmitted network events are idempotent by sequence watermark:
@@ -69,26 +69,13 @@ runpy.run_path('scripts/patch205_hash_sync.py', run_name='__main__')
 # Clock transport is independent of expensive hash checkpoints. The host sends
 # its current authoritative Worker tick at 8 Hz so the guest can continuously
 # advance at the intended fixed lag rather than stalling between hash reports.
+# This patch also installs the idempotent game-readiness handshake.
 runpy.run_path('scripts/patch205_clock_pacing.py', run_name='__main__')
 
 # Diagnostics must be observational. A forced network hash used to advance
 # lastNetworkHashTick independently on host and guest, which changed future
 # checkpoint cadence merely by opening diagnostics/profiling.
 runpy.run_path('scripts/patch205_readonly_diagnostics.py', run_name='__main__')
-
-# Temporary exact-input instrumentation records the fields consumed by the
-# network checksum at each checkpoint. It is read-only and exists to identify
-# the first genuinely divergent field between independent browser processes.
-runpy.run_path('scripts/instrument205_network_hash_inputs.py', run_name='__main__')
-
-# Trace the first 48 multiplayer simulation ticks for enemy workers/active
-# orders and their exact interaction-target geometry so a sub-checksum drift
-# can be localized before rounded network hashes expose it.
-runpy.run_path('scripts/instrument205_unit_drift.py', run_name='__main__')
-
-# Keep a compact view of pending authoritative network actions so a recovery
-# failure can distinguish transport loss from a stalled/action-blocked Worker.
-runpy.run_path('scripts/instrument205_recovery_queue.py', run_name='__main__')
 
 # The physical save test must cover the complete user-facing slot lifecycle,
 # including overwrite-in-place and deletion, not only creation and loading.
