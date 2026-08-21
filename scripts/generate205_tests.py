@@ -136,6 +136,11 @@ Path('tests/input-authority205.generated.mjs').write_text(input_text, 'utf-8')
 # load the one-time imported legacy record through the new slot authority.
 runpy.run_path('scripts/patch205_legacy_save_gate.py', run_name='__main__')
 
+# The inherited Worker-recovery fixture also starts from a singleton save.
+# Route that setup through the one-time imported build-205 slot before forcing
+# a bridge failure, so the gate exercises the real post-205 load lifecycle.
+runpy.run_path('scripts/patch205_worker_recovery_gate.py', run_name='__main__')
+
 required_outputs = [
     'reliability205.generated.mjs',
     'movement205.generated.mjs',
