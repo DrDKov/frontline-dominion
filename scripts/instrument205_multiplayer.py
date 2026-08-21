@@ -9,9 +9,6 @@ if not test_path.exists():
 if not module_path.exists():
     raise RuntimeError(f'build {BUILD} multiplayer game module missing: {module_path}')
 
-# Expose both the startup clock relationship and the exact state at the first
-# deterministic-hash barrier. This stays in the gate until the protocol is
-# green so failures identify scheduling faults rather than only timing out.
 text = test_path.read_text('utf-8')
 pre_anchor = """const coopHostMove = await issueMove(coop.host, { x: 410, y: 130 });
 """
@@ -48,14 +45,14 @@ if text.count(anchor) != 1:
 test_path.write_text(text.replace(anchor, instrumented, 1), 'utf-8')
 
 module = module_path.read_text('utf-8').splitlines()
-patterns = ['function applyDue', 'function applyEvent', 'function emitIntent', 'fd:mp-status', 'fd:mp-start', 'fd:mp-event']
+patterns = ['function replay', 'function applyDue', 'function emitIntent']
 for pattern in patterns:
     found = False
     for index, line in enumerate(module):
         if pattern in line:
             found = True
-            lo = max(0, index - 24)
-            hi = min(len(module), index + 90)
+            lo = max(0, index - 18)
+            hi = min(len(module), index + 145)
             tag = pattern.replace(':', '_').replace('-', '_').replace(' ', '_')
             print(f'FD205_{tag}_SOURCE_BEGIN')
             for number in range(lo, hi):
@@ -65,4 +62,4 @@ for pattern in patterns:
     if not found:
         print(f'FD205_SOURCE_MISSING {pattern}')
 
-print('Build 205 multiplayer event-path diagnostics instrumented')
+print('Build 205 multiplayer replay diagnostics instrumented')
