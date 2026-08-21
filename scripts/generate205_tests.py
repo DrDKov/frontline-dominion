@@ -23,9 +23,14 @@ runpy.run_path('scripts/patch205_deterministic_ai.py', run_name='__main__')
 # newer than the snapshot's baseSeq after the replacement Worker is ready.
 runpy.run_path('scripts/patch205_resync_replay.py', run_name='__main__')
 
+# A Worker network hash has its own authoritative computation tick. A later
+# presentation snapshot may carry that older hash, so never label it with the
+# snapshot tick or the lobby can manufacture a false desync.
+runpy.run_path('scripts/patch205_hash_tick_identity.py', run_name='__main__')
+
 # The lobby receives host and guest status callbacks asynchronously. Apply the
-# deterministic tick-pair matcher before any physical multiplayer gate runs;
-# release205 publishes the same patched dist after these gates pass.
+# deterministic hash-tick matcher while keeping the live simulation clock
+# separate for guest pacing.
 runpy.run_path('scripts/patch205_hash_sync.py', run_name='__main__')
 
 # While the two-player determinism gate is being hardened, emit one exact
