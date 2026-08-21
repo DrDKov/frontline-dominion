@@ -1,13 +1,20 @@
 from pathlib import Path
+import runpy
 
 BUILD = 205
 path = Path('dist/multiplayer-lobby-v205.js')
 if not path.exists():
     raise RuntimeError(f'build {BUILD} multiplayer lobby missing: {path}')
 
+
+def patch_ready_handshake205():
+    runpy.run_path('scripts/patch205_ready_handshake.py', run_name='__main__')
+
+
 text = path.read_text('utf-8')
 if 'lastClockSentTick205' in text:
     print('Build 205 live clock pacing already patched')
+    patch_ready_handshake205()
     raise SystemExit(0)
 
 state_anchor = """  let pingTimer = 0;
@@ -111,3 +118,4 @@ text = text.replace(diag_anchor, diag_replacement, 1)
 
 path.write_text(text, 'utf-8')
 print('Build 205 live host clock pacing patched at 8 Hz with timer recovery')
+patch_ready_handshake205()
