@@ -131,6 +131,11 @@ input_text = input_text.replace('__FD_RUNTIME_SHELL_204__', '__FD_RUNTIME_SHELL_
 input_text = input_text.replace('?.build === 204', '?.build === 205', 1)
 Path('tests/input-authority205.generated.mjs').write_text(input_text, 'utf-8')
 
+# Build 205 changes the load button from "load latest singleton immediately"
+# to an explicit slot chooser. Keep the old corruption/resilience fixture, but
+# load the one-time imported legacy record through the new slot authority.
+runpy.run_path('scripts/patch205_legacy_save_gate.py', run_name='__main__')
+
 required_outputs = [
     'reliability205.generated.mjs',
     'movement205.generated.mjs',
