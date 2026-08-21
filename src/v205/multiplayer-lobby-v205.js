@@ -323,9 +323,26 @@
     return true;
   }
 
+  function authoritativeTick() {
+    // A frame in the UI can be behind the Simulation Worker.  Never schedule
+    // an event from that stale value: the host may already have passed its
+    // tick while the guest has not, which is a real deterministic split.
+    const win = gameWindow();
+    return Math.max(
+      0,
+      Number(state.hostTick || 0) || 0,
+      Number(win?.__FD_STABLE_STATE165__?.bridge?.workerTick || 0) || 0,
+      Number(win?.__FD_DEBUG__?.game?.simTick || 0) || 0,
+    );
+  }
+
   function leadTicks() {
+    // The guest deliberately follows the host a few simulation ticks behind.
+    // Keep a full network cushion beyond that lag, including when a browser
+    // drops a frame.  25 Hz means 8–20 ticks is 320–800 ms: responsive for an
+    // RTS command but safely ahead of both Workers on ordinary WAN links.
     const rtt = Number(state.rtt) || 40;
-    return clamp(4 + Math.ceil(rtt / 80), 4, 10);
+    return clamp(8 + Math.ceil(rtt / 40), 8, 20);
   }
 
   function authorizeIntent(intent) {
@@ -334,7 +351,10 @@
       ...intent,
       id: `net-${state.roomCode || 'room'}-${++state.eventSequence}`,
       seq: state.eventSequence,
-      atTick: Math.max(Number(state.hostTick || 0) + leadTicks(), Number(intent.tick || 0) + 1),
+      atTick: Math.max(
+        authoritativeTick() + leadTicks(),
+        Number(intent.tick || 0) + leadTicks(),
+      ),
     };
     state.eventsSent += 1;
     state.lastEvent = { action: event.action, seq: event.seq, atTick: event.atTick, team: event.team };
@@ -583,6 +603,8 @@
     closePeer,
     diagnostics: () => ({
       ...state,
+      authoritativeTick: authoritativeTick(),
+      leadTicks: leadTicks(),
       outboundPackets: outbound.length,
       fragments: fragments.size,
       channelBufferedAmount: channel?.bufferedAmount || 0,

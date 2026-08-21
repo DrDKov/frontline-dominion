@@ -67,6 +67,7 @@
   const storageSet = (key, value) => {
     try { localStorage.setItem(key, value); return true; } catch (_) { return false; }
   };
+  const multiplayerActive = () => Boolean(root.__FD_MULTIPLAYER_ACTIVE__ && root.__FD_MULTIPLAYER__?.active);
 
   function openDatabase() {
     if (databasePromise) return databasePromise;
@@ -236,7 +237,10 @@
     if (!candidate?.raw || !safeParse(candidate.raw)) return false;
     const sourceHash = hashRaw(candidate.raw);
     const records = await recordsGetAll();
-    if (records.some(record => record.sourceHash === sourceHash)) return false;
+    // Import the pre-205 singleton exactly once.  After the archive exists,
+    // the compatibility key is merely a mirror and must not manufacture a
+    // new, potentially older "previous save" on every reload.
+    if (records.length || records.some(record => record.sourceHash === sourceHash)) return false;
     const timestamp = Number(candidate.data?.savedAt) || now();
     await recordPut(recordFromRaw({
       id: randomId('legacy'),
@@ -278,11 +282,12 @@
         return new Promise((resolve, reject) => {
           const timer = setTimeout(() => {
             state.pendingRequests.delete(requestId);
-            const raw = storageGet(root.__FD_DEBUG__?.SAVE_KEY || CURRENT_KEY);
-            if (safeParse(raw)) {
-              state.fallbackSaves += 1;
-              resolve(raw);
-            } else reject(new Error('Simulation Worker не вернул снимок сохранения'));
+            // A stale main-thread mirror is exactly what made the old one-slot
+            // save appear to load an earlier game.  Once an authoritative
+            // Worker exists, never silently substitute that mirror: keep the
+            // current slots intact and tell the player that this capture was
+            // not confirmed.
+            reject(new Error('Simulation Worker не подтвердил снимок сохранения вовремя'));
           }, 6000);
           state.pendingRequests.set(requestId, { resolve, reject, timer });
         });
@@ -296,6 +301,7 @@
   }
 
   async function saveNamed(name, overwriteId = null) {
+    if (multiplayerActive()) throw new Error('Индивидуальные сохранения недоступны во время сетевого матча');
     const raw = await captureExactSave();
     const existing = overwriteId ? await recordGet(overwriteId) : null;
     const id = existing?.kind === 'manual' || existing?.kind === 'legacy' ? existing.id : randomId('save');
@@ -496,6 +502,10 @@
   }
 
   function openModal(mode) {
+    if (mode === 'save' && multiplayerActive()) {
+      root.__FD_DEBUG__?.game?.alert?.('Индивидуальные сохранения недоступны во время сетевого матча', 'info');
+      return;
+    }
     ensureModal();
     state.modalMode = mode;
     state.selectedId = mode === 'save' ? state.activeManualId : state.slots[0]?.id || null;

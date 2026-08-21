@@ -219,10 +219,27 @@ if (guestEvent.team !== 'player') throw new Error(`Guest co-op command used the 
 const coopApplied2 = await waitApplied(coop, guestEvent.seq);
 const coopSync = await synchronization(coop, 3);
 
-await waitFor(coop.host, () => {
-  const at = Number(globalThis.__FD_MULTIPLAYER_LOBBY_205__?.state?.lastResyncAt || 0);
-  return !at || Date.now() - at > 8200;
-}, undefined, 12000, 200);
+// Let the match run beyond the command window before deliberately requesting
+// a recovery.  A healthy deterministic match must not silently enter the
+// automatic resync loop after otherwise valid host/guest commands.
+const stableBeforeManualResync = await waitFor(coop.host, baselineChecks => {
+  const diag = globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.();
+  return Number(diag?.hashChecks || 0) >= baselineChecks + 6
+    ? {
+        hashChecks: Number(diag.hashChecks || 0),
+        hashMismatches: Number(diag.hashMismatches || 0),
+        mismatchStreak: Number(diag.mismatchStreak || 0),
+        resyncsRequested: Number(diag.resyncsRequested || 0),
+        leadTicks: Number(diag.leadTicks || 0),
+        rtt: diag.rtt,
+        lastEvent: diag.lastEvent || null,
+      }
+    : null;
+}, coopSync.hashChecks, 16000, 120);
+if (stableBeforeManualResync.hashMismatches || stableBeforeManualResync.mismatchStreak || stableBeforeManualResync.resyncsRequested ||
+    stableBeforeManualResync.leadTicks < 8 || stableBeforeManualResync.leadTicks > 20) {
+  throw new Error(`Co-op diverged before the explicit recovery test: ${JSON.stringify(stableBeforeManualResync)}`);
+}
 const snapshotsBefore = await coop.host.evaluate(() => globalThis.__FD_MULTIPLAYER_LOBBY_205__.state.snapshotsSent);
 const receivedBefore = await coop.guest.evaluate(() => globalThis.__FD_MULTIPLAYER_LOBBY_205__.state.snapshotsReceived);
 await coop.guest.evaluate(() => {
@@ -300,7 +317,7 @@ console.log(JSON.stringify({
     worker: { host: coopHostDiag, guest: coopGuestDiag },
     events: [hostEvent, guestEvent, postResyncEvent],
     applied: [coopApplied1, coopApplied2, coopAppliedAfterResync],
-    synchronization: [coopSync, coopSyncAfterResync],
+    synchronization: [coopSync, stableBeforeManualResync, coopSyncAfterResync],
     resync: { guest: resynced, host: hostAfterResync },
   },
   versus: {
