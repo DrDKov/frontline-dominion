@@ -64,8 +64,6 @@ auth = replace_once(auth, "    version: '20.6', canonicalLogisticsHash206, conse
 AUTH.write_text(auth, 'utf-8')
 
 worker = WORKER.read_text('utf-8')
-# Hash epochs must depend only on authoritative simulation tick, never on the
-# wall-clock phase at which each browser happened to compute its first hash.
 worker = replace_once(
     worker,
     "  if (!force && lastNetworkHashTick >= 0 && tick - lastNetworkHashTick < interval) return lastNetworkHash;\n",
@@ -90,6 +88,10 @@ bridge = replace_once(
     bridge,
     "      tick, hash: message.networkHash || this.networkHash,\n",
     "      tick, hash: message.networkHash || this.networkHash,\n"
+    "      networkStateHash206: Number(message.stateHash || 0) >>> 0,\n"
+    "      networkSubsystemHashes206: message.subsystemHashes || null,\n"
+    "      networkRngSeed206: Number(message.rngSeed || 0) >>> 0,\n"
+    "      networkAppliedSeq206: Number(message.appliedSeq || 0),\n"
     "      networkLogisticsHash206: Number(message.networkLogisticsHash206 || 0) >>> 0,\n"
     "      networkLogisticsComponents206: message.networkLogisticsComponents206 || null,\n",
     'bridge multiplayer status pass-through',
@@ -103,12 +105,12 @@ lobby = replace_once(
     "    else {\n"
     "      state.lastHashMismatch206 = {\n"
     "        tick: state.remoteTick,\n"
-    "        local: { hash: local.hash, stateHash: local.stateHash, rngSeed: local.rngSeed, logisticsHash: local.networkLogisticsHash206, components: local.networkLogisticsComponents206, subsystems: local.subsystemHashes },\n"
-    "        remote: { hash: status.hash, stateHash: status.stateHash, rngSeed: status.rngSeed, logisticsHash: status.networkLogisticsHash206, components: status.networkLogisticsComponents206, subsystems: status.subsystemHashes },\n"
+    "        local: { hash: local.hash, stateHash: local.networkStateHash206, rngSeed: local.networkRngSeed206, appliedSeq: local.networkAppliedSeq206, logisticsHash: local.networkLogisticsHash206, components: local.networkLogisticsComponents206, subsystems: local.networkSubsystemHashes206 },\n"
+    "        remote: { hash: status.hash, stateHash: status.networkStateHash206, rngSeed: status.networkRngSeed206, appliedSeq: status.networkAppliedSeq206, logisticsHash: status.networkLogisticsHash206, components: status.networkLogisticsComponents206, subsystems: status.networkSubsystemHashes206 },\n"
     "      };\n"
     "      state.firstHashMismatch206 ||= state.lastHashMismatch206;\n"
     "      state.hashMismatches += 1;\n      state.mismatchStreak += 1;\n",
     'lobby mismatch diagnostic',
 )
 LOBBY.write_text(lobby, 'utf-8')
-print('Build 206 network checksums aligned to canonical simulation epochs; first matched-tick divergence preserved')
+print('Build 206 matched-tick diagnostics include base Worker state, subsystems, RNG and applied sequence')
