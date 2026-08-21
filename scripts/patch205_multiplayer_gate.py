@@ -24,6 +24,7 @@ diag_replacement = """            tick: message.tick,
             networkHash: message.networkHash,
             networkHashTick: message.networkHashTick,
             networkHashInputHistory205: message.networkHashInputHistory205 || [],
+            unitDriftHistory205: message.unitDriftHistory205 || [],
             multiplayer: message.multiplayer,
             aiEnabled: message.aiEnabled,
             rngSeed205: message.rngSeed205,
@@ -98,7 +99,28 @@ if (preCommandStable205.failed || preCommandStable205.hashMismatches || preComma
     }
     if (!firstDifference205 && hostInput205.hash !== guestInput205.hash) firstDifference205 = { kind: 'hash-only', host: hostInput205.hash, guest: guestInput205.hash };
   }
-  throw new Error(`Co-op diverged before player input: ${JSON.stringify({ preCommandStable205, mismatchTick205, firstDifference205, hostInput205, guestInput205, hostWorker, guestWorker })}`);
+
+  let firstUnitDrift205 = null;
+  const hostTraceByTick205 = new Map((hostWorker.unitDriftHistory205 || []).map(entry => [Number(entry.tick), entry]));
+  const guestTraceByTick205 = new Map((guestWorker.unitDriftHistory205 || []).map(entry => [Number(entry.tick), entry]));
+  for (let tick = 0; tick <= mismatchTick205 && !firstUnitDrift205; tick += 1) {
+    const hostTrace = hostTraceByTick205.get(tick);
+    const guestTrace = guestTraceByTick205.get(tick);
+    if (!hostTrace || !guestTrace) continue;
+    const hostUnits = new Map((hostTrace.units || []).map(unit => [String(unit.id), unit]));
+    const guestUnits = new Map((guestTrace.units || []).map(unit => [String(unit.id), unit]));
+    for (const id of [...new Set([...hostUnits.keys(), ...guestUnits.keys()])].sort()) {
+      const hostUnit = hostUnits.get(id) || null;
+      const guestUnit = guestUnits.get(id) || null;
+      if (JSON.stringify(hostUnit) !== JSON.stringify(guestUnit)) {
+        firstUnitDrift205 = { tick, id, host: hostUnit, guest: guestUnit };
+        break;
+      }
+    }
+  }
+  const hostSummary205 = { ...hostWorker, networkHashInputHistory205: undefined, unitDriftHistory205: undefined };
+  const guestSummary205 = { ...guestWorker, networkHashInputHistory205: undefined, unitDriftHistory205: undefined };
+  throw new Error(`Co-op diverged before player input: ${JSON.stringify({ preCommandStable205, mismatchTick205, firstDifference205, firstUnitDrift205, hostInput205, guestInput205, hostWorker: hostSummary205, guestWorker: guestSummary205 })}`);
 }
 
 const coopHostMove = await issueMove(coop.host, { x: 410, y: 130 });
@@ -108,4 +130,4 @@ if text.count(command_anchor) != 1:
 text = text.replace(command_anchor, command_replacement, 1)
 
 path.write_text(text, 'utf-8')
-print('Build 205 clean six-checkpoint pre-command determinism gate installed with first-field diagnostics')
+print('Build 205 clean six-checkpoint pre-command determinism gate installed with first-tick unit drift diagnostics')
