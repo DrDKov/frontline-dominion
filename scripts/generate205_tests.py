@@ -86,6 +86,10 @@ runpy.run_path('scripts/instrument205_network_hash_inputs.py', run_name='__main_
 # can be localized before rounded network hashes expose it.
 runpy.run_path('scripts/instrument205_unit_drift.py', run_name='__main__')
 
+# Keep a compact view of pending authoritative network actions so a recovery
+# failure can distinguish transport loss from a stalled/action-blocked Worker.
+runpy.run_path('scripts/instrument205_recovery_queue.py', run_name='__main__')
+
 # The physical save test must cover the complete user-facing slot lifecycle,
 # including overwrite-in-place and deletion, not only creation and loading.
 runpy.run_path('scripts/patch205_save_slot_gate.py', run_name='__main__')
