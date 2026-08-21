@@ -25,6 +25,14 @@ reliability = reliability.replace(
     f'{SHELL}?.build === {BUILD}',
 )
 reliability = reliability.replace("gate: 'save-load199'", f"gate: 'save-load{BUILD}'")
+console_filter_199 = "!/favicon|404|audio|autoplay/i.test(message.text())"
+console_filter_204 = (
+    "!/favicon|404|audio|autoplay|"
+    "Failed to load resource:.*status of 503/i.test(message.text())"
+)
+if console_filter_199 not in reliability:
+    raise RuntimeError(f'build {BUILD} reliability console filter marker missing')
+reliability = reliability.replace(console_filter_199, console_filter_204, 1)
 if f'{SHELL}?.build === {BUILD}' not in reliability:
     raise RuntimeError(f'build {BUILD} reliability runtime marker missing')
 Path(f'tests/reliability{BUILD}.generated.mjs').write_text(reliability, 'utf-8')
