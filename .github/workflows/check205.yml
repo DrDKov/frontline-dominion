@@ -73,6 +73,7 @@ jobs:
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/save-slots205.mjs
           node --check tests/multiplayer205.mjs
+          node --check tests/multiplayer205-soak.mjs
           node tests/recon-memory-queue203.unit.mjs
           node tests/building-visible-hit204.unit.mjs
           node tests/rally-point204.unit.mjs
@@ -92,7 +93,9 @@ jobs:
           grep -q '__fdDeterministicNetworkLod205' dist/authoritative-simulation-worker-v174.js
           grep -q 'if (!multiplayer.active)' dist/authoritative-simulation-worker-v174.js
           grep -q 'diagnosticReadOnly205: true' dist/authoritative-simulation-worker-v174.js
-          ! grep -q 'unitCheckpointHistory205' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'networkHashInputHistory205' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'unitDriftHistory205' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'pendingNetworkActions205' dist/authoritative-simulation-worker-v174.js
 
       - name: Physical save and two-player gates
         run: |
@@ -114,6 +117,15 @@ jobs:
             echo "FD205 multiplayer gate failed with status $MP_STATUS"
             exit "$MP_STATUS"
           fi
+          set +e
+          FD205_SOAK_MS=90000 FD_MULTIPLAYER_URL="$MP_URL" node tests/multiplayer205-soak.mjs 2>&1 | tee /tmp/fd205-soak.log
+          SOAK_STATUS=${PIPESTATUS[0]}
+          set -e
+          tail -n 120 /tmp/fd205-soak.log > /tmp/fd205-soak-tail.log || true
+          if [ "$SOAK_STATUS" -ne 0 ]; then
+            echo "FD205 multiplayer soak failed with status $SOAK_STATUS"
+            exit "$SOAK_STATUS"
+          fi
           FD_GAME_URL="$GAME_URL" node tests/input-authority205.generated.mjs
 
       - name: Upload multiplayer diagnostics
@@ -124,6 +136,8 @@ jobs:
           path: |
             /tmp/fd205-multiplayer.log
             /tmp/fd205-multiplayer-tail.log
+            /tmp/fd205-soak.log
+            /tmp/fd205-soak-tail.log
             /tmp/fd205-check-http.log
           if-no-files-found: ignore
           retention-days: 2
