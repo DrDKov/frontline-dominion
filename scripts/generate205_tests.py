@@ -46,6 +46,11 @@ runpy.run_path('scripts/patch205_resync_replay.py', run_name='__main__')
 # relabel an older snapshot as if it already contained that command.
 runpy.run_path('scripts/patch205_atomic_resync_watermark.py', run_name='__main__')
 
+# Replacement Workers must inherit the snapshot's authoritative tick/RNG and
+# base sequence before launch. Replay is released only after the new bridge is
+# ready and has received the current host clock.
+runpy.run_path('scripts/patch205_resync_worker_handoff.py', run_name='__main__')
+
 # Replayed/retransmitted network events are idempotent by sequence watermark:
 # an event already included in the authoritative snapshot is ACKed, not applied
 # a second time.
