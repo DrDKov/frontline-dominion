@@ -16,6 +16,19 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static check build 206 modules
+        run: |
+          status=0
+          : > audit206-static.txt
+          for f in src/v206/*.js; do
+            echo "===== $f =====" | tee -a audit206-static.txt
+            node --check "$f" >> audit206-static.txt 2>&1 || status=1
+          done
+          python -m py_compile scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py >> audit206-static.txt 2>&1 || status=1
+          exit "$status"
       - name: Assemble current build 205 runtime
         run: |
           set -euo pipefail
@@ -59,6 +72,7 @@ jobs:
           python scripts/audit206_schema.py
           python scripts/audit206_aiapi.py
       - name: Upload full audit
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: audit206
