@@ -124,6 +124,10 @@ jobs:
           npx playwright install chromium
           python scripts/generate205_tests.py
           for file in tests/*205.generated.mjs; do node --check "$file"; done
+          grep -q '__fdDeterministicNetworkLod205' dist/authoritative-simulation-worker-v174.js
+          grep -q 'if (!multiplayer.active)' dist/authoritative-simulation-worker-v174.js
+          grep -q 'diagnosticReadOnly205: true' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'unitCheckpointHistory205' dist/authoritative-simulation-worker-v174.js
 
       - name: Physical Chromium release gates
         run: |
