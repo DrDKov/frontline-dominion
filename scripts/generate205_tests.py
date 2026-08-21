@@ -115,7 +115,10 @@ for source_name in generated:
     text = text.replace('__FD_BOOT_204__', '__FD_BOOT_205__')
     text = text.replace('__FD_RUNTIME_SHELL_205__?.build === 204', '__FD_RUNTIME_SHELL_205__?.build === 205')
     text = text.replace('save-load204', 'save-load205')
-    target_name = source_name.replace('204.generated', '205.generated')
+    # Replace the build number itself rather than the narrower `204.generated`
+    # token so compound names such as `user-fixes204-recon.generated.mjs` are
+    # advanced as well.
+    target_name = source_name.replace('204', '205', 1)
     target = Path('tests') / target_name
     target.write_text(text, 'utf-8')
 
@@ -127,5 +130,21 @@ input_text = input_text.replace('?build=204', '?build=205')
 input_text = input_text.replace('__FD_RUNTIME_SHELL_204__', '__FD_RUNTIME_SHELL_205__')
 input_text = input_text.replace('?.build === 204', '?.build === 205', 1)
 Path('tests/input-authority205.generated.mjs').write_text(input_text, 'utf-8')
+
+required_outputs = [
+    'reliability205.generated.mjs',
+    'movement205.generated.mjs',
+    'save-load205.generated.mjs',
+    'user-fixes205.generated.mjs',
+    'user-fixes205-recon.generated.mjs',
+    'worker-recovery205.generated.mjs',
+    'recon-energy205.generated.mjs',
+    'recon-memory-queue205.generated.mjs',
+    'input-authority205.generated.mjs',
+]
+for output_name in required_outputs:
+    output = Path('tests') / output_name
+    if not output.exists():
+        raise RuntimeError(f'build {BUILD} generated test missing: {output}')
 
 print(f'Build {BUILD} inherited browser gates generated')
