@@ -57,11 +57,15 @@ const preCommandStable205 = await waitFor(coop.host, () => {
         remoteTick: Number(diag.remoteTick || 0),
         lastStatus: diag.lastStatus || null,
         remoteStatus: diag.remoteStatus || null,
+        lastHashPair205: diag.lastHashPair205 || null,
+        lastMismatch205: diag.lastMismatch205 || null,
       }
     : null;
 }, undefined, 16000, 100);
 const preCommandCheckpoint205 = {
   sync: preCommandStable205,
+  hostLobby: await coop.host.evaluate(() => globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.()),
+  guestLobby: await coop.guest.evaluate(() => globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.()),
   hostWorker: await workerDiagnostics(coop.host),
   guestWorker: await workerDiagnostics(coop.guest),
 };
