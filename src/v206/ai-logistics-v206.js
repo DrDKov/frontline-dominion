@@ -31,31 +31,46 @@
     L.ensureGame(game).team[team].aggregates={...(L.ensureGame(game).team[team].aggregates||{}),...result};return result;
   }
 
-  function demandScore206(building){const node=L.ensureNode(building);if(!node)return -Infinity;const demand=L.computeDemand(node.stock,node.thresholds,node.priority);let score=L.manifestTotal(demand)*L.priorityMultiplier(node.priority);if(node.nodeType==='airfield')score*=1.25;if(node.nodeType==='pmto')score*=1.35;if(node.nodeType==='central')score*=.9;return score;}
+  function demandScore206(building){const node=L.ensureNode(building);if(!node)return-Infinity;const demand=L.computeDemand(node.stock,node.thresholds,node.priority);let score=L.manifestTotal(demand)*L.priorityMultiplier(node.priority);if(node.nodeType==='airfield')score*=1.25;if(node.nodeType==='pmto')score*=1.35;if(node.nodeType==='central')score*=.9;return score;}
+  function credits206(game){return{player:L.round(Number(game.teams?.player?.credits)||0),enemy:L.round(Number(game.teams?.enemy?.credits)||0)};}
+  function physical206(game){return{player:L.totalPhysical(game,'player'),enemy:L.totalPhysical(game,'enemy')};}
+  function queue206(building){return(building?.queue||[]).map(item=>({typeId:item?.typeId||item?.id||item?.type||null,kind:item?.kind||null,progress:L.round(Number(item?.progress)||0),remaining:L.round(Number(item?.remaining)||0),cost:L.round(Number(item?.cost)||0)}));}
 
   TacticalAI.prototype.managePhysicalLogistics206=function(){
-    const game=this.game,team='enemy';L.scanEntities(game,true);const metrics=aggregateLogistics206(game,team);this.logisticsMetrics206=metrics;
+    const game=this.game,team='enemy';
+    const trace={tick:Number(game.simTick)||0,before:{credits:credits206(game),physical:physical206(game)},steps:[]};
+    const mark=(name,extra={})=>trace.steps.push({name,credits:credits206(game),...extra});
+    L.scanEntities(game,true);mark('scan');
+    const metrics=aggregateLogistics206(game,team);this.logisticsMetrics206=metrics;mark('aggregate',{metrics:{fuel:L.round(metrics.armyFuelReadiness),ammo:L.round(metrics.armyAmmoReadiness),support:L.round(metrics.armySupportReadiness),regional:L.round(metrics.regionalSupplyReadiness)}});
     const nodes=(game.buildings||[]).filter(b=>b?.alive&&b.completed&&b.team===team&&L.ensureNode(b));
     const pmto=nodes.filter(b=>L.ensureNode(b).nodeType==='pmto');
     const airfields=nodes.filter(b=>L.ensureNode(b).nodeType==='airfield');
     const trade=nodes.filter(b=>['trade'].includes(L.ensureNode(b).nodeType));
     for(const b of trade){game.ensureTradeState206?.(b);const t=L.ensureNode(b).trade;if(t){t.fuel.mode='MAINTAIN_STOCK';t.fuel.targetAmount=Math.max(t.fuel.targetAmount||0,20000);t.ammo.mode='MAINTAIN_STOCK';t.ammo.targetAmount=Math.max(t.ammo.targetAmount||0,15000);}}
+    mark('trade',{nodes:nodes.length,pmto:pmto.length,airfields:airfields.length,trade:trade.map(b=>String(b.id))});
 
     const preparing=Math.min(metrics.armyFuelReadiness,metrics.armyAmmoReadiness,metrics.armySupportReadiness,metrics.regionalSupplyReadiness)<.68;
     for(const b of pmto){const n=L.ensureNode(b);n.priority=preparing?'HIGH':(nodeReadiness206(n)<.3?'CRITICAL':'NORMAL');for(const k of L.STOCK_KEYS)n.thresholds.target[k]=L.round(n.stock[`${k}Max`]*(preparing ? .90 : .70));}
     for(const b of airfields){const n=L.ensureNode(b);if(nodeReadiness206(n)<.30)n.priority='CRITICAL';else if(nodeReadiness206(n)<.58)n.priority='HIGH';}
+    mark('priorities',{preparing,pmto:pmto.map(b=>({id:String(b.id),priority:L.ensureNode(b).priority,stock:{...L.ensureNode(b).stock},target:{...L.ensureNode(b).thresholds.target}}))});
 
     const trucks=(game.units||[]).filter(u=>u?.alive&&u.team===team&&L.isTruck(u)).sort((a,b)=>String(a.id).localeCompare(String(b.id),'en'));
     const desired=Math.max(2,Math.min(18,Math.ceil(nodes.length/2.8)+Math.ceil((game.buildings||[]).filter(b=>b?.alive&&b.team===team&&L.ensureExtractor(b)).length/2)));
-    if(trucks.length<desired){const producer=nodes.concat(game.buildings||[]).filter(b=>b?.alive&&b.completed&&b.team===team&&Array.isArray(b.stats?.produces)&&b.stats.produces.includes('resourceTruck')).sort((a,b)=>String(a.id).localeCompare(String(b.id),'en'))[0];if(producer&&(producer.queue?.length||0)<3)game.queueProduction?.(producer,'resourceTruck','unit',false);}
+    const producer=nodes.concat(game.buildings||[]).filter(b=>b?.alive&&b.completed&&b.team===team&&Array.isArray(b.stats?.produces)&&b.stats.produces.includes('resourceTruck')).sort((a,b)=>String(a.id).localeCompare(String(b.id),'en'))[0]||null;
+    trace.production={trucks:trucks.map(u=>String(u.id)),desired,producerId:producer?.id||null,queueBefore:queue206(producer),creditsBefore:credits206(game),attempted:false,result:null};
+    if(trucks.length<desired&&producer&&(producer.queue?.length||0)<3){trace.production.attempted=true;trace.production.result=Boolean(game.queueProduction?.(producer,'resourceTruck','unit',false));}
+    trace.production.queueAfter=queue206(producer);trace.production.creditsAfter=credits206(game);mark('production',{production:trace.production});
 
     const destinations=nodes.filter(b=>!['trade'].includes(L.ensureNode(b).nodeType)).sort((a,b)=>demandScore206(b)-demandScore206(a)||String(a.id).localeCompare(String(b.id),'en'));
-    let cursor=0;
+    let cursor=0,assigned=0;
     for(const truck of trucks){const s=L.ensureUnit(truck,false);const current=game.getEntity?.(s.destinationNodeId);const stale=!current?.alive||demandScore206(current)<5||['IDLE','WAITING_DEMAND','WAITING_DESTINATION'].includes(s.status);
-      if(!stale)continue;const dest=destinations[cursor++%Math.max(1,destinations.length)];if(!dest)continue;game.setLogisticsMission206?.({truckIds:[truck.id],missionType:'SUPPLY_BUILDING',homeNodeId:s.homeNodeId||dest.id,destinationNodeId:dest.id});}
+      if(!stale)continue;const dest=destinations[cursor++%Math.max(1,destinations.length)];if(!dest)continue;if(game.setLogisticsMission206?.({truckIds:[truck.id],missionType:'SUPPLY_BUILDING',homeNodeId:s.homeNodeId||dest.id,destinationNodeId:dest.id}))assigned++;}
+    mark('missions',{assigned,destinations:destinations.slice(0,8).map(b=>({id:String(b.id),score:L.round(demandScore206(b))}))});
 
     const critical=Math.min(metrics.armyFuelReadiness,metrics.armyAmmoReadiness,metrics.armySupportReadiness)<.28;
     if(critical)game.logisticsEvent206?.('operation-logistics-warning',{team,metrics:{fuel:metrics.armyFuelReadiness,ammo:metrics.armyAmmoReadiness,support:metrics.armySupportReadiness}});
+    trace.after={credits:credits206(game),physical:physical206(game),critical};
+    game.__aiLogisticsTrace206=trace;
     return metrics;
   };
 
@@ -67,7 +82,7 @@
 
   function patchOperationalCore206(game){const core=game.operationalCore160||root.__FD_V160__?.core;if(!core||core.__physicalSupply206)return;core.__physicalSupply206=true;
     core.updateSupply=function(){for(const u of this.game.units||[]){if(!u?.alive||!['player','enemy'].includes(u.team))continue;const r=L.unitReadiness(u);u.supply160=r.supply;const s=L.ensureUnit(u,false);if(s)s.readiness206=r;}};
-    const oldSubsystem=core.subsystemHashes?.bind(core);if(oldSubsystem)core.subsystemHashes=function(){return {...oldSubsystem(),logistics206:this.game.logisticsHash206?.()||0};};
+    const oldSubsystem=core.subsystemHashes?.bind(core);if(oldSubsystem)core.subsystemHashes=function(){return{...oldSubsystem(),logistics206:this.game.logisticsHash206?.()||0};};
   }
   function aiPost206(){
     patchOperationalCore206(this);
@@ -81,6 +96,6 @@
   }
   Game.prototype.registerLogisticsHook206('post',aiPost206,90);
 
-  Game.prototype.logisticsStrategicEffects206=function(){return ['DEGRADE_ENEMY_FUEL','DEGRADE_ENEMY_AMMO','DEGRADE_ENEMY_SUPPORT','INTERDICT_SUPPLY_ROUTE','DESTROY_FORWARD_SUPPLY','REDUCE_AIRFIELD_READINESS','DEGRADE_IMPORT_CAPACITY','FORCE_LOGISTICS_REROUTE','ISOLATE_ENEMY_GROUP','EXHAUST_ARTILLERY_AMMO','REDUCE_OPERATIONAL_TEMPO'];};
+  Game.prototype.logisticsStrategicEffects206=function(){return['DEGRADE_ENEMY_FUEL','DEGRADE_ENEMY_AMMO','DEGRADE_ENEMY_SUPPORT','INTERDICT_SUPPLY_ROUTE','DESTROY_FORWARD_SUPPLY','REDUCE_AIRFIELD_READINESS','DEGRADE_IMPORT_CAPACITY','FORCE_LOGISTICS_REROUTE','ISOLATE_ENEMY_GROUP','EXHAUST_ARTILLERY_AMMO','REDUCE_OPERATIONAL_TEMPO'];};
   root.__FD_AI_LOGISTICS206__={version:'20.6',aggregateLogistics206,AI_EPOCH_TICKS206};
 })();
