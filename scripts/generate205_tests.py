@@ -7,6 +7,12 @@ BUILD = 205
 # its launcher/runtime ownership to the new canonical build.
 runpy.run_path('scripts/generate204_tests.py', run_name='__main__')
 
+# Network commands must be delivered to the authoritative Worker immediately,
+# while their canonical atTick is still in the future.  Otherwise presentation
+# timing becomes part of the simulation and two browsers can execute the same
+# command on adjacent ticks.
+runpy.run_path('scripts/patch205_command_tick.py', run_name='__main__')
+
 # The lobby receives host and guest status callbacks asynchronously. Apply the
 # deterministic tick-pair matcher before any physical multiplayer gate runs;
 # release205 publishes the same patched dist after these gates pass.
