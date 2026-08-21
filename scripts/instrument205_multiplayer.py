@@ -12,6 +12,29 @@ for name, path in paths.items():
         raise RuntimeError(f'build {BUILD} {name} file missing: {path}')
 
 text = test_path.read_text('utf-8')
+
+diag_anchor = """            tick: message.tick,
+            networkHash: message.networkHash,
+            multiplayer: message.multiplayer,
+            aiEnabled: message.aiEnabled,
+            counts: message.counts,
+            actionQueue: message.performance?.actionQueue,
+"""
+diag_replacement = """            tick: message.tick,
+            stateHash: message.stateHash,
+            subsystemHashes: message.subsystemHashes,
+            networkHash: message.networkHash,
+            multiplayer: message.multiplayer,
+            aiEnabled: message.aiEnabled,
+            deterministicRandomCalls205: message.deterministicRandomCalls205,
+            rngSeed205: message.rngSeed205,
+            counts: message.counts,
+            actionQueue: message.performance?.actionQueue,
+"""
+if text.count(diag_anchor) != 1:
+    raise RuntimeError('build 205 Worker diagnostic projection anchor missing')
+text = text.replace(diag_anchor, diag_replacement, 1)
+
 pre_anchor = """const coopHostMove = await issueMove(coop.host, { x: 410, y: 130 });
 """
 pre_instrumented = """const startupCheckpoint205 = {
@@ -21,6 +44,32 @@ pre_instrumented = """const startupCheckpoint205 = {
   guestWorker: await workerDiagnostics(coop.guest),
 };
 console.log('FD205_CHECKPOINT_BEFORE_FIRST_COMMAND ' + JSON.stringify(startupCheckpoint205));
+
+const preCommandStable205 = await waitFor(coop.host, () => {
+  const diag = globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.();
+  return Number(diag?.hashChecks || 0) >= 6
+    ? {
+        hashChecks: Number(diag.hashChecks || 0),
+        hashMismatches: Number(diag.hashMismatches || 0),
+        mismatchStreak: Number(diag.mismatchStreak || 0),
+        resyncsRequested: Number(diag.resyncsRequested || 0),
+        hostTick: Number(diag.hostTick || 0),
+        remoteTick: Number(diag.remoteTick || 0),
+        lastStatus: diag.lastStatus || null,
+        remoteStatus: diag.remoteStatus || null,
+      }
+    : null;
+}, undefined, 16000, 100);
+const preCommandCheckpoint205 = {
+  sync: preCommandStable205,
+  hostWorker: await workerDiagnostics(coop.host),
+  guestWorker: await workerDiagnostics(coop.guest),
+};
+console.log('FD205_CHECKPOINT_PRE_COMMAND_STABILITY ' + JSON.stringify(preCommandCheckpoint205));
+if (preCommandStable205.hashMismatches || preCommandStable205.mismatchStreak || preCommandStable205.resyncsRequested) {
+  throw new Error(`Co-op diverged before any player command: ${JSON.stringify(preCommandCheckpoint205)}`);
+}
+
 const coopHostMove = await issueMove(coop.host, { x: 410, y: 130 });
 """
 if text.count(pre_anchor) != 1:
@@ -47,9 +96,9 @@ if text.count(anchor) != 1:
 test_path.write_text(text.replace(anchor, instrumented, 1), 'utf-8')
 
 queries = {
-    'multiplayer': ['function replay'],
+    'multiplayer': ['function replay', "case 'fd:mp-snapshot'", "case 'fd:mp-resynced'"],
     'bridge': ['actionErrors', 'postMessage({ type: \'action\'', "type: 'action'", 'lastAck'],
-    'worker': ['actionQueue', "message.type === 'action'", "case 'action'", 'appliedNetworkSeq'],
+    'worker': ['actionQueue', "case 'action'", 'function subsystemHashes', 'function networkStateHash', 'deterministicRandomCalls205'],
 }
 for label, path in paths.items():
     lines = path.read_text('utf-8').splitlines()
@@ -67,4 +116,4 @@ for label, path in paths.items():
                 print(f'{number + 1}: {lines[number]}')
             print(f'FD205_{label}_{tag}_{occurrence}_SOURCE_END')
 
-print('Build 205 authoritative Worker action timing diagnostics instrumented')
+print('Build 205 deterministic startup, Worker and resync diagnostics instrumented')
