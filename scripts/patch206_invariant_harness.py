@@ -38,6 +38,11 @@ replace(
     'test 10 stale state',
 )
 replace(
+    "post.call(g,.1);s.fuel=0;const ammo=s.ammoReady;",
+    "post.call(g,.1);const live=L.ensureUnit(v,false);live.fuel=0;const ammo=live.ammoReady;",
+    'test 11 stale write',
+)
+replace(
     "assert(near(v.x,x),'empty vehicle still moved');assert(s.ammoReady===ammo&&s.ammoReady>0,'fuel shortage altered ammo');",
     "const after=L.ensureUnit(v,false);assert(near(v.x,x),'empty vehicle still moved');assert(after.ammoReady===ammo&&after.ammoReady>0,'fuel shortage altered ammo');",
     'test 11 stale state',
@@ -53,4 +58,4 @@ replace(
     'test 14 stale state',
 )
 path.write_text(text, 'utf-8')
-print('Build 206 invariant harness stale-state reads fixed; truck diagnostics enabled')
+print('Build 206 invariant harness stale-state reads/writes fixed; truck diagnostics enabled')
