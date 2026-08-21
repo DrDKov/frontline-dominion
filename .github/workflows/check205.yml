@@ -121,5 +121,6 @@ jobs:
             /tmp/fd205-multiplayer.log
             /tmp/fd205-multiplayer-tail.log
             /tmp/fd205-check-http.log
+            dist/authoritative-simulation-bundle-v172.js
           if-no-files-found: ignore
           retention-days: 2
