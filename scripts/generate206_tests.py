@@ -37,11 +37,17 @@ mp = mp_path.read_text('utf-8')
 anchor = "        lastEvent: diag.lastEvent || null,\n"
 if mp.count(anchor) != 1:
     raise RuntimeError(f'build 206 multiplayer diagnostic anchor count={mp.count(anchor)}')
-mp = mp.replace(anchor, anchor + "        lastHashMismatch206: diag.lastHashMismatch206 || null,\n", 1)
+mp = mp.replace(
+    anchor,
+    anchor
+    + "        firstHashMismatch206: diag.firstHashMismatch206 || null,\n"
+    + "        lastHashMismatch206: diag.lastHashMismatch206 || null,\n",
+    1,
+)
 
 # Do not spend the full synchronization timeout once a real matched-tick
-# mismatch is already known. Fail immediately with the component/subsystem
-# hashes captured by the host lobby at that exact tick.
+# mismatch is known. Report the first divergent epoch, before secondary
+# economic/logistics feedback can contaminate every component.
 sync_anchor = "    const host = globalThis.__FD_MULTIPLAYER_LOBBY_206__?.diagnostics?.();\n    const win = document.getElementById('mp-game-frame205')?.contentWindow;\n"
 if mp.count(sync_anchor) != 1:
     raise RuntimeError(f'build 206 synchronization diagnostic anchor count={mp.count(sync_anchor)}')
@@ -50,11 +56,12 @@ sync_diag = (
     "    if (Number(host?.hashMismatches || 0) > 0) {\n"
     "      throw new Error(`Build 206 matched-tick divergence: ${JSON.stringify({\n"
     "        hashChecks: host.hashChecks, hashMismatches: host.hashMismatches, mismatchStreak: host.mismatchStreak,\n"
-    "        lastHashMismatch206: host.lastHashMismatch206 || null, lastEvent: host.lastEvent || null,\n"
+    "        firstHashMismatch206: host.firstHashMismatch206 || null, lastHashMismatch206: host.lastHashMismatch206 || null,\n"
+    "        lastEvent: host.lastEvent || null,\n"
     "      })}`);\n"
     "    }\n"
     "    const win = document.getElementById('mp-game-frame205')?.contentWindow;\n"
 )
 mp = mp.replace(sync_anchor, sync_diag, 1)
 mp_path.write_text(mp, 'utf-8')
-print('instrumented multiplayer206.generated.mjs matched-tick component diagnostics')
+print('instrumented multiplayer206.generated.mjs first matched-tick divergence diagnostics')
