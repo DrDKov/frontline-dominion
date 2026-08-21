@@ -6,7 +6,7 @@
   const Game=D.Game,TacticalAI=D.TacticalAI;
   if(Game.prototype.__fdAILogistics206Installed)return;
   Object.defineProperty(Game.prototype,'__fdAILogistics206Installed',{value:true,configurable:true});
-  const EPS=1e-6;
+  const EPS=1e-6,AI_EPOCH_TICKS206=100;
 
   function nodeReadiness206(node){if(!node?.stock)return 1;const vals=L.STOCK_KEYS.filter(k=>node.stock[`${k}Max`]>0).map(k=>L.stockRatio(node.stock,k));return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:1;}
   function aggregateLogistics206(game,team){
@@ -42,7 +42,7 @@
     for(const b of trade){game.ensureTradeState206?.(b);const t=L.ensureNode(b).trade;if(t){t.fuel.mode='MAINTAIN_STOCK';t.fuel.targetAmount=Math.max(t.fuel.targetAmount||0,20000);t.ammo.mode='MAINTAIN_STOCK';t.ammo.targetAmount=Math.max(t.ammo.targetAmount||0,15000);}}
 
     const preparing=Math.min(metrics.armyFuelReadiness,metrics.armyAmmoReadiness,metrics.armySupportReadiness,metrics.regionalSupplyReadiness)<.68;
-    for(const b of pmto){const n=L.ensureNode(b);n.priority=preparing?'HIGH':(nodeReadiness206(n)<.3?'CRITICAL':'NORMAL');for(const k of L.STOCK_KEYS)n.thresholds.target[k]=L.round(n.stock[`${k}Max`]*(preparing?.90:.70));}
+    for(const b of pmto){const n=L.ensureNode(b);n.priority=preparing?'HIGH':(nodeReadiness206(n)<.3?'CRITICAL':'NORMAL');for(const k of L.STOCK_KEYS)n.thresholds.target[k]=L.round(n.stock[`${k}Max`]*(preparing ? .90 : .70));}
     for(const b of airfields){const n=L.ensureNode(b);if(nodeReadiness206(n)<.30)n.priority='CRITICAL';else if(nodeReadiness206(n)<.58)n.priority='HIGH';}
 
     const trucks=(game.units||[]).filter(u=>u?.alive&&u.team===team&&L.isTruck(u)).sort((a,b)=>String(a.id).localeCompare(String(b.id),'en'));
@@ -59,18 +59,9 @@
     return metrics;
   };
 
-  const baseAIUpdate206=TacticalAI.prototype.update;
-  TacticalAI.prototype.update=function(dt){
-    const result=baseAIUpdate206.call(this,dt);
-    if(!Number.isFinite(this._logisticsTimer206))this._logisticsTimer206=3.5;
-    this._logisticsTimer206-=dt;
-    if(this._logisticsTimer206<=0){this._logisticsTimer206+=3.5;this.managePhysicalLogistics206();}
-    return result;
-  };
-
   if(typeof TacticalAI.prototype.launchWarOperations126==='function'){
     const baseLaunch206=TacticalAI.prototype.launchWarOperations126;
-    TacticalAI.prototype.launchWarOperations126=function(){const m=this.logisticsMetrics206||this.managePhysicalLogistics206();const readiness=Math.min(m.armyFuelReadiness,m.armyAmmoReadiness,m.armySupportReadiness,m.regionalSupplyReadiness);
+    TacticalAI.prototype.launchWarOperations126=function(){const m=this.logisticsMetrics206||aggregateLogistics206(this.game,'enemy');const readiness=Math.min(m.armyFuelReadiness,m.armyAmmoReadiness,m.armySupportReadiness,m.regionalSupplyReadiness);
       if(readiness<.52){this.operationTimer126=Math.min(Number(this.operationTimer126)||8,8);this.game.logisticsEvent206?.('operation-logistics-warning',{team:'enemy',readiness,decision:'WAIT'});return false;}return baseLaunch206.call(this);};
   }
 
@@ -78,9 +69,18 @@
     core.updateSupply=function(){for(const u of this.game.units||[]){if(!u?.alive||!['player','enemy'].includes(u.team))continue;const r=L.unitReadiness(u);u.supply160=r.supply;const s=L.ensureUnit(u,false);if(s)s.readiness206=r;}};
     const oldSubsystem=core.subsystemHashes?.bind(core);if(oldSubsystem)core.subsystemHashes=function(){return {...oldSubsystem(),logistics206:this.game.logisticsHash206?.()||0};};
   }
-  function aiPost206(){patchOperationalCore206(this);aggregateLogistics206(this,'player');aggregateLogistics206(this,'enemy');}
+  function aiPost206(){
+    patchOperationalCore206(this);
+    aggregateLogistics206(this,'player');
+    aggregateLogistics206(this,'enemy');
+    const tick=Number(this.simTick)||0,ai=this.ai;
+    if(ai&&tick>0&&tick%AI_EPOCH_TICKS206===0&&ai._lastLogisticsEpoch206!==tick){
+      ai._lastLogisticsEpoch206=tick;
+      ai.managePhysicalLogistics206();
+    }
+  }
   Game.prototype.registerLogisticsHook206('post',aiPost206,90);
 
   Game.prototype.logisticsStrategicEffects206=function(){return ['DEGRADE_ENEMY_FUEL','DEGRADE_ENEMY_AMMO','DEGRADE_ENEMY_SUPPORT','INTERDICT_SUPPLY_ROUTE','DESTROY_FORWARD_SUPPLY','REDUCE_AIRFIELD_READINESS','DEGRADE_IMPORT_CAPACITY','FORCE_LOGISTICS_REROUTE','ISOLATE_ENEMY_GROUP','EXHAUST_ARTILLERY_AMMO','REDUCE_OPERATIONAL_TEMPO'];};
-  root.__FD_AI_LOGISTICS206__={version:'20.6',aggregateLogistics206};
+  root.__FD_AI_LOGISTICS206__={version:'20.6',aggregateLogistics206,AI_EPOCH_TICKS206};
 })();
