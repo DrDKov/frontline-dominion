@@ -101,5 +101,25 @@ jobs:
           GAME_URL='http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=205'
           MP_URL='http://127.0.0.1:8765/frontline-dominion/multiplayer.html?build=205'
           FD_GAME_URL="$GAME_URL" node tests/save-slots205.mjs
-          FD_MULTIPLAYER_URL="$MP_URL" node tests/multiplayer205.mjs
+          set +e
+          FD_MULTIPLAYER_URL="$MP_URL" node tests/multiplayer205.mjs 2>&1 | tee /tmp/fd205-multiplayer.log
+          MP_STATUS=${PIPESTATUS[0]}
+          set -e
+          tail -n 160 /tmp/fd205-multiplayer.log > /tmp/fd205-multiplayer-tail.log || true
+          if [ "$MP_STATUS" -ne 0 ]; then
+            echo "FD205 multiplayer gate failed with status $MP_STATUS"
+            exit "$MP_STATUS"
+          fi
           FD_GAME_URL="$GAME_URL" node tests/input-authority205.generated.mjs
+
+      - name: Upload multiplayer diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fd205-multiplayer-diagnostics
+          path: |
+            /tmp/fd205-multiplayer.log
+            /tmp/fd205-multiplayer-tail.log
+            /tmp/fd205-check-http.log
+          if-no-files-found: ignore
+          retention-days: 2
