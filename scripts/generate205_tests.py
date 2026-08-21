@@ -70,6 +70,11 @@ runpy.run_path('scripts/patch205_readonly_diagnostics.py', run_name='__main__')
 # the first genuinely divergent field between independent browser processes.
 runpy.run_path('scripts/instrument205_network_hash_inputs.py', run_name='__main__')
 
+# Trace the first 48 multiplayer simulation ticks for enemy workers/active
+# orders so a sub-checksum movement drift can be localized to an exact tick and
+# internal navigation/velocity field rather than inferred from rounded hashes.
+runpy.run_path('scripts/instrument205_unit_drift.py', run_name='__main__')
+
 # The physical save test must cover the complete user-facing slot lifecycle,
 # including overwrite-in-place and deletion, not only creation and loading.
 runpy.run_path('scripts/patch205_save_slot_gate.py', run_name='__main__')
