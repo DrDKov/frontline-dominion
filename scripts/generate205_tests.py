@@ -25,6 +25,11 @@ runpy.run_path('scripts/patch205_deterministic_ai.py', run_name='__main__')
 # 25 Hz and inactive LOD depends only on deterministic simulation state.
 runpy.run_path('scripts/patch205_deterministic_sim_lod.py', run_name='__main__')
 
+# Network checksums describe authoritative state, not the incidental insertion
+# order of JS arrays. Hash entities/projectiles in canonical identity order so
+# two equivalent Workers cannot manufacture a desync from container ordering.
+runpy.run_path('scripts/patch205_canonical_network_hash.py', run_name='__main__')
+
 # A recovery snapshot may arrive while already-authorized future commands are
 # waiting for their atTick. Keep a bounded event journal and replay every event
 # newer than the snapshot's baseSeq after the replacement Worker is ready.
