@@ -66,8 +66,6 @@ AUTH.write_text(auth, 'utf-8')
 worker = WORKER.read_text('utf-8')
 # Hash epochs must depend only on authoritative simulation tick, never on the
 # wall-clock phase at which each browser happened to compute its first hash.
-# Otherwise host can settle on 55/60/65 while guest settles on 54/59/64 and
-# there is no common tick on which a checksum can be compared.
 worker = replace_once(
     worker,
     "  if (!force && lastNetworkHashTick >= 0 && tick - lastNetworkHashTick < interval) return lastNetworkHash;\n",
@@ -82,18 +80,12 @@ worker = replace_once(worker, "networkHash, networkHashTick: lastNetworkHashTick
 WORKER.write_text(worker, 'utf-8')
 
 bridge = BRIDGE.read_text('utf-8')
-# Multiplayer status must be keyed by the tick at which its network checksum
-# was actually computed, not by the newer presentation snapshot tick. Otherwise
-# host/guest can compare hashes from adjacent simulation ticks under one label.
 pattern = r"(postMultiplayerStatus\(message\)\s*\{[\s\S]{0,600}?\bconst tick\s*=\s*)([^;\n]+);"
 def fix_tick(match):
     return match.group(1) + "Number(message.networkHashTick || message.tick || 0) || 0;"
 bridge, count = re.subn(pattern, fix_tick, bridge, count=1)
 if count != 1:
     raise RuntimeError(f'build 206 multiplayer status tick anchor count={count}')
-
-# postMultiplayerStatus consumes this same authoritative Worker snapshot. Pass
-# the component diagnostics straight through without another mutable cache.
 bridge = replace_once(
     bridge,
     "      tick, hash: message.networkHash || this.networkHash,\n",
@@ -114,8 +106,9 @@ lobby = replace_once(
     "        local: { hash: local.hash, stateHash: local.stateHash, rngSeed: local.rngSeed, logisticsHash: local.networkLogisticsHash206, components: local.networkLogisticsComponents206, subsystems: local.subsystemHashes },\n"
     "        remote: { hash: status.hash, stateHash: status.stateHash, rngSeed: status.rngSeed, logisticsHash: status.networkLogisticsHash206, components: status.networkLogisticsComponents206, subsystems: status.subsystemHashes },\n"
     "      };\n"
+    "      state.firstHashMismatch206 ||= state.lastHashMismatch206;\n"
     "      state.hashMismatches += 1;\n      state.mismatchStreak += 1;\n",
     'lobby mismatch diagnostic',
 )
 LOBBY.write_text(lobby, 'utf-8')
-print('Build 206 network checksums aligned to canonical simulation epochs; matched-tick diagnostics installed')
+print('Build 206 network checksums aligned to canonical simulation epochs; first matched-tick divergence preserved')
