@@ -60,7 +60,13 @@
   };
 
   const baseAIUpdate206=TacticalAI.prototype.update;
-  TacticalAI.prototype.update=function(dt){const result=baseAIUpdate206.call(this,dt);this._logisticsTimer206=(Number(this._logisticsTimer206)||0)-dt;if(this._logisticsTimer206<=0){this._logisticsTimer206=3.5;this.managePhysicalLogistics206();}return result;};
+  TacticalAI.prototype.update=function(dt){
+    const result=baseAIUpdate206.call(this,dt);
+    if(!Number.isFinite(this._logisticsTimer206))this._logisticsTimer206=3.5;
+    this._logisticsTimer206-=dt;
+    if(this._logisticsTimer206<=0){this._logisticsTimer206+=3.5;this.managePhysicalLogistics206();}
+    return result;
+  };
 
   if(typeof TacticalAI.prototype.launchWarOperations126==='function'){
     const baseLaunch206=TacticalAI.prototype.launchWarOperations126;
