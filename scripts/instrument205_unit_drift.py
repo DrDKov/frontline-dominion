@@ -15,6 +15,40 @@ state_anchor = """let networkHashInputHistory205 = [];
 state_replacement = """let networkHashInputHistory205 = [];
 let unitDriftHistory205 = [];
 
+function traceTargetGeometry205(unit) {
+  const command = unit?.currentCommand;
+  const targetId = command?.interactionTargetId || command?.buildingId || command?.targetId || null;
+  const target = targetId ? game?.getEntity?.(targetId) : null;
+  if (!target) return null;
+  let footprint = null;
+  try { footprint = game?.getEntityBuildingFootprintAt?.(target, 0) || null; } catch (_) {}
+  const record = {
+    id: String(target.id || ''),
+    kind: target.kind || null,
+    typeId: target.typeId || null,
+    team: target.team || null,
+    x: Number(target.x), y: Number(target.y),
+    rotation: Number(target.rotation),
+    radius: Number(target.radius),
+    construction: Number(target.construction),
+    completed: Boolean(target.completed),
+    footprint: footprint ? {
+      x: Number(footprint.x), y: Number(footprint.y), rotation: Number(footprint.rotation),
+      minX: Number(footprint.minX), minY: Number(footprint.minY),
+      maxX: Number(footprint.maxX), maxY: Number(footprint.maxY),
+      maxRadius: Number(footprint.maxRadius),
+    } : null,
+  };
+  const relevant = /(rotation|angle|footprint|radius|width|height|size|collision|construction|placement|anchor|orientation)/i;
+  for (const [key, value] of Object.entries(target || {})) {
+    if (key in record || !relevant.test(key)) continue;
+    if (value == null || typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean') {
+      record[key] = typeof value === 'number' && !Number.isFinite(value) ? null : value;
+    }
+  }
+  return record;
+}
+
 function traceUnitDrift205(unit) {
   const record = {
     id: String(unit?.id || ''),
@@ -24,6 +58,7 @@ function traceUnitDrift205(unit) {
     rotation: Number(unit?.rotation),
     lod: game?.unitSimLodV9 ? Number(game.unitSimLodV9(unit)) : null,
     command: plainClone(unit?.currentCommand || null),
+    interactionTarget205: traceTargetGeometry205(unit),
   };
   const relevant = /(^(?:v[xy]|d[xy]|speed|currentSpeed|moveSpeed|accel|decel|pathIndex|pathCursor|waypointIndex|targetX|targetY|moveTargetX|moveTargetY|stuckTime|stuckTicks|lastMoveTick|lastPathTick|simTick|lastSimTick)$|path|waypoint|avoid|collision|stuck|velocity|steer|moveTarget|pathTarget|nav)/i;
   for (const [key, value] of Object.entries(unit || {})) {
@@ -88,4 +123,4 @@ if text.count(diag_anchor) != 1:
 text = text.replace(diag_anchor, diag_replacement, 1)
 
 path.write_text(text, 'utf-8')
-print('Build 205 per-tick enemy worker movement drift instrumented')
+print('Build 205 per-tick enemy worker and construction target drift instrumented')
