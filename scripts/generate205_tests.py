@@ -65,6 +65,11 @@ runpy.run_path('scripts/patch205_clock_pacing.py', run_name='__main__')
 # checkpoint cadence merely by opening diagnostics/profiling.
 runpy.run_path('scripts/patch205_readonly_diagnostics.py', run_name='__main__')
 
+# Temporary exact-input instrumentation records the fields consumed by the
+# network checksum at each checkpoint. It is read-only and exists to identify
+# the first genuinely divergent field between independent browser processes.
+runpy.run_path('scripts/instrument205_network_hash_inputs.py', run_name='__main__')
+
 # The physical save test must cover the complete user-facing slot lifecycle,
 # including overwrite-in-place and deletion, not only creation and loading.
 runpy.run_path('scripts/patch205_save_slot_gate.py', run_name='__main__')
