@@ -44,6 +44,12 @@ if 'snapshotAppliedSeq205' not in mp:
     new_start = """  function restoreSnapshot(snapshot) {
     if (!snapshot?.entities || !snapshot.__mp) return;
     const localCamera = debug.game?.camera ? { ...debug.game.camera } : null;
+    // Capture the old bridge identity before replacing the Game. A merely
+    // `ready` bridge is not sufficient during handoff: for a short interval the
+    // previous Worker may still be alive while debug.startGame constructs the
+    // replacement bridge. Replaying into that old Worker loses the event when
+    // AuthoritativeBridge.launch() shuts the old bridge down.
+    const previousBridge205 = window.__FD_STABLE_STATE165__?.bridge || debug.game?.authoritativeBridge172 || null;
     // The replacement bridge reads multiplayerState() during debug.startGame().
     // Install the snapshot watermark before that launch, not afterwards.
     const snapshotAppliedSeq205 = Number(snapshot.__mp.appliedSeq) || 0;
@@ -76,19 +82,28 @@ if 'snapshotAppliedSeq205' not in mp:
     new_finish = """    state.lastStatusTick = -1;
     game.alert?.('Связь восстановлена · состояние боя синхронизировано', 'info');
 
-    // Do not tell the lobby to replay the journal until the replacement
-    // authoritative Worker has actually accepted the snapshot. Dispatching
-    // replay during bridge bootstrap made delivery depend on Worker startup
-    // timing and could strand all commands after a resync.
+    // Do not tell the lobby to replay the journal until the *replacement*
+    // authoritative Worker has accepted this exact Game/snapshot. The old
+    // bridge can remain ready for a few milliseconds after startGame(), so
+    // bridge readiness alone is not an identity barrier.
     const handoffStarted205 = performance.now();
     const finishWorkerHandoff205 = () => {
       const bridge = window.__FD_STABLE_STATE165__?.bridge || debug.game?.authoritativeBridge172;
-      if (bridge?.ready && !bridge.failed) {
+      const replacementBridgeReady205 = Boolean(
+        bridge &&
+        bridge !== previousBridge205 &&
+        bridge.game === game &&
+        bridge.worker &&
+        bridge.ready &&
+        !bridge.failed
+      );
+      if (replacementBridgeReady205) {
         bridge.appliedNetworkSeq = Math.max(Number(bridge.appliedNetworkSeq || 0), snapshotAppliedSeq205);
         if (Number.isFinite(state.hostTick)) bridge.sendClock?.(Number(state.hostTick));
         send('fd:mp-resynced', {
           tick: Number(bridge.workerTick || game.simTick || snapshot.__mp.simTick || 0),
           baseSeq: snapshotAppliedSeq205,
+          replacementBridge205: true,
         });
         return;
       }
@@ -97,7 +112,10 @@ if 'snapshotAppliedSeq205' not in mp:
         return;
       }
       game.alert?.('Не удалось восстановить authoritative Worker', 'error');
-      send('fd:mp-resync-failed', { baseSeq: snapshotAppliedSeq205 });
+      send('fd:mp-resync-failed', {
+        baseSeq: snapshotAppliedSeq205,
+        oldBridgeStillActive205: Boolean((window.__FD_STABLE_STATE165__?.bridge || debug.game?.authoritativeBridge172) === previousBridge205),
+      });
     };
     finishWorkerHandoff205();
   }
@@ -107,4 +125,4 @@ if 'snapshotAppliedSeq205' not in mp:
     mp = mp.replace(old_finish, new_finish, 1)
     mp_path.write_text(mp, 'utf-8')
 
-print('Build 205 resync now preserves snapshot tick/RNG and waits for replacement Worker readiness')
+print('Build 205 resync preserves snapshot identity and waits for the actual replacement Worker bridge')
