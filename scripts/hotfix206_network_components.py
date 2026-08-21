@@ -100,6 +100,9 @@ auth = replace_once(
 )
 AUTH.write_text(auth, 'utf-8')
 
+# Component data is attached to the regular authoritative snapshot. That is the
+# exact object used by the multiplayer status/hash comparison, so no separate
+# diagnosticsRequest instrumentation is required.
 worker = WORKER.read_text('utf-8')
 worker = replace_once(
     worker,
@@ -126,16 +129,6 @@ worker = replace_once(
     "networkHash, networkHashTick: lastNetworkHashTick, appliedSeq:",
     "networkHash, networkHashTick: lastNetworkHashTick, networkLogisticsHash206: lastNetworkLogisticsHash206, networkLogisticsComponents206: lastNetworkLogisticsComponents206, appliedSeq:",
     'Worker snapshot diagnostics',
-)
-worker = regex_once(
-    worker,
-    r"^(\s*)diagnosticReadOnly205:\s*true,",
-    lambda m: (
-        f"{m.group(1)}networkLogisticsHash206: lastNetworkLogisticsHash206,\n"
-        f"{m.group(1)}networkLogisticsComponents206: lastNetworkLogisticsComponents206,\n"
-        f"{m.group(1)}diagnosticReadOnly205: true,"
-    ),
-    'Worker diagnostics payload',
 )
 WORKER.write_text(worker, 'utf-8')
 
