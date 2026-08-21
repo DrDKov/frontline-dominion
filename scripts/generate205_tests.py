@@ -25,6 +25,12 @@ runpy.run_path('scripts/patch205_deterministic_ai.py', run_name='__main__')
 # 25 Hz and inactive LOD depends only on deterministic simulation state.
 runpy.run_path('scripts/patch205_deterministic_sim_lod.py', run_name='__main__')
 
+# Unit collision envelopes used to arrive from an asynchronous model-manifest
+# fetch. Two browsers could therefore run the first ticks with different
+# footprints even though their game/RNG state was identical. Freeze the same
+# build-local manifest geometry synchronously into the Worker before init.
+runpy.run_path('scripts/patch205_deterministic_unit_geometry.py', run_name='__main__')
+
 # Network checksums describe authoritative state, not the incidental insertion
 # order of JS arrays. Hash entities/projectiles in canonical identity order so
 # two equivalent Workers cannot manufacture a desync from container ordering.
@@ -71,8 +77,8 @@ runpy.run_path('scripts/patch205_readonly_diagnostics.py', run_name='__main__')
 runpy.run_path('scripts/instrument205_network_hash_inputs.py', run_name='__main__')
 
 # Trace the first 48 multiplayer simulation ticks for enemy workers/active
-# orders so a sub-checksum movement drift can be localized to an exact tick and
-# internal navigation/velocity field rather than inferred from rounded hashes.
+# orders and their exact interaction-target geometry so a sub-checksum drift
+# can be localized before rounded network hashes expose it.
 runpy.run_path('scripts/instrument205_unit_drift.py', run_name='__main__')
 
 # The physical save test must cover the complete user-facing slot lifecycle,
