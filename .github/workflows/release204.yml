@@ -1,17 +1,19 @@
-name: Release Frontline Dominion build 203
+name: Release Frontline Dominion build 204
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: frontline-release-203
+  group: frontline-release-204
   cancel-in-progress: true
 
 jobs:
-  release203:
+  release204:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -41,11 +43,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b release-status
           git add current.json
-          git commit -m "Build 203 run ${GITHUB_RUN_ID} started"
+          git commit -m "Build 204 run ${GITHUB_RUN_ID} started"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin release-status
 
-      - name: Assemble Frontline Dominion v16.8.19 build 203
+      - name: Assemble Frontline Dominion v16.8.20 build 204
         run: |
           set -euo pipefail
           rm -rf dist
@@ -78,6 +80,7 @@ jobs:
           python scripts/assemble201.py
           python scripts/assemble202.py
           python scripts/assemble203.py
+          python scripts/assemble204.py
 
       - name: Static and deterministic regression gates
         run: |
@@ -85,22 +88,31 @@ jobs:
           test -s dist/index.html
           test -s dist/frontline-dominion.html
           test -s dist/recon-memory-production-v203.js
-          test -s dist/runtime-ui-v203.js
-          test -s dist/runtime-shell-v203.js
-          grep -q 'frontline-dominion.html?build=203' dist/index.html
-          grep -q 'v16.8.19' dist/index.html
-          grep -q 'data-fd-canonical-build="203"' dist/frontline-dominion.html
-          grep -q 'recon-memory-production-v203.js?build=203' dist/frontline-dominion.html
-          grep -q 'runtime-shell-v203.js?build=203' dist/frontline-dominion.html
-          grep -q 'recon-memory-production-v203.js?build=203' dist/authoritative-simulation-worker-v174.js
+          test -s dist/building-visible-hit-v204.js
+          test -s dist/rally-point-authority-v204.js
+          test -s dist/runtime-ui-v204.js
+          test -s dist/runtime-shell-v204.js
+          grep -q 'frontline-dominion.html?build=204' dist/index.html
+          grep -q 'v16.8.20' dist/index.html
+          grep -q 'data-fd-canonical-build="204"' dist/frontline-dominion.html
+          grep -q 'recon-memory-production-v203.js?build=204' dist/frontline-dominion.html
+          grep -q 'building-visible-hit-v204.js?build=204' dist/frontline-dominion.html
+          grep -q 'rally-point-authority-v204.js?build=204' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v204.js?build=204' dist/frontline-dominion.html
+          grep -q 'recon-memory-production-v203.js?build=204' dist/authoritative-simulation-worker-v174.js
           grep -q 'authority203.queueSignature(building)' dist/authoritative-simulation-worker-v174.js
           grep -q 'reconMemoryQueue203:' dist/authoritative-simulation-worker-v174.js
           grep -q '__FD_RECON_MEMORY_QUEUE_203__' dist/recon-memory-production-v203.js
-          ! grep -q 'runtime-shell-v202.js?build=203' dist/frontline-dominion.html
-          python -m py_compile scripts/assemble203.py scripts/generate203_tests.py
+          grep -q '__FD_BUILDING_VISIBLE_HIT_204__' dist/building-visible-hit-v204.js
+          grep -q '__FD_RALLY_POINT_AUTHORITY_204__' dist/rally-point-authority-v204.js
+          ! grep -q 'runtime-shell-v203.js?build=204' dist/frontline-dominion.html
+          python -m py_compile scripts/assemble204.py scripts/generate204_tests.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/recon-memory-queue203.mjs
+          node --check tests/input-authority204.mjs
           node tests/recon-memory-queue203.unit.mjs
+          node tests/building-visible-hit204.unit.mjs
+          node tests/rally-point204.unit.mjs
           node tests/command-power202.unit.mjs
           node tests/resilience200.unit.mjs
           node tests/building-selection197.unit.mjs
@@ -115,14 +127,15 @@ jobs:
           set -euo pipefail
           npm install --no-save playwright
           npx playwright install chromium
-          python scripts/generate203_tests.py
-          node --check tests/reliability203.generated.mjs
-          node --check tests/movement203.generated.mjs
-          node --check tests/save-load203.generated.mjs
-          node --check tests/user-fixes203.generated.mjs
-          node --check tests/user-fixes203-recon.generated.mjs
-          node --check tests/worker-recovery203.generated.mjs
-          node --check tests/recon-energy203.generated.mjs
+          python scripts/generate204_tests.py
+          node --check tests/reliability204.generated.mjs
+          node --check tests/movement204.generated.mjs
+          node --check tests/save-load204.generated.mjs
+          node --check tests/user-fixes204.generated.mjs
+          node --check tests/user-fixes204-recon.generated.mjs
+          node --check tests/worker-recovery204.generated.mjs
+          node --check tests/recon-energy204.generated.mjs
+          node --check tests/recon-memory-queue204.generated.mjs
 
       - name: Physical Chromium release gates
         run: |
@@ -130,20 +143,21 @@ jobs:
           rm -rf smoke-root
           mkdir -p smoke-root
           ln -s "$PWD/dist" smoke-root/frontline-dominion
-          python -m http.server 8765 --directory smoke-root >/tmp/fd203-http.log 2>&1 &
+          python -m http.server 8765 --directory smoke-root >/tmp/fd204-http.log 2>&1 &
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
-          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=203"
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability203.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement203.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/user-fixes203.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/user-fixes203-recon.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/save-load203.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/worker-recovery203.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/recon-energy203.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/recon-memory-queue203.mjs
+          GAME_URL="http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=204"
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability204.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement204.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/user-fixes204.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/user-fixes204-recon.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/save-load204.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/worker-recovery204.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/recon-energy204.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/recon-memory-queue204.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/input-authority204.mjs
 
-      - name: Publish build 203 to GitHub Pages
+      - name: Publish build 204 to GitHub Pages
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -154,34 +168,37 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Frontline Dominion v16.8.19 build 203"
+          git commit -m "Frontline Dominion v16.8.20 build 204"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
 
-      - name: Verify published build 203
+      - name: Verify published build 204
         run: |
           set -euo pipefail
-          PUBLIC_URL="https://drdkov.github.io/frontline-dominion/frontline-dominion.html?build=203&verify=${GITHUB_SHA}"
+          PUBLIC_URL="https://drdkov.github.io/frontline-dominion/frontline-dominion.html?build=204&verify=${GITHUB_SHA}"
           ok=0
           for attempt in $(seq 1 60); do
-            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_URL" > /tmp/fd203-public.html && \
-               grep -q 'data-fd-canonical-build="203"' /tmp/fd203-public.html && \
-               grep -q 'recon-memory-production-v203.js?build=203' /tmp/fd203-public.html && \
-               grep -q 'runtime-shell-v203.js?build=203' /tmp/fd203-public.html; then
+            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_URL" > /tmp/fd204-public.html && \
+               grep -q 'data-fd-canonical-build="204"' /tmp/fd204-public.html && \
+               grep -q 'recon-memory-production-v203.js?build=204' /tmp/fd204-public.html && \
+               grep -q 'building-visible-hit-v204.js?build=204' /tmp/fd204-public.html && \
+               grep -q 'rally-point-authority-v204.js?build=204' /tmp/fd204-public.html && \
+               grep -q 'runtime-shell-v204.js?build=204' /tmp/fd204-public.html; then
               ok=1
               break
             fi
             sleep 5
           done
           test "$ok" -eq 1
-          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability203.generated.mjs
-          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement203.generated.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/user-fixes203.generated.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/user-fixes203-recon.generated.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/save-load203.generated.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/worker-recovery203.generated.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/recon-energy203.generated.mjs
-          FD_GAME_URL="$PUBLIC_URL" node tests/recon-memory-queue203.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/reliability204.generated.mjs
+          FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_URL" node tests/movement204.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/user-fixes204.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/user-fixes204-recon.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/save-load204.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/worker-recovery204.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/recon-energy204.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/recon-memory-queue204.generated.mjs
+          FD_GAME_URL="$PUBLIC_URL" node tests/input-authority204.mjs
 
       - name: Publish final run result
         if: always()
@@ -208,6 +225,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b release-status
           git add current.json
-          git commit -m "Build 203 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git commit -m "Build 204 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin release-status
