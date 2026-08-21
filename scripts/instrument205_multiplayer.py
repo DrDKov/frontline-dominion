@@ -2,12 +2,14 @@ from pathlib import Path
 
 BUILD = 205
 test_path = Path('tests/multiplayer205.mjs')
-module_path = Path('dist/multiplayer-game-v96.js')
-
-if not test_path.exists():
-    raise RuntimeError(f'build {BUILD} multiplayer test missing: {test_path}')
-if not module_path.exists():
-    raise RuntimeError(f'build {BUILD} multiplayer game module missing: {module_path}')
+paths = {
+    'multiplayer': Path('dist/multiplayer-game-v96.js'),
+    'bridge': Path('dist/authoritative-simulation-v174.js'),
+    'worker': Path('dist/authoritative-simulation-worker-v174.js'),
+}
+for name, path in paths.items():
+    if not path.exists():
+        raise RuntimeError(f'build {BUILD} {name} file missing: {path}')
 
 text = test_path.read_text('utf-8')
 pre_anchor = """const coopHostMove = await issueMove(coop.host, { x: 410, y: 130 });
@@ -44,22 +46,25 @@ if text.count(anchor) != 1:
     raise RuntimeError('build 205 multiplayer checkpoint test anchor missing')
 test_path.write_text(text.replace(anchor, instrumented, 1), 'utf-8')
 
-module = module_path.read_text('utf-8').splitlines()
-patterns = ['function replay', 'function applyDue', 'function emitIntent']
-for pattern in patterns:
-    found = False
-    for index, line in enumerate(module):
-        if pattern in line:
-            found = True
-            lo = max(0, index - 18)
-            hi = min(len(module), index + 145)
-            tag = pattern.replace(':', '_').replace('-', '_').replace(' ', '_')
-            print(f'FD205_{tag}_SOURCE_BEGIN')
+queries = {
+    'multiplayer': ['function replay'],
+    'bridge': ['actionErrors', 'postMessage({ type: \'action\'', "type: 'action'", 'lastAck'],
+    'worker': ['actionQueue', "message.type === 'action'", "case 'action'", 'appliedNetworkSeq'],
+}
+for label, path in paths.items():
+    lines = path.read_text('utf-8').splitlines()
+    for pattern in queries[label]:
+        hits = [i for i, line in enumerate(lines) if pattern in line]
+        tag = pattern.replace(':', '_').replace('-', '_').replace(' ', '_').replace("'", '').replace('{', '').replace('}', '')
+        if not hits:
+            print(f'FD205_{label}_{tag}_SOURCE_MISSING')
+            continue
+        for occurrence, index in enumerate(hits[:3], 1):
+            lo = max(0, index - 34)
+            hi = min(len(lines), index + 125)
+            print(f'FD205_{label}_{tag}_{occurrence}_SOURCE_BEGIN')
             for number in range(lo, hi):
-                print(f'{number + 1}: {module[number]}')
-            print(f'FD205_{tag}_SOURCE_END')
-            break
-    if not found:
-        print(f'FD205_SOURCE_MISSING {pattern}')
+                print(f'{number + 1}: {lines[number]}')
+            print(f'FD205_{label}_{tag}_{occurrence}_SOURCE_END')
 
-print('Build 205 multiplayer replay diagnostics instrumented')
+print('Build 205 authoritative Worker action timing diagnostics instrumented')
