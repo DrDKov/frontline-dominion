@@ -35,6 +35,11 @@ runpy.run_path('scripts/patch205_canonical_network_hash.py', run_name='__main__'
 # newer than the snapshot's baseSeq after the replacement Worker is ready.
 runpy.run_path('scripts/patch205_resync_replay.py', run_name='__main__')
 
+# Replayed/retransmitted network events are idempotent by sequence watermark:
+# an event already included in the authoritative snapshot is ACKed, not applied
+# a second time.
+runpy.run_path('scripts/patch205_network_idempotency.py', run_name='__main__')
+
 # A Worker network hash has its own authoritative computation tick. A later
 # presentation snapshot may carry that older hash, so never label it with the
 # snapshot tick or the lobby can manufacture a false desync.
