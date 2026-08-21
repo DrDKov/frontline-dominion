@@ -33,6 +33,11 @@ runpy.run_path('scripts/patch205_hash_tick_identity.py', run_name='__main__')
 # separate for guest pacing.
 runpy.run_path('scripts/patch205_hash_sync.py', run_name='__main__')
 
+# Clock transport is independent of expensive hash checkpoints. The host sends
+# its current authoritative Worker tick at 8 Hz so the guest can continuously
+# advance at the intended fixed lag rather than stalling between hash reports.
+runpy.run_path('scripts/patch205_clock_pacing.py', run_name='__main__')
+
 # While the two-player determinism gate is being hardened, emit one exact
 # checkpoint from both isolated clients and the status-publication source so a
 # failed run identifies the protocol fault rather than only reporting timeout.
