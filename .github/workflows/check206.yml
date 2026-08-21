@@ -58,6 +58,7 @@ jobs:
           python scripts/assemble204.py
           python scripts/assemble205.py
           python scripts/assemble206.py
+          python scripts/hotfix206_logistics_state.py
           python scripts/hotfix206_multiplayer_hash.py
           python scripts/hotfix206_multiplayer_initial_state.py
           python scripts/install206_ui.py
@@ -80,12 +81,13 @@ jobs:
           grep -q 'data.logistics206 = game.exportLogistics206' dist/authoritative-simulation-worker-v174.js
           grep -q 'fd:authoritative-save206' dist/authoritative-simulation-v174.js
           grep -q 'fd:authoritative-save206' dist/save-slots-v206.js
+          grep -q '\.\.\.existing' dist/logistics-core-v206.js
           ! grep -q 'networkLogisticsHash206?.(state.localPerspectiveSwapped)' dist/multiplayer-game-v96.js
           ! grep -q 'runtime-shell-v205.js?build=206' dist/frontline-dominion.html
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics206-browser.mjs
           node --check tests/logistics206-invariants.mjs
-          python -m py_compile scripts/assemble206.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/install206_ui.py scripts/generate206_tests.py
+          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/install206_ui.py scripts/generate206_tests.py
 
       - name: Install Chromium and generate inherited gates
         run: |
