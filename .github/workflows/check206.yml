@@ -1,0 +1,132 @@
+name: Validate Frontline Dominion build 206
+
+on:
+  push:
+    branches: [build206-logistics]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontline-check-206-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  logistics-save-multiplayer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Assemble build 206
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+          python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
+          python scripts/assemble198.py
+          python scripts/assemble199.py
+          python scripts/hotfix199_runtime.py
+          python scripts/assemble200.py
+          python scripts/assemble201.py
+          python scripts/assemble202.py
+          python scripts/assemble203.py
+          python scripts/assemble204.py
+          python scripts/assemble205.py
+          python scripts/assemble206.py
+          python scripts/install206_ui.py
+
+      - name: Static authoritative gates
+        run: |
+          set -euo pipefail
+          test -s dist/frontline-dominion.html
+          test -s dist/logistics-core-v206.js
+          test -s dist/logistics-ui-v206.js
+          test -s dist/runtime-shell-v206.js
+          test -s dist/save-slots-v206.js
+          test -s dist/multiplayer-lobby-v206.js
+          grep -q 'data-fd-canonical-build="206"' dist/frontline-dominion.html
+          grep -q 'logistics-ui-v206.js?build=206' dist/frontline-dominion.html
+          grep -q "case 'logisticsMission'" dist/authoritative-simulation-worker-v174.js
+          grep -q "case 'logisticsEmergencyImport'" dist/authoritative-simulation-worker-v174.js
+          grep -q 'networkLogisticsHash206' dist/authoritative-simulation-worker-v174.js
+          grep -q 'data.logistics206 = game.exportLogistics206' dist/authoritative-simulation-worker-v174.js
+          grep -q 'fd:authoritative-save206' dist/authoritative-simulation-v174.js
+          grep -q 'fd:authoritative-save206' dist/save-slots-v206.js
+          ! grep -q 'runtime-shell-v205.js?build=206' dist/frontline-dominion.html
+          for file in dist/*.js; do node --check "$file"; done
+          node --check tests/logistics206-browser.mjs
+          python -m py_compile scripts/assemble206.py scripts/install206_ui.py scripts/generate206_tests.py
+
+      - name: Install Chromium and generate inherited gates
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install chromium
+          python scripts/generate206_tests.py
+          node --check tests/save-slots206.generated.mjs
+          node --check tests/multiplayer206.generated.mjs
+          node --check tests/multiplayer206-soak.generated.mjs
+
+      - name: Physical logistics and save gates
+        run: |
+          set -euo pipefail
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd206-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          GAME_URL='http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=206'
+          FD_GAME_URL="$GAME_URL" node tests/logistics206-browser.mjs 2>&1 | tee /tmp/fd206-logistics.log
+          FD_GAME_URL="$GAME_URL" node tests/save-slots206.generated.mjs 2>&1 | tee /tmp/fd206-save.log
+
+      - name: Two-client multiplayer deterministic gate
+        run: |
+          set -euo pipefail
+          mkdir -p smoke-root
+          [ -e smoke-root/frontline-dominion ] || ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd206-mp-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          MP_URL='http://127.0.0.1:8765/frontline-dominion/multiplayer.html?build=206'
+          FD_MULTIPLAYER_URL="$MP_URL" node tests/multiplayer206.generated.mjs 2>&1 | tee /tmp/fd206-multiplayer.log
+          FD205_SOAK_MS=45000 FD_MULTIPLAYER_URL="$MP_URL" node tests/multiplayer206-soak.generated.mjs 2>&1 | tee /tmp/fd206-soak.log
+
+      - name: Upload build 206 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fd206-diagnostics
+          path: |
+            /tmp/fd206-http.log
+            /tmp/fd206-logistics.log
+            /tmp/fd206-save.log
+            /tmp/fd206-mp-http.log
+            /tmp/fd206-multiplayer.log
+            /tmp/fd206-soak.log
+          if-no-files-found: ignore
+          retention-days: 2
