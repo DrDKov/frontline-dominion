@@ -18,6 +18,13 @@ runpy.run_path('scripts/patch205_command_tick.py', run_name='__main__')
 # authoritative RNG seed so equal simulation ticks stay deterministic.
 runpy.run_path('scripts/patch205_deterministic_ai.py', run_name='__main__')
 
+# Simulation LOD must never depend on a local camera in multiplayer. The
+# inherited mass scheduler used isOnScreen() to choose unit update intervals,
+# so two computers viewing different map areas could produce different unit
+# positions at the same simulation tick. Active network commands now run at
+# 25 Hz and inactive LOD depends only on deterministic simulation state.
+runpy.run_path('scripts/patch205_deterministic_sim_lod.py', run_name='__main__')
+
 # A recovery snapshot may arrive while already-authorized future commands are
 # waiting for their atTick. Keep a bounded event journal and replay every event
 # newer than the snapshot's baseSeq after the replacement Worker is ready.
