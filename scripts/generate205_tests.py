@@ -55,9 +55,9 @@ runpy.run_path('scripts/patch205_clock_pacing.py', run_name='__main__')
 # checkpoint cadence merely by opening diagnostics/profiling.
 runpy.run_path('scripts/patch205_readonly_diagnostics.py', run_name='__main__')
 
-# Test-only instrumentation records compact Worker/lobby state when a gate
-# fails. It must not alter authoritative simulation state or production hashes.
-runpy.run_path('scripts/instrument205_multiplayer.py', run_name='__main__')
+# Keep one permanent no-input determinism gate: co-op must produce six clean
+# authoritative checkpoints before either player sends the first command.
+runpy.run_path('scripts/patch205_multiplayer_gate.py', run_name='__main__')
 
 generated = [
     'reliability204.generated.mjs',
