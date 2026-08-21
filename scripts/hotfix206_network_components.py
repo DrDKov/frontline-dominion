@@ -121,8 +121,10 @@ worker = replace_once(
 )
 worker = replace_once(
     worker,
-    "        networkHash: lastNetworkHash,\n        networkHashTick: lastNetworkHashTick, diagnosticReadOnly205: true,\n",
-    "        networkHash: lastNetworkHash,\n        networkHashTick: lastNetworkHashTick,\n        networkLogisticsHash206: lastNetworkLogisticsHash206,\n        networkLogisticsComponents206: lastNetworkLogisticsComponents206,\n        diagnosticReadOnly205: true,\n",
+    "        networkHash: lastNetworkHash,\n",
+    "        networkHash: lastNetworkHash,\n"
+    "        networkLogisticsHash206: lastNetworkLogisticsHash206,\n"
+    "        networkLogisticsComponents206: lastNetworkLogisticsComponents206,\n",
     'Worker diagnostics payload',
 )
 WORKER.write_text(worker, 'utf-8')
