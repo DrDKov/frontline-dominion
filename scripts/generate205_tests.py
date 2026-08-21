@@ -67,6 +67,11 @@ runpy.run_path('scripts/patch205_dual_process_test.py', run_name='__main__')
 # authoritative checkpoints before either player sends the first command.
 runpy.run_path('scripts/patch205_multiplayer_gate.py', run_name='__main__')
 
+# Recovery must not erase commands that were already authorized for a future
+# simulation tick. Force a resync while such an event is pending and require
+# both replacement Workers to apply the original sequence afterwards.
+runpy.run_path('scripts/patch205_resync_future_command_gate.py', run_name='__main__')
+
 generated = [
     'reliability204.generated.mjs',
     'movement204.generated.mjs',
