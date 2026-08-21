@@ -27,7 +27,7 @@ jobs:
             echo "===== $f =====" | tee -a audit206-static.txt
             node --check "$f" >> audit206-static.txt 2>&1 || status=1
           done
-          python -m py_compile scripts/assemble206.py scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py >> audit206-static.txt 2>&1 || status=1
+          python -m py_compile scripts/assemble206.py scripts/install206_ui.py scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py >> audit206-static.txt 2>&1 || status=1
           exit "$status"
       - name: Assemble build 206 runtime
         run: |
@@ -65,10 +65,12 @@ jobs:
           python scripts/assemble204.py
           python scripts/assemble205.py
           python scripts/assemble206.py
+          python scripts/install206_ui.py
           for f in dist/*.js; do node --check "$f"; done
           grep -q 'data-fd-canonical-build="206"' dist/frontline-dominion.html
           grep -q 'logistics-core-v206.js?build=206' dist/frontline-dominion.html
           grep -q 'authoritative-logistics-v206.js?build=206' dist/frontline-dominion.html
+          grep -q 'logistics-ui-v206.js?build=206' dist/frontline-dominion.html
           grep -q "case 'logisticsMission'" dist/authoritative-simulation-worker-v174.js
           grep -q 'networkLogisticsHash206' dist/authoritative-simulation-worker-v174.js
           grep -q 'fd:authoritative-save206' dist/authoritative-simulation-v174.js
