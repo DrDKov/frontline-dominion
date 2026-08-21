@@ -12,19 +12,20 @@ def replace(old, new, label):
         raise RuntimeError(f'{label} anchor count={count}')
     text = text.replace(old, new, 1)
 
+truck_diag = "currentCommand:t.currentCommand,isTruck:L.isTruck(t),processCommand:String(t.processCommand).slice(0,260)"
 replace(
     "assert(wh.logistics206.stock.fuel>0,'no delivered fuel');assert(near(before,after),'fuel not conserved');",
-    "assert(wh.logistics206.stock.fuel>0,`no delivered fuel: ${JSON.stringify({truck:L.ensureUnit(t,false),warehouse:wh.logistics206,extractor:oil.resourceBuffer83})}`);assert(near(before,after),'fuel not conserved');",
+    f"assert(wh.logistics206.stock.fuel>0,`no delivered fuel: ${{JSON.stringify({{{truck_diag},truck:L.ensureUnit(t,false),warehouse:wh.logistics206,extractor:oil.resourceBuffer83}})}}`);assert(near(before,after),'fuel not conserved');",
     'test 2 diagnostics',
 )
 replace(
     "assert(wh.logistics206.stock.ammo>0,'no delivered ammo');assert(near(before,after),'ammo not conserved');",
-    "assert(wh.logistics206.stock.ammo>0,`no delivered ammo: ${JSON.stringify({truck:L.ensureUnit(t,false),warehouse:wh.logistics206,extractor:mine.resourceBuffer83})}`);assert(near(before,after),'ammo not conserved');",
+    f"assert(wh.logistics206.stock.ammo>0,`no delivered ammo: ${{JSON.stringify({{{truck_diag},truck:L.ensureUnit(t,false),warehouse:wh.logistics206,extractor:mine.resourceBuffer83}})}}`);assert(near(before,after),'ammo not conserved');",
     'test 4 diagnostics',
 )
 replace(
     "assert(dest.logistics206.stock.fuel>0&&dest.logistics206.stock.ammo>0&&dest.logistics206.stock.support>0,'building not supplied');",
-    "assert(dest.logistics206.stock.fuel>0&&dest.logistics206.stock.ammo>0&&dest.logistics206.stock.support>0,`building not supplied: ${JSON.stringify({truck:L.ensureUnit(t,false),source:src.logistics206,destination:dest.logistics206})}`);",
+    f"assert(dest.logistics206.stock.fuel>0&&dest.logistics206.stock.ammo>0&&dest.logistics206.stock.support>0,`building not supplied: ${{JSON.stringify({{{truck_diag},truck:L.ensureUnit(t,false),source:src.logistics206,destination:dest.logistics206}})}}`);",
     'test 7 diagnostics',
 )
 replace(
@@ -58,4 +59,4 @@ replace(
     'test 14 stale state',
 )
 path.write_text(text, 'utf-8')
-print('Build 206 invariant harness stale-state reads/writes fixed; truck diagnostics enabled')
+print('Build 206 invariant harness state and truck-command diagnostics enabled')
