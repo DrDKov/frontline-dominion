@@ -36,16 +36,18 @@
       .sort((a, b) => String(a.id).localeCompare(String(b.id), 'en'));
   }
 
+  // Network hashing must never initialize, normalize, scan, or otherwise mutate
+  // simulation state.  All logistics initialization belongs to the simulation
+  // hooks themselves.  A checksum is a pure observation of the state at a tick.
   function canonicalLogisticsHash206(game, perspectiveSwapped = false) {
-    L.scanEntities(game);
-    const state = L.ensureGame(game);
+    const state = game?.logistics206 && typeof game.logistics206 === 'object' ? game.logistics206 : null;
     let hash = 2166136261 >>> 0;
-    hash = fnvNumber(hash, game.simTick || 0, 1);
+    hash = fnvNumber(hash, game?.simTick || 0, 1);
     for (const canonical of ['player', 'enemy']) {
       const local = localTeam(canonical, perspectiveSwapped);
       hash = fnvText(hash, canonical);
-      hash = fnvNumber(hash, game.teams?.[local]?.credits, 100);
-      const teamState = state.team?.[local] || {};
+      hash = fnvNumber(hash, game?.teams?.[local]?.credits, 100);
+      const teamState = state?.team?.[local] || {};
       hash = fnvNumber(hash, teamState.supportSpent, 100);
       hash = fnvNumber(hash, teamState.importSpent, 100);
       const contracts = teamState.contracts || {};
@@ -61,11 +63,10 @@
       }
     }
 
-    for (const entity of stableEntities(game)) {
+    for (const entity of stableEntities(game || {})) {
       const s = entity.logistics206;
       if (!s && !Number.isFinite(entity.resourceBuffer83)) continue;
       hash = fnvText(hash, entity.id);
-      // Team identity is canonicalized so versus guests hash the same state.
       const canonicalTeam = perspectiveSwapped
         ? (entity.team === 'player' ? 'enemy' : entity.team === 'enemy' ? 'player' : entity.team)
         : entity.team;
