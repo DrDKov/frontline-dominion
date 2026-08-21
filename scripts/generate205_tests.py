@@ -12,6 +12,11 @@ runpy.run_path('scripts/generate204_tests.py', run_name='__main__')
 # release205 publishes the same patched dist after these gates pass.
 runpy.run_path('scripts/patch205_hash_sync.py', run_name='__main__')
 
+# While the two-player determinism gate is being hardened, emit one exact
+# checkpoint from both isolated clients and the status-publication source so a
+# failed run identifies the protocol fault rather than only reporting timeout.
+runpy.run_path('scripts/instrument205_multiplayer.py', run_name='__main__')
+
 generated = [
     'reliability204.generated.mjs',
     'movement204.generated.mjs',
