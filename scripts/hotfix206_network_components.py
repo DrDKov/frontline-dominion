@@ -1,5 +1,4 @@
 from pathlib import Path
-import re
 
 AUTH = Path('dist/authoritative-logistics-v206.js')
 WORKER = Path('dist/authoritative-simulation-worker-v174.js')
@@ -70,15 +69,31 @@ worker = replace_once(worker, "lastHashTick = -1; lastNetworkHashTick = -1; last
 worker = replace_once(worker, "networkHash, networkHashTick: lastNetworkHashTick, appliedSeq:", "networkHash, networkHashTick: lastNetworkHashTick, networkLogisticsHash206: lastNetworkLogisticsHash206, networkLogisticsComponents206: lastNetworkLogisticsComponents206, appliedSeq:", 'Worker snapshot diagnostics')
 WORKER.write_text(worker, 'utf-8')
 
+# postMultiplayerStatus consumes this same authoritative Worker snapshot. Pass
+# the diagnostics straight through instead of caching another mutable copy.
 bridge = BRIDGE.read_text('utf-8')
-# One-run structural probe: print only status/hash-related bridge lines so the
-# next patch can bind to the actual assembled v206 structure.
-probe = []
-for index, line in enumerate(bridge.splitlines(), 1):
-    low = line.lower()
-    if any(key in low for key in ['networkhash', 'subsystemhash', 'workertick', 'mp-status', 'multiplayerstatus', 'statehash']):
-        probe.append(f'{index}: {line[:500]}')
-print('BUILD206_BRIDGE_PROBE_BEGIN')
-for line in probe[:120]: print(line)
-print('BUILD206_BRIDGE_PROBE_END')
-raise RuntimeError(f'build 206 bridge probe captured {len(probe)} candidate lines')
+bridge = replace_once(
+    bridge,
+    "      tick, hash: message.networkHash || this.networkHash,\n",
+    "      tick, hash: message.networkHash || this.networkHash,\n"
+    "      networkLogisticsHash206: Number(message.networkLogisticsHash206 || 0) >>> 0,\n"
+    "      networkLogisticsComponents206: message.networkLogisticsComponents206 || null,\n",
+    'bridge multiplayer status pass-through',
+)
+BRIDGE.write_text(bridge, 'utf-8')
+
+lobby = LOBBY.read_text('utf-8')
+lobby = replace_once(
+    lobby,
+    "    else {\n      state.hashMismatches += 1;\n      state.mismatchStreak += 1;\n",
+    "    else {\n"
+    "      state.lastHashMismatch206 = {\n"
+    "        tick: state.remoteTick,\n"
+    "        local: { hash: local.hash, stateHash: local.stateHash, rngSeed: local.rngSeed, logisticsHash: local.networkLogisticsHash206, components: local.networkLogisticsComponents206, subsystems: local.subsystemHashes },\n"
+    "        remote: { hash: status.hash, stateHash: status.stateHash, rngSeed: status.rngSeed, logisticsHash: status.networkLogisticsHash206, components: status.networkLogisticsComponents206, subsystems: status.subsystemHashes },\n"
+    "      };\n"
+    "      state.hashMismatches += 1;\n      state.mismatchStreak += 1;\n",
+    'lobby mismatch diagnostic',
+)
+LOBBY.write_text(lobby, 'utf-8')
+print('Build 206 matched-tick network logistics component diagnostics installed')
