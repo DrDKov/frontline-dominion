@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 AUTH = Path('dist/authoritative-logistics-v206.js')
 WORKER = Path('dist/authoritative-simulation-worker-v174.js')
@@ -69,9 +70,19 @@ worker = replace_once(worker, "lastHashTick = -1; lastNetworkHashTick = -1; last
 worker = replace_once(worker, "networkHash, networkHashTick: lastNetworkHashTick, appliedSeq:", "networkHash, networkHashTick: lastNetworkHashTick, networkLogisticsHash206: lastNetworkLogisticsHash206, networkLogisticsComponents206: lastNetworkLogisticsComponents206, appliedSeq:", 'Worker snapshot diagnostics')
 WORKER.write_text(worker, 'utf-8')
 
-# postMultiplayerStatus consumes this same authoritative Worker snapshot. Pass
-# the diagnostics straight through instead of caching another mutable copy.
 bridge = BRIDGE.read_text('utf-8')
+# Multiplayer status must be keyed by the tick at which its network checksum
+# was actually computed, not by the newer presentation snapshot tick. Otherwise
+# host/guest can compare hashes from adjacent simulation ticks under one label.
+pattern = r"(postMultiplayerStatus\(message\)\s*\{[\s\S]{0,600}?\bconst tick\s*=\s*)([^;\n]+);"
+def fix_tick(match):
+    return match.group(1) + "Number(message.networkHashTick || message.tick || 0) || 0;"
+bridge, count = re.subn(pattern, fix_tick, bridge, count=1)
+if count != 1:
+    raise RuntimeError(f'build 206 multiplayer status tick anchor count={count}')
+
+# postMultiplayerStatus consumes this same authoritative Worker snapshot. Pass
+# the component diagnostics straight through without another mutable cache.
 bridge = replace_once(
     bridge,
     "      tick, hash: message.networkHash || this.networkHash,\n",
@@ -96,4 +107,4 @@ lobby = replace_once(
     'lobby mismatch diagnostic',
 )
 LOBBY.write_text(lobby, 'utf-8')
-print('Build 206 matched-tick network logistics component diagnostics installed')
+print('Build 206 matched-tick network logistics diagnostics installed; status tick bound to networkHashTick')
