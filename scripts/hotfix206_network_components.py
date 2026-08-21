@@ -64,6 +64,17 @@ auth = replace_once(auth, "    version: '20.6', canonicalLogisticsHash206, conse
 AUTH.write_text(auth, 'utf-8')
 
 worker = WORKER.read_text('utf-8')
+# Hash epochs must depend only on authoritative simulation tick, never on the
+# wall-clock phase at which each browser happened to compute its first hash.
+# Otherwise host can settle on 55/60/65 while guest settles on 54/59/64 and
+# there is no common tick on which a checksum can be compared.
+worker = replace_once(
+    worker,
+    "  if (!force && lastNetworkHashTick >= 0 && tick - lastNetworkHashTick < interval) return lastNetworkHash;\n",
+    "  if (!force && tick % interval !== 0) return lastNetworkHash;\n"
+    "  if (!force && lastNetworkHashTick === tick) return lastNetworkHash;\n",
+    'Worker canonical network hash epochs',
+)
 worker = replace_once(worker, "let lastNetworkHash = '00000000';\n", "let lastNetworkHash = '00000000';\nlet lastNetworkLogisticsHash206 = 0;\nlet lastNetworkLogisticsComponents206 = null;\n", 'Worker logistics diagnostic declarations')
 worker = replace_once(worker, "  mix(game.networkLogisticsHash206?.(multiplayer.perspectiveSwapped) || 0);\n", "  lastNetworkLogisticsHash206 = Number(game.networkLogisticsHash206?.(multiplayer.perspectiveSwapped) || 0) >>> 0;\n  lastNetworkLogisticsComponents206 = game.networkLogisticsComponents206?.(multiplayer.perspectiveSwapped) || null;\n  mix(lastNetworkLogisticsHash206);\n", 'Worker logistics hash capture')
 worker = replace_once(worker, "lastHashTick = -1; lastNetworkHashTick = -1; lastNetworkHash = '00000000';\n", "lastHashTick = -1; lastNetworkHashTick = -1; lastNetworkHash = '00000000'; lastNetworkLogisticsHash206 = 0; lastNetworkLogisticsComponents206 = null;\n", 'Worker logistics diagnostic reset')
@@ -107,4 +118,4 @@ lobby = replace_once(
     'lobby mismatch diagnostic',
 )
 LOBBY.write_text(lobby, 'utf-8')
-print('Build 206 matched-tick network logistics diagnostics installed; status tick bound to networkHashTick')
+print('Build 206 network checksums aligned to canonical simulation epochs; matched-tick diagnostics installed')
