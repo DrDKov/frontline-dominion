@@ -54,7 +54,18 @@ text = text.replace(resync_anchor, resync_replacement, 1)
 
 post_resync_anchor = """const postResyncMove = await issueMove(coop.guest, { x: 190, y: -260 });
 """
-post_resync_replacement = """const pendingAppliedAfterResync205 = await waitApplied(coop, pendingResyncEvent205.seq);
+post_resync_replacement = """const replayProof205 = await waitFor(coop.guest, seq => {
+  const diag = globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.();
+  const baseSeq = Number(diag?.lastSnapshotBaseSeq205 || 0);
+  const replayed = Number(diag?.lastReplayCount205 || 0);
+  return baseSeq < seq && replayed > 0
+    ? { baseSeq, replayed, eventHistory: Number(diag?.eventHistory || 0), snapshotsReceived: Number(diag?.snapshotsReceived || 0) }
+    : null;
+}, pendingResyncEvent205.seq, 8000, 40);
+if (replayProof205.baseSeq >= pendingResyncEvent205.seq || replayProof205.replayed < 1) {
+  throw new Error(`Future command was not actually journal-replayed: ${JSON.stringify({ pendingResyncEvent205, replayProof205 })}`);
+}
+const pendingAppliedAfterResync205 = await waitApplied(coop, pendingResyncEvent205.seq);
 
 const postResyncMove = await issueMove(coop.guest, { x: 190, y: -260 });
 """
@@ -77,11 +88,11 @@ output_events_anchor = """    events: [hostEvent, guestEvent, postResyncEvent],
 """
 output_events_replacement = """    events: [hostEvent, guestEvent, pendingResyncEvent205, postResyncEvent],
     applied: [coopApplied1, coopApplied2, pendingAppliedAfterResync205, coopAppliedAfterResync],
-    futureCommandResync: { event: pendingResyncEvent205, before: pendingWindow205, applied: pendingAppliedAfterResync205 },
+    futureCommandResync: { event: pendingResyncEvent205, before: pendingWindow205, replay: replayProof205, applied: pendingAppliedAfterResync205 },
 """
 if text.count(output_events_anchor) != 1:
     raise RuntimeError('build 205 multiplayer output anchor missing')
 text = text.replace(output_events_anchor, output_events_replacement, 1)
 
 path.write_text(text, 'utf-8')
-print('Build 205 resync gate now preserves an agreed future command across Worker replacement')
+print('Build 205 resync gate now proves an agreed future command is journal-replayed across Worker replacement')
