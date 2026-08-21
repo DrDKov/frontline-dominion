@@ -54,7 +54,29 @@ text = text.replace(resync_anchor, resync_replacement, 1)
 
 post_resync_anchor = """const postResyncMove = await issueMove(coop.guest, { x: 190, y: -260 });
 """
-post_resync_replacement = """const replayProof205 = await waitFor(coop.guest, seq => {
+post_resync_replacement = """async function recoveryDiagnostics205() {
+  const [hostWorker, guestWorker, hostLobby, guestLobby, hostBridge, guestBridge] = await Promise.all([
+    workerDiagnostics(coop.host).catch(error => ({ error: String(error) })),
+    workerDiagnostics(coop.guest).catch(error => ({ error: String(error) })),
+    coop.host.evaluate(() => globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.() || null),
+    coop.guest.evaluate(() => globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.() || null),
+    coop.host.evaluate(() => {
+      const win = document.getElementById('mp-game-frame205')?.contentWindow;
+      const bridge = win?.__FD_STABLE_STATE165__?.bridge;
+      const mp = win?.__FD_MULTIPLAYER__;
+      return { ready: Boolean(bridge?.ready), failed: Boolean(bridge?.failed), workerTick: Number(bridge?.workerTick || 0), appliedNetworkSeq: Number(bridge?.appliedNetworkSeq || 0), lastAck: Number(bridge?.lastAck || 0), actionErrors: Number(bridge?.actionErrors || 0), mpAppliedSeq: Number(mp?.lastAppliedSeq || 0), mpHostTick: Number(mp?.hostTick || 0) };
+    }),
+    coop.guest.evaluate(() => {
+      const win = document.getElementById('mp-game-frame205')?.contentWindow;
+      const bridge = win?.__FD_STABLE_STATE165__?.bridge;
+      const mp = win?.__FD_MULTIPLAYER__;
+      return { ready: Boolean(bridge?.ready), failed: Boolean(bridge?.failed), workerTick: Number(bridge?.workerTick || 0), appliedNetworkSeq: Number(bridge?.appliedNetworkSeq || 0), lastAck: Number(bridge?.lastAck || 0), actionErrors: Number(bridge?.actionErrors || 0), mpAppliedSeq: Number(mp?.lastAppliedSeq || 0), mpHostTick: Number(mp?.hostTick || 0) };
+    }),
+  ]);
+  return { hostWorker, guestWorker, hostLobby, guestLobby, hostBridge, guestBridge };
+}
+
+const replayProof205 = await waitFor(coop.guest, seq => {
   const diag = globalThis.__FD_MULTIPLAYER_LOBBY_205__?.diagnostics?.();
   const baseSeq = Number(diag?.lastSnapshotBaseSeq205 || 0);
   const replayed = Number(diag?.lastReplayCount205 || 0);
@@ -65,7 +87,12 @@ post_resync_replacement = """const replayProof205 = await waitFor(coop.guest, se
 if (replayProof205.baseSeq >= pendingResyncEvent205.seq || replayProof205.replayed < 1) {
   throw new Error(`Future command was not actually journal-replayed: ${JSON.stringify({ pendingResyncEvent205, replayProof205 })}`);
 }
-const pendingAppliedAfterResync205 = await waitApplied(coop, pendingResyncEvent205.seq);
+let pendingAppliedAfterResync205;
+try {
+  pendingAppliedAfterResync205 = await waitApplied(coop, pendingResyncEvent205.seq);
+} catch (error) {
+  throw new Error(`Journal-replayed future command did not apply: ${JSON.stringify({ message: String(error?.message || error), pendingResyncEvent205, replayProof205, diagnostics: await recoveryDiagnostics205() })}`);
+}
 
 const postResyncMove = await issueMove(coop.guest, { x: 190, y: -260 });
 """
@@ -77,7 +104,12 @@ previous_anchor = """}, guestEvent.seq, 5000);
 const coopAppliedAfterResync = await waitApplied(coop, postResyncEvent.seq);
 """
 previous_replacement = """}, pendingResyncEvent205.seq, 5000);
-const coopAppliedAfterResync = await waitApplied(coop, postResyncEvent.seq);
+let coopAppliedAfterResync;
+try {
+  coopAppliedAfterResync = await waitApplied(coop, postResyncEvent.seq);
+} catch (error) {
+  throw new Error(`New command after resync did not apply: ${JSON.stringify({ message: String(error?.message || error), postResyncEvent, diagnostics: await recoveryDiagnostics205() })}`);
+}
 """
 if text.count(previous_anchor) != 1:
     raise RuntimeError('build 205 post-resync sequence anchor missing')
@@ -95,4 +127,4 @@ if text.count(output_events_anchor) != 1:
 text = text.replace(output_events_anchor, output_events_replacement, 1)
 
 path.write_text(text, 'utf-8')
-print('Build 205 resync gate now proves an agreed future command is journal-replayed across Worker replacement')
+print('Build 205 resync gate now proves an agreed future command is journal-replayed across Worker replacement with exact failure diagnostics')
