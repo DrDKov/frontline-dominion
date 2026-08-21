@@ -62,6 +62,7 @@ jobs:
           python scripts/hotfix206_multiplayer_hash.py
           python scripts/hotfix206_multiplayer_initial_state.py
           python scripts/install206_ui.py
+          python scripts/patch206_invariant_harness.py
 
       - name: Static authoritative gates
         run: |
@@ -87,7 +88,7 @@ jobs:
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics206-browser.mjs
           node --check tests/logistics206-invariants.mjs
-          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/install206_ui.py scripts/generate206_tests.py
+          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/install206_ui.py scripts/generate206_tests.py scripts/patch206_invariant_harness.py
 
       - name: Install Chromium and generate inherited gates
         run: |
