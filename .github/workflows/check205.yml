@@ -89,6 +89,10 @@ jobs:
           python scripts/generate205_tests.py
           node --check tests/input-authority205.generated.mjs
           node --check tests/reliability205.generated.mjs
+          grep -q '__fdDeterministicNetworkLod205' dist/authoritative-simulation-worker-v174.js
+          grep -q 'if (!multiplayer.active)' dist/authoritative-simulation-worker-v174.js
+          grep -q 'diagnosticReadOnly205: true' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'unitCheckpointHistory205' dist/authoritative-simulation-worker-v174.js
 
       - name: Physical save and two-player gates
         run: |
@@ -121,6 +125,5 @@ jobs:
             /tmp/fd205-multiplayer.log
             /tmp/fd205-multiplayer-tail.log
             /tmp/fd205-check-http.log
-            dist/authoritative-simulation-bundle-v172.js
           if-no-files-found: ignore
           retention-days: 2
