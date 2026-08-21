@@ -3,6 +3,8 @@ name: Validate build 206 development
 on:
   push:
     branches: [build206-logistics]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
