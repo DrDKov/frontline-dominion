@@ -50,11 +50,32 @@ clock_function = """  function pumpLiveClock205() {
     return true;
   }
 
+  function ensureStatusTimer205() {
+    clearInterval(statusTimer);
+    statusTimer = setInterval(() => {
+      pumpLiveClock205();
+      updateUI();
+    }, 125);
+  }
+
   function leadTicks() {
 """
 if text.count(function_anchor) != 1:
     raise RuntimeError('build 205 leadTicks anchor missing')
 text = text.replace(function_anchor, clock_function, 1)
+
+open_anchor = """      clearInterval(pingTimer);
+      pingTimer = setInterval(() => sendPacket({ kind: 'ping', sentAt: performance.timeOrigin + performance.now() }), 1000);
+      updateUI();
+"""
+open_replacement = """      clearInterval(pingTimer);
+      pingTimer = setInterval(() => sendPacket({ kind: 'ping', sentAt: performance.timeOrigin + performance.now() }), 1000);
+      ensureStatusTimer205();
+      updateUI();
+"""
+if text.count(open_anchor) != 1:
+    raise RuntimeError('build 205 channel-open clock timer anchor missing')
+text = text.replace(open_anchor, open_replacement, 1)
 
 show_anchor = """  function showGame() {
     state.started = true;
@@ -62,6 +83,7 @@ show_anchor = """  function showGame() {
 show_replacement = """  function showGame() {
     state.started = true;
     lastClockSentTick205 = -1;
+    ensureStatusTimer205();
 """
 if text.count(show_anchor) != 1:
     raise RuntimeError('build 205 showGame clock anchor missing')
@@ -69,10 +91,7 @@ text = text.replace(show_anchor, show_replacement, 1)
 
 interval_anchor = """  statusTimer = setInterval(updateUI, 500);
 """
-interval_replacement = """  statusTimer = setInterval(() => {
-    pumpLiveClock205();
-    updateUI();
-  }, 125);
+interval_replacement = """  ensureStatusTimer205();
 """
 if text.count(interval_anchor) != 1:
     raise RuntimeError('build 205 status timer anchor missing')
@@ -91,4 +110,4 @@ if text.count(diag_anchor) != 1:
 text = text.replace(diag_anchor, diag_replacement, 1)
 
 path.write_text(text, 'utf-8')
-print('Build 205 live host clock pacing patched at 8 Hz')
+print('Build 205 live host clock pacing patched at 8 Hz with timer recovery')
