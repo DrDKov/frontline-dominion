@@ -55,6 +55,10 @@ runpy.run_path('scripts/patch205_clock_pacing.py', run_name='__main__')
 # checkpoint cadence merely by opening diagnostics/profiling.
 runpy.run_path('scripts/patch205_readonly_diagnostics.py', run_name='__main__')
 
+# Exercise WebRTC in two distinct browser processes rather than two contexts
+# sharing one Chromium process. This catches accidental process-local coupling.
+runpy.run_path('scripts/patch205_dual_process_test.py', run_name='__main__')
+
 # Keep one permanent no-input determinism gate: co-op must produce six clean
 # authoritative checkpoints before either player sends the first command.
 runpy.run_path('scripts/patch205_multiplayer_gate.py', run_name='__main__')
