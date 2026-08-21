@@ -57,6 +57,7 @@ jobs:
           python scripts/audit206_runtime.py
           python scripts/audit206_deep.py
           python scripts/audit206_schema.py
+          python scripts/audit206_aiapi.py
       - name: Upload full audit
         uses: actions/upload-artifact@v4
         with:
