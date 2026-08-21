@@ -43,6 +43,11 @@ runpy.run_path('scripts/patch205_clock_pacing.py', run_name='__main__')
 # checkpoint cadence merely by opening diagnostics/profiling.
 runpy.run_path('scripts/patch205_readonly_diagnostics.py', run_name='__main__')
 
+# Cache exact per-unit fingerprints at the same authoritative ticks used for
+# network hashes. This is a bounded read-only history used to identify the first
+# divergent unit/field without perturbing simulation timing.
+runpy.run_path('scripts/patch205_unit_checkpoint_history.py', run_name='__main__')
+
 # While the two-player determinism gate is being hardened, emit one exact
 # checkpoint from both isolated clients and the status-publication source so a
 # failed run identifies the protocol fault rather than only reporting timeout.
