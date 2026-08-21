@@ -105,6 +105,7 @@ jobs:
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/save-slots205.mjs
           node --check tests/multiplayer205.mjs
+          node --check tests/multiplayer205-soak.mjs
           node tests/recon-memory-queue203.unit.mjs
           node tests/building-visible-hit204.unit.mjs
           node tests/rally-point204.unit.mjs
@@ -128,6 +129,9 @@ jobs:
           grep -q 'if (!multiplayer.active)' dist/authoritative-simulation-worker-v174.js
           grep -q 'diagnosticReadOnly205: true' dist/authoritative-simulation-worker-v174.js
           ! grep -q 'unitCheckpointHistory205' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'networkHashInputHistory205' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'unitDriftHistory205' dist/authoritative-simulation-worker-v174.js
+          ! grep -q 'recoveryQueueHistory205' dist/authoritative-simulation-worker-v174.js
 
       - name: Physical Chromium release gates
         run: |
@@ -141,6 +145,7 @@ jobs:
           MP_URL='http://127.0.0.1:8765/frontline-dominion/multiplayer.html?build=205'
           FD_GAME_URL="$GAME_URL" node tests/save-slots205.mjs
           FD_MULTIPLAYER_URL="$MP_URL" node tests/multiplayer205.mjs
+          FD_MULTIPLAYER_URL="$MP_URL" node tests/multiplayer205-soak.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/reliability205.generated.mjs
           FD_BROWSER=chromium FD_GAME_URL="$GAME_URL" node tests/movement205.generated.mjs
           FD_GAME_URL="$GAME_URL" node tests/user-fixes205.generated.mjs
@@ -187,6 +192,7 @@ jobs:
           test "$ok" -eq 1
           FD_GAME_URL="$PUBLIC_GAME" node tests/save-slots205.mjs
           FD_MULTIPLAYER_URL="$PUBLIC_MP" node tests/multiplayer205.mjs
+          FD_MULTIPLAYER_URL="$PUBLIC_MP" node tests/multiplayer205-soak.mjs
           FD_BROWSER=chromium FD_GAME_URL="$PUBLIC_GAME" node tests/reliability205.generated.mjs
           FD_GAME_URL="$PUBLIC_GAME" node tests/input-authority205.generated.mjs
 
