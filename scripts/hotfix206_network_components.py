@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 AUTH = Path('dist/authoritative-logistics-v206.js')
 WORKER = Path('dist/authoritative-simulation-worker-v174.js')
@@ -14,6 +15,13 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
     if count != 1:
         raise RuntimeError(f'build 206 {label} anchor count={count}')
     return text.replace(old, new, 1)
+
+
+def regex_once(text: str, pattern: str, replacement, label: str) -> str:
+    next_text, count = re.subn(pattern, replacement, text, count=1, flags=re.MULTILINE)
+    if count != 1:
+        raise RuntimeError(f'build 206 {label} regex count={count}')
+    return next_text
 
 # Compact deterministic component hashes. They are diagnostic only: the actual
 # authoritative network checksum remains unchanged.
@@ -119,24 +127,27 @@ worker = replace_once(
     "networkHash, networkHashTick: lastNetworkHashTick, networkLogisticsHash206: lastNetworkLogisticsHash206, networkLogisticsComponents206: lastNetworkLogisticsComponents206, appliedSeq:",
     'Worker snapshot diagnostics',
 )
-worker = replace_once(
+worker = regex_once(
     worker,
-    "        networkHash: lastNetworkHash,\n",
-    "        networkHash: lastNetworkHash,\n"
-    "        networkLogisticsHash206: lastNetworkLogisticsHash206,\n"
-    "        networkLogisticsComponents206: lastNetworkLogisticsComponents206,\n",
+    r"^(\s*)diagnosticReadOnly205:\s*true,",
+    lambda m: (
+        f"{m.group(1)}networkLogisticsHash206: lastNetworkLogisticsHash206,\n"
+        f"{m.group(1)}networkLogisticsComponents206: lastNetworkLogisticsComponents206,\n"
+        f"{m.group(1)}diagnosticReadOnly205: true,"
+    ),
     'Worker diagnostics payload',
 )
 WORKER.write_text(worker, 'utf-8')
 
 bridge = BRIDGE.read_text('utf-8')
-bridge = replace_once(
+bridge = regex_once(
     bridge,
-    "      subsystemHashes: message.subsystemHashes || this.subsystemHashes || null,\n      rngSeed:",
-    "      subsystemHashes: message.subsystemHashes || this.subsystemHashes || null,\n"
-    "      networkLogisticsHash206: Number(message.networkLogisticsHash206 || 0) >>> 0,\n"
-    "      networkLogisticsComponents206: message.networkLogisticsComponents206 || null,\n"
-    "      rngSeed:",
+    r"^(\s*)subsystemHashes:\s*message\.subsystemHashes\s*\|\|\s*this\.subsystemHashes\s*\|\|\s*null,",
+    lambda m: (
+        f"{m.group(1)}subsystemHashes: message.subsystemHashes || this.subsystemHashes || null,\n"
+        f"{m.group(1)}networkLogisticsHash206: Number(message.networkLogisticsHash206 || 0) >>> 0,\n"
+        f"{m.group(1)}networkLogisticsComponents206: message.networkLogisticsComponents206 || null,"
+    ),
     'bridge multiplayer status diagnostics',
 )
 BRIDGE.write_text(bridge, 'utf-8')
