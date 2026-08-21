@@ -48,15 +48,15 @@ if text.count(anchor) != 1:
 test_path.write_text(text.replace(anchor, instrumented, 1), 'utf-8')
 
 module = module_path.read_text('utf-8').splitlines()
-patterns = ['fd:mp-status', 'fd:mp-start', 'fd:mp-event', 'hostTick']
+patterns = ['function applyDue', 'function applyEvent', 'function emitIntent', 'fd:mp-status', 'fd:mp-start', 'fd:mp-event']
 for pattern in patterns:
     found = False
     for index, line in enumerate(module):
         if pattern in line:
             found = True
-            lo = max(0, index - 28)
-            hi = min(len(module), index + 70)
-            tag = pattern.replace(':', '_').replace('-', '_')
+            lo = max(0, index - 24)
+            hi = min(len(module), index + 90)
+            tag = pattern.replace(':', '_').replace('-', '_').replace(' ', '_')
             print(f'FD205_{tag}_SOURCE_BEGIN')
             for number in range(lo, hi):
                 print(f'{number + 1}: {module[number]}')
@@ -65,4 +65,4 @@ for pattern in patterns:
     if not found:
         print(f'FD205_SOURCE_MISSING {pattern}')
 
-print('Build 205 multiplayer startup and checkpoint diagnostics instrumented')
+print('Build 205 multiplayer event-path diagnostics instrumented')
