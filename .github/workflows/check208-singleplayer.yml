@@ -98,6 +98,8 @@ jobs:
           grep -q 'pruneIdleEngineerHauling208' dist/gameplay-v208.js
           grep -q 'moneyIncomePerSecond208' dist/gameplay-v208.js
           grep -q '__fdProductionHot208' dist/gameplay-v208.js
+          grep -q '__fdProductionQueueStamp208' dist/gameplay-v208.js
+          grep -q 'productionQueueFallback208' dist/gameplay-v208.js
           grep -q 'targetUnitIds208' dist/logistics-ui-v208.js
           grep -q 'СОЗДАТЬ ТРАНСПОРТ' dist/logistics-ui-v208.js
           python -m py_compile scripts/assemble208.py scripts/hotfix208_logistics_replication.py scripts/generate208_tests.py
