@@ -21,6 +21,17 @@ new_bootstrap = "      if(!(Number(s.fuelMax)>0)){s.fuelMax=TRUCK_TANK;s.fuel=TR
 if single.count(old_bootstrap) != 1:
     raise RuntimeError(f'build 208 truck fuel bootstrap anchor count={single.count(old_bootstrap)}')
 single = single.replace(old_bootstrap, new_bootstrap, 1)
+
+# Build 208 allows every supply-consuming production building to order a tied
+# resource truck. Keep one truck-equipment load (720 Fuel) physically reserved
+# at those buildings: an operating truck may refuel from surplus Fuel but must
+# not consume the last replacement-truck package and deadlock its own logistics
+# node. No Fuel is created; the reserve is simply unavailable to refuelling.
+old_fuel_store = "    if(node?.stock&&Number(node.stock.fuelMax)>0)return {get:()=>Math.max(0,Number(node.stock.fuel)||0),set:v=>{node.stock.fuel=round(Math.max(0,v));}};"
+new_fuel_store = "    if(node?.stock&&Number(node.stock.fuelMax)>0){const reserve=entity.stats?.tiedSupplyTransport208?Math.min(TRUCK_TANK,Math.max(0,Number(node.stock.fuel)||0)):0;return {get:()=>Math.max(0,(Number(node.stock.fuel)||0)-reserve),set:v=>{node.stock.fuel=round(Math.max(0,v)+reserve);}};}"
+if single.count(old_fuel_store) != 1:
+    raise RuntimeError(f'build 208 protected truck reserve anchor count={single.count(old_fuel_store)}')
+single = single.replace(old_fuel_store, new_fuel_store, 1)
 SINGLEPLAYER207.write_text(single, 'utf-8')
 
 # Mark only units that actually received physical resources. This gives the
@@ -66,4 +77,4 @@ if bridge.count(old_bridge_ack) != 1:
 bridge = bridge.replace(old_bridge_ack, new_bridge_ack, 1)
 BRIDGE.write_text(bridge, 'utf-8')
 
-print('Build 208 logistics replication fixed; legacy truck fuel bootstrap and authoritative mission ACK diagnostics installed')
+print('Build 208 logistics replication fixed; legacy truck fuel bootstrap, protected replacement reserve and authoritative mission ACK diagnostics installed')
