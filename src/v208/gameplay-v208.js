@@ -21,7 +21,9 @@
     coreDrill: 9,
     ironMine: 7,
   });
-  const isWorkerRealm = typeof document === 'undefined';
+  // The authoritative simulation shim exposes a minimal `document`, so document
+  // presence cannot distinguish the Worker. importScripts is Worker-specific here.
+  const isWorkerRealm = typeof importScripts === 'function';
   const isEngineer = unit => Boolean(unit?.alive !== false && unit.typeId === 'worker' && !unit.embarkedIn);
   const hashText = value => {
     let hash = 2166136261 >>> 0;
