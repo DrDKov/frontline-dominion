@@ -79,7 +79,8 @@ jobs:
           Path('tests/movement208.generated.mjs').write_text(text,'utf-8')
           PY
           node --check tests/movement208.generated.mjs
-      - name: Physical right-click movement gate
+          node --check tests/movement209-directional.mjs
+      - name: Physical right-click movement gates
         run: |
           set -euo pipefail
           mkdir -p smoke-root
@@ -87,4 +88,6 @@ jobs:
           python -m http.server 8765 --directory smoke-root >/tmp/fd209-http.log 2>&1 &
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
-          FD_GAME_URL='http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=208' node tests/movement208.generated.mjs
+          GAME_URL='http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=208'
+          FD_GAME_URL="$GAME_URL" node tests/movement208.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/movement209-directional.mjs
