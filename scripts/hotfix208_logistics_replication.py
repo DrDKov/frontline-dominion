@@ -37,6 +37,25 @@ SINGLEPLAYER207.write_text(single, 'utf-8')
 
 supply = SUPPLY.read_text('utf-8')
 
+# Production nodes are consumers, not free frontline depots. Once build 208
+# gives such a node its own tied resource-truck capability, other logistics
+# missions may use only stock above one physical replacement-truck package.
+# Otherwise an Area/Group mission standing next to a barracks can drain its
+# Support/Fuel and permanently prevent the barracks from producing the truck
+# needed to resupply itself. The reserve is derived from the authoritative
+# production package instead of duplicating its constants.
+old_available_stock = "    return Math.max(0, Number(node.stock?.[key]) || 0);"
+new_available_stock = "    const typeStats=D.BUILDING_TYPES?.[source.typeId],tied=Boolean(source.stats?.tiedSupplyTransport208||typeStats?.tiedSupplyTransport208);const reserve=tied?Math.max(0,Number(source.game?.productionMaterialPackage206?.(source,'resourceTruck')?.[key])||0):0;return Math.max(0,(Number(node.stock?.[key])||0)-reserve);"
+if supply.count(old_available_stock) != 1:
+    raise RuntimeError(f'build 208 tied dispatch availability anchor count={supply.count(old_available_stock)}')
+supply = supply.replace(old_available_stock, new_available_stock, 1)
+
+old_source_stock = "    if (node.stock && Number(node.stock[`${key}Max`]) > 0) return { kind:'stock', get:()=>Number(node.stock[key])||0, set:v=>{node.stock[key]=L.round(Math.max(0,v));} };"
+new_source_stock = "    if (node.stock && Number(node.stock[`${key}Max`]) > 0) { const typeStats=D.BUILDING_TYPES?.[source.typeId],tied=Boolean(source.stats?.tiedSupplyTransport208||typeStats?.tiedSupplyTransport208);const reserve=tied?Math.max(0,Number(source.game?.productionMaterialPackage206?.(source,'resourceTruck')?.[key])||0):0;return { kind:'stock', get:()=>Math.max(0,(Number(node.stock[key])||0)-reserve), set:v=>{node.stock[key]=L.round(Math.max(0,v)+reserve);} }; }"
+if supply.count(old_source_stock) != 1:
+    raise RuntimeError(f'build 208 tied dispatch source-store anchor count={supply.count(old_source_stock)}')
+supply = supply.replace(old_source_stock, new_source_stock, 1)
+
 # LOAD must work against residual demand. The inherited loop recalculated the
 # same destination deficit every tick without subtracting cargo already loaded,
 # so a 700-unit frontline demand could fill a 5600-unit truck. That inflated
@@ -114,4 +133,4 @@ if bridge.count(old_bridge_ack) != 1:
 bridge = bridge.replace(old_bridge_ack, new_bridge_ack, 1)
 BRIDGE.write_text(bridge, 'utf-8')
 
-print('Build 208 logistics replication fixed; legacy truck fuel bootstrap, protected replacement reserve, residual loading, selective cargo rebalance and authoritative mission ACK diagnostics installed')
+print('Build 208 logistics replication fixed; truck bootstrap, tied production reserves, residual loading, selective cargo rebalance and authoritative mission diagnostics installed')
