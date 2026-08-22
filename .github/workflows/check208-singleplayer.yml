@@ -97,6 +97,7 @@ jobs:
           grep -q 'workerAutomation207' dist/singleplayer-gameplay-v207.js
           grep -q 'pruneIdleEngineerHauling208' dist/gameplay-v208.js
           grep -q 'moneyIncomePerSecond208' dist/gameplay-v208.js
+          grep -q '__fdProductionHot208' dist/gameplay-v208.js
           grep -q 'targetUnitIds208' dist/logistics-ui-v208.js
           grep -q 'СОЗДАТЬ ТРАНСПОРТ' dist/logistics-ui-v208.js
           python -m py_compile scripts/assemble208.py scripts/hotfix208_logistics_replication.py scripts/generate208_tests.py
@@ -105,30 +106,6 @@ jobs:
           node --check tests/construction208-all-buildings-v2.mjs
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
-
-      - name: Inspect building scheduler
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          paths=[Path('dist/authoritative-simulation-worker-v174.js'),Path('dist/authoritative-simulation-bundle-v172.js')]
-          needles=['building.update(', 'building.update?.(', 'for (const building of this.buildings', 'for (const building of game.buildings', 'this.buildings.forEach', 'buildings.forEach', 'updateTier', 'lodTier']
-          for path in paths:
-              text=path.read_text('utf-8',errors='replace')
-              print(f'=== {path} ===')
-              for needle in needles:
-                  start=0
-                  found=0
-                  while True:
-                      i=text.find(needle,start)
-                      if i<0: break
-                      found+=1
-                      a=max(0,i-1800); b=min(len(text),i+3600)
-                      print(f'--- {needle} occurrence {found} @ {i} ---')
-                      print(text[a:b])
-                      start=i+len(needle)
-                      if found>=8: break
-          raise SystemExit('building scheduler diagnostic stop')
-          PY
 
       - name: Install Chromium and generate inherited save gate
         run: |
