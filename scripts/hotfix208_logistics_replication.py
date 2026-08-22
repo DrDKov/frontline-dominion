@@ -36,11 +36,20 @@ SINGLEPLAYER207.write_text(single, 'utf-8')
 
 supply = SUPPLY.read_text('utf-8')
 
+# LOAD must work against residual demand. The inherited loop recalculated the
+# same destination deficit every tick without subtracting cargo already loaded,
+# so a 700-unit frontline demand could fill a 5600-unit truck. That inflated
+# travel/rebalance time and distorted the physical resource economy.
+old_load_demand = "      const freshDemand=missionDemand206(game,truck);const demand=L.manifestTotal(freshDemand)>1?freshDemand:(s.plannedDemand206||freshDemand);\n      const weights={fuel:1,ammo:1.15,support:.75};\n      const manifest=L.allocateManifest(demand,Math.max(0,s.cargoCapacity-L.manifestTotal(s.cargo)),weights);"
+new_load_demand = "      const freshDemand=missionDemand206(game,truck);const rawDemand=L.manifestTotal(freshDemand)>1?freshDemand:(s.plannedDemand206||freshDemand);const demand=L.copyManifest(rawDemand);\n      for(const key of L.STOCK_KEYS)demand[key]=L.round(Math.max(0,(Number(demand[key])||0)-(Number(s.cargo[key])||0)));\n      const weights={fuel:1,ammo:1.15,support:.75};\n      const manifest=L.allocateManifest(demand,Math.max(0,s.cargoCapacity-L.manifestTotal(s.cargo)),weights);"
+if supply.count(old_load_demand) != 1:
+    raise RuntimeError(f'build 208 residual demand anchor count={supply.count(old_load_demand)}')
+supply = supply.replace(old_load_demand, new_load_demand, 1)
+
 # A manual mission change must not reinterpret arbitrary leftover cargo as the
 # correct manifest for the new mission. Keep missionType equal to the user's
 # newly selected mission (so UI/ACK remain truthful), but first run an internal
-# REBALANCE208 phase that physically returns the previous manifest to the source
-# that loaded it. Only then PLAN/load the new mission.
+# REBALANCE208 phase that physically returns incompatible cargo to its source.
 old_return_block = "    if(s.missionType==='RETURN_TO_SOURCE') {\n      const src=game.getEntity?.(s.sourceNodeId||s.homeNodeId);if(!src?.alive){s.status='IDLE';return;}s.status='RETURNING';\n      if(moveTruck206(truck,src,dt,'logistics-return')){s.status='WAITING';}return;\n    }"
 new_return_block = "    if(s.phase206==='REBALANCE208') {\n      const src=game.getEntity?.(s.rebalanceSourceNodeId208||s.sourceNodeId||s.homeNodeId);\n      if(!src?.alive){s.rebalanceSourceNodeId208=null;s.phase206='PLAN';s.status='ASSIGNED';return;}\n      s.status='REBALANCING';\n      if(moveTruck206(truck,src,dt,'logistics-return')){\n        let budget=UNLOAD_RATE*dt,moved=0;const node=L.ensureNode(src),ex=L.ensureExtractor(src);\n        for(const key of L.STOCK_KEYS){if(budget<=EPS)break;let amount=0;\n          if(node?.nodeType==='trade'&&node.importBuffer&&Number(s.cargo[key])>EPS){const available=Math.max(0,Number(s.cargo[key])||0);amount=L.round(Math.min(available,budget));node.importBuffer[key]=L.round((Number(node.importBuffer[key])||0)+amount);s.cargo[key]=L.round(available-amount);}\n          else if(node?.stock)amount=unloadToNode206(s,node,key,Math.min(Number(s.cargo[key])||0,budget));\n          else if(ex?.resourceType===key&&Number(s.cargo[key])>EPS){const max=Math.max(0,Number(src.resourceBufferMax206||src.stats?.bufferCapacity)||0),have=Math.max(0,Number(src.resourceBuffer83)||0),available=Math.max(0,Number(s.cargo[key])||0);amount=L.round(Math.min(available,Math.max(0,max-have),budget));if(amount>EPS){src.resourceBuffer83=L.round(have+amount);s.cargo[key]=L.round(available-amount);}}\n          budget-=amount;moved+=amount;\n        }\n        truck.cargo=L.round(L.manifestTotal(s.cargo));\n        if(truck.cargo<=EPS||moved<=EPS){s.rebalanceSourceNodeId208=null;s.phase206='PLAN';s.status='ASSIGNED';s.waitUntil206=0;}\n      }return;\n    }\n    if(s.missionType==='RETURN_TO_SOURCE') {\n      const src=game.getEntity?.(s.sourceNodeId||s.homeNodeId);if(!src?.alive){s.status='IDLE';return;}s.status='RETURNING';\n      if(moveTruck206(truck,src,dt,'logistics-return')){s.status='WAITING';}return;\n    }"
 if supply.count(old_return_block) != 1:
@@ -54,9 +63,10 @@ if supply.count(old_mission_start) != 1:
 supply = supply.replace(old_mission_start, new_mission_start, 1)
 
 # hotfix206_truck_commands.py has already converted this path to Unit.setCommand.
-# Patch that assembled form instead of the older direct commandQueue assignment.
+# Rebalance only when the new mission cannot consume a meaningful amount of the
+# old manifest. Compatible Ammo/Support may continue Area→Group directly.
 old_mission_phase = "      s.phase206=L.manifestTotal(s.cargo)>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';\n      const command206={type:'logistics206',missionType:mission};\n      if(typeof truck.setCommand==='function')truck.setCommand(command206,false);\n      else{truck.commandQueue=[command206];try{truck.currentCommand=command206;}catch(_){}}\n      truck.invalidateNavigation?.();changed+=1;"
-new_mission_phase = "      const rebalance208=previousMission208&&previousMission208!==mission&&L.manifestTotal(s.cargo)>EPS&&mission!=='RETURN_TO_SOURCE';\n      if(rebalance208){s.rebalanceSourceNodeId208=s.sourceNodeId||s.homeNodeId||null;s.phase206='REBALANCE208';s.status='REBALANCING';}\n      else{s.rebalanceSourceNodeId208=null;s.phase206=L.manifestTotal(s.cargo)>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';}\n      const command206={type:'logistics206',missionType:s.missionType};\n      if(typeof truck.setCommand==='function')truck.setCommand(command206,false);\n      else{truck.commandQueue=[command206];try{truck.currentCommand=command206;}catch(_){}}\n      truck.invalidateNavigation?.();changed+=1;"
+new_mission_phase = "      const nextDemand208=missionDemand206(this,truck),cargoTotal208=L.manifestTotal(s.cargo);\n      const incompatibleCargo208=L.STOCK_KEYS.reduce((sum,key)=>sum+((Number(nextDemand208[key])||0)>EPS?0:Math.max(0,Number(s.cargo[key])||0)),0);\n      const rebalanceLimit208=Math.min(300,Math.max(1,s.cargoCapacity*.08));\n      const rebalance208=previousMission208&&previousMission208!==mission&&cargoTotal208>EPS&&mission!=='RETURN_TO_SOURCE'&&incompatibleCargo208>rebalanceLimit208;\n      if(rebalance208){s.rebalanceSourceNodeId208=s.sourceNodeId||s.homeNodeId||null;s.phase206='REBALANCE208';s.status='REBALANCING';}\n      else{s.rebalanceSourceNodeId208=null;s.phase206=cargoTotal208>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';}\n      const command206={type:'logistics206',missionType:s.missionType};\n      if(typeof truck.setCommand==='function')truck.setCommand(command206,false);\n      else{truck.commandQueue=[command206];try{truck.currentCommand=command206;}catch(_){}}\n      truck.invalidateNavigation?.();changed+=1;"
 if supply.count(old_mission_phase) != 1:
     raise RuntimeError(f'build 208 mission rebalance anchor count={supply.count(old_mission_phase)}')
 supply = supply.replace(old_mission_phase, new_mission_phase, 1)
@@ -103,4 +113,4 @@ if bridge.count(old_bridge_ack) != 1:
 bridge = bridge.replace(old_bridge_ack, new_bridge_ack, 1)
 BRIDGE.write_text(bridge, 'utf-8')
 
-print('Build 208 logistics replication fixed; legacy truck fuel bootstrap, protected replacement reserve, cargo rebalance and authoritative mission ACK diagnostics installed')
+print('Build 208 logistics replication fixed; legacy truck fuel bootstrap, protected replacement reserve, residual loading, selective cargo rebalance and authoritative mission ACK diagnostics installed')
