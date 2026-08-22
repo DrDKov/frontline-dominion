@@ -3,10 +3,24 @@ from pathlib import Path
 OUT = Path('dist')
 SUPPLY = OUT / 'supply-transport-v206.js'
 WORKER = OUT / 'authoritative-simulation-worker-v174.js'
+SINGLEPLAYER207 = OUT / 'singleplayer-gameplay-v207.js'
 
-for path in (SUPPLY, WORKER):
+for path in (SUPPLY, WORKER, SINGLEPLAYER207):
     if not path.exists():
         raise RuntimeError(f'build 208 replication input missing: {path}')
+
+# Build 207 introduced physical truck refuelling, while build 206 sustainment
+# already had a legacy migration rule that gave old trucks a 720-unit tank and
+# an initial full load.  The order of the two post hooks caused the 207 hook to
+# set fuelMax first but leave fuel at zero, preventing the 206 migration from
+# ever filling the tank.  Preserve the intended migration atomically.
+single = SINGLEPLAYER207.read_text('utf-8')
+old_bootstrap = "      if(!(Number(s.fuelMax)>0))s.fuelMax=TRUCK_TANK;\n      s.fuel=Math.max(0,Math.min(s.fuelMax,Number(s.fuel)||0));"
+new_bootstrap = "      if(!(Number(s.fuelMax)>0)){s.fuelMax=TRUCK_TANK;s.fuel=TRUCK_TANK;}\n      s.fuel=Math.max(0,Math.min(s.fuelMax,Number(s.fuel)||0));"
+if single.count(old_bootstrap) != 1:
+    raise RuntimeError(f'build 208 truck fuel bootstrap anchor count={single.count(old_bootstrap)}')
+single = single.replace(old_bootstrap, new_bootstrap, 1)
+SINGLEPLAYER207.write_text(single, 'utf-8')
 
 # Mark only units that actually received physical resources.  This gives the
 # presentation bridge a short replication window without making every unit a
@@ -33,4 +47,4 @@ if worker.count(old_filter) != 1:
 worker = worker.replace(old_filter, new_filter, 1)
 WORKER.write_text(worker, 'utf-8')
 
-print('Build 208 active logistics trucks and recent resupply recipients replicate outside camera view')
+print('Build 208 logistics replication fixed; legacy supply trucks receive the intended physical fuel bootstrap')
