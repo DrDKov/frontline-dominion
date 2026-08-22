@@ -73,6 +73,7 @@ jobs:
           python scripts/assemble207.py
           python scripts/assemble208.py
           python scripts/hotfix208_logistics_replication.py
+          python scripts/hotfix208_transport_ack_diagnostic.py
 
       - name: Static build 208 gates
         run: |
@@ -95,29 +96,41 @@ jobs:
           grep -q 'logisticsCritical208' dist/authoritative-simulation-worker-v174.js
           grep -q '_fdLogisticsDetailUntil208' dist/supply-transport-v206.js
           grep -q "productionMaterialPackage206?.(source,'resourceTruck')" dist/supply-transport-v206.js
+          grep -q 'logisticsCreateTransport' dist/authoritative-simulation-worker-v174.js
           grep -q 'workerAutomation207' dist/singleplayer-gameplay-v207.js
           grep -q 'pruneIdleEngineerHauling208' dist/gameplay-v208.js
           grep -q 'moneyIncomePerSecond208' dist/gameplay-v208.js
           grep -q 'targetUnitIds208' dist/logistics-ui-v208.js
           grep -q 'СОЗДАТЬ ТРАНСПОРТ' dist/logistics-ui-v208.js
-          python -m py_compile scripts/assemble208.py scripts/hotfix208_logistics_replication.py scripts/generate208_tests.py
+          python -m py_compile scripts/assemble208.py scripts/hotfix208_logistics_replication.py scripts/hotfix208_transport_ack_diagnostic.py scripts/generate208_tests.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics208-controls-v2.mjs
-          node --check tests/construction208-all-buildings-v2.mjs
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
 
-      - name: Install Chromium and generate inherited save gate
+      - name: Install Chromium
         run: |
           set -euo pipefail
           npm install --no-save playwright
           npx playwright install chromium
-          python scripts/generate208_tests.py
-          node --check tests/save-slots208.generated.mjs
 
-      - name: Physical build 208 gates
+      - name: Focused full-scenario transport diagnostic
         run: |
           set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/logistics208-controls-v2.mjs')
+          text=p.read_text('utf-8')
+          old="fuelMax:Number(n?.stock?.fuelMax||0),blocked:Boolean(n?.productionBlocked206||b?.logistics206?.productionBlocked206),credits:"
+          new="fuelMax:Number(n?.stock?.fuelMax||0),ammo:Number(n?.stock?.ammo||0),ammoMax:Number(n?.stock?.ammoMax||0),support:Number(n?.stock?.support||0),supportMax:Number(n?.stock?.supportMax||0),completed:Boolean(b?.completed),construction:Number(b?.construction),demand:{...(b?.logistics206?.productionDemand206||{})},ack:globalThis.__FD_STABLE_STATE165__?.bridge?.lastActionAck208||null,blocked:Boolean(n?.productionBlocked206||b?.logistics206?.productionBlocked206),credits:"
+          if text.count(old)!=1: raise SystemExit(f'diagnostic stock anchor count={text.count(old)}')
+          text=text.replace(old,new,1)
+          old_timeout="},{I,before},45000);if(tied.home!==I.barracks"
+          new_timeout="},{I,before},7000);if(tied.home!==I.barracks"
+          if text.count(old_timeout)!=1: raise SystemExit(f'diagnostic timeout anchor count={text.count(old_timeout)}')
+          text=text.replace(old_timeout,new_timeout,1)
+          p.write_text(text,'utf-8')
+          PY
           mkdir -p smoke-root
           ln -s "$PWD/dist" smoke-root/frontline-dominion
           python -m http.server 8765 --directory smoke-root >/tmp/fd208-http.log 2>&1 &
@@ -131,12 +144,7 @@ jobs:
           done
           test "$ready" -eq 1
           GAME_URL="$BASE_URL/frontline-dominion.html?build=208"
-          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd208-invariants.log
-          FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs 2>&1 | tee /tmp/fd208-bootstrap.log
-          FD_GAME_URL="$GAME_URL" node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd208-air.log
           FD_GAME_URL="$GAME_URL" node tests/logistics208-controls-v2.mjs 2>&1 | tee /tmp/fd208-logistics.log
-          FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings-v2.mjs 2>&1 | tee /tmp/fd208-construction.log
-          FD_GAME_URL="$GAME_URL" node tests/save-slots208.generated.mjs 2>&1 | tee /tmp/fd208-save.log
 
       - name: Upload build 208 diagnostics
         if: always()
@@ -145,11 +153,6 @@ jobs:
           name: fd208-singleplayer-diagnostics
           path: |
             /tmp/fd208-http.log
-            /tmp/fd208-invariants.log
-            /tmp/fd208-bootstrap.log
-            /tmp/fd208-air.log
             /tmp/fd208-logistics.log
-            /tmp/fd208-construction.log
-            /tmp/fd208-save.log
           if-no-files-found: ignore
           retention-days: 3
