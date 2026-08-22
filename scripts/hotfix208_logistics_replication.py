@@ -3,17 +3,18 @@ from pathlib import Path
 OUT = Path('dist')
 SUPPLY = OUT / 'supply-transport-v206.js'
 WORKER = OUT / 'authoritative-simulation-worker-v174.js'
+BRIDGE = OUT / 'authoritative-simulation-v174.js'
 SINGLEPLAYER207 = OUT / 'singleplayer-gameplay-v207.js'
 
-for path in (SUPPLY, WORKER, SINGLEPLAYER207):
+for path in (SUPPLY, WORKER, BRIDGE, SINGLEPLAYER207):
     if not path.exists():
         raise RuntimeError(f'build 208 replication input missing: {path}')
 
 # Build 207 introduced physical truck refuelling, while build 206 sustainment
 # already had a legacy migration rule that gave old trucks a 720-unit tank and
-# an initial full load.  The order of the two post hooks caused the 207 hook to
+# an initial full load. The order of the two post hooks caused the 207 hook to
 # set fuelMax first but leave fuel at zero, preventing the 206 migration from
-# ever filling the tank.  Preserve the intended migration atomically.
+# ever filling the tank. Preserve the intended migration atomically.
 single = SINGLEPLAYER207.read_text('utf-8')
 old_bootstrap = "      if(!(Number(s.fuelMax)>0))s.fuelMax=TRUCK_TANK;\n      s.fuel=Math.max(0,Math.min(s.fuelMax,Number(s.fuel)||0));"
 new_bootstrap = "      if(!(Number(s.fuelMax)>0)){s.fuelMax=TRUCK_TANK;s.fuel=TRUCK_TANK;}\n      s.fuel=Math.max(0,Math.min(s.fuelMax,Number(s.fuel)||0));"
@@ -22,7 +23,7 @@ if single.count(old_bootstrap) != 1:
 single = single.replace(old_bootstrap, new_bootstrap, 1)
 SINGLEPLAYER207.write_text(single, 'utf-8')
 
-# Mark only units that actually received physical resources.  This gives the
+# Mark only units that actually received physical resources. This gives the
 # presentation bridge a short replication window without making every unit a
 # permanent high-detail snapshot participant.
 supply = SUPPLY.read_text('utf-8')
@@ -33,11 +34,11 @@ if supply.count(old_resupply) != 1:
 supply = supply.replace(old_resupply, new_resupply, 1)
 SUPPLY.write_text(supply, 'utf-8')
 
-# dynamicDetails historically omitted off-screen/unselected units.  That is
+# dynamicDetails historically omitted off-screen/unselected units. That is
 # valid for ordinary combat presentation, but not for player-owned logistics:
 # a mission button must visibly change the truck state even when it is outside
 # the camera, and a unit that has just received supply must publish its new
-# finite stock.  Always replicate supply trucks; replicate actual recipients
+# finite stock. Always replicate supply trucks; replicate actual recipients
 # only during the short window stamped above.
 worker = WORKER.read_text('utf-8')
 old_filter = "    if (!force && !selected.has(unit.id) && !inView) continue;\n    records.push(serializeEntity(unit));"
@@ -45,6 +46,24 @@ new_filter = "    const logisticsCritical208 = Boolean(\n      unit.currentComma
 if worker.count(old_filter) != 1:
     raise RuntimeError(f'build 208 dynamic detail filter anchor count={worker.count(old_filter)}')
 worker = worker.replace(old_filter, new_filter, 1)
+
+# Attach a compact authoritative post-action snapshot to logistics ACKs. This is
+# diagnostic state only and does not participate in simulation or hashing. It
+# makes command-path regressions observable without mutating the presentation
+# mirror optimistically.
+old_ack = "  postMessage({ type: 'actionAck', seq: event.seq, networkSeq: event.networkSeq || 0, tick: game.simTick, ok: result !== false, action: event.action });"
+new_ack = "  const debug208 = event.action === 'logisticsMission' ? (() => { const ids=(payload.truckIds||payload.unitIds||[payload.truckId]).filter(Boolean); return { payload:plainClone(payload), trucks:ids.map(id=>{const unit=game.getEntity?.(id),s=unit?.logistics206;return {id:String(id),alive:Boolean(unit?.alive),team:unit?.team||null,missionType:s?.missionType||null,targetGroupId:s?.targetGroupId||null,phase206:s?.phase206||null,status:s?.status||null};}) }; })() : null;\n  postMessage({ type: 'actionAck', seq: event.seq, networkSeq: event.networkSeq || 0, tick: game.simTick, ok: result !== false, action: event.action, debug208 });"
+if worker.count(old_ack) != 1:
+    raise RuntimeError(f'build 208 action ACK anchor count={worker.count(old_ack)}')
+worker = worker.replace(old_ack, new_ack, 1)
 WORKER.write_text(worker, 'utf-8')
 
-print('Build 208 logistics replication fixed; legacy supply trucks receive the intended physical fuel bootstrap')
+bridge = BRIDGE.read_text('utf-8')
+old_bridge_ack = "    if (message.type === 'actionAck') {\n      this.lastAck = Math.max(this.lastAck, message.seq || 0);"
+new_bridge_ack = "    if (message.type === 'actionAck') {\n      this.lastActionAck208 = clonePlain(message);\n      this.lastAck = Math.max(this.lastAck, message.seq || 0);"
+if bridge.count(old_bridge_ack) != 1:
+    raise RuntimeError(f'build 208 bridge ACK anchor count={bridge.count(old_bridge_ack)}')
+bridge = bridge.replace(old_bridge_ack, new_bridge_ack, 1)
+BRIDGE.write_text(bridge, 'utf-8')
+
+print('Build 208 logistics replication fixed; legacy truck fuel bootstrap and authoritative mission ACK diagnostics installed')
