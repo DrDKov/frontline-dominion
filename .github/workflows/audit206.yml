@@ -27,7 +27,7 @@ jobs:
             echo "===== $f =====" | tee -a audit206-static.txt
             node --check "$f" >> audit206-static.txt 2>&1 || status=1
           done
-          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_resync_snapshot.py scripts/hotfix206_network_components.py scripts/hotfix206_initial_signature.py scripts/hotfix206_ai_trace_diagnostics.py scripts/install206_ui.py scripts/patch206_invariant_harness.py scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py scripts/audit206_determinism.py >> audit206-static.txt 2>&1 || status=1
+          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_resync_snapshot.py scripts/hotfix206_resync_continuity.py scripts/hotfix206_network_components.py scripts/hotfix206_initial_signature.py scripts/hotfix206_ai_trace_diagnostics.py scripts/install206_ui.py scripts/patch206_invariant_harness.py scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py scripts/audit206_determinism.py >> audit206-static.txt 2>&1 || status=1
           exit "$status"
       - name: Assemble build 206 runtime
         run: |
@@ -70,6 +70,7 @@ jobs:
           python scripts/hotfix206_multiplayer_hash.py
           python scripts/hotfix206_multiplayer_initial_state.py
           python scripts/hotfix206_resync_snapshot.py
+          python scripts/hotfix206_resync_continuity.py
           python scripts/hotfix206_network_components.py
           python scripts/hotfix206_initial_signature.py
           python scripts/hotfix206_ai_trace_diagnostics.py
@@ -80,11 +81,14 @@ jobs:
           grep -q 'logistics-core-v206.js?build=206' dist/frontline-dominion.html
           grep -q 'authoritative-logistics-v206.js?build=206' dist/frontline-dominion.html
           grep -q 'logistics-ui-v206.js?build=206' dist/frontline-dominion.html
+          test -s dist/resync-continuity-v206.js
           grep -q "case 'logisticsMission'" dist/authoritative-simulation-worker-v174.js
           grep -q 'networkLogisticsHash206' dist/authoritative-simulation-worker-v174.js
           grep -q 'initialNetworkHash206' dist/authoritative-simulation-worker-v174.js
           grep -q '_fdLoadedMultiplayerSnapshot206' dist/authoritative-simulation-v174.js
           grep -q 'preservedResync206' dist/authoritative-simulation-v174.js
+          grep -q 'workerTransient206' dist/authoritative-simulation-worker-v174.js
+          grep -q 'importWorkerTransient206' dist/resync-continuity-v206.js
           grep -q 'fd:authoritative-save206' dist/authoritative-simulation-v174.js
       - name: Audit logistics economy runtime and determinism anchors
         run: |
