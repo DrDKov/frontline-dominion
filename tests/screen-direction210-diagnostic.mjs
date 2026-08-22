@@ -3,10 +3,10 @@ import { chromium } from 'playwright';
 const url = process.env.FD_GAME_URL || 'http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=209';
 const browser = await chromium.launch({ headless: true });
 const directions = [
-  { name: 'up', dx: 0, dy: -220 },
-  { name: 'right', dx: 220, dy: 0 },
-  { name: 'down', dx: 0, dy: 220 },
-  { name: 'left', dx: -220, dy: 0 },
+  { name: 'up', dx: 0, dy: -140 },
+  { name: 'right', dx: 140, dy: 0 },
+  { name: 'down', dx: 0, dy: 140 },
+  { name: 'left', dx: -140, dy: 0 },
 ];
 const results = [];
 
@@ -22,7 +22,7 @@ const waitFor = async (page, fn, arg, timeout = 20000, interval = 80) => {
 };
 
 for (const direction of directions) {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2, hasTouch: true });
   const page = await context.newPage();
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(String(error?.stack || error)));
@@ -54,9 +54,11 @@ for (const direction of directions) {
 
     const beforeScreen = g.worldToScreen(unit.x, unit.y, 0);
     const targetScreen = { x: beforeScreen.x + dx, y: beforeScreen.y + dy };
+    // worldToScreen/screenToWorld use game.viewport coordinates. Convert those to
+    // CSS client coordinates using the same viewport, not the HiDPI canvas backing size.
     const client = {
-      x: rect.left + targetScreen.x * rect.width / canvas.width,
-      y: rect.top + targetScreen.y * rect.height / canvas.height,
+      x: rect.left + targetScreen.x * rect.width / g.viewport.width,
+      y: rect.top + targetScreen.y * rect.height / g.viewport.height,
     };
     const expectedWorld = g.screenToWorld(targetScreen.x, targetScreen.y, 0) || g.screenToWorld(targetScreen.x, targetScreen.y);
 
@@ -90,6 +92,15 @@ for (const direction of directions) {
       client,
       expectedWorld,
       beforeSeq: Number(bridge.seq || 0),
+      dimensions: {
+        dpr: devicePixelRatio,
+        canvasWidth: canvas.width,
+        canvasHeight: canvas.height,
+        rectWidth: rect.width,
+        rectHeight: rect.height,
+        viewportWidth: g.viewport.width,
+        viewportHeight: g.viewport.height,
+      },
       screenToWorldSource: String(g.screenToWorld),
       worldToScreenSource: String(g.worldToScreen),
     };
@@ -148,6 +159,7 @@ for (const direction of directions) {
 
 console.log('SCREEN_DIRECTION_210_SUMMARY', JSON.stringify(results.map(r => ({
   direction: r.direction.name,
+  dimensions: r.fixture.dimensions,
   expectedWorld: r.fixture.expectedWorld,
   action: r.routed.action,
   commandScreenVector: r.routed.commandScreenVector,
@@ -157,6 +169,6 @@ console.log('SCREEN_DIRECTION_210_SUMMARY', JSON.stringify(results.map(r => ({
 }))));
 
 const bad = results.filter(r => r.routed.commandCosine < 0.6 || r.motion.cosine < 0.2 || r.pageErrors.length);
-if (bad.length) throw new Error(`SCREEN_DIRECTION_MISMATCH ${JSON.stringify(bad.map(r => ({ direction: r.direction.name, routed: r.routed, motion: r.motion, errors: r.pageErrors })))}`);
+if (bad.length) throw new Error(`SCREEN_DIRECTION_MISMATCH ${JSON.stringify(bad.map(r => ({ direction: r.direction.name, dimensions: r.fixture.dimensions, routed: r.routed, motion: r.motion, errors: r.pageErrors })))}`);
 
 await browser.close();
