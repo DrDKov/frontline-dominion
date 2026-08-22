@@ -82,7 +82,7 @@ jobs:
           directional=Path('tests/movement209-directional.mjs').read_text('utf-8')
           free="if (typeof game.setFormationEnabled201 === 'function') game.setFormationEnabled201(false, false);\n  if (game.formationSettings) game.formationSettings.enabled = false;"
           line="game.setFormationMode?.('line');\n  if (typeof game.setFormationEnabled201 === 'function') game.setFormationEnabled201(true, false);\n  if (game.formationSettings) { game.formationSettings.enabled = true; game.formationSettings.mode = 'line'; }"
-          if directional.count(free) != 2:
+          if directional.count(free) != 1:
               raise SystemExit(f'unexpected free-formation anchors: {directional.count(free)}')
           Path('tests/movement209-line.generated.mjs').write_text(directional.replace(free,line),'utf-8')
           PY
