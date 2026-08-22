@@ -14,15 +14,23 @@
   const priorities=['LOW','NORMAL','HIGH','CRITICAL'];
   const missionNames={AUTO:'Автоматический',EXTRACT_RESOURCE:'Вывоз добычи',SUPPLY_BUILDING:'Снабжение здания',SUPPLY_AREA:'Снабжение области',SUPPLY_GROUP:'Снабжение группы',MANUAL_TRANSFER:'Ручная перевозка',RETURN_TO_SOURCE:'Возврат на склад'};
   const nodeNames={central:'Командный/центральный склад',warehouse:'Склад',pmto:'ПМТО',terminal:'Логистический терминал',trade:'Торговый узел',airfield:'Аэродром',production:'Производственный объект',barracks:'Казармы',repair:'Ремонтная база',defense:'Оборонный узел'};
-  const state={entityId:null,layout:null,targetMode:null,truckIds:[],sourceEntityId:null,overlay:false,pendingPriority:new Map(),lastTopUpdate:0};
+  const state={entityId:null,layout:null,targetMode:null,truckIds:[],sourceEntityId:null,overlay:false,pendingPriority:new Map(),activeTab:'stats'};
 
   const style=document.createElement('style');style.id='fd-logistics-ui207-style';style.textContent=`
-    #fd-logistics-panel207{display:none;grid-column:1/-1;gap:7px;margin-top:7px;padding:9px;border:1px solid rgba(103,193,151,.34);border-radius:7px;background:rgba(4,16,12,.76);contain:layout style}
-    #fd-logistics-panel207.active{display:grid}#fd-logistics-panel207 h4{margin:0;color:#cce9d7;font:900 10px/1.2 system-ui;letter-spacing:.09em;text-transform:uppercase}
-    #fd-logistics-panel207 .fd-grid207{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 11px}#fd-logistics-panel207 .fd-line207{display:flex;justify-content:space-between;gap:8px;color:#92aa9e;font:700 9px/1.35 system-ui}#fd-logistics-panel207 .fd-line207 strong{color:#e1eee7;text-align:right;font-variant-numeric:tabular-nums}
-    #fd-logistics-panel207 .fd-actions207{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}#fd-logistics-panel207 button{min-height:31px;padding:4px 7px;border:1px solid rgba(110,194,151,.38);border-radius:5px;background:rgba(35,86,61,.22);color:#dbeae1;font:800 8px/1.15 system-ui;letter-spacing:.025em;cursor:pointer;touch-action:manipulation}#fd-logistics-panel207 button:hover{border-color:rgba(139,231,183,.82);background:rgba(48,115,79,.36)}#fd-logistics-panel207 button:active{transform:translateY(1px);background:rgba(62,135,94,.46)}
-    #fd-logistics-panel207 .fd-priority207{display:grid;grid-template-columns:34px 1fr 34px;gap:5px;align-items:center}.fd-priority207 span{text-align:center;color:#dfeee5;font:900 9px system-ui}
-    #fd-fuel-resource207{white-space:nowrap}#fd-logistics-toggle207{position:fixed;z-index:83;right:14px;top:72px;min-height:36px;padding:0 12px;border:1px solid rgba(112,202,158,.48);border-radius:5px;background:rgba(5,20,14,.88);color:#cae7d7;font:900 9px system-ui;cursor:pointer}#fd-logistics-toggle207.active{background:rgba(47,111,77,.9);color:white}
+    #selection-panel .selection-tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+    #selection-logistics-pane{padding:4px 1px!important}
+    #fd-logistics-panel207{display:grid;gap:6px;padding:1px 1px 3px;background:none;contain:layout style}
+    #fd-logistics-panel207 h4{margin:0 1px 2px;color:#cce9d7;font:900 9px/1.2 system-ui;letter-spacing:.08em;text-transform:uppercase}
+    #fd-logistics-panel207 .fd-grid207{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 9px}
+    #fd-logistics-panel207 .fd-line207{display:flex;justify-content:space-between;gap:7px;min-height:15px;padding:1px 0;color:#92aa9e;font:700 9px/1.25 system-ui}
+    #fd-logistics-panel207 .fd-line207 strong{color:#e1eee7;text-align:right;font-variant-numeric:tabular-nums}
+    #fd-logistics-panel207 .fd-actions207{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin-top:2px}
+    #fd-logistics-panel207 button{min-height:25px;padding:3px 5px;border:1px solid rgba(110,194,151,.38);border-radius:5px;background:rgba(35,86,61,.22);color:#dbeae1;font:800 8px/1.1 system-ui;letter-spacing:.02em;cursor:pointer;touch-action:manipulation}
+    #fd-logistics-panel207 button:hover{border-color:rgba(139,231,183,.82);background:rgba(48,115,79,.36)}#fd-logistics-panel207 button:active{transform:translateY(1px);background:rgba(62,135,94,.46)}
+    #fd-logistics-panel207 .fd-priority207{display:grid;grid-template-columns:30px 1fr 30px;gap:4px;align-items:center;margin-top:2px}.fd-priority207 span{text-align:center;color:#dfeee5;font:900 9px system-ui}
+    #fd-logistics-empty207{padding:10px 4px;color:#81968b;font:700 9px/1.35 system-ui}
+    #fd-fuel-resource207{white-space:nowrap}
+    #fd-logistics-toggle207{position:fixed;z-index:83;right:14px;top:72px;min-height:36px;padding:0 12px;border:1px solid rgba(112,202,158,.48);border-radius:5px;background:rgba(5,20,14,.88);color:#cae7d7;font:900 9px system-ui;cursor:pointer}#fd-logistics-toggle207.active{background:rgba(47,111,77,.9);color:white}
     #fd-logistics-summary207{position:fixed;z-index:82;right:14px;top:114px;display:none;width:260px;padding:9px;border:1px solid rgba(112,202,158,.33);border-radius:7px;background:rgba(4,14,10,.9);color:#dcebe3;font:700 9px/1.45 system-ui;pointer-events:none}#fd-logistics-summary207.active{display:grid;gap:3px}
     body.fd-logistics-target207 #game-canvas{cursor:crosshair!important}
   `;document.head.appendChild(style);
@@ -39,34 +47,48 @@
     if(entity.kind==='unit')return 'unit';
     if(entity.kind==='building'&&L.ensureExtractor(entity))return 'extractor';
     if(entity.kind==='building'&&L.ensureNode(entity))return 'node';
+    if(entity.kind==='building')return 'building';
     return null;
   }
-  function shell(layout,entity){
+  function shell(layout){
     if(layout==='truck')return `<h4>Грузовик снабжения</h4><div class="fd-grid207">${field('tank','Топливо в баке')}${field('cargo','Груз / вместимость')}${field('fuelCargo','Fuel в грузе')}${field('ammoCargo','Ammo в грузе')}${field('supportCargo','Support в грузе')}${field('mission','Задача')}${field('status','Состояние')}${field('source','Источник')}${field('destination','Назначение')}</div>${actions([['area','СНАБЖАТЬ ОБЛАСТЬ'],['group','СНАБЖАТЬ ГРУППУ'],['building','СНАБЖАТЬ ЗДАНИЕ'],['return','ВЕРНУТЬСЯ НА СКЛАД'],['auto','АВТОМАТИЧЕСКИЙ РЕЖИМ'],['manual','РУЧНОЙ ПЕРЕНОС']])}`;
     if(layout==='worker')return `<h4>Инженер · физическая логистика</h4><div class="fd-grid207">${field('cargo','Груз / вместимость')}${field('resourceCargo','Состав груза')}${field('mission','Логистическая задача')}${field('destination','Куда несёт')}</div>`;
     if(layout==='air')return `<h4>Авиационное снабжение</h4><div class="fd-grid207">${field('tank','Топливо')}${field('ammo','Боекомплект')}${field('support','Техобслуживание')}${field('airState','Состояние')}</div>`;
     if(layout==='unit')return `<h4>Тактическое снабжение</h4><div class="fd-grid207">${field('tank','Топливо')}${field('ammo','Боекомплект')}${field('support','Support')}${field('supply','Готовность')}</div>`;
     if(layout==='extractor')return `<h4 data-fd-title207>Добывающее предприятие</h4><div class="fd-grid207">${field('resourceType','Ресурс')}${field('deposit','Остаток месторождения')}${field('buffer','Локальный склад')}${field('rate','Скорость добычи')}${field('haul','Вывоз')}</div>`;
-    if(layout==='node')return `<h4 data-fd-title207>Физическая логистика</h4><div class="fd-grid207">${field('fuelStock','Fuel stock')}${field('ammoStock','Ammo stock')}${field('supportStock','Support stock')}${field('transport','Транспорт')}${field('radius','Радиус снабжения')}</div><div class="fd-priority207"><button type="button" data-fd-action207="priority-down">−</button><span data-fd-field207="priority">ОБЫЧНЫЙ</span><button type="button" data-fd-action207="priority-up">+</button></div>${actions([['create-transport','СОЗДАТЬ ТРАНСПОРТ']])}`;
-    return '';
+    if(layout==='node')return `<h4 data-fd-title207>Физическая логистика</h4><div class="fd-grid207">${field('fuelStock','Fuel stock')}${field('ammoStock','Ammo stock')}${field('supportStock','Support stock')}${field('transport','Транспорт')}${field('radius','Радиус снабжения')}</div><div class="fd-priority207"><button type="button" data-fd-action207="priority-down" aria-label="Понизить приоритет">−</button><span data-fd-field207="priority">ОБЫЧНЫЙ</span><button type="button" data-fd-action207="priority-up" aria-label="Повысить приоритет">+</button></div>${actions([['create-transport','СОЗДАТЬ ТРАНСПОРТ']])}`;
+    return `<div id="fd-logistics-empty207">У этого строения нет отдельного локального запаса или транспортной задачи.</div>`;
   }
 
-  function ensurePanel(){
-    let panel=document.getElementById('fd-logistics-panel207');
-    if(panel)return panel;
-    panel=document.createElement('div');panel.id='fd-logistics-panel207';
-    const parent=document.getElementById('selection-panel')||document.getElementById('hud')||document.body;
-    const details=document.getElementById('selection-details');
-    if(details?.parentNode===parent)parent.insertBefore(panel,details.nextSibling);else parent.appendChild(panel);
-    panel.addEventListener('pointerdown',e=>{if(e.target.closest('button'))e.stopPropagation();},true);
-    panel.addEventListener('click',handleAction,true);
-    return panel;
+  function ensureTabs(){
+    const selection=document.getElementById('selection-panel');if(!selection)return null;
+    const tablist=selection.querySelector('.selection-tabs'),body=selection.querySelector('.selection-tab-body');if(!tablist||!body)return null;
+    let tab=tablist.querySelector('[data-selection-tab="logistics"]');
+    if(!tab){tab=document.createElement('button');tab.type='button';tab.className='selection-tab';tab.dataset.selectionTab='logistics';tab.setAttribute('role','tab');tab.setAttribute('aria-selected','false');tab.textContent='Логистика';tablist.appendChild(tab);}
+    let pane=body.querySelector('[data-selection-pane="logistics"]');
+    if(!pane){pane=document.createElement('div');pane.id='selection-logistics-pane';pane.className='selection-pane';pane.dataset.selectionPane='logistics';body.appendChild(pane);}
+    let panel=pane.querySelector('#fd-logistics-panel207');
+    if(!panel){panel=document.createElement('div');panel.id='fd-logistics-panel207';pane.appendChild(panel);panel.addEventListener('pointerdown',e=>{if(e.target.closest('button'))e.stopPropagation();},true);panel.addEventListener('click',handleAction,true);}
+    if(!tablist.__fdLogisticsTab207){
+      tablist.__fdLogisticsTab207=true;
+      tablist.addEventListener('click',event=>{const clicked=event.target?.closest?.('[data-selection-tab]');if(!clicked)return;const next=clicked.dataset.selectionTab;if(next==='logistics'){event.preventDefault();event.stopImmediatePropagation();state.activeTab='logistics';applyTabState207();}else{state.activeTab=next||'stats';tab.classList.remove('active');tab.setAttribute('aria-selected','false');pane.classList.remove('active');}},true);
+    }
+    return {selection,tablist,body,tab,pane,panel};
   }
-  function setField(panel,name,value){const el=panel.querySelector(`[data-fd-field207="${name}"]`);if(el&&el.textContent!==String(value))el.textContent=String(value);}
+  function applyTabState207(){
+    const ui=ensureTabs();if(!ui)return;
+    const available=Boolean(layoutFor(selectedOne(D.game)));ui.tab.disabled=!available;
+    if(state.activeTab==='logistics'&&!available)state.activeTab='stats';
+    if(state.activeTab!=='logistics'){ui.tab.classList.remove('active');ui.tab.setAttribute('aria-selected','false');ui.pane.classList.remove('active');return;}
+    for(const tab of ui.tablist.querySelectorAll('[data-selection-tab]')){const on=tab===ui.tab;tab.classList.toggle('active',on);tab.setAttribute('aria-selected',on?'true':'false');}
+    for(const pane of ui.body.querySelectorAll('[data-selection-pane]'))pane.classList.toggle('active',pane===ui.pane);
+  }
+  function ensurePanel(){return ensureTabs()?.panel||null;}
+  function setField(panel,name,value){const el=panel?.querySelector(`[data-fd-field207="${name}"]`);if(el&&el.textContent!==String(value))el.textContent=String(value);}
   function updatePanel(game){
-    const panel=ensurePanel(),entity=selectedOne(game),layout=layoutFor(entity);
-    if(!entity||!layout){panel.classList.remove('active');state.entityId=null;state.layout=null;return;}
-    if(state.entityId!==entity.id||state.layout!==layout){panel.innerHTML=shell(layout,entity);state.entityId=entity.id;state.layout=layout;panel.classList.add('active');}
+    const ui=ensureTabs();if(!ui)return;const panel=ui.panel,entity=selectedOne(game),layout=layoutFor(entity);ui.tab.disabled=!layout;
+    if(!entity||!layout){state.entityId=null;state.layout=null;if(state.activeTab==='logistics')state.activeTab='stats';applyTabState207();return;}
+    if(state.entityId!==entity.id||state.layout!==layout){panel.innerHTML=shell(layout);state.entityId=entity.id;state.layout=layout;}
     if(layout==='truck'){
       const s=entity.logistics206||L.ensureUnit(entity,false);if(!s)return;
       setField(panel,'tank',`${amount(s.fuel)} / ${amount(s.fuelMax)} (${pct(s.fuel,s.fuelMax)})`);setField(panel,'cargo',`${amount(L.manifestTotal(s.cargo))} / ${amount(s.cargoCapacity)}`);setField(panel,'fuelCargo',amount(s.cargo?.fuel));setField(panel,'ammoCargo',amount(s.cargo?.ammo));setField(panel,'supportCargo',amount(s.cargo?.support));setField(panel,'mission',missionNames[s.missionType]||s.missionType||'—');setField(panel,'status',s.status||'—');setField(panel,'source',label(game,s.sourceNodeId));setField(panel,'destination',label(game,s.destinationNodeId||s.homeNodeId));
@@ -77,10 +99,11 @@
     }else if(layout==='unit'){
       const s=entity.logistics206||L.ensureUnit(entity,false),r=L.unitReadiness(entity);setField(panel,'tank',s?.fuelMax>0?`${amount(s.fuel)} / ${amount(s.fuelMax)}`:'не требуется');setField(panel,'ammo',`${amount(s?.ammoReady)} + ${amount(s?.ammoReserve)}`);setField(panel,'support',`${amount(s?.support)} / ${amount(s?.supportMax)}`);setField(panel,'supply',`${Math.round((r?.supply||0)*100)}%`);
     }else if(layout==='extractor'){
-      const ex=L.ensureExtractor(entity),node=game.getEntity?.(entity.resourceNodeId),resource=ex?.resourceType==='fuel'?'Fuel':'Железо / Ammo';const max=Number(node?.maxAmount207||node?.maxAmount)||0,current=Number(node?.amount)||0,bufferMax=Number(entity.resourceBufferMax206||entity.stats?.bufferCapacity)||0;panel.querySelector('[data-fd-title207]').textContent=entity.stats?.name||'Добывающее предприятие';setField(panel,'resourceType',resource);setField(panel,'deposit',`${amount(current)} / ${amount(max)} (${pct(current,max)})`);setField(panel,'buffer',`${amount(entity.resourceBuffer83)} / ${amount(bufferMax)}`);setField(panel,'rate',`${amount(entity.stats?.extractPerTick||0)} ед./с`);setField(panel,'haul','грузовик или инженер');
+      const ex=L.ensureExtractor(entity),node=game.getEntity?.(entity.resourceNodeId),resource=ex?.resourceType==='fuel'?'Fuel':'Железо / Ammo';const max=Number(node?.maxAmount207||node?.maxAmount)||0,current=Number(node?.amount)||0,bufferMax=Number(entity.resourceBufferMax206||entity.stats?.bufferCapacity)||0;const title=panel.querySelector('[data-fd-title207]');if(title)title.textContent=entity.stats?.name||'Добывающее предприятие';setField(panel,'resourceType',resource);setField(panel,'deposit',`${amount(current)} / ${amount(max)} (${pct(current,max)})`);setField(panel,'buffer',`${amount(entity.resourceBuffer83)} / ${amount(bufferMax)}`);setField(panel,'rate',`${amount(entity.stats?.extractPerTick||0)} ед./с`);setField(panel,'haul','грузовик или инженер');
     }else if(layout==='node'){
       const n=L.ensureNode(entity),count=(game.units||[]).filter(u=>u?.alive&&L.isTruck(u)&&u.logistics206?.homeNodeId===entity.id).length;const title=panel.querySelector('[data-fd-title207]');if(title)title.textContent=nodeNames[n.nodeType]||'Физическая логистика';setField(panel,'fuelStock',`${amount(n.stock?.fuel)} / ${amount(n.stock?.fuelMax)}`);setField(panel,'ammoStock',`${amount(n.stock?.ammo)} / ${amount(n.stock?.ammoMax)}`);setField(panel,'supportStock',`${amount(n.stock?.support)} / ${amount(n.stock?.supportMax)}`);setField(panel,'transport',`${count} / ${n.transportSlots||0}`);setField(panel,'radius',amount(n.supplyRadius||0));const pending=state.pendingPriority.get(entity.id);if(pending&&n.priority===pending)state.pendingPriority.delete(entity.id);setField(panel,'priority',priorityNames[pending||n.priority]||pending||n.priority||'ОБЫЧНЫЙ');
     }
+    applyTabState207();
   }
 
   function selectedTruckIds(game){return (game?.selected||[]).filter(u=>u?.alive&&L.isTruck(u)).map(u=>u.id);}
@@ -107,12 +130,12 @@
 
   function ensureOverlay(){if(!document.getElementById('fd-logistics-toggle207')){const b=document.createElement('button');b.id='fd-logistics-toggle207';b.type='button';b.textContent='ЛОГИСТИКА';b.onclick=()=>{state.overlay=!state.overlay;b.classList.toggle('active',state.overlay);document.getElementById('fd-logistics-summary207')?.classList.toggle('active',state.overlay);};document.body.appendChild(b);}if(!document.getElementById('fd-logistics-summary207')){const p=document.createElement('div');p.id='fd-logistics-summary207';document.body.appendChild(p);}}
   function updateOverlay(game){const p=document.getElementById('fd-logistics-summary207');if(!p||!state.overlay)return;const t=L.totalPhysical(game,'player'),a=L.aggregateTeam(game,'player');p.innerHTML=`<strong>ФИЗИЧЕСКАЯ ЛОГИСТИКА</strong><span>Money: ${amount(game.teams?.player?.credits)}</span><span>Fuel: ${amount(t.fuel)}</span><span>Ammo: ${amount(t.ammo)}</span><span>Support: ${amount(t.support)}</span><span>Готовность F/A/S: ${Math.round((a.armyFuelReadiness||0)*100)} / ${Math.round((a.armyAmmoReadiness||0)*100)} / ${Math.round((a.armySupportReadiness||0)*100)}%</span>`;}
-  ensureOverlay();ensureTopFuel();
+  ensureOverlay();ensureTopFuel();ensureTabs();
 
   const baseSelection=Game.prototype.renderSelectionUI;
-  Game.prototype.renderSelectionUI=function(...args){const result=baseSelection.apply(this,args);updatePanel(this);updateTopFuel(this);return result;};
+  Game.prototype.renderSelectionUI=function(...args){const result=baseSelection.apply(this,args);updatePanel(this);updateTopFuel(this);applyTabState207();return result;};
   const baseRender=Game.prototype.render;
-  if(typeof baseRender==='function')Game.prototype.render=function(...args){const result=baseRender.apply(this,args);updatePanel(this);updateTopFuel(this);updateOverlay(this);return result;};
+  if(typeof baseRender==='function')Game.prototype.render=function(...args){const result=baseRender.apply(this,args);updatePanel(this);updateTopFuel(this);updateOverlay(this);applyTabState207();return result;};
 
-  window.__FD_LOGISTICS_UI207__={build:207,version:'16.9.1',state,panel:()=>ensurePanel(),update:()=>D.game&&updatePanel(D.game)};
+  window.__FD_LOGISTICS_UI207__={build:207,version:'16.9.1',state,panel:()=>ensurePanel(),tab:()=>ensureTabs()?.tab||null,update:()=>D.game&&updatePanel(D.game),open(){state.activeTab='logistics';applyTabState207();updatePanel(D.game);}};
 })();
