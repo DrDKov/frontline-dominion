@@ -119,25 +119,33 @@
     };
 
     // SUPPLY_GROUP accepts either a real formation id or an explicit deterministic list of unit ids.
+    // Resolve membership from the authoritative game.units collection and from the truck's team.
+    // Do not depend on presentation-only `kind` metadata or hard-code the player perspective.
     const baseSetMission208 = Game.prototype.setLogisticsMission206;
     if (typeof baseSetMission208 === 'function') Game.prototype.setLogisticsMission206 = function(payload = {}) {
       let next = payload && typeof payload === 'object' ? { ...payload } : {};
       if (next.missionType === 'SUPPLY_GROUP' && !next.targetGroupId && Array.isArray(next.targetUnitIds208)) {
+        const truckIds = (next.truckIds || next.unitIds || [next.truckId]).filter(Boolean).map(String);
+        const truck = truckIds.map(id => this.getEntity?.(id)).find(unit => unit?.alive && L.isTruck(unit));
+        const targetTeam = truck?.team || 'player';
         const requested = [...new Set(next.targetUnitIds208.map(String))].sort();
-        const units = requested.map(id => this.getEntity?.(id)).filter(unit =>
-          unit?.alive && unit.kind === 'unit' && unit.team === 'player' && !L.isAir(unit) && !L.isTruck(unit)
-        );
+        const requestedSet = new Set(requested);
+        const units = (this.units || []).filter(unit =>
+          unit?.alive && requestedSet.has(String(unit.id)) && unit.team === targetTeam && !L.isAir(unit) && !L.isTruck(unit)
+        ).sort((a, b) => String(a.id).localeCompare(String(b.id), 'en'));
         if (!units.length) return false;
-        const signature = units.map(unit => unit.id).sort().join('|');
+        const signature = `${targetTeam}|${units.map(unit => unit.id).join('|')}`;
         const groupId = next.syntheticGroupId208 || `supply208-${hashText(signature).toString(16)}`;
         if (!(this.formations instanceof Map)) this.formations = new Map();
         const existing = this.formations.get(groupId) || { id: groupId };
         existing.id = groupId;
-        existing.unitIds = units.map(unit => unit.id).sort();
+        existing.team = targetTeam;
+        existing.unitIds = units.map(unit => unit.id);
         existing.syntheticSupply208 = true;
         existing.updatedAt208 = Number(this.time) || 0;
         this.formations.set(groupId, existing);
         next.targetGroupId = groupId;
+        next.targetUnitIds208 = existing.unitIds.slice();
       }
       return baseSetMission208.call(this, next);
     };
