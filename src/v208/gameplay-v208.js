@@ -30,16 +30,24 @@
   };
 
   // Every building that can produce units and consumes physical supply must be a logistics node.
-  // Existing explicit profiles (HQ, barracks, airfields, factories, etc.) always win.
+  // It must also be able to create its own tied supply truck, rather than depending on a separate vehicle factory.
   for (const [typeId, stats] of Object.entries(D.BUILDING_TYPES || {})) {
     if (!stats) continue;
     const produces = Array.isArray(stats.produces) && stats.produces.length > 0;
     const factionProduces = stats.producesByFaction && typeof stats.producesByFaction === 'object' &&
       Object.values(stats.producesByFaction).some(list => Array.isArray(list) && list.length > 0);
     if (!(produces || factionProduces)) continue;
-    if (L.profileForBuilding({ typeId, stats })) continue;
-    stats.role = `${stats.role || ''} Производственный объект с локальным физическим снабжением.`.trim();
-    stats.logisticsProduction208 = true;
+    let profile = L.profileForBuilding({ typeId, stats });
+    if (!profile) {
+      stats.role = `${stats.role || ''} Производственный объект с локальным физическим снабжением.`.trim();
+      stats.logisticsProduction208 = true;
+      profile = L.profileForBuilding({ typeId, stats });
+    }
+    if (profile) {
+      const list = Array.isArray(stats.produces) ? stats.produces : [];
+      if (!list.includes('resourceTruck')) stats.produces = [...list, 'resourceTruck'];
+      stats.tiedSupplyTransport208 = true;
+    }
   }
 
   for (const [typeId, rate] of Object.entries(EXTRACTOR_MONEY)) {
