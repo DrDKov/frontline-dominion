@@ -75,10 +75,18 @@ html=html.replace('<script src="./runtime-ui-v206.js?build=207"></script>',
                   '<script src="./runtime-ui-v207.js?build=207"></script>',1)
 html=html.replace('runtime-shell-v206.js?build=207','runtime-shell-v207.js?build=207')
 html=html.replace('save-slots-v206.js?build=207','save-slots-v207.js?build=207')
+# The canonical start-screen boot controller is inline in the inherited 206 HTML.
+# Keep that owner intact for old code, but expose it under the 207 name before
+# runtime-shell-v207 captures its boot reference.
+shell_tag='<script src="./runtime-shell-v207.js?build=207"></script>'
+boot_bridge='<script id="fd-boot-bridge207">globalThis.__FD_BOOT_207__ ||= globalThis.__FD_BOOT_206__;</script>'
+if html.count(shell_tag)!=1: raise RuntimeError(f'build 207 runtime shell HTML anchor count={html.count(shell_tag)}')
+if boot_bridge not in html: html=html.replace(shell_tag,boot_bridge+'\n'+shell_tag,1)
 if html.count('logistics-ui-v207.js?build=207')!=1: raise RuntimeError('build 207 UI owner not unique')
 if 'logistics-ui-v206.js?build=207' in html: raise RuntimeError('build 207 inherited volatile logistics UI still loaded')
 if 'runtime-ui-v207.js?build=207' not in html or 'runtime-shell-v207.js?build=207' not in html or 'save-slots-v207.js?build=207' not in html:
     raise RuntimeError('build 207 presentation owner transformation incomplete')
+if html.count('fd-boot-bridge207')!=1: raise RuntimeError('build 207 boot bridge ownership is not unique')
 HTML.write_text(html,'utf-8')
 
 index=OUT/'index.html'
@@ -87,4 +95,4 @@ if index.exists():
     text=re.sub(r'data-fd-canonical-build="206"','data-fd-canonical-build="207"',text)
     index.write_text(text,'utf-8')
 
-print('Frontline Dominion v16.9.1 build 207 single-player logistics/UI fixes assembled with 206 compatibility aliases')
+print('Frontline Dominion v16.9.1 build 207 single-player logistics/UI fixes assembled with boot and 206 compatibility bridges')
