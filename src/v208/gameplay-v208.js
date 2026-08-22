@@ -11,6 +11,7 @@
   const BUILD = 208;
   const VERSION = '16.9.2';
   const EPS = 1e-6;
+  const TIED_TRUCK_FUEL_RESERVE = 1800;
   // Cover every extractor type known to the physical resource economy, including legacy save-compatible mines.
   const EXTRACTOR_MONEY = Object.freeze({
     oilPump: 8,
@@ -50,6 +51,31 @@
       if (!list.includes('resourceTruck')) stats.produces = [...list, 'resourceTruck'];
       stats.tiedSupplyTransport208 = true;
     }
+  }
+
+  // A tied truck is itself a fuel-consuming product. Some inherited production
+  // profiles (notably barracks) had fuelMax=0, making their new truck button
+  // impossible to satisfy physically. Preserve their original combat stocks but
+  // add a small dispatch reserve sufficient to manufacture/refuel a local truck.
+  const baseEnsureNode208 = L.ensureNode;
+  if (typeof baseEnsureNode208 === 'function' && !baseEnsureNode208.__fdTiedTruckFuel208) {
+    const ensureNode208 = function(building) {
+      const node = baseEnsureNode208(building);
+      if (!node?.stock || !building?.stats?.tiedSupplyTransport208) return node;
+      if ((Number(node.stock.fuelMax) || 0) < TIED_TRUCK_FUEL_RESERVE) {
+        node.stock.fuelMax = TIED_TRUCK_FUEL_RESERVE;
+        node.stock.fuel = Math.min(TIED_TRUCK_FUEL_RESERVE, Math.max(0, Number(node.stock.fuel) || 0));
+        const previous = node.thresholds || {};
+        node.thresholds = L.thresholdsFor(node.stock, {
+          target: { ...(previous.target || {}), fuel: 1260 },
+          low: { ...(previous.low || {}), fuel: 630 },
+          critical: { ...(previous.critical || {}), fuel: 270 },
+        });
+      }
+      return node;
+    };
+    Object.defineProperty(ensureNode208, '__fdTiedTruckFuel208', { value: true });
+    L.ensureNode = ensureNode208;
   }
 
   for (const [typeId, rate] of Object.entries(EXTRACTOR_MONEY)) {
@@ -186,6 +212,7 @@
     build: BUILD,
     version: VERSION,
     extractorMoneyPerSecond: { ...EXTRACTOR_MONEY },
+    tiedTruckFuelReserve: TIED_TRUCK_FUEL_RESERVE,
     removedIdleEngineerHooks: removedIdleHooks,
     clearLegacyAutoHaulOrders208,
     initiativePreserved: typeof Unit.prototype.tryEngineerInitiative130 === 'function',
