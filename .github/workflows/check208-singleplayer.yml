@@ -94,19 +94,16 @@ jobs:
           grep -q "importScripts('/frontline-dominion/gameplay-v208.js?build=208')" dist/authoritative-simulation-worker-v174.js
           grep -q 'logisticsCritical208' dist/authoritative-simulation-worker-v174.js
           grep -q '_fdLogisticsDetailUntil208' dist/supply-transport-v206.js
+          grep -q "productionMaterialPackage206?.(source,'resourceTruck')" dist/supply-transport-v206.js
           grep -q 'workerAutomation207' dist/singleplayer-gameplay-v207.js
           grep -q 'pruneIdleEngineerHauling208' dist/gameplay-v208.js
           grep -q 'moneyIncomePerSecond208' dist/gameplay-v208.js
-          grep -q '__fdProductionHot208' dist/gameplay-v208.js
-          grep -q '__fdProductionQueueStamp208' dist/gameplay-v208.js
-          grep -q 'productionQueueFallback208' dist/gameplay-v208.js
           grep -q 'targetUnitIds208' dist/logistics-ui-v208.js
           grep -q 'СОЗДАТЬ ТРАНСПОРТ' dist/logistics-ui-v208.js
           python -m py_compile scripts/assemble208.py scripts/hotfix208_logistics_replication.py scripts/generate208_tests.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics208-controls-v2.mjs
           node --check tests/construction208-all-buildings-v2.mjs
-          node --check tests/transport208-authority-diagnostic.mjs
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
 
@@ -118,7 +115,7 @@ jobs:
           python scripts/generate208_tests.py
           node --check tests/save-slots208.generated.mjs
 
-      - name: Focused transport authority probe
+      - name: Physical build 208 gates
         run: |
           set -euo pipefail
           mkdir -p smoke-root
@@ -134,8 +131,12 @@ jobs:
           done
           test "$ready" -eq 1
           GAME_URL="$BASE_URL/frontline-dominion.html?build=208"
-          FD_GAME_URL="$GAME_URL" node tests/transport208-authority-diagnostic.mjs 2>&1 | tee /tmp/fd208-transport-probe.log
-          exit 1
+          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd208-invariants.log
+          FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs 2>&1 | tee /tmp/fd208-bootstrap.log
+          FD_GAME_URL="$GAME_URL" node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd208-air.log
+          FD_GAME_URL="$GAME_URL" node tests/logistics208-controls-v2.mjs 2>&1 | tee /tmp/fd208-logistics.log
+          FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings-v2.mjs 2>&1 | tee /tmp/fd208-construction.log
+          FD_GAME_URL="$GAME_URL" node tests/save-slots208.generated.mjs 2>&1 | tee /tmp/fd208-save.log
 
       - name: Upload build 208 diagnostics
         if: always()
@@ -144,6 +145,11 @@ jobs:
           name: fd208-singleplayer-diagnostics
           path: |
             /tmp/fd208-http.log
-            /tmp/fd208-transport-probe.log
+            /tmp/fd208-invariants.log
+            /tmp/fd208-bootstrap.log
+            /tmp/fd208-air.log
+            /tmp/fd208-logistics.log
+            /tmp/fd208-construction.log
+            /tmp/fd208-save.log
           if-no-files-found: ignore
           retention-days: 3
