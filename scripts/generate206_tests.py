@@ -104,8 +104,12 @@ try {
       gameTick: Number(win?.__FD_DEBUG__?.game?.simTick || 0),
     };
   });
+  const safeWorkerDiagnostics = async page => {
+    try { return await workerDiagnostics(page); }
+    catch (diagnosticError) { return { error: String(diagnosticError?.message || diagnosticError) }; }
+  };
   const [hostState, guestState, hostWorker, guestWorker] = await Promise.all([
-    inspect(coop.host), inspect(coop.guest), workerDiagnostics(coop.host), workerDiagnostics(coop.guest),
+    inspect(coop.host), inspect(coop.guest), safeWorkerDiagnostics(coop.host), safeWorkerDiagnostics(coop.guest),
   ]);
   throw new Error(`Build 206 post-resync command ${postResyncEvent.seq} did not apply: ${JSON.stringify({
     original: String(error?.message || error), postResyncEvent, hostState, guestState, hostWorker, guestWorker,
