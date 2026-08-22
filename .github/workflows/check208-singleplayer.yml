@@ -114,19 +114,23 @@ jobs:
           npm install --no-save playwright
           npx playwright install chromium
 
-      - name: Focused full-scenario transport diagnostic
+      - name: Focused authoritative transport diagnostic
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
           p=Path('tests/logistics208-controls-v2.mjs')
           text=p.read_text('utf-8')
+          old="const n=L.ensureNode(b);return{__pending:true,queue:"
+          new="const n=L.ensureNode(b),bridge=globalThis.__FD_STABLE_STATE165__?.bridge,now=Number(g.time)||0;if(!globalThis.__FD208_TIED_START__)globalThis.__FD208_TIED_START__=now;if(now-globalThis.__FD208_TIED_START__>2&&!globalThis.__FD208_TIED_SAVE__)globalThis.__FD208_TIED_SAVE__=bridge?.requestSave?.(false)||0;let authoritative=null;const saveId=Number(globalThis.__FD208_TIED_SAVE__||0);if(saveId&&bridge&&!bridge.pendingSaves?.has?.(saveId)){try{const raw=globalThis.__FD_DEBUG__.storageGet(globalThis.__FD_DEBUG__.SAVE_KEY),data=raw?JSON.parse(raw):null;const find=(value,depth=0)=>{if(!value||depth>10)return null;if(Array.isArray(value)){for(const item of value){const hit=find(item,depth+1);if(hit)return hit;}return null;}if(typeof value==='object'){if(String(value.id||'')===String(I.barracks)&&String(value.typeId||'')==='barracks')return value;for(const item of Object.values(value)){const hit=find(item,depth+1);if(hit)return hit;}}return null;};const hit=find(data);authoritative=hit?{completed:Boolean(hit.completed),construction:Number(hit.construction),queue:(hit.queue||[]).map(q=>({id:q.id,kind:q.kind,remaining:Number(q.remaining),total:Number(q.total)})),stock:hit.logistics206?.stock||null,blocked:Boolean(hit.logistics206?.productionBlocked206),demand:hit.logistics206?.productionDemand206||null,saveTick:Number(data?.authoritative172?.simTick||data?.simTick||0)}:{notFound:true,keys:Object.keys(data||{})};}catch(error){authoritative={error:String(error?.stack||error)};}}return{__pending:true,authoritative,queue:"
+          if text.count(old)!=1: raise SystemExit(f'authoritative diagnostic anchor count={text.count(old)}')
+          text=text.replace(old,new,1)
           old="fuelMax:Number(n?.stock?.fuelMax||0),blocked:Boolean(n?.productionBlocked206||b?.logistics206?.productionBlocked206),credits:"
-          new="fuelMax:Number(n?.stock?.fuelMax||0),ammo:Number(n?.stock?.ammo||0),ammoMax:Number(n?.stock?.ammoMax||0),support:Number(n?.stock?.support||0),supportMax:Number(n?.stock?.supportMax||0),completed:Boolean(b?.completed),construction:Number(b?.construction),demand:{...(b?.logistics206?.productionDemand206||{})},ack:globalThis.__FD_STABLE_STATE165__?.bridge?.lastActionAck208||null,blocked:Boolean(n?.productionBlocked206||b?.logistics206?.productionBlocked206),credits:"
+          new="fuelMax:Number(n?.stock?.fuelMax||0),ammo:Number(n?.stock?.ammo||0),ammoMax:Number(n?.stock?.ammoMax||0),support:Number(n?.stock?.support||0),supportMax:Number(n?.stock?.supportMax||0),completed:Boolean(b?.completed),construction:Number(b?.construction),demand:{...(b?.logistics206?.productionDemand206||{})},ack:bridge?.lastActionAck208||null,blocked:Boolean(n?.productionBlocked206||b?.logistics206?.productionBlocked206),credits:"
           if text.count(old)!=1: raise SystemExit(f'diagnostic stock anchor count={text.count(old)}')
           text=text.replace(old,new,1)
           old_timeout="},{I,before},45000);if(tied.home!==I.barracks"
-          new_timeout="},{I,before},7000);if(tied.home!==I.barracks"
+          new_timeout="},{I,before},9000);if(tied.home!==I.barracks"
           if text.count(old_timeout)!=1: raise SystemExit(f'diagnostic timeout anchor count={text.count(old_timeout)}')
           text=text.replace(old_timeout,new_timeout,1)
           p.write_text(text,'utf-8')
