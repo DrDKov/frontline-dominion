@@ -22,7 +22,13 @@ module = r'''(() => {
   const UNIT_EXCLUDED = new Set(['game','stats','weapons','weapon','selected','logistics206']);
   const GAME_EXCLUDED = new Set([
     'units','buildings','resources','projectiles','formations','teams','ai','rng','stats','camera','canvas','ctx',
-    'selectedUnits','selectedBuilding','effects','particles','spatialGrid','operationalCore160','logistics206'
+    'selectedUnits','selectedBuilding','effects','particles','spatialGrid','operationalCore160','logistics206',
+    // mass-simulation-core-v163 owns these runtime objects. `_v163.hot` is a
+    // HotState163 instance with typed-array storage and reset()/push() methods;
+    // serializing the surrounding plain object drops that class instance and
+    // produces a poisoned `{hot: undefined}` runtime after resync. Rebuild the
+    // entire v163 runtime in the replacement Worker on its first fixed tick.
+    '_v163','_v163Installed'
   ]);
   const AI_TRANSIENT_FIELD = /(?:^_|timer|cooldown|epoch|cycle|phase|next|last|expires|budget|clock|cursor|cadence|interval|metric|picture|plan|operation)/i;
   const GAME_TRANSIENT_FIELD = /(?:^_|timer|cooldown|epoch|cycle|phase|next|last|expires|budget|clock|cursor|cadence|interval|accumulator|counter)/i;
