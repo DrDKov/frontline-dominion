@@ -1,0 +1,151 @@
+name: Validate Frontline Dominion build 208 single-player
+
+on:
+  push:
+    branches: [build208-logistics-controls-construction]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontline-check-208-singleplayer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  singleplayer208:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Assemble build 208
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+          python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
+          python scripts/assemble198.py
+          python scripts/assemble199.py
+          python scripts/hotfix199_runtime.py
+          python scripts/assemble200.py
+          python scripts/assemble201.py
+          python scripts/assemble202.py
+          python scripts/assemble203.py
+          python scripts/assemble204.py
+          python scripts/assemble205.py
+          python scripts/assemble206.py
+          python scripts/hotfix206_logistics_state.py
+          python scripts/hotfix206_truck_commands.py
+          python scripts/hotfix206_multiplayer_hash.py
+          python scripts/hotfix206_deterministic_geometry.py
+          python scripts/hotfix206_multiplayer_initial_state.py
+          python scripts/hotfix206_resync_snapshot.py
+          python scripts/hotfix206_resync_continuity.py
+          python scripts/hotfix206_network_components.py
+          python scripts/hotfix206_initial_signature.py
+          python scripts/hotfix206_ai_trace_diagnostics.py
+          python scripts/install206_ui.py
+          python scripts/patch206_invariant_harness.py
+          python scripts/assemble207.py
+          python scripts/assemble208.py
+
+      - name: Static build 208 gates
+        run: |
+          set -euo pipefail
+          test -s dist/frontline-dominion.html
+          test -s dist/gameplay-v208.js
+          test -s dist/logistics-ui-v208.js
+          test -s dist/runtime-ui-v208.js
+          test -s dist/runtime-shell-v208.js
+          test -s dist/save-slots-v208.js
+          grep -q 'data-fd-canonical-build="208"' dist/frontline-dominion.html
+          grep -q 'gameplay-v208.js?build=208' dist/frontline-dominion.html
+          grep -q 'logistics-ui-v208.js?build=208' dist/frontline-dominion.html
+          ! grep -q 'logistics-ui-v207.js?build=208' dist/frontline-dominion.html
+          grep -q 'runtime-ui-v208.js?build=208' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v208.js?build=208' dist/frontline-dominion.html
+          grep -q 'save-slots-v208.js?build=208' dist/frontline-dominion.html
+          grep -q 'fd-boot-bridge208' dist/frontline-dominion.html
+          grep -q "importScripts('/frontline-dominion/gameplay-v208.js?build=208')" dist/authoritative-simulation-worker-v174.js
+          grep -q 'workerAutomation207' dist/singleplayer-gameplay-v207.js
+          grep -q 'pruneIdleEngineerHauling208' dist/gameplay-v208.js
+          grep -q 'moneyIncomePerSecond208' dist/gameplay-v208.js
+          grep -q 'targetUnitIds208' dist/logistics-ui-v208.js
+          grep -q 'СОЗДАТЬ ТРАНСПОРТ' dist/logistics-ui-v208.js
+          python -m py_compile scripts/assemble208.py scripts/generate208_tests.py
+          for file in dist/*.js; do node --check "$file"; done
+          node --check tests/logistics208-controls.mjs
+          node --check tests/construction208-all-buildings.mjs
+          count=$(find dist/models -type f | wc -l)
+          test "$count" -gt 700
+
+      - name: Install Chromium and generate inherited save gate
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install chromium
+          python scripts/generate208_tests.py
+          node --check tests/save-slots208.generated.mjs
+
+      - name: Physical build 208 gates
+        run: |
+          set -euo pipefail
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd208-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          BASE_URL='http://127.0.0.1:8765/frontline-dominion'
+          ready=0
+          for attempt in $(seq 1 50); do
+            if curl -fsSL "$BASE_URL/frontline-dominion.html?build=208" >/tmp/fd208-local.html; then ready=1; break; fi
+            sleep 0.1
+          done
+          test "$ready" -eq 1
+          GAME_URL="$BASE_URL/frontline-dominion.html?build=208"
+          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd208-invariants.log
+          FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs 2>&1 | tee /tmp/fd208-bootstrap.log
+          FD_GAME_URL="$GAME_URL" node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd208-air.log
+          FD_GAME_URL="$GAME_URL" node tests/logistics208-controls.mjs 2>&1 | tee /tmp/fd208-logistics.log
+          FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings.mjs 2>&1 | tee /tmp/fd208-construction.log
+          FD_GAME_URL="$GAME_URL" node tests/save-slots208.generated.mjs 2>&1 | tee /tmp/fd208-save.log
+
+      - name: Upload build 208 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fd208-singleplayer-diagnostics
+          path: |
+            /tmp/fd208-http.log
+            /tmp/fd208-invariants.log
+            /tmp/fd208-bootstrap.log
+            /tmp/fd208-air.log
+            /tmp/fd208-logistics.log
+            /tmp/fd208-construction.log
+            /tmp/fd208-save.log
+          if-no-files-found: ignore
+          retention-days: 3
