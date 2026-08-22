@@ -63,6 +63,7 @@ jobs:
           python scripts/hotfix206_multiplayer_hash.py
           python scripts/hotfix206_multiplayer_initial_state.py
           python scripts/hotfix206_resync_snapshot.py
+          python scripts/hotfix206_resync_continuity.py
           python scripts/hotfix206_network_components.py
           python scripts/hotfix206_initial_signature.py
           python scripts/hotfix206_ai_trace_diagnostics.py
@@ -75,6 +76,7 @@ jobs:
           test -s dist/frontline-dominion.html
           test -s dist/logistics-core-v206.js
           test -s dist/logistics-ui-v206.js
+          test -s dist/resync-continuity-v206.js
           test -s dist/runtime-shell-v206.js
           test -s dist/save-slots-v206.js
           test -s dist/multiplayer-lobby-v206.js
@@ -88,6 +90,9 @@ jobs:
           grep -q 'initialNetworkBaseComponents206' dist/multiplayer-lobby-v206.js
           grep -q '_fdLoadedMultiplayerSnapshot206' dist/authoritative-simulation-v174.js
           grep -q 'preservedResync206' dist/authoritative-simulation-v174.js
+          grep -q 'workerTransient206' dist/authoritative-simulation-worker-v174.js
+          grep -q 'exportWorkerTransient206' dist/resync-continuity-v206.js
+          grep -q 'importWorkerTransient206' dist/resync-continuity-v206.js
           grep -q 'aiLogisticsTrace206' dist/authoritative-simulation-worker-v174.js
           grep -q 'lastHashMismatch206' dist/multiplayer-lobby-v206.js
           grep -q 'canonicalFreshNetworkLogistics206' dist/authoritative-simulation-worker-v174.js
@@ -101,7 +106,7 @@ jobs:
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics206-browser.mjs
           node --check tests/logistics206-invariants.mjs
-          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_resync_snapshot.py scripts/hotfix206_network_components.py scripts/hotfix206_initial_signature.py scripts/hotfix206_ai_trace_diagnostics.py scripts/install206_ui.py scripts/generate206_tests.py scripts/patch206_invariant_harness.py
+          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_resync_snapshot.py scripts/hotfix206_resync_continuity.py scripts/hotfix206_network_components.py scripts/hotfix206_initial_signature.py scripts/hotfix206_ai_trace_diagnostics.py scripts/install206_ui.py scripts/generate206_tests.py scripts/patch206_invariant_harness.py
 
       - name: Install Chromium and generate inherited gates
         run: |
