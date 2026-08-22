@@ -26,9 +26,10 @@ single = single.replace(old_bootstrap, new_bootstrap, 1)
 # resource truck. Keep one truck-equipment load (720 Fuel) physically reserved
 # at those buildings: an operating truck may refuel from surplus Fuel but must
 # not consume the last replacement-truck package and deadlock its own logistics
-# node. No Fuel is created; the reserve is simply unavailable to refuelling.
+# node. Resolve capability both from the live instance and the authoritative
+# type catalogue because hydrated instance stats can omit v208 marker fields.
 old_fuel_store = "    if(node?.stock&&Number(node.stock.fuelMax)>0)return {get:()=>Math.max(0,Number(node.stock.fuel)||0),set:v=>{node.stock.fuel=round(Math.max(0,v));}};"
-new_fuel_store = "    if(node?.stock&&Number(node.stock.fuelMax)>0){const reserve=entity.stats?.tiedSupplyTransport208?Math.min(TRUCK_TANK,Math.max(0,Number(node.stock.fuel)||0)):0;return {get:()=>Math.max(0,(Number(node.stock.fuel)||0)-reserve),set:v=>{node.stock.fuel=round(Math.max(0,v)+reserve);}};}"
+new_fuel_store = "    if(node?.stock&&Number(node.stock.fuelMax)>0){const typeStats=D.BUILDING_TYPES?.[entity.typeId],tied=Boolean(entity.stats?.tiedSupplyTransport208||typeStats?.tiedSupplyTransport208||entity.stats?.produces?.includes?.('resourceTruck')||typeStats?.produces?.includes?.('resourceTruck'));const reserve=tied?Math.min(TRUCK_TANK,Math.max(0,Number(node.stock.fuel)||0)):0;return {get:()=>Math.max(0,(Number(node.stock.fuel)||0)-reserve),set:v=>{node.stock.fuel=round(Math.max(0,v)+reserve);}};}"
 if single.count(old_fuel_store) != 1:
     raise RuntimeError(f'build 208 protected truck reserve anchor count={single.count(old_fuel_store)}')
 single = single.replace(old_fuel_store, new_fuel_store, 1)
