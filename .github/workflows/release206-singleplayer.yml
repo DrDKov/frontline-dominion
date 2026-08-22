@@ -23,6 +23,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Publish active release identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf release206-status
+          mkdir release206-status
+          cat > release206-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "status": "in_progress",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "started_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release206-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release206-singleplayer-status
+          git add current.json
+          git commit -m "Build 206 single-player run ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release206-singleplayer-status
+
       - name: Assemble build 206 release candidate
         run: |
           set -euo pipefail
@@ -195,3 +222,32 @@ jobs:
             /tmp/fd206-public-mp.html
           if-no-files-found: ignore
           retention-days: 3
+
+      - name: Publish final release result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf release206-status
+          mkdir release206-status
+          cat > release206-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "status": "${JOB_STATUS}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "finished_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release206-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release206-singleplayer-status
+          git add current.json
+          git commit -m "Build 206 single-player run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release206-singleplayer-status
