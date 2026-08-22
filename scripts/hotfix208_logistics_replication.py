@@ -53,8 +53,10 @@ if supply.count(old_mission_start) != 1:
     raise RuntimeError(f'build 208 mission previous-state anchor count={supply.count(old_mission_start)}')
 supply = supply.replace(old_mission_start, new_mission_start, 1)
 
-old_mission_phase = "      s.phase206=L.manifestTotal(s.cargo)>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';\n      truck.commandQueue=[{type:'logistics206',missionType:mission}];truck.invalidateNavigation?.();changed+=1;"
-new_mission_phase = "      const rebalance208=previousMission208&&previousMission208!==mission&&L.manifestTotal(s.cargo)>EPS&&mission!=='RETURN_TO_SOURCE';\n      if(rebalance208){s.pendingMission208=mission;s.missionType='RETURN_TO_SOURCE';s.phase206='REBALANCE208';s.status='REBALANCING';}\n      else{s.pendingMission208=null;s.phase206=L.manifestTotal(s.cargo)>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';}\n      truck.commandQueue=[{type:'logistics206',missionType:s.missionType}];truck.invalidateNavigation?.();changed+=1;"
+# hotfix206_truck_commands.py has already converted this path to Unit.setCommand.
+# Patch that assembled form instead of the older direct commandQueue assignment.
+old_mission_phase = "      s.phase206=L.manifestTotal(s.cargo)>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';\n      const command206={type:'logistics206',missionType:mission};\n      if(typeof truck.setCommand==='function')truck.setCommand(command206,false);\n      else{truck.commandQueue=[command206];try{truck.currentCommand=command206;}catch(_){}}\n      truck.invalidateNavigation?.();changed+=1;"
+new_mission_phase = "      const rebalance208=previousMission208&&previousMission208!==mission&&L.manifestTotal(s.cargo)>EPS&&mission!=='RETURN_TO_SOURCE';\n      if(rebalance208){s.pendingMission208=mission;s.missionType='RETURN_TO_SOURCE';s.phase206='REBALANCE208';s.status='REBALANCING';}\n      else{s.pendingMission208=null;s.phase206=L.manifestTotal(s.cargo)>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';}\n      const command206={type:'logistics206',missionType:s.missionType};\n      if(typeof truck.setCommand==='function')truck.setCommand(command206,false);\n      else{truck.commandQueue=[command206];try{truck.currentCommand=command206;}catch(_){}}\n      truck.invalidateNavigation?.();changed+=1;"
 if supply.count(old_mission_phase) != 1:
     raise RuntimeError(f'build 208 mission rebalance anchor count={supply.count(old_mission_phase)}')
 supply = supply.replace(old_mission_phase, new_mission_phase, 1)
