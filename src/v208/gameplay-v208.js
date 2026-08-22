@@ -4,7 +4,7 @@
   const D = root.__FD_DEBUG__;
   const L = root.__FD_LOGISTICS206__;
   if (!D?.Game || !D?.Unit || !D?.BUILDING_TYPES || !L) return;
-  const { Game, Unit, Building } = D;
+  const { Game, Unit } = D;
   if (Game.prototype.__fdGameplay208Installed) return;
   Object.defineProperty(Game.prototype, '__fdGameplay208Installed', { value: true, configurable: true });
 
@@ -76,51 +76,6 @@
     };
     Object.defineProperty(ensureNode208, '__fdTiedTruckFuel208', { value: true });
     L.ensureNode = ensureNode208;
-  }
-
-  // Large-scale simulation phases idle buildings to keep 20k-unit scenarios cheap.
-  // Production/research queues are authoritative timers, however, and must not be
-  // frozen by a coarse building interval. A queued building therefore becomes a
-  // full-rate simulation participant until its queue drains; idle buildings retain
-  // the inherited mass-scale scheduling policy unchanged.
-  const baseBuildingInterval208 = Game.prototype.buildingIntervalTicksV9;
-  if (typeof baseBuildingInterval208 === 'function' && !baseBuildingInterval208.__fdProductionHot208) {
-    const buildingIntervalTicks208 = function(building) {
-      if (building?.alive && Array.isArray(building.queue) && building.queue.length > 0) return 1;
-      return baseBuildingInterval208.call(this, building);
-    };
-    Object.defineProperty(buildingIntervalTicks208, '__fdProductionHot208', { value: true });
-    Object.defineProperty(buildingIntervalTicks208, '__fdProductionHot208Original', { value: baseBuildingInterval208 });
-    Game.prototype.buildingIntervalTicksV9 = buildingIntervalTicks208;
-  }
-
-  // Some inherited mass-scale paths cache or shadow the building interval method
-  // on the game instance. Track the authoritative queue update itself and, in the
-  // Worker post-step, advance only queues that the normal building scheduler did
-  // not touch on this simulation tick. Reset the phase accumulator after fallback
-  // work so a later coarse building tick cannot replay already-accounted time.
-  if (isWorkerRealm && Building?.prototype && typeof Building.prototype.updateQueue === 'function') {
-    const baseUpdateQueue208 = Building.prototype.updateQueue;
-    if (!baseUpdateQueue208.__fdProductionQueueStamp208) {
-      const updateQueue208 = function(dt) {
-        this._fdProductionQueueTick208 = Number(this.game?.simTick) || 0;
-        return baseUpdateQueue208.call(this, dt);
-      };
-      Object.defineProperty(updateQueue208, '__fdProductionQueueStamp208', { value: true });
-      Object.defineProperty(updateQueue208, '__fdProductionQueueStamp208Original', { value: baseUpdateQueue208 });
-      Building.prototype.updateQueue = updateQueue208;
-    }
-
-    function productionQueueFallback208(dt) {
-      const tick = Number(this.simTick) || 0;
-      for (const building of this.buildings || []) {
-        if (!building?.alive || !building.completed || !Array.isArray(building.queue) || !building.queue.length) continue;
-        if ((Number(building._fdProductionQueueTick208) || -1) === tick) continue;
-        building.updateQueue?.(dt);
-        building._v9SimAccum = 0;
-      }
-    }
-    Game.prototype.registerLogisticsHook206?.('post', productionQueueFallback208, 72);
   }
 
   for (const [typeId, rate] of Object.entries(EXTRACTOR_MONEY)) {
@@ -258,7 +213,6 @@
     version: VERSION,
     extractorMoneyPerSecond: { ...EXTRACTOR_MONEY },
     tiedTruckFuelReserve: TIED_TRUCK_FUEL_RESERVE,
-    productionQueueFallback: Boolean(isWorkerRealm && Building?.prototype?.updateQueue?.__fdProductionQueueStamp208),
     removedIdleEngineerHooks: removedIdleHooks,
     clearLegacyAutoHaulOrders208,
     initiativePreserved: typeof Unit.prototype.tryEngineerInitiative130 === 'function',
