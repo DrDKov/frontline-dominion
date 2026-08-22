@@ -1,0 +1,141 @@
+name: Audit Frontline Dominion build 206 logistics
+
+on:
+  push:
+    branches: [build206-logistics]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static check build 206 sources
+        run: |
+          status=0
+          : > audit206-static.txt
+          for f in src/v206/*.js; do
+            echo "===== $f =====" | tee -a audit206-static.txt
+            node --check "$f" >> audit206-static.txt 2>&1 || status=1
+          done
+          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_deterministic_geometry.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_resync_snapshot.py scripts/hotfix206_resync_continuity.py scripts/hotfix206_network_components.py scripts/hotfix206_initial_signature.py scripts/hotfix206_ai_trace_diagnostics.py scripts/install206_ui.py scripts/patch206_invariant_harness.py scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py scripts/audit206_determinism.py >> audit206-static.txt 2>&1 || status=1
+          exit "$status"
+      - name: Assemble build 206 runtime
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+          python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
+          python scripts/assemble198.py
+          python scripts/assemble199.py
+          python scripts/hotfix199_runtime.py
+          python scripts/assemble200.py
+          python scripts/assemble201.py
+          python scripts/assemble202.py
+          python scripts/assemble203.py
+          python scripts/assemble204.py
+          python scripts/assemble205.py
+          python scripts/assemble206.py
+          python scripts/hotfix206_logistics_state.py
+          python scripts/hotfix206_truck_commands.py
+          python scripts/hotfix206_multiplayer_hash.py
+          python scripts/hotfix206_deterministic_geometry.py
+          python scripts/hotfix206_multiplayer_initial_state.py
+          python scripts/hotfix206_resync_snapshot.py
+          python scripts/hotfix206_resync_continuity.py
+          python scripts/hotfix206_network_components.py
+          python scripts/hotfix206_initial_signature.py
+          python scripts/hotfix206_ai_trace_diagnostics.py
+          python scripts/install206_ui.py
+          python scripts/patch206_invariant_harness.py
+          for f in dist/*.js; do node --check "$f"; done
+          grep -q 'data-fd-canonical-build="206"' dist/frontline-dominion.html
+          grep -q 'logistics-core-v206.js?build=206' dist/frontline-dominion.html
+          grep -q 'authoritative-logistics-v206.js?build=206' dist/frontline-dominion.html
+          grep -q 'logistics-ui-v206.js?build=206' dist/frontline-dominion.html
+          test -s dist/resync-continuity-v206.js
+          grep -q "case 'logisticsMission'" dist/authoritative-simulation-worker-v174.js
+          grep -q 'networkLogisticsHash206' dist/authoritative-simulation-worker-v174.js
+          grep -q '__fdDeterministicUnitGeometry206' dist/authoritative-simulation-worker-v174.js
+          grep -q 'initialNetworkHash206' dist/authoritative-simulation-worker-v174.js
+          grep -q '_fdLoadedMultiplayerSnapshot206' dist/authoritative-simulation-v174.js
+          grep -q 'preservedResync206' dist/authoritative-simulation-v174.js
+          grep -q 'workerTransient206' dist/authoritative-simulation-worker-v174.js
+          grep -q 'importWorkerTransient206' dist/resync-continuity-v206.js
+          grep -q 'fd:authoritative-save206' dist/authoritative-simulation-v174.js
+      - name: Audit logistics economy runtime and determinism anchors
+        run: |
+          set -euo pipefail
+          python scripts/audit206_runtime.py
+          python scripts/audit206_deep.py
+          python scripts/audit206_schema.py
+          python scripts/audit206_aiapi.py
+          python scripts/audit206_determinism.py
+      - name: Upload full audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit206
+          path: |
+            audit206*.txt
+          retention-days: 2
+      - name: Publish audit snapshot branch
+        if: always() && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf audit-publish
+          mkdir audit-publish
+          shopt -s nullglob
+          reports=(audit206*.txt)
+          if [ ${#reports[@]} -gt 0 ]; then cp "${reports[@]}" audit-publish/; else echo 'audit files missing' > audit-publish/audit206.txt; fi
+          cat > audit-publish/status.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "status": "${JOB_STATUS}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "finished_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd audit-publish
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b audit206-runtime
+          git add audit206*.txt status.json
+          git commit -m "Build 206 runtime audit ${GITHUB_RUN_ID}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin audit206-runtime

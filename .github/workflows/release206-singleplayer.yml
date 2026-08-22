@@ -1,0 +1,262 @@
+name: Release Frontline Dominion build 206 single-player
+
+on:
+  push:
+    branches: [build206-logistics]
+    paths:
+      - '.github/workflows/release206-singleplayer.yml'
+      - 'scripts/prepare206_singleplayer_release.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontline-release-206-singleplayer
+  cancel-in-progress: true
+
+jobs:
+  release206-singleplayer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Publish active release identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf release206-status
+          mkdir release206-status
+          cat > release206-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "status": "in_progress",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "started_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release206-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release206-singleplayer-status
+          git add current.json
+          git commit -m "Build 206 single-player run ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release206-singleplayer-status
+
+      - name: Assemble build 206 release candidate
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+          python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
+          python scripts/assemble198.py
+          python scripts/assemble199.py
+          python scripts/hotfix199_runtime.py
+          python scripts/assemble200.py
+          python scripts/assemble201.py
+          python scripts/assemble202.py
+          python scripts/assemble203.py
+          python scripts/assemble204.py
+          python scripts/assemble205.py
+          python scripts/assemble206.py
+          python scripts/hotfix206_logistics_state.py
+          python scripts/hotfix206_truck_commands.py
+          python scripts/hotfix206_multiplayer_hash.py
+          python scripts/hotfix206_deterministic_geometry.py
+          python scripts/hotfix206_multiplayer_initial_state.py
+          python scripts/hotfix206_resync_snapshot.py
+          python scripts/hotfix206_resync_continuity.py
+          python scripts/hotfix206_network_components.py
+          python scripts/hotfix206_initial_signature.py
+          python scripts/hotfix206_ai_trace_diagnostics.py
+          python scripts/install206_ui.py
+          python scripts/patch206_invariant_harness.py
+          python scripts/prepare206_singleplayer_release.py
+
+      - name: Static single-player release gates
+        run: |
+          set -euo pipefail
+          test -s dist/index.html
+          test -s dist/frontline-dominion.html
+          test -s dist/multiplayer.html
+          test -s dist/logistics-core-v206.js
+          test -s dist/logistics-ui-v206.js
+          test -s dist/runtime-shell-v206.js
+          test -s dist/save-slots-v206.js
+          grep -q 'data-fd-canonical-build="206"' dist/index.html
+          grep -q 'data-fd-release-mode="singleplayer"' dist/index.html
+          grep -q 'frontline-dominion.html?build=206' dist/index.html
+          ! grep -q 'multiplayer.html?build=206' dist/index.html
+          grep -q 'data-fd-multiplayer-status="deferred"' dist/multiplayer.html
+          ! grep -q 'multiplayer-lobby-v206.js' dist/multiplayer.html
+          grep -q 'fd-singleplayer-release-206' dist/frontline-dominion.html
+          grep -q 'data-fd-canonical-build="206"' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v206.js?build=206' dist/frontline-dominion.html
+          grep -q 'save-slots-v206.js?build=206' dist/frontline-dominion.html
+          grep -q 'logistics-ui-v206.js?build=206' dist/frontline-dominion.html
+          grep -q "case 'logisticsMission'" dist/authoritative-simulation-worker-v174.js
+          grep -q "case 'logisticsEmergencyImport'" dist/authoritative-simulation-worker-v174.js
+          grep -q 'data.logistics206 = game.exportLogistics206' dist/authoritative-simulation-worker-v174.js
+          grep -q 'fd:authoritative-save206' dist/authoritative-simulation-v174.js
+          grep -q 'fd:authoritative-save206' dist/save-slots-v206.js
+          ! grep -q 'runtime-shell-v205.js?build=206' dist/frontline-dominion.html
+          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_deterministic_geometry.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_resync_snapshot.py scripts/hotfix206_resync_continuity.py scripts/hotfix206_network_components.py scripts/hotfix206_initial_signature.py scripts/hotfix206_ai_trace_diagnostics.py scripts/install206_ui.py scripts/generate206_tests.py scripts/patch206_invariant_harness.py scripts/prepare206_singleplayer_release.py
+          for file in dist/*.js; do node --check "$file"; done
+          node --check tests/logistics206-browser.mjs
+          node --check tests/logistics206-invariants.mjs
+          node tests/recon-memory-queue203.unit.mjs
+          node tests/building-visible-hit204.unit.mjs
+          node tests/rally-point204.unit.mjs
+          node tests/command-power202.unit.mjs
+          node tests/resilience200.unit.mjs
+          node tests/building-selection197.unit.mjs
+          node tests/building-model-hit201.unit.mjs
+          node tests/formation-target197.unit.mjs
+          node tests/group-movement201.unit.mjs
+          count=$(find dist/models -type f | wc -l)
+          test "$count" -gt 700
+
+      - name: Install Chromium and generate save gate
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install chromium
+          python scripts/generate206_tests.py
+          node --check tests/save-slots206.generated.mjs
+
+      - name: Physical single-player Chromium gates
+        run: |
+          set -euo pipefail
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd206-singleplayer-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          BASE_URL='http://127.0.0.1:8765/frontline-dominion'
+          GAME_URL="$BASE_URL/frontline-dominion.html?build=206"
+          ready=0
+          for attempt in $(seq 1 50); do
+            if curl -fsSL "$BASE_URL/index.html" > /tmp/fd206-local-index.html; then
+              ready=1
+              break
+            fi
+            sleep 0.1
+          done
+          test "$ready" -eq 1
+          grep -q 'data-fd-release-mode="singleplayer"' /tmp/fd206-local-index.html
+          curl -fsSL "$BASE_URL/multiplayer.html?build=206" | grep -q 'data-fd-multiplayer-status="deferred"'
+          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd206-singleplayer-invariants.log
+          FD_GAME_URL="$GAME_URL" node tests/logistics206-browser.mjs 2>&1 | tee /tmp/fd206-singleplayer-browser.log
+          FD_GAME_URL="$GAME_URL" node tests/save-slots206.generated.mjs 2>&1 | tee /tmp/fd206-singleplayer-save.log
+
+      - name: Publish build 206 single-player to GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd dist
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Frontline Dominion v16.9.0 build 206 single-player"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin gh-pages
+
+      - name: Verify published build 206 single-player
+        run: |
+          set -euo pipefail
+          PUBLIC_ROOT="https://drdkov.github.io/frontline-dominion"
+          PUBLIC_INDEX="$PUBLIC_ROOT/index.html?build=206&verify=${GITHUB_SHA}"
+          PUBLIC_GAME="$PUBLIC_ROOT/frontline-dominion.html?build=206&verify=${GITHUB_SHA}"
+          PUBLIC_MP="$PUBLIC_ROOT/multiplayer.html?build=206&verify=${GITHUB_SHA}"
+          ok=0
+          for attempt in $(seq 1 60); do
+            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_INDEX" > /tmp/fd206-public-index.html && \
+               curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_GAME" > /tmp/fd206-public-game.html && \
+               curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_MP" > /tmp/fd206-public-mp.html && \
+               grep -q 'data-fd-release-mode="singleplayer"' /tmp/fd206-public-index.html && \
+               grep -q 'data-fd-canonical-build="206"' /tmp/fd206-public-game.html && \
+               grep -q 'fd-singleplayer-release-206' /tmp/fd206-public-game.html && \
+               grep -q 'data-fd-multiplayer-status="deferred"' /tmp/fd206-public-mp.html; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" -eq 1
+          FD_GAME_URL="$PUBLIC_GAME" node tests/logistics206-browser.mjs
+          FD_GAME_URL="$PUBLIC_GAME" node tests/save-slots206.generated.mjs
+
+      - name: Upload release diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fd206-singleplayer-release-diagnostics
+          path: |
+            /tmp/fd206-singleplayer-http.log
+            /tmp/fd206-singleplayer-invariants.log
+            /tmp/fd206-singleplayer-browser.log
+            /tmp/fd206-singleplayer-save.log
+            /tmp/fd206-public-index.html
+            /tmp/fd206-public-game.html
+            /tmp/fd206-public-mp.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Publish final release result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf release206-status
+          mkdir release206-status
+          cat > release206-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "status": "${JOB_STATUS}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "finished_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release206-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release206-singleplayer-status
+          git add current.json
+          git commit -m "Build 206 single-player run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release206-singleplayer-status
