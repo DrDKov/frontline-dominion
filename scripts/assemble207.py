@@ -7,12 +7,13 @@ OUT=ROOT/'dist'
 BUILD=207
 VERSION='16.9.1'
 GAMEPLAY='singleplayer-gameplay-v207.js'
+HOOK_CONTEXT='hook-context-v207.js'
 UI='logistics-ui-v207.js'
 HTML=OUT/'frontline-dominion.html'
 WORKER=OUT/'authoritative-simulation-worker-v174.js'
 BRIDGE=OUT/'authoritative-simulation-v174.js'
 
-for name in (GAMEPLAY,UI):
+for name in (GAMEPLAY,HOOK_CONTEXT,UI):
     source=ROOT/'src'/'v207'/name
     if not source.exists(): raise RuntimeError(f'build 207 source missing: {source}')
     shutil.copy2(source,OUT/name)
@@ -54,7 +55,9 @@ worker=re.sub(r"const VERSION = '[^']+';",f"const VERSION = '{VERSION}';",worker
 worker=worker.replace('?build=206','?build=207')
 anchor='let game = null;'
 if worker.count(anchor)!=1: raise RuntimeError(f'build 207 Worker game anchor count={worker.count(anchor)}')
-worker=worker.replace(anchor,f"importScripts('/frontline-dominion/{GAMEPLAY}?build=207');\n\n{anchor}",1)
+worker=worker.replace(anchor,
+    f"importScripts('/frontline-dominion/{GAMEPLAY}?build=207');\n"
+    f"importScripts('/frontline-dominion/{HOOK_CONTEXT}?build=207');\n\n{anchor}",1)
 WORKER.write_text(worker,'utf-8')
 
 bridge=BRIDGE.read_text('utf-8')
@@ -71,6 +74,7 @@ old_ui='<script src="./logistics-ui-v206.js?build=207"></script>'
 html=html.replace(old_ui,'')
 html=html.replace('<script src="./runtime-ui-v206.js?build=207"></script>',
                   '<script src="./singleplayer-gameplay-v207.js?build=207"></script>\n'
+                  '<script src="./hook-context-v207.js?build=207"></script>\n'
                   '<script src="./logistics-ui-v207.js?build=207"></script>\n'
                   '<script src="./runtime-ui-v207.js?build=207"></script>',1)
 html=html.replace('runtime-shell-v206.js?build=207','runtime-shell-v207.js?build=207')
@@ -83,6 +87,7 @@ boot_bridge='<script id="fd-boot-bridge207">globalThis.__FD_BOOT_207__ ||= globa
 if html.count(shell_tag)!=1: raise RuntimeError(f'build 207 runtime shell HTML anchor count={html.count(shell_tag)}')
 if boot_bridge not in html: html=html.replace(shell_tag,boot_bridge+'\n'+shell_tag,1)
 if html.count('logistics-ui-v207.js?build=207')!=1: raise RuntimeError('build 207 UI owner not unique')
+if html.count('hook-context-v207.js?build=207')!=1: raise RuntimeError('build 207 hook context owner not unique')
 if 'logistics-ui-v206.js?build=207' in html: raise RuntimeError('build 207 inherited volatile logistics UI still loaded')
 if 'runtime-ui-v207.js?build=207' not in html or 'runtime-shell-v207.js?build=207' not in html or 'save-slots-v207.js?build=207' not in html:
     raise RuntimeError('build 207 presentation owner transformation incomplete')
@@ -95,4 +100,4 @@ if index.exists():
     text=re.sub(r'data-fd-canonical-build="206"','data-fd-canonical-build="207"',text)
     index.write_text(text,'utf-8')
 
-print('Frontline Dominion v16.9.1 build 207 single-player logistics/UI fixes assembled with boot and 206 compatibility bridges')
+print('Frontline Dominion v16.9.1 build 207 single-player logistics/UI fixes assembled with boot, hook-context and 206 compatibility bridges')
