@@ -1,0 +1,1336 @@
+BUILD206 DEEP AUDIT airbase: airbase-v93.js
+bytes=43091 lines=800
+
+### NEEDLE fuel count_sample=10
+--- fuel #1 offset=5740 line=87 ---
+    .v93-air-quantity button:hover, .v93-air-unit-chip:hover { border-color: rgba(164,235,192,.72); background: rgba(82,151,106,.28); }
+    .v93-air-quantity button[data-air-select-type93], .v93-air-quantity button[data-air-select-all93] { padding: 3px 7px; color: #c7f1d6; font-size: 9px; font-weight: 900; }
+    .v93-air-quantity output { color: #f0f7f3; font-size: 10px; font-weight: 900; text-align: center; font-variant-numeric: tabular-nums; }
+    .v93-air-unit-list { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+    .v93-air-unit-chip { min-height: 28px; padding: 3px 7px; font-size: 8.5px; color: #b9cfc3; }
+    .v93-air-unit-chip[data-air-stage93="ready"] { border-color: rgba(108,223,155,.42); color: #bff0d1; }
+    .v93-air-unit-chip[data-air-stage93="service"] { border-color: rgba(244,197,105,.42); color: #f1d39a; }
+    .v93-air-unit-chip[data-air-stage93="return"], .v93-air-unit-chip[data-air-stage93="launch"] { border-color: rgba(113,188,231,.42); color: #b7dff4; }
+    #action-panel.production-layout.v93-airfield-layout #action-buttons {
+      overflow-y: auto !important; grid-template-rows: none !important; grid-auto-rows: auto !important; align-content: start !important;
+    }
+    #action-panel.production-layout.v93-airfield-layout .action-button[data-action-kind="unit"] { min-height: 50px !important; height: 50px !important; }
+    @media (max-width: 920px), (pointer: coarse) {
+      .v93-air-type { grid-template-columns: 1fr; }
+      .v93-air-quantity { grid-template-columns: 34px 44px 34px minmax(92px,1fr) 46px; }
+      .v93-air-quantity button, .v93-air-unit-chip { min-height: 34px; }
+    }
+  `;
+  document.head.appendChild(style93);
+
+  function ensureSortieResource93(unit) {
+    if (!isFixedWing93(unit)) return false;
+    debug.v74EnsureAircraftLogistics?.(unit);
+    const previousMax = Math.max(1, Number(unit.sortieFuelMax) || MIN_SORTIE_RESOURCE93);
+    const previousFuel = clamp93(Number(unit.sortieFuel) || 0, 0, previousMax);
+    if (previousMax < MIN_SORTIE_RESOURCE93) {
+      unit.sortieFuelMax = MIN_SORTIE_RESOURCE93;
+      unit.sortieFuel = clamp93(previousFuel / previousMax * unit.sortieFuelMax, 0, unit.sortieFuelMax);
+    }
+    return true;
+  }
+
+  if (debug.UPGRADES?.airfieldExpansion) {
+    debug.UPGRADES.airfieldExpansion.name = 'Усиленная аэродромная служба';
+    debug.UPGRADES.airfieldExpansion.description = 'Ускоряет ремонт, заправку и подготовку самолётов на 35%. Вместимость каждого аэродрома уже составляет 12 самолётов.';
+  }
+
+  GameClass.prototype.getAirfieldCapacity = function(field) {
+    return isAirfield93(field) ? HANGAR_CAPACITY93 : 0;
+  };
+
+  GameClass.prototype.getTeamAirFleetState93 = function(teamKey, force = false) {
+    const tick = Math.floor((Number(this.time) || 0) * 4);
+    const cached = this._teamAirFleetState93?.[teamKey];
+    if (!force && cached?.tick === tick) return cached;
+    let capacity = 0;
+    let queued = 0;
+    for (const building of this.buildings) {
+      if (!building.alive || building.team !== teamKey) continue;
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+      if (!AIRFIELD_TYPES93.has(building.typeId) || !Array.isArray(building.queue)) continue;
+      for (const item of building.queue) {
+        if (item?.kind !== 'unit') continue;
+        const stats = debug.getUnitStats?.(item.id, this.teams[teamKey]);
+        if (isFixedWingStats93(stats, item.id)) queued += 1;
+      }
+    }
+    let aircraft = 0;
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+--- fuel #9 offset=18217 line=358 ---
+      field = this.game.findOperationalAirfield(this.team, this.x, this.y, this.id);
+      if (!field) {
+        const resume = this.airSavedCommands.map((saved) => ({ ...saved }));
+        this.airSavedCommands = [];
+        this.airServiceState = null;
+        this.airServiceTargetId = null;
+        this.commandQueue = resume;
+        this.invalidateNavigation();
+        return;
+      }
+      command.airfieldId = field.id;
+      command.stage = 'return';
+      delete command.slot;
+      this.airServiceTargetId = field.id;
+    }
+
+    const pad = this.game.getAirHangarPosition93(field, this, command);
+    const runway = pad.rotation;
+    if (command.stage === 'return') {
+      this.airServiceState = 'return';
+      const approachDistance = Math.max(18, this.radius * .72);
+      if (this.moveToward(pad.x, pad.y, dt, .95) || Math.hypot(this.x - pad.x, this.y - pad.y) <= approachDistance) {
+        command.stage = 'service';
+        this.airServiceState = 'servicing';
+        this.airServiceTimer = 0;
+        this.x = pad.x;
+        this.y = pad.y;
+        this.rotation = runway;
+        this.renderX = pad.x;
+        this.renderY = pad.y;
+        this.renderRotation = runway;
+        this.game.uiDirty = true;
+      }
+      return;
+    }
+
+    if (command.stage === 'service' || command.stage === 'ready') {
+      this.airServiceState = 'servicing';
+      this.rotation = runway;
+      this.x += (pad.x - this.x) * clamp93(dt * 5, 0, 1);
+      this.y += (pad.y - this.y) * clamp93(dt * 5, 0, 1);
+      const team = this.game.teams[this.team];
+      const powered = team?.powerProduced > 0 && team?.powerFactor >= .38;
+      const upgrade = team?.upgrades?.has('airfieldExpansion') ? 1.35 : 1;
+      const serviceRate = (powered ? 1 : .38) * upgrade;
+      this.airServiceTimer += dt * serviceRate;
+      this.heal(this.maxHp * .16 * dt * serviceRate);
+      this.sortieFuel = Math.min(this.sortieFuelMax, this.sortieFuel + this.sortieFuelMax * .28 * dt * serviceRate);
+      if (Number.isFinite(this.airAmmoMax)) this.airAmmo = Math.min(this.airAmmoMax, this.airAmmo + Math.max(1, this.airAmmoMax * .42 * dt * serviceRate));
+      if (this.ensureCountermeasures92?.()) {
+        this.countermeasureCharges92 = Math.min(this.countermeasureMax92, this.countermeasureCharges92 + 2.8 * dt * serviceRate);
+      }
+      const fullyReady = this.healthRatio >= .999 && this.sortieFuel >= this.sortieFuelMax * .999 &&
+        (this.airAmmoMax <= 0 || this.airAmmo >= this.airAmmoMax - .01) &&
+        (!Number.isFinite(this.countermeasureMax92) || this.countermeasureCharges92 >= this.countermeasureMax92 - .01);
+      if (command.stage === 'service' && this.airServiceTimer >= 2.4 && fullyReady) {
+        this.hp = this.maxHp;
+        this.sortieFuel = this.sortieFuelMax;
+        this.airAmmo = this.airAmmoMax;
+        if (Number.isFinite(this.countermeasureMax92)) this.countermeasureCharges92 = this.countermeasureMax92;
+        command.stage = this.airSavedCommands.length ? 'launch' : 'ready';
+        this.airServiceState = command.stage === 'launch' ? 'launch' : 'servicing';
+        this.game.uiDirty = true;
+        if (command.stage === 'ready' && this.team === 'player') {
+          this.game.alert(`${this.stats.name}: в ангаре · готовность 100%`, 'info', field.x, field.y);
+        }
+      } else if (command.stage === 'ready') {
+        this.hp = this.maxHp;
+        this.sortieFuel = this.sortieFuelMax;
+        this.airAmmo = this.airAmmoMax;
+        if (Number.isFinite(this.countermeasureMax92)) this.countermeasureCharges92 = this.countermeasureMax92;
+        if (this.airSavedCommands.length) {
+          command.stage = 'launch';
+          this.airServiceState = 'launch';
+
+### NEEDLE ammo count_sample=10
+--- ammo #6 offset=18775 line=364 ---
+    if (command.stage === 'return') {
+      this.airServiceState = 'return';
+      const approachDistance = Math.max(18, this.radius * .72);
+      if (this.moveToward(pad.x, pad.y, dt, .95) || Math.hypot(this.x - pad.x, this.y - pad.y) <= approachDistance) {
+        command.stage = 'service';
+        this.airServiceState = 'servicing';
+        this.airServiceTimer = 0;
+        this.x = pad.x;
+        this.y = pad.y;
+        this.rotation = runway;
+        this.renderX = pad.x;
+        this.renderY = pad.y;
+        this.renderRotation = runway;
+        this.game.uiDirty = true;
+      }
+      return;
+    }
+
+    if (command.stage === 'service' || command.stage === 'ready') {
+      this.airServiceState = 'servicing';
+      this.rotation = runway;
+      this.x += (pad.x - this.x) * clamp93(dt * 5, 0, 1);
+      this.y += (pad.y - this.y) * clamp93(dt * 5, 0, 1);
+      const team = this.game.teams[this.team];
+      const powered = team?.powerProduced > 0 && team?.powerFactor >= .38;
+      const upgrade = team?.upgrades?.has('airfieldExpansion') ? 1.35 : 1;
+      const serviceRate = (powered ? 1 : .38) * upgrade;
+      this.airServiceTimer += dt * serviceRate;
+      this.heal(this.maxHp * .16 * dt * serviceRate);
+      this.sortieFuel = Math.min(this.sortieFuelMax, this.sortieFuel + this.sortieFuelMax * .28 * dt * serviceRate);
+      if (Number.isFinite(this.airAmmoMax)) this.airAmmo = Math.min(this.airAmmoMax, this.airAmmo + Math.max(1, this.airAmmoMax * .42 * dt * serviceRate));
+      if (this.ensureCountermeasures92?.()) {
+        this.countermeasureCharges92 = Math.min(this.countermeasureMax92, this.countermeasureCharges92 + 2.8 * dt * serviceRate);
+      }
+      const fullyReady = this.healthRatio >= .999 && this.sortieFuel >= this.sortieFuelMax * .999 &&
+        (this.airAmmoMax <= 0 || this.airAmmo >= this.airAmmoMax - .01) &&
+        (!Number.isFinite(this.countermeasureMax92) || this.countermeasureCharges92 >= this.countermeasureMax92 - .01);
+      if (command.stage === 'service' && this.airServiceTimer >= 2.4 && fullyReady) {
+        this.hp = this.maxHp;
+        this.sortieFuel = this.sortieFuelMax;
+        this.airAmmo = this.airAmmoMax;
+        if (Number.isFinite(this.countermeasureMax92)) this.countermeasureCharges92 = this.countermeasureMax92;
+        command.stage = this.airSavedCommands.length ? 'launch' : 'ready';
+        this.airServiceState = command.stage === 'launch' ? 'launch' : 'servicing';
+        this.game.uiDirty = true;
+        if (command.stage === 'ready' && this.team === 'player') {
+          this.game.alert(`${this.stats.name}: в ангаре · готовность 100%`, 'info', field.x, field.y);
+        }
+      } else if (command.stage === 'ready') {
+        this.hp = this.maxHp;
+        this.sortieFuel = this.sortieFuelMax;
+        this.airAmmo = this.airAmmoMax;
+        if (Number.isFinite(this.countermeasureMax92)) this.countermeasureCharges92 = this.countermeasureMax92;
+        if (this.airSavedCommands.length) {
+          command.stage = 'launch';
+          this.airServiceState = 'launch';
+          this.airServiceTimer = 0;
+          this.game.uiDirty = true;
+        }
+      }
+      return;
+    }
+
+    this.airServiceState = 'launch';
+    const lateral = (pad.slot % 4 - 1.5) * 13;
+    const exitDistance = field.radius + 250 + Math.floor(pad.slot / 4) * 18;
+    const exitX = field.x + Math.cos(runway) * exitDistance - Math.sin(runway) * lateral;
+    const exitY = field.y + Math.sin(runway) * exitDistance + Math.cos(runway) * lateral;
+    if (this.moveToward(exitX, exitY, dt, .88) || Math.hypot(this.x - exitX, this.y - exitY) < 26) {
+--- ammo #9 offset=19131 line=369 ---
+        this.airServiceTimer = 0;
+        this.x = pad.x;
+        this.y = pad.y;
+        this.rotation = runway;
+        this.renderX = pad.x;
+        this.renderY = pad.y;
+        this.renderRotation = runway;
+        this.game.uiDirty = true;
+      }
+      return;
+    }
+
+    if (command.stage === 'service' || command.stage === 'ready') {
+      this.airServiceState = 'servicing';
+      this.rotation = runway;
+      this.x += (pad.x - this.x) * clamp93(dt * 5, 0, 1);
+      this.y += (pad.y - this.y) * clamp93(dt * 5, 0, 1);
+      const team = this.game.teams[this.team];
+      const powered = team?.powerProduced > 0 && team?.powerFactor >= .38;
+      const upgrade = team?.upgrades?.has('airfieldExpansion') ? 1.35 : 1;
+      const serviceRate = (powered ? 1 : .38) * upgrade;
+      this.airServiceTimer += dt * serviceRate;
+      this.heal(this.maxHp * .16 * dt * serviceRate);
+      this.sortieFuel = Math.min(this.sortieFuelMax, this.sortieFuel + this.sortieFuelMax * .28 * dt * serviceRate);
+      if (Number.isFinite(this.airAmmoMax)) this.airAmmo = Math.min(this.airAmmoMax, this.airAmmo + Math.max(1, this.airAmmoMax * .42 * dt * serviceRate));
+      if (this.ensureCountermeasures92?.()) {
+        this.countermeasureCharges92 = Math.min(this.countermeasureMax92, this.countermeasureCharges92 + 2.8 * dt * serviceRate);
+      }
+      const fullyReady = this.healthRatio >= .999 && this.sortieFuel >= this.sortieFuelMax * .999 &&
+        (this.airAmmoMax <= 0 || this.airAmmo >= this.airAmmoMax - .01) &&
+        (!Number.isFinite(this.countermeasureMax92) || this.countermeasureCharges92 >= this.countermeasureMax92 - .01);
+      if (command.stage === 'service' && this.airServiceTimer >= 2.4 && fullyReady) {
+        this.hp = this.maxHp;
+        this.sortieFuel = this.sortieFuelMax;
+        this.airAmmo = this.airAmmoMax;
+        if (Number.isFinite(this.countermeasureMax92)) this.countermeasureCharges92 = this.countermeasureMax92;
+        command.stage = this.airSavedCommands.length ? 'launch' : 'ready';
+        this.airServiceState = command.stage === 'launch' ? 'launch' : 'servicing';
+        this.game.uiDirty = true;
+        if (command.stage === 'ready' && this.team === 'player') {
+          this.game.alert(`${this.stats.name}: в ангаре · готовность 100%`, 'info', field.x, field.y);
+        }
+      } else if (command.stage === 'ready') {
+        this.hp = this.maxHp;
+        this.sortieFuel = this.sortieFuelMax;
+        this.airAmmo = this.airAmmoMax;
+        if (Number.isFinite(this.countermeasureMax92)) this.countermeasureCharges92 = this.countermeasureMax92;
+        if (this.airSavedCommands.length) {
+          command.stage = 'launch';
+          this.airServiceState = 'launch';
+          this.airServiceTimer = 0;
+          this.game.uiDirty = true;
+        }
+      }
+      return;
+    }
+
+    this.airServiceState = 'launch';
+    const lateral = (pad.slot % 4 - 1.5) * 13;
+    const exitDistance = field.radius + 250 + Math.floor(pad.slot / 4) * 18;
+    const exitX = field.x + Math.cos(runway) * exitDistance - Math.sin(runway) * lateral;
+    const exitY = field.y + Math.sin(runway) * exitDistance + Math.cos(runway) * lateral;
+    if (this.moveToward(exitX, exitY, dt, .88) || Math.hypot(this.x - exitX, this.y - exitY) < 26) {
+      const mission = this.airSavedCommands.map((saved) => ({ ...saved }));
+      this.airSavedCommands = [];
+      this.airServiceState = null;
+      this.airServiceReason = null;
+      this.commandQueue = mission;
+      this.invalidateNavigation();
+      this.game.uiDirty = true;
+      if (this.team === 'player') this.game.alert(`${this.stats.name}: взлёт · ресурс и вооружение 100%`, 'info', this.x, this.y);
+
+### NEEDLE service count_sample=10
+--- service #1 offset=1428 line=27 ---
+(() => {
+  'use strict';
+  const debug = window.__FD_DEBUG__;
+  const GameClass = debug?.Game;
+  const UnitClass = debug?.Unit;
+  const BuildingClass = debug?.Building;
+  if (!GameClass || !UnitClass || !BuildingClass) return;
+
+  const AIRFIELD_TYPES93 = new Set(['airfield', 'advancedAirfield']);
+  const HANGAR_CAPACITY93 = 12;
+  const MIN_SORTIE_RESOURCE93 = 320;
+  const clamp93 = (value, min, max) => Math.max(min, Math.min(max, value));
+  const isFixedWingStats93 = (stats, typeId = '') => Boolean(
+    stats?.air && stats.mobilityClass === 'fixedWing' &&
+    !/helicopter|lightGunship/i.test(`${typeId} ${stats.visualRole || ''}`)
+  );
+  const isFixedWing93 = (unit) => Boolean(unit?.alive && isFixedWingStats93(unit.stats, unit.typeId));
+  const isAirfield93 = (field) => Boolean(field?.alive && field.completed && AIRFIELD_TYPES93.has(field.typeId));
+  const isHangarCommand93 = (unit) => unit?.currentCommand?.type === 'airHangar93';
+  const isStoredReady93 = (unit) => isHangarCommand93(unit) && unit.currentCommand.stage === 'ready';
+  const isPersistentAirMission93 = (unit, command) => {
+    if (command?.type === 'patrol' || command?.type === 'guard') return true;
+    if (command?.type !== 'formation') return false;
+    return unit?.game?.formations?.get(command.formationId)?.mode === 'patrol';
+  };
+  const hasPersistentAirMission93 = (unit) => unit?.commandQueue?.some((command) =>
+    command?.type !== 'airService' && command?.type !== 'airHangar93' && isPersistentAirMission93(unit, command));
+  const escapeHTML93 = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
+
+  const style93 = document.createElement('style');
+  style93.id = 'v93-airbase-style';
+  style93.textContent = `
+    .v93-airbase-ready strong { color: #9feac2; }
+    .v93-airbase-service strong { color: #ffd98a; }
+    .v93-airbase-away strong { color: #9fd8ff; }
+    .command-button[data-air-wing93] { border-color: rgba(124,205,255,.46); background: rgba(76,151,197,.12); }
+    .command-button[data-air-return93] { border-color: rgba(158,230,187,.42); }
+    .v93-fleet-capacity { color: #a9d7bf; }
+    .v93-fleet-capacity.is-full strong { color: #ffd27d; }
+    .v93-air-roster {
+      grid-column: 1 / -1; order: -5; display: grid; gap: 6px; padding: 7px;
+      border: 1px solid rgba(126,195,162,.28); border-radius: 8px;
+      background: linear-gradient(145deg, rgba(41,72,57,.32), rgba(10,19,15,.58));
+    }
+    .v93-air-roster-head { display: flex; justify-content: space-between; align-items: center; gap: 9px; }
+    .v93-air-roster-head span { color: #b7cfc2; font-size: 9px; font-weight: 900; letter-spacing: .11em; }
+    .v93-air-roster-head strong { color: #e5f2ea; font-size: 10px; text-align: right; }
+    .v93-air-roster-empty { color: #82988c; font-size: 10px; line-height: 1.3; padding: 4px 2px; }
+    .v93-air-type-list { display: grid; gap: 5px; }
+    .v93-air-type {
+      display: grid; grid-template-columns: minmax(132px,1fr) auto; gap: 5px 8px; align-items: center;
+      padding: 5px; border: 1px solid rgba(146,185,165,.19); border-radius: 6px; background: rgba(6,13,10,.34);
+    }
+    .v93-air-type-name { min-w
+--- service #3 offset=4646 line=70 ---
+    .v93-air-roster-empty { color: #82988c; font-size: 10px; line-height: 1.3; padding: 4px 2px; }
+    .v93-air-type-list { display: grid; gap: 5px; }
+    .v93-air-type {
+      display: grid; grid-template-columns: minmax(132px,1fr) auto; gap: 5px 8px; align-items: center;
+      padding: 5px; border: 1px solid rgba(146,185,165,.19); border-radius: 6px; background: rgba(6,13,10,.34);
+    }
+    .v93-air-type-name { min-width: 0; }
+    .v93-air-type-name strong { display: block; color: #e4eee8; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .v93-air-type-name small { display: block; margin-top: 2px; color: #89a095; font-size: 8.5px; }
+    .v93-air-quantity { display: grid; grid-template-columns: 30px 42px 30px minmax(72px,auto) 42px; gap: 4px; align-items: center; }
+    .v93-air-quantity button, .v93-air-unit-chip {
+      min-height: 30px; border: 1px solid rgba(137,202,168,.32); border-radius: 5px;
+      background: rgba(76,124,96,.15); color: #dfede4; cursor: pointer; touch-action: manipulation;
+    }
+    .v93-air-quantity button:hover, .v93-air-unit-chip:hover { border-color: rgba(164,235,192,.72); background: rgba(82,151,106,.28); }
+    .v93-air-quantity button[data-air-select-type93], .v93-air-quantity button[data-air-select-all93] { padding: 3px 7px; color: #c7f1d6; font-size: 9px; font-weight: 900; }
+    .v93-air-quantity output { color: #f0f7f3; font-size: 10px; font-weight: 900; text-align: center; font-variant-numeric: tabular-nums; }
+    .v93-air-unit-list { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+    .v93-air-unit-chip { min-height: 28px; padding: 3px 7px; font-size: 8.5px; color: #b9cfc3; }
+    .v93-air-unit-chip[data-air-stage93="ready"] { border-color: rgba(108,223,155,.42); color: #bff0d1; }
+    .v93-air-unit-chip[data-air-stage93="service"] { border-color: rgba(244,197,105,.42); color: #f1d39a; }
+    .v93-air-unit-chip[data-air-stage93="return"], .v93-air-unit-chip[data-air-stage93="launch"] { border-color: rgba(113,188,231,.42); color: #b7dff4; }
+    #action-panel.production-layout.v93-airfield-layout #action-buttons {
+      overflow-y: auto !important; grid-template-rows: none !important; grid-auto-rows: auto !important; align-content: start !important;
+    }
+    #action-panel.production-layout.v93-airfield-layout .action-button[data-action-kind="unit"] { min-height: 50px !important; height: 50px !important; }
+    @media (max-width: 920px), (pointer: coarse) {
+      .v93-air-type { grid-template-columns: 1fr; }
+      .v93-air-quantity { grid-template-columns: 34px 44px 34px minmax(92px,1fr) 46px; }
+      .v93-air-quantity button, .v93-air-unit-chip { min-height: 34px; }
+    }
+  `;
+  document.head.appendChild(style93);
+
+  function ensureSortieResource93(unit) {
+    if (!isFixedWing93(unit)) return false;
+    debug.v74EnsureAircraftLogistics?.(unit);
+    const previousMax = Math.max(1, Number(unit.sortieFuelMax) || MIN_SORTIE_RESOURCE93);
+    const previousFuel = clamp93(Number(unit.sortieFuel) || 0, 0, previousMax);
+    if (previousMax < MIN_SORTIE_RESOURCE93) {
+      unit.sortieFuelMax = MIN_SORTIE_RESOURCE93;
+      unit.sortieFuel = clamp93(previousFuel / previousMax * unit.sortieFuelMax, 0, unit.sortieFuelMax);
+    }
+    return true;
+  }
+
+  if (debug.UPGRADES?.airfieldExpansion) {
+    debug.UPGRADES.airfieldExpansion.name = 'Усиленная аэродромная служба';
+    debug.UPGRADES.airfieldExpansion.description = 'Ускоряет ремонт, заправку и подготовку самолётов на 35%. Вместимость каждого аэродрома уже составляет 12 самолётов.';
+  }
+
+  GameClass.prototype.getAirfieldCapacity = function(field) {
+    return isAirfield93(field) ? HANGAR_CAPACITY93 : 0;
+--- service #4 offset=8038 line=138 ---
+    debug.UPGRADES.airfieldExpansion.description = 'Ускоряет ремонт, заправку и подготовку самолётов на 35%. Вместимость каждого аэродрома уже составляет 12 самолётов.';
+  }
+
+  GameClass.prototype.getAirfieldCapacity = function(field) {
+    return isAirfield93(field) ? HANGAR_CAPACITY93 : 0;
+  };
+
+  GameClass.prototype.getTeamAirFleetState93 = function(teamKey, force = false) {
+    const tick = Math.floor((Number(this.time) || 0) * 4);
+    const cached = this._teamAirFleetState93?.[teamKey];
+    if (!force && cached?.tick === tick) return cached;
+    let capacity = 0;
+    let queued = 0;
+    for (const building of this.buildings) {
+      if (!building.alive || building.team !== teamKey) continue;
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+      if (!AIRFIELD_TYPES93.has(building.typeId) || !Array.isArray(building.queue)) continue;
+      for (const item of building.queue) {
+        if (item?.kind !== 'unit') continue;
+        const stats = debug.getUnitStats?.(item.id, this.teams[teamKey]);
+        if (isFixedWingStats93(stats, item.id)) queued += 1;
+      }
+    }
+    let aircraft = 0;
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+    this._teamAirFleetState93 ||= Object.create(null);
+    this._teamAirFleetState93[teamKey] = state;
+    return state;
+  };
+
+  GameClass.prototype.invalidateTeamAirFleetState93 = function(teamKey = null) {
+    if (!this._teamAirFleetState93) return;
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+  };
+
+  GameClass.prototype.getAirfieldAircraftState93 = function(field) {
+    if (!field) return { assigned: [], ready: [], service: [], away: [], hangar: [] };
+    const tick = Math.floor((Number(this.time) || 0) * 5);
+    const cache = this._airfieldAircraftState93;
+    if (cache?.fieldId === field.id && cache.tick === tick) return cache.state;
+    const assigned = [];
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === field.team && isFixedWing93(unit) && unit.airServiceTargetId === field.id) assigned.push(unit);
+    }
+    const hangar = assigned.filter(isHangarCommand93);
+    const ready = hangar.filter(isStoredReady93);
+    const service = hangar.filter((unit) => ['return', 'service', 'launch'].includes(unit.currentCommand.stage));
+    const away = assigned.filter((unit) => !isHangarCommand93(unit) && !unit.airServiceState);
+    const state = { assigned, ready, service, away, hangar };
+    this._airfieldAircraftState93 = { fieldId: field.id, tick, state };
+    return state;
+  };
+
+  GameClass.prototype.getAirfieldOccupancy = function(field, excludeUnitId = null) {
+    if (!field) return 0;
+    return this.units.filter((unit) => unit.alive && unit.id !== excludeUnitId && isFixedWing93(unit) &&
+      unit.airServiceTargetId === field.id).length;
+  };
+
+  GameClass.prototype.getAirfieldQueuedAircraft93 = function(field) {
+    if (!field || !Array.isArray(field.queue)) return 0;
+    return field.queue.filter((item) => {
+      if (item?.kind !== 'unit') return false;
+      const stats = debug.getUnitStats?.(item.id, this.teams[field.team]);
+      return isFixedWingStats93(stats, item.id);
+    }).length;
+  };
+
+  GameClass.prototype.getAirfieldReadyAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).ready;
+  };
+
+  GameClass.prototype.getAirfieldServiceAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).service;
+  };
+--- service #5 offset=8408 line=144 ---
+    const tick = Math.floor((Number(this.time) || 0) * 4);
+    const cached = this._teamAirFleetState93?.[teamKey];
+    if (!force && cached?.tick === tick) return cached;
+    let capacity = 0;
+    let queued = 0;
+    for (const building of this.buildings) {
+      if (!building.alive || building.team !== teamKey) continue;
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+      if (!AIRFIELD_TYPES93.has(building.typeId) || !Array.isArray(building.queue)) continue;
+      for (const item of building.queue) {
+        if (item?.kind !== 'unit') continue;
+        const stats = debug.getUnitStats?.(item.id, this.teams[teamKey]);
+        if (isFixedWingStats93(stats, item.id)) queued += 1;
+      }
+    }
+    let aircraft = 0;
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+    this._teamAirFleetState93 ||= Object.create(null);
+    this._teamAirFleetState93[teamKey] = state;
+    return state;
+  };
+
+  GameClass.prototype.invalidateTeamAirFleetState93 = function(teamKey = null) {
+    if (!this._teamAirFleetState93) return;
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+  };
+
+  GameClass.prototype.getAirfieldAircraftState93 = function(field) {
+    if (!field) return { assigned: [], ready: [], service: [], away: [], hangar: [] };
+    const tick = Math.floor((Number(this.time) || 0) * 5);
+    const cache = this._airfieldAircraftState93;
+    if (cache?.fieldId === field.id && cache.tick === tick) return cache.state;
+    const assigned = [];
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === field.team && isFixedWing93(unit) && unit.airServiceTargetId === field.id) assigned.push(unit);
+    }
+    const hangar = assigned.filter(isHangarCommand93);
+    const ready = hangar.filter(isStoredReady93);
+    const service = hangar.filter((unit) => ['return', 'service', 'launch'].includes(unit.currentCommand.stage));
+    const away = assigned.filter((unit) => !isHangarCommand93(unit) && !unit.airServiceState);
+    const state = { assigned, ready, service, away, hangar };
+    this._airfieldAircraftState93 = { fieldId: field.id, tick, state };
+    return state;
+  };
+
+  GameClass.prototype.getAirfieldOccupancy = function(field, excludeUnitId = null) {
+    if (!field) return 0;
+    return this.units.filter((unit) => unit.alive && unit.id !== excludeUnitId && isFixedWing93(unit) &&
+      unit.airServiceTargetId === field.id).length;
+  };
+
+  GameClass.prototype.getAirfieldQueuedAircraft93 = function(field) {
+    if (!field || !Array.isArray(field.queue)) return 0;
+    return field.queue.filter((item) => {
+      if (item?.kind !== 'unit') return false;
+      const stats = debug.getUnitStats?.(item.id, this.teams[field.team]);
+      return isFixedWingStats93(stats, item.id);
+    }).length;
+  };
+
+  GameClass.prototype.getAirfieldReadyAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).ready;
+  };
+
+  GameClass.prototype.getAirfieldServiceAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).service;
+  };
+
+  GameClass.prototype.getAirfieldAircraftAway93 = function(field) {
+    return this.getAirfieldAircraftState93(field).away;
+  };
+
+  GameClass.prototype.findOperationalAirfield = function(teamKey, x, y, excludeUnitId = null) {
+    const team = this.teams[teamKey];
+    const fields = this.buildings.filter((field) => isAirfield93(field) && field.team === teamKey &&
+      field.sabotagedUntil <= this.time && this.getAirfieldOccupancy(field, excludeUnitId) < this.getAirfieldCapacity(field));
+--- service #8 offset=8764 line=149 ---
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+      if (!AIRFIELD_TYPES93.has(building.typeId) || !Array.isArray(building.queue)) continue;
+      for (const item of building.queue) {
+        if (item?.kind !== 'unit') continue;
+        const stats = debug.getUnitStats?.(item.id, this.teams[teamKey]);
+        if (isFixedWingStats93(stats, item.id)) queued += 1;
+      }
+    }
+    let aircraft = 0;
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+    this._teamAirFleetState93 ||= Object.create(null);
+    this._teamAirFleetState93[teamKey] = state;
+    return state;
+  };
+
+  GameClass.prototype.invalidateTeamAirFleetState93 = function(teamKey = null) {
+    if (!this._teamAirFleetState93) return;
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+  };
+
+  GameClass.prototype.getAirfieldAircraftState93 = function(field) {
+    if (!field) return { assigned: [], ready: [], service: [], away: [], hangar: [] };
+    const tick = Math.floor((Number(this.time) || 0) * 5);
+    const cache = this._airfieldAircraftState93;
+    if (cache?.fieldId === field.id && cache.tick === tick) return cache.state;
+    const assigned = [];
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === field.team && isFixedWing93(unit) && unit.airServiceTargetId === field.id) assigned.push(unit);
+    }
+    const hangar = assigned.filter(isHangarCommand93);
+    const ready = hangar.filter(isStoredReady93);
+    const service = hangar.filter((unit) => ['return', 'service', 'launch'].includes(unit.currentCommand.stage));
+    const away = assigned.filter((unit) => !isHangarCommand93(unit) && !unit.airServiceState);
+    const state = { assigned, ready, service, away, hangar };
+    this._airfieldAircraftState93 = { fieldId: field.id, tick, state };
+    return state;
+  };
+
+  GameClass.prototype.getAirfieldOccupancy = function(field, excludeUnitId = null) {
+    if (!field) return 0;
+    return this.units.filter((unit) => unit.alive && unit.id !== excludeUnitId && isFixedWing93(unit) &&
+      unit.airServiceTargetId === field.id).length;
+  };
+
+  GameClass.prototype.getAirfieldQueuedAircraft93 = function(field) {
+    if (!field || !Array.isArray(field.queue)) return 0;
+    return field.queue.filter((item) => {
+      if (item?.kind !== 'unit') return false;
+      const stats = debug.getUnitStats?.(item.id, this.teams[field.team]);
+      return isFixedWingStats93(stats, item.id);
+    }).length;
+  };
+
+  GameClass.prototype.getAirfieldReadyAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).ready;
+  };
+
+  GameClass.prototype.getAirfieldServiceAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).service;
+  };
+
+  GameClass.prototype.getAirfieldAircraftAway93 = function(field) {
+    return this.getAirfieldAircraftState93(field).away;
+  };
+
+  GameClass.prototype.findOperationalAirfield = function(teamKey, x, y, excludeUnitId = null) {
+    const team = this.teams[teamKey];
+    const fields = this.buildings.filter((field) => isAirfield93(field) && field.team === teamKey &&
+      field.sabotagedUntil <= this.time && this.getAirfieldOccupancy(field, excludeUnitId) < this.getAirfieldCapacity(field));
+    if (!fields.length) return null;
+    return fields.sort((a, b) => {
+      const powerPenalty = team?.powerProduced > 0 && team?.powerFactor >= .38 ? 0 : 700;
+      const loadA = this.getAirfieldOccupancy(a, excludeUnitId) / HANGAR_CAPACITY93;
+--- service #10 offset=9167 line=158 ---
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+    this._teamAirFleetState93 ||= Object.create(null);
+    this._teamAirFleetState93[teamKey] = state;
+    return state;
+  };
+
+  GameClass.prototype.invalidateTeamAirFleetState93 = function(teamKey = null) {
+    if (!this._teamAirFleetState93) return;
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+  };
+
+  GameClass.prototype.getAirfieldAircraftState93 = function(field) {
+    if (!field) return { assigned: [], ready: [], service: [], away: [], hangar: [] };
+    const tick = Math.floor((Number(this.time) || 0) * 5);
+    const cache = this._airfieldAircraftState93;
+    if (cache?.fieldId === field.id && cache.tick === tick) return cache.state;
+    const assigned = [];
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === field.team && isFixedWing93(unit) && unit.airServiceTargetId === field.id) assigned.push(unit);
+    }
+    const hangar = assigned.filter(isHangarCommand93);
+    const ready = hangar.filter(isStoredReady93);
+    const service = hangar.filter((unit) => ['return', 'service', 'launch'].includes(unit.currentCommand.stage));
+    const away = assigned.filter((unit) => !isHangarCommand93(unit) && !unit.airServiceState);
+    const state = { assigned, ready, service, away, hangar };
+    this._airfieldAircraftState93 = { fieldId: field.id, tick, state };
+    return state;
+  };
+
+  GameClass.prototype.getAirfieldOccupancy = function(field, excludeUnitId = null) {
+    if (!field) return 0;
+    return this.units.filter((unit) => unit.alive && unit.id !== excludeUnitId && isFixedWing93(unit) &&
+      unit.airServiceTargetId === field.id).length;
+  };
+
+  GameClass.prototype.getAirfieldQueuedAircraft93 = function(field) {
+    if (!field || !Array.isArray(field.queue)) return 0;
+    return field.queue.filter((item) => {
+      if (item?.kind !== 'unit') return false;
+      const stats = debug.getUnitStats?.(item.id, this.teams[field.team]);
+      return isFixedWingStats93(stats, item.id);
+    }).length;
+  };
+
+  GameClass.prototype.getAirfieldReadyAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).ready;
+  };
+
+  GameClass.prototype.getAirfieldServiceAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).service;
+  };
+
+  GameClass.prototype.getAirfieldAircraftAway93 = function(field) {
+    return this.getAirfieldAircraftState93(field).away;
+  };
+
+  GameClass.prototype.findOperationalAirfield = function(teamKey, x, y, excludeUnitId = null) {
+    const team = this.teams[teamKey];
+    const fields = this.buildings.filter((field) => isAirfield93(field) && field.team === teamKey &&
+      field.sabotagedUntil <= this.time && this.getAirfieldOccupancy(field, excludeUnitId) < this.getAirfieldCapacity(field));
+    if (!fields.length) return null;
+    return fields.sort((a, b) => {
+      const powerPenalty = team?.powerProduced > 0 && team?.powerFactor >= .38 ? 0 : 700;
+      const loadA = this.getAirfieldOccupancy(a, excludeUnitId) / HANGAR_CAPACITY93;
+      const loadB = this.getAirfieldOccupancy(b, excludeUnitId) / HANGAR_CAPACITY93;
+      return Math.hypot(a.x - x, a.y - y) + powerPenalty + loadA * 620 -
+        (Math.hypot(b.x - x, b.y - y) + powerPenalty + loadB * 620);
+    })[0] || null;
+  };
+
+  GameClass.prototype.getAirHangarPosition93 = function(field, unit, command = unit.currentCommand) {
+    const occupied = new Set(this.units.filter((other) => other.alive && other !== unit && isFixedWing93(other) &&
+
+### NEEDLE sortie count_sample=10
+
+### NEEDLE hangar count_sample=10
+--- hangar #6 offset=6475 line=102 ---
+    .v93-air-unit-chip[data-air-stage93="service"] { border-color: rgba(244,197,105,.42); color: #f1d39a; }
+    .v93-air-unit-chip[data-air-stage93="return"], .v93-air-unit-chip[data-air-stage93="launch"] { border-color: rgba(113,188,231,.42); color: #b7dff4; }
+    #action-panel.production-layout.v93-airfield-layout #action-buttons {
+      overflow-y: auto !important; grid-template-rows: none !important; grid-auto-rows: auto !important; align-content: start !important;
+    }
+    #action-panel.production-layout.v93-airfield-layout .action-button[data-action-kind="unit"] { min-height: 50px !important; height: 50px !important; }
+    @media (max-width: 920px), (pointer: coarse) {
+      .v93-air-type { grid-template-columns: 1fr; }
+      .v93-air-quantity { grid-template-columns: 34px 44px 34px minmax(92px,1fr) 46px; }
+      .v93-air-quantity button, .v93-air-unit-chip { min-height: 34px; }
+    }
+  `;
+  document.head.appendChild(style93);
+
+  function ensureSortieResource93(unit) {
+    if (!isFixedWing93(unit)) return false;
+    debug.v74EnsureAircraftLogistics?.(unit);
+    const previousMax = Math.max(1, Number(unit.sortieFuelMax) || MIN_SORTIE_RESOURCE93);
+    const previousFuel = clamp93(Number(unit.sortieFuel) || 0, 0, previousMax);
+    if (previousMax < MIN_SORTIE_RESOURCE93) {
+      unit.sortieFuelMax = MIN_SORTIE_RESOURCE93;
+      unit.sortieFuel = clamp93(previousFuel / previousMax * unit.sortieFuelMax, 0, unit.sortieFuelMax);
+    }
+    return true;
+  }
+
+  if (debug.UPGRADES?.airfieldExpansion) {
+    debug.UPGRADES.airfieldExpansion.name = 'Усиленная аэродромная служба';
+    debug.UPGRADES.airfieldExpansion.description = 'Ускоряет ремонт, заправку и подготовку самолётов на 35%. Вместимость каждого аэродрома уже составляет 12 самолётов.';
+  }
+
+  GameClass.prototype.getAirfieldCapacity = function(field) {
+    return isAirfield93(field) ? HANGAR_CAPACITY93 : 0;
+  };
+
+  GameClass.prototype.getTeamAirFleetState93 = function(teamKey, force = false) {
+    const tick = Math.floor((Number(this.time) || 0) * 4);
+    const cached = this._teamAirFleetState93?.[teamKey];
+    if (!force && cached?.tick === tick) return cached;
+    let capacity = 0;
+    let queued = 0;
+    for (const building of this.buildings) {
+      if (!building.alive || building.team !== teamKey) continue;
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+      if (!AIRFIELD_TYPES93.has(building.typeId) || !Array.isArray(building.queue)) continue;
+      for (const item of building.queue) {
+        if (item?.kind !== 'unit') continue;
+        const stats = debug.getUnitStats?.(item.id, this.teams[teamKey]);
+        if (isFixedWingStats93(stats, item.id)) queued += 1;
+      }
+    }
+    let aircraft = 0;
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+    this._teamAirFleetState93 ||= Object.create(null);
+    this._teamAirFleetState93[teamKey] = state;
+    return state;
+  };
+
+  GameClass.prototype.invalidateTeamAirFleetState93 = function(teamKey = null) {
+    if (!this._teamAirFleetState93) return;
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+  };
+
+  GameClass.prototype.getAirfieldAircraftState93 = function(field) {
+    if (!field) return { assigned: [], ready: [], service: [], away: [], hangar: [] };
+    const tick = Math.floor((Number(this.time) || 0) * 5);
+    const cache = this._airfieldAircraftState93;
+    if (cache?.fieldId === field.id && cache.tick === tick) return cache.state;
+    const assigned = [];
+--- hangar #7 offset=6957 line=113 ---
+    #action-panel.production-layout.v93-airfield-layout .action-button[data-action-kind="unit"] { min-height: 50px !important; height: 50px !important; }
+    @media (max-width: 920px), (pointer: coarse) {
+      .v93-air-type { grid-template-columns: 1fr; }
+      .v93-air-quantity { grid-template-columns: 34px 44px 34px minmax(92px,1fr) 46px; }
+      .v93-air-quantity button, .v93-air-unit-chip { min-height: 34px; }
+    }
+  `;
+  document.head.appendChild(style93);
+
+  function ensureSortieResource93(unit) {
+    if (!isFixedWing93(unit)) return false;
+    debug.v74EnsureAircraftLogistics?.(unit);
+    const previousMax = Math.max(1, Number(unit.sortieFuelMax) || MIN_SORTIE_RESOURCE93);
+    const previousFuel = clamp93(Number(unit.sortieFuel) || 0, 0, previousMax);
+    if (previousMax < MIN_SORTIE_RESOURCE93) {
+      unit.sortieFuelMax = MIN_SORTIE_RESOURCE93;
+      unit.sortieFuel = clamp93(previousFuel / previousMax * unit.sortieFuelMax, 0, unit.sortieFuelMax);
+    }
+    return true;
+  }
+
+  if (debug.UPGRADES?.airfieldExpansion) {
+    debug.UPGRADES.airfieldExpansion.name = 'Усиленная аэродромная служба';
+    debug.UPGRADES.airfieldExpansion.description = 'Ускоряет ремонт, заправку и подготовку самолётов на 35%. Вместимость каждого аэродрома уже составляет 12 самолётов.';
+  }
+
+  GameClass.prototype.getAirfieldCapacity = function(field) {
+    return isAirfield93(field) ? HANGAR_CAPACITY93 : 0;
+  };
+
+  GameClass.prototype.getTeamAirFleetState93 = function(teamKey, force = false) {
+    const tick = Math.floor((Number(this.time) || 0) * 4);
+    const cached = this._teamAirFleetState93?.[teamKey];
+    if (!force && cached?.tick === tick) return cached;
+    let capacity = 0;
+    let queued = 0;
+    for (const building of this.buildings) {
+      if (!building.alive || building.team !== teamKey) continue;
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+      if (!AIRFIELD_TYPES93.has(building.typeId) || !Array.isArray(building.queue)) continue;
+      for (const item of building.queue) {
+        if (item?.kind !== 'unit') continue;
+        const stats = debug.getUnitStats?.(item.id, this.teams[teamKey]);
+        if (isFixedWingStats93(stats, item.id)) queued += 1;
+      }
+    }
+    let aircraft = 0;
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+    this._teamAirFleetState93 ||= Object.create(null);
+    this._teamAirFleetState93[teamKey] = state;
+    return state;
+  };
+
+  GameClass.prototype.invalidateTeamAirFleetState93 = function(teamKey = null) {
+    if (!this._teamAirFleetState93) return;
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+  };
+
+  GameClass.prototype.getAirfieldAircraftState93 = function(field) {
+    if (!field) return { assigned: [], ready: [], service: [], away: [], hangar: [] };
+    const tick = Math.floor((Number(this.time) || 0) * 5);
+    const cache = this._airfieldAircraftState93;
+    if (cache?.fieldId === field.id && cache.tick === tick) return cache.state;
+    const assigned = [];
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === field.team && isFixedWing93(unit) && unit.airServiceTargetId === field.id) assigned.push(unit);
+    }
+    const hangar = assigned.filter(isHangarCommand93);
+    const ready = hangar.filter(isStoredReady93);
+    const service = hangar.filter((unit) => ['return', 'service', 'launch'].includes(unit.currentCommand.stage));
+    const away = assigned.filter((unit) => !isHangarCommand93(unit) && !unit.airServiceState);
+
+### NEEDLE airfield count_sample=10
+--- airfield #7 offset=5125 line=75 ---
+    .v93-air-type-name strong { display: block; color: #e4eee8; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .v93-air-type-name small { display: block; margin-top: 2px; color: #89a095; font-size: 8.5px; }
+    .v93-air-quantity { display: grid; grid-template-columns: 30px 42px 30px minmax(72px,auto) 42px; gap: 4px; align-items: center; }
+    .v93-air-quantity button, .v93-air-unit-chip {
+      min-height: 30px; border: 1px solid rgba(137,202,168,.32); border-radius: 5px;
+      background: rgba(76,124,96,.15); color: #dfede4; cursor: pointer; touch-action: manipulation;
+    }
+    .v93-air-quantity button:hover, .v93-air-unit-chip:hover { border-color: rgba(164,235,192,.72); background: rgba(82,151,106,.28); }
+    .v93-air-quantity button[data-air-select-type93], .v93-air-quantity button[data-air-select-all93] { padding: 3px 7px; color: #c7f1d6; font-size: 9px; font-weight: 900; }
+    .v93-air-quantity output { color: #f0f7f3; font-size: 10px; font-weight: 900; text-align: center; font-variant-numeric: tabular-nums; }
+    .v93-air-unit-list { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+    .v93-air-unit-chip { min-height: 28px; padding: 3px 7px; font-size: 8.5px; color: #b9cfc3; }
+    .v93-air-unit-chip[data-air-stage93="ready"] { border-color: rgba(108,223,155,.42); color: #bff0d1; }
+    .v93-air-unit-chip[data-air-stage93="service"] { border-color: rgba(244,197,105,.42); color: #f1d39a; }
+    .v93-air-unit-chip[data-air-stage93="return"], .v93-air-unit-chip[data-air-stage93="launch"] { border-color: rgba(113,188,231,.42); color: #b7dff4; }
+    #action-panel.production-layout.v93-airfield-layout #action-buttons {
+      overflow-y: auto !important; grid-template-rows: none !important; grid-auto-rows: auto !important; align-content: start !important;
+    }
+    #action-panel.production-layout.v93-airfield-layout .action-button[data-action-kind="unit"] { min-height: 50px !important; height: 50px !important; }
+    @media (max-width: 920px), (pointer: coarse) {
+      .v93-air-type { grid-template-columns: 1fr; }
+      .v93-air-quantity { grid-template-columns: 34px 44px 34px minmax(92px,1fr) 46px; }
+      .v93-air-quantity button, .v93-air-unit-chip { min-height: 34px; }
+    }
+  `;
+  document.head.appendChild(style93);
+
+  function ensureSortieResource93(unit) {
+    if (!isFixedWing93(unit)) return false;
+    debug.v74EnsureAircraftLogistics?.(unit);
+    const previousMax = Math.max(1, Number(unit.sortieFuelMax) || MIN_SORTIE_RESOURCE93);
+    const previousFuel = clamp93(Number(unit.sortieFuel) || 0, 0, previousMax);
+    if (previousMax < MIN_SORTIE_RESOURCE93) {
+      unit.sortieFuelMax = MIN_SORTIE_RESOURCE93;
+      unit.sortieFuel = clamp93(previousFuel / previousMax * unit.sortieFuelMax, 0, unit.sortieFuelMax);
+    }
+    return true;
+  }
+
+  if (debug.UPGRADES?.airfieldExpansion) {
+    debug.UPGRADES.airfieldExpansion.name = 'Усиленная аэродромная служба';
+    debug.UPGRADES.airfieldExpansion.description = 'Ускоряет ремонт, заправку и подготовку самолётов на 35%. Вместимость каждого аэродрома уже составляет 12 самолётов.';
+  }
+
+  GameClass.prototype.getAirfieldCapacity = function(field) {
+    return isAirfield93(field) ? HANGAR_CAPACITY93 : 0;
+  };
+
+  GameClass.prototype.getTeamAirFleetState93 = function(teamKey, force = false) {
+    const tick = Math.floor((Number(this.time) || 0) * 4);
+    const cached = this._teamAirFleetState93?.[teamKey];
+    if (!force && cached?.tick === tick) return cached;
+    let capacity = 0;
+    let queued = 0;
+    for (const building of this.buildings) {
+      if (!building.alive || building.team !== teamKey) continue;
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+--- airfield #8 offset=6108 line=96 ---
+    .v93-air-quantity output { color: #f0f7f3; font-size: 10px; font-weight: 900; text-align: center; font-variant-numeric: tabular-nums; }
+    .v93-air-unit-list { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+    .v93-air-unit-chip { min-height: 28px; padding: 3px 7px; font-size: 8.5px; color: #b9cfc3; }
+    .v93-air-unit-chip[data-air-stage93="ready"] { border-color: rgba(108,223,155,.42); color: #bff0d1; }
+    .v93-air-unit-chip[data-air-stage93="service"] { border-color: rgba(244,197,105,.42); color: #f1d39a; }
+    .v93-air-unit-chip[data-air-stage93="return"], .v93-air-unit-chip[data-air-stage93="launch"] { border-color: rgba(113,188,231,.42); color: #b7dff4; }
+    #action-panel.production-layout.v93-airfield-layout #action-buttons {
+      overflow-y: auto !important; grid-template-rows: none !important; grid-auto-rows: auto !important; align-content: start !important;
+    }
+    #action-panel.production-layout.v93-airfield-layout .action-button[data-action-kind="unit"] { min-height: 50px !important; height: 50px !important; }
+    @media (max-width: 920px), (pointer: coarse) {
+      .v93-air-type { grid-template-columns: 1fr; }
+      .v93-air-quantity { grid-template-columns: 34px 44px 34px minmax(92px,1fr) 46px; }
+      .v93-air-quantity button, .v93-air-unit-chip { min-height: 34px; }
+    }
+  `;
+  document.head.appendChild(style93);
+
+  function ensureSortieResource93(unit) {
+    if (!isFixedWing93(unit)) return false;
+    debug.v74EnsureAircraftLogistics?.(unit);
+    const previousMax = Math.max(1, Number(unit.sortieFuelMax) || MIN_SORTIE_RESOURCE93);
+    const previousFuel = clamp93(Number(unit.sortieFuel) || 0, 0, previousMax);
+    if (previousMax < MIN_SORTIE_RESOURCE93) {
+      unit.sortieFuelMax = MIN_SORTIE_RESOURCE93;
+      unit.sortieFuel = clamp93(previousFuel / previousMax * unit.sortieFuelMax, 0, unit.sortieFuelMax);
+    }
+    return true;
+  }
+
+  if (debug.UPGRADES?.airfieldExpansion) {
+    debug.UPGRADES.airfieldExpansion.name = 'Усиленная аэродромная служба';
+    debug.UPGRADES.airfieldExpansion.description = 'Ускоряет ремонт, заправку и подготовку самолётов на 35%. Вместимость каждого аэродрома уже составляет 12 самолётов.';
+  }
+
+  GameClass.prototype.getAirfieldCapacity = function(field) {
+    return isAirfield93(field) ? HANGAR_CAPACITY93 : 0;
+  };
+
+  GameClass.prototype.getTeamAirFleetState93 = function(teamKey, force = false) {
+    const tick = Math.floor((Number(this.time) || 0) * 4);
+    const cached = this._teamAirFleetState93?.[teamKey];
+    if (!force && cached?.tick === tick) return cached;
+    let capacity = 0;
+    let queued = 0;
+    for (const building of this.buildings) {
+      if (!building.alive || building.team !== teamKey) continue;
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+      if (!AIRFIELD_TYPES93.has(building.typeId) || !Array.isArray(building.queue)) continue;
+      for (const item of building.queue) {
+        if (item?.kind !== 'unit') continue;
+        const stats = debug.getUnitStats?.(item.id, this.teams[teamKey]);
+        if (isFixedWingStats93(stats, item.id)) queued += 1;
+      }
+    }
+    let aircraft = 0;
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+    this._teamAirFleetState93 ||= Object.create(null);
+    this._teamAirFleetState93[teamKey] = state;
+    return state;
+  };
+
+  GameClass.prototype.invalidateTeamAirFleetState93 = function(teamKey = null) {
+    if (!this._teamAirFleetState93) return;
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+
+### NEEDLE airbase count_sample=10
+--- airbase #5 offset=34946 line=658 ---
+            button.title = `${stats.role}\nАвиапарк заполнен: ${fleet.committed}/${fleet.capacity}. Для нового самолёта постройте дополнительный аэродром.`;
+          }
+        }
+      }
+    }
+    return result;
+  };
+
+  GameClass.prototype.selectAirWing93 = function(field) {
+    const ready = this.getAirfieldReadyAircraft93(field);
+    if (!ready.length) {
+      this.alert('На этом аэродроме пока нет самолётов с готовностью 100%', 'warning', field.x, field.y);
+      return false;
+    }
+    this.setSelection(ready, false);
+    this.updateUI(true);
+    this.alert(`Авиагруппа выбрана: ${ready.length}. Укажите цель или маршрут — самолёты сразу начнут взлёт`, 'info', field.x, field.y);
+    return true;
+  };
+
+  GameClass.prototype.issueAirReturn93 = function() {
+    const aircraft = this.getSelectedUnits().filter(isFixedWing93);
+    let accepted = 0;
+    for (const unit of aircraft) {
+      if (isHangarCommand93(unit)) {
+        const command = unit.currentCommand;
+        const wasTemporary = Boolean(command.temporaryService93 || unit.airSavedCommands.length || command.stage === 'launch');
+        if (!wasTemporary) continue;
+        unit.airSavedCommands = [];
+        command.temporaryService93 = false;
+        command.reason = 'приказ на возвращение';
+        unit.airServiceReason = command.reason;
+        if (command.stage === 'launch') {
+          command.stage = 'return';
+          unit.airServiceState = 'return';
+          unit.airServiceTimer = 0;
+          delete command.slot;
+        }
+        unit.invalidateNavigation();
+        unit.game.uiDirty = true;
+        accepted += 1;
+      } else if (unit.requestAirHangar93('приказ на возвращение', null, false)) accepted += 1;
+    }
+    if (accepted) this.updateUI(true);
+    if (accepted) this.alert(`Возврат на базу: ${accepted} самолётов · задания отменены`, 'info');
+    return accepted;
+  };
+
+  GameClass.prototype.ensureAirbaseCommandButtons93 = function() {
+    const commandButtons = document.getElementById('command-buttons');
+    if (!commandButtons) return;
+    const primary = this.getPrimarySelection?.();
+    const field = this.selected?.length === 1 && primary?.kind === 'building' && primary.team === 'player' && isAirfield93(primary) ? primary : null;
+    let wingButton = commandButtons.querySelector('[data-air-wing93]');
+    if (!field) wingButton?.remove();
+    else {
+      if (!wingButton || wingButton.dataset.fieldId !== String(field.id)) {
+        wingButton?.remove();
+        wingButton = document.createElement('button');
+        wingButton.type = 'button';
+        wingButton.className = 'action-button command-button';
+        wingButton.dataset.airWing93 = 'true';
+        wingButton.dataset.fieldId = field.id;
+        wingButton.addEventListener('click', () => {
+          const liveField = this.getEntity(wingButton.dataset.fieldId);
+          if (liveField) this.selectAirWing93(liveField);
+        });
+        commandButtons.prepend(wingButton);
+      }
+      const ready = this.getAirfieldReadyAircraft93(field).length;
+      wingButton.disabled = ready === 0;
+      wingButton.textContent = `✈ · Авиагруппа ${ready}/12`;
+      wingButton.title = ready ? `Выбрать ${ready} полностью готовых самолётов. Затем укажите цель или маршрут.` : 'Нет полностью готовых самолётов';
+    }
+
+    const selectedFixed = this.getSelectedUnits?.().filter(isFixedWing93) || [];
+    const returning = selectedFixed.filter((unit) => !isHangarCommand93(unit) ||
+      unit.currentCommand.temporaryService93 || unit.airSavedCommands.length || unit.currentCommand.stage === 'launch');
+    let returnButton = commandButtons.querySelector('[data-air-return93]');
+    if (!selectedFixed.length) returnButton?.remove();
+--- airbase #6 offset=38169 line=717 ---
+    const selectedFixed = this.getSelectedUnits?.().filter(isFixedWing93) || [];
+    const returning = selectedFixed.filter((unit) => !isHangarCommand93(unit) ||
+      unit.currentCommand.temporaryService93 || unit.airSavedCommands.length || unit.currentCommand.stage === 'launch');
+    let returnButton = commandButtons.querySelector('[data-air-return93]');
+    if (!selectedFixed.length) returnButton?.remove();
+    else {
+      if (!returnButton) {
+        returnButton = document.createElement('button');
+        returnButton.type = 'button';
+        returnButton.className = 'action-button command-button';
+        returnButton.dataset.airReturn93 = 'true';
+        returnButton.addEventListener('click', () => this.issueAirReturn93());
+        commandButtons.appendChild(returnButton);
+      }
+      returnButton.disabled = returning.length === 0;
+      returnButton.textContent = returning.length ? `⌂ · На аэродром · ${returning.length}` : '⌂ · Уже в ангарах';
+      returnButton.title = 'Ручной возврат: отменить патруль или охрану и оставить самолёты на аэродроме после обслуживания';
+    }
+  };
+
+  const baseRenderSelectionUI93 = GameClass.prototype.renderSelectionUI;
+  GameClass.prototype.renderSelectionUI = function(...args) {
+    const result = baseRenderSelectionUI93.apply(this, args);
+    const primary = this.selected?.length === 1 ? this.selected[0] : null;
+    const details = document.getElementById('selection-details');
+    if (primary?.kind === 'building' && isAirfield93(primary) && details) {
+      const oldCapacity = details.querySelector('.v76-airfield-capacity');
+      if (oldCapacity) {
+        const expansion = oldCapacity.nextElementSibling;
+        oldCapacity.remove();
+        if (expansion?.textContent?.includes('Расширение')) expansion.remove();
+      }
+      details.querySelector('[data-airbase93]')?.remove();
+      const ready = this.getAirfieldReadyAircraft93(primary).length;
+      const service = this.getAirfieldServiceAircraft93(primary).length;
+      const away = this.getAirfieldAircraftAway93(primary).length;
+      const queued = this.getAirfieldQueuedAircraft93(primary);
+      const fleet = this.getTeamAirFleetState93(primary.team);
+      const accelerated = this.teams[primary.team]?.upgrades?.has('airfieldExpansion');
+      const free = Math.max(0, fleet.capacity - fleet.committed);
+      details.insertAdjacentHTML('beforeend', `<div data-airbase93><div class="stat-line v93-airbase-ready"><span>В ангарах · готовность 100%</span><strong>${ready} / 12</strong></div><div class="stat-line v93-airbase-service"><span>Посадка / взлёт / обслуживание / производство</span><strong>${service + queued}</strong></div><div class="stat-line v93-airbase-away"><span>На боевых заданиях</span><strong>${away}</strong></div><div class="stat-line v93-fleet-capacity${free === 0 ? ' is-full' : ''}"><span>Общий авиапарк</span><strong>${fleet.committed} / ${fleet.capacity} · свободно ${free}</strong></div><div class="stat-line"><span>Аэродромная служба</span><strong>${accelerated ? 'ускоренная +35%' : 'штатная'}</strong></div></div>`);
+    } else if (primary?.kind === 'unit' && isFixedWing93(primary) && details) {
+      const priceLine = [...details.querySelectorAll('.stat-line')].find((line) => line.querySelector('span')?.textContent === 'Цена пополнения');
+      if (priceLine) priceLine.innerHTML = '<span>Подготовка в ангаре</span><strong>полное пополнение</strong>';
+      const badge = [...details.querySelectorAll('.air-service-badge')].find((line) => line.querySelector('span')?.textContent === 'Авиационная логистика');
+      if (badge && isStoredReady93(primary)) badge.querySelector('strong').textContent = 'в ангаре · готовность 100%';
+--- airbase #7 offset=38740 line=725 ---
+        returnButton.className = 'action-button command-button';
+        returnButton.dataset.airReturn93 = 'true';
+        returnButton.addEventListener('click', () => this.issueAirReturn93());
+        commandButtons.appendChild(returnButton);
+      }
+      returnButton.disabled = returning.length === 0;
+      returnButton.textContent = returning.length ? `⌂ · На аэродром · ${returning.length}` : '⌂ · Уже в ангарах';
+      returnButton.title = 'Ручной возврат: отменить патруль или охрану и оставить самолёты на аэродроме после обслуживания';
+    }
+  };
+
+  const baseRenderSelectionUI93 = GameClass.prototype.renderSelectionUI;
+  GameClass.prototype.renderSelectionUI = function(...args) {
+    const result = baseRenderSelectionUI93.apply(this, args);
+    const primary = this.selected?.length === 1 ? this.selected[0] : null;
+    const details = document.getElementById('selection-details');
+    if (primary?.kind === 'building' && isAirfield93(primary) && details) {
+      const oldCapacity = details.querySelector('.v76-airfield-capacity');
+      if (oldCapacity) {
+        const expansion = oldCapacity.nextElementSibling;
+        oldCapacity.remove();
+        if (expansion?.textContent?.includes('Расширение')) expansion.remove();
+      }
+      details.querySelector('[data-airbase93]')?.remove();
+      const ready = this.getAirfieldReadyAircraft93(primary).length;
+      const service = this.getAirfieldServiceAircraft93(primary).length;
+      const away = this.getAirfieldAircraftAway93(primary).length;
+      const queued = this.getAirfieldQueuedAircraft93(primary);
+      const fleet = this.getTeamAirFleetState93(primary.team);
+      const accelerated = this.teams[primary.team]?.upgrades?.has('airfieldExpansion');
+      const free = Math.max(0, fleet.capacity - fleet.committed);
+      details.insertAdjacentHTML('beforeend', `<div data-airbase93><div class="stat-line v93-airbase-ready"><span>В ангарах · готовность 100%</span><strong>${ready} / 12</strong></div><div class="stat-line v93-airbase-service"><span>Посадка / взлёт / обслуживание / производство</span><strong>${service + queued}</strong></div><div class="stat-line v93-airbase-away"><span>На боевых заданиях</span><strong>${away}</strong></div><div class="stat-line v93-fleet-capacity${free === 0 ? ' is-full' : ''}"><span>Общий авиапарк</span><strong>${fleet.committed} / ${fleet.capacity} · свободно ${free}</strong></div><div class="stat-line"><span>Аэродромная служба</span><strong>${accelerated ? 'ускоренная +35%' : 'штатная'}</strong></div></div>`);
+    } else if (primary?.kind === 'unit' && isFixedWing93(primary) && details) {
+      const priceLine = [...details.querySelectorAll('.stat-line')].find((line) => line.querySelector('span')?.textContent === 'Цена пополнения');
+      if (priceLine) priceLine.innerHTML = '<span>Подготовка в ангаре</span><strong>полное пополнение</strong>';
+      const badge = [...details.querySelectorAll('.air-service-badge')].find((line) => line.querySelector('span')?.textContent === 'Авиационная логистика');
+      if (badge && isStoredReady93(primary)) badge.querySelector('strong').textContent = 'в ангаре · готовность 100%';
+      else if (badge && isHangarCommand93(primary) && primary.currentCommand.temporaryService93 && primary.airSavedCommands.length) {
+        const mission = primary.airSavedCommands.some((command) => command.type === 'guard') ? 'охрана' : 'патруль';
+        badge.querySelector('strong').textContent = `обслуживание · затем ${mission}`;
+      }
+    }
+    this.ensureAirbaseCommandButtons93();
+    return result;
+  };
+
+  const baseDrawAirUnit93 = GameClass.prototype.drawAirUnit3D;
+  GameClass.prototype.drawAirUnit3D = function(unit) {
+
+### NEEDLE aircraft count_sample=10
+--- aircraft #2 offset=7315 line=121 ---
+  document.head.appendChild(style93);
+
+  function ensureSortieResource93(unit) {
+    if (!isFixedWing93(unit)) return false;
+    debug.v74EnsureAircraftLogistics?.(unit);
+    const previousMax = Math.max(1, Number(unit.sortieFuelMax) || MIN_SORTIE_RESOURCE93);
+    const previousFuel = clamp93(Number(unit.sortieFuel) || 0, 0, previousMax);
+    if (previousMax < MIN_SORTIE_RESOURCE93) {
+      unit.sortieFuelMax = MIN_SORTIE_RESOURCE93;
+      unit.sortieFuel = clamp93(previousFuel / previousMax * unit.sortieFuelMax, 0, unit.sortieFuelMax);
+    }
+    return true;
+  }
+
+  if (debug.UPGRADES?.airfieldExpansion) {
+    debug.UPGRADES.airfieldExpansion.name = 'Усиленная аэродромная служба';
+    debug.UPGRADES.airfieldExpansion.description = 'Ускоряет ремонт, заправку и подготовку самолётов на 35%. Вместимость каждого аэродрома уже составляет 12 самолётов.';
+  }
+
+  GameClass.prototype.getAirfieldCapacity = function(field) {
+    return isAirfield93(field) ? HANGAR_CAPACITY93 : 0;
+  };
+
+  GameClass.prototype.getTeamAirFleetState93 = function(teamKey, force = false) {
+    const tick = Math.floor((Number(this.time) || 0) * 4);
+    const cached = this._teamAirFleetState93?.[teamKey];
+    if (!force && cached?.tick === tick) return cached;
+    let capacity = 0;
+    let queued = 0;
+    for (const building of this.buildings) {
+      if (!building.alive || building.team !== teamKey) continue;
+      if (isAirfield93(building)) capacity += HANGAR_CAPACITY93;
+      if (!AIRFIELD_TYPES93.has(building.typeId) || !Array.isArray(building.queue)) continue;
+      for (const item of building.queue) {
+        if (item?.kind !== 'unit') continue;
+        const stats = debug.getUnitStats?.(item.id, this.teams[teamKey]);
+        if (isFixedWingStats93(stats, item.id)) queued += 1;
+      }
+    }
+    let aircraft = 0;
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === teamKey && isFixedWing93(unit)) aircraft += 1;
+    }
+    const state = { tick, capacity, aircraft, queued, committed: aircraft + queued };
+    this._teamAirFleetState93 ||= Object.create(null);
+    this._teamAirFleetState93[teamKey] = state;
+    return state;
+  };
+
+  GameClass.prototype.invalidateTeamAirFleetState93 = function(teamKey = null) {
+    if (!this._teamAirFleetState93) return;
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+  };
+
+  GameClass.prototype.getAirfieldAircraftState93 = function(field) {
+    if (!field) return { assigned: [], ready: [], service: [], away: [], hangar: [] };
+    const tick = Math.floor((Number(this.time) || 0) * 5);
+    const cache = this._airfieldAircraftState93;
+    if (cache?.fieldId === field.id && cache.tick === tick) return cache.state;
+    const assigned = [];
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === field.team && isFixedWing93(unit) && unit.airServiceTargetId === field.id) assigned.push(unit);
+    }
+    const hangar = assigned.filter(isHangarCommand93);
+    const ready = hangar.filter(isStoredReady93);
+    const service = hangar.filter((unit) => ['return', 'service', 'launch'].includes(unit.currentCommand.stage));
+    const away = assigned.filter((unit) => !isHangarCommand93(unit) && !unit.airServiceState);
+    const state = { assigned, ready, service, away, hangar };
+    this._airfieldAircraftState93 = { fieldId: field.id, tick, state };
+    return state;
+  };
+
+  GameClass.prototype.getAirfieldOccupancy = function(field, excludeUnitId = null) {
+    if (!field) return 0;
+    return this.units.filter((unit) => unit.alive && unit.id !== excludeUnitId && isFixedWing93(unit) &&
+--- aircraft #10 offset=9610 line=170 ---
+    if (teamKey) delete this._teamAirFleetState93[teamKey];
+    else this._teamAirFleetState93 = Object.create(null);
+  };
+
+  GameClass.prototype.getAirfieldAircraftState93 = function(field) {
+    if (!field) return { assigned: [], ready: [], service: [], away: [], hangar: [] };
+    const tick = Math.floor((Number(this.time) || 0) * 5);
+    const cache = this._airfieldAircraftState93;
+    if (cache?.fieldId === field.id && cache.tick === tick) return cache.state;
+    const assigned = [];
+    for (const unit of this.units) {
+      if (unit.alive && unit.team === field.team && isFixedWing93(unit) && unit.airServiceTargetId === field.id) assigned.push(unit);
+    }
+    const hangar = assigned.filter(isHangarCommand93);
+    const ready = hangar.filter(isStoredReady93);
+    const service = hangar.filter((unit) => ['return', 'service', 'launch'].includes(unit.currentCommand.stage));
+    const away = assigned.filter((unit) => !isHangarCommand93(unit) && !unit.airServiceState);
+    const state = { assigned, ready, service, away, hangar };
+    this._airfieldAircraftState93 = { fieldId: field.id, tick, state };
+    return state;
+  };
+
+  GameClass.prototype.getAirfieldOccupancy = function(field, excludeUnitId = null) {
+    if (!field) return 0;
+    return this.units.filter((unit) => unit.alive && unit.id !== excludeUnitId && isFixedWing93(unit) &&
+      unit.airServiceTargetId === field.id).length;
+  };
+
+  GameClass.prototype.getAirfieldQueuedAircraft93 = function(field) {
+    if (!field || !Array.isArray(field.queue)) return 0;
+    return field.queue.filter((item) => {
+      if (item?.kind !== 'unit') return false;
+      const stats = debug.getUnitStats?.(item.id, this.teams[field.team]);
+      return isFixedWingStats93(stats, item.id);
+    }).length;
+  };
+
+  GameClass.prototype.getAirfieldReadyAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).ready;
+  };
+
+  GameClass.prototype.getAirfieldServiceAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).service;
+  };
+
+  GameClass.prototype.getAirfieldAircraftAway93 = function(field) {
+    return this.getAirfieldAircraftState93(field).away;
+  };
+
+  GameClass.prototype.findOperationalAirfield = function(teamKey, x, y, excludeUnitId = null) {
+    const team = this.teams[teamKey];
+    const fields = this.buildings.filter((field) => isAirfield93(field) && field.team === teamKey &&
+      field.sabotagedUntil <= this.time && this.getAirfieldOccupancy(field, excludeUnitId) < this.getAirfieldCapacity(field));
+    if (!fields.length) return null;
+    return fields.sort((a, b) => {
+      const powerPenalty = team?.powerProduced > 0 && team?.powerFactor >= .38 ? 0 : 700;
+      const loadA = this.getAirfieldOccupancy(a, excludeUnitId) / HANGAR_CAPACITY93;
+      const loadB = this.getAirfieldOccupancy(b, excludeUnitId) / HANGAR_CAPACITY93;
+      return Math.hypot(a.x - x, a.y - y) + powerPenalty + loadA * 620 -
+        (Math.hypot(b.x - x, b.y - y) + powerPenalty + loadB * 620);
+    })[0] || null;
+  };
+
+  GameClass.prototype.getAirHangarPosition93 = function(field, unit, command = unit.currentCommand) {
+    const occupied = new Set(this.units.filter((other) => other.alive && other !== unit && isFixedWing93(other) &&
+      other.airServiceTargetId === field.id && isHangarCommand93(other) && Number.isInteger(other.currentCommand.slot))
+      .map((other) => other.currentCommand.slot));
+    let slot = Number.isInteger(command?.slot) ? command.slot : -1;
+    if (slot < 0 || slot >= HANGAR_CAPACITY93 || occupied.has(slot)) {
+      let hash = 0;
+      for (const char of String(unit.id || 'aircraft')) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+
+### NEEDLE helicopter count_sample=1
+
+### NEEDLE rearm count_sample=0
+
+### NEEDLE refuel count_sample=0
+
+### NEEDLE stock count_sample=0

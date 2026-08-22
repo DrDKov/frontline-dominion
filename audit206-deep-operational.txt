@@ -1,0 +1,622 @@
+BUILD206 DEEP AUDIT operational: operational-core-v160.js
+bytes=28195 lines=231
+
+### NEEDLE supply160 count_sample=10
+--- supply160 #1 offset=3536 line=55 ---
+    for(const k of ['x','y','targetId','buildingId','resourceId']) if(command[k]!=null)c[k]=command[k];
+    this.events.push(c); if(this.events.length>50000)this.events.splice(0,5000);
+  }
+}
+const COMMANDS=new CommandRegistry160();
+['move','patrol','hold','stop','harvest','repair','heal','transport','unload','mineField','returnToBase'].forEach(x=>COMMANDS.define(x));
+['attack','attackMove'].forEach(x=>COMMANDS.define(x,{supportForbidden:true}));
+
+function makeSectors(game){
+  const cols=3,rows=3,arr=[];
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+    const id=`S${y*cols+x+1}`; const x0=x*WORLD.width/cols,y0=y*WORLD.height/rows,x1=(x+1)*WORLD.width/cols,y1=(y+1)*WORLD.height/rows;
+    arr.push({id,index:y*cols+x,x0,y0,x1,y1,x:(x0+x1)/2,y:(y0+y1)/2,control:0,owner:'neutral',value:1,playerPower:0,enemyPower:0,resourceValue:0,infraValue:0,roadValue:0,lastChanged:0});
+  }
+  for(const s of arr){
+    for(const r of game.resources||[]) if(r.x>=s.x0&&r.x<s.x1&&r.y>=s.y0&&r.y<s.y1) s.resourceValue+=Math.min(5,(Number(r.amount)||100000)/150000);
+    for(const b of game.buildings||[]) if(b.x>=s.x0&&b.x<s.x1&&b.y>=s.y0&&b.y<s.y1) s.infraValue+=b.team==='neutral'?1.5:0.4;
+    for(const road of game.roads||[]) for(const p of road||[]) if(p.x>=s.x0&&p.x<s.x1&&p.y>=s.y0&&p.y<s.y1){s.roadValue+=0.18;break;}
+    s.value=1+s.resourceValue*0.75+s.infraValue+s.roadValue;
+  }
+  return arr;
+}
+function sectorFor(core,x,y){const c=clamp(Math.floor(x/(WORLD.width/3)),0,2),r=clamp(Math.floor(y/(WORLD.height/3)),0,2);return core.sectors[r*3+c];}
+function roadAxes(game){return (game.roads||[]).slice(0,6).map((r,i)=>({id:`R${i+1}`,kind:r.kind||'road',width:r.width||120,points:r.map(p=>({x:p.x,y:p.y}))}));}
+
+function ensureUnitState(u){
+  if(!Number.isFinite(u.suppression160))u.suppression160=0;
+  if(!Number.isFinite(u.cohesion160))u.cohesion160=1;
+  if(!Number.isFinite(u.supply160))u.supply160=1;
+  if(!Number.isFinite(u.morale160))u.morale160=1;
+  if(!Number.isFinite(u.lastSuppressedAt160))u.lastSuppressedAt160=-999;
+  if(!u.functionalDamage160)u.functionalDamage160={engine:0,sensors:0,weapon:0};
+  return u;
+}
+function detectionRadius(e){return Math.max(Number(e?.detector)||Number(e?.stats?.detector)||0,Number(e?.vision)||Number(e?.stats?.vision)||0)*1.05;}
+function enemyCanObserve(game,target){
+  const observers=[];
+  for(const u of game.units||[]) if(u.alive&&u.team==='enemy'&&!u.embarkedIn) observers.push(u);
+  for(const b of game.buildings||[]) if(b.alive&&b.team==='enemy'&&b.buildProgress>=0.85) observers.push(b);
+  for(const o of observers){const r=detectionRadius(o);if(r>0&&dist(o,target)<=r)return true;}
+  return false;
+}
+
+class OperationalCore160 {
+  constructor(game,data=null){
+    this.game=game;this.version=VERSION;this.build=BUILD;this.cols=3;this.rows=3;this.sectors=makeSectors(game);this.roads=roadAxes(game);
+    this.contacts=new Map();this.operations=[];this.nextOperationId=1;this.reserveIds=[];this.commandRegistry=COMMANDS;
+    this.commandLog=[];this.hashHistory=[];this.workerHash=0;this.workerTick=0;this.workerReady=false;this.lastWorkerAt=0;
+    this.timers={sector:0,intel:0,supply:0,morale:0.4,income:2,ai:4,worker:0.5,doctrine:0};
+    this.metrics={workerMessages:0,sectorFlips:0,contactsCreated:0,operationsCreated:0,operationsAborted:0,operationsSucceeded:0};
+    this.worker=null;this.initWorker(); if(data)this.hydrate(data);
+  }
+  initWorker(){
+    try{this.worker=new Worker('/frontline-dominion/operational-core-worker-v160.js?build=206');this.worker.onmessage=(e)=>this.onWorker(e.data);this.worker.onerror=()=>{this.workerReady=false;};this.workerReady=true;}catch(e){this.workerReady=false;}
+  }
+  onWorker(m){if(m?.type!=='result')return;this.workerHash=m.hash>>>0;this.workerTick=m.tick||0;this.metrics.workerMessages++;for(const r of m.sectors||[]){const s=this.sectors.find(x=>x.id===r.id);if(s){s.playerPower=r.playerPower;s.enemyPower=r.enemyPower;}}}
+--- supply160 #3 offset=7070 line=90 ---
+    try{this.worker=new Worker('/frontline-dominion/operational-core-worker-v160.js?build=206');this.worker.onmessage=(e)=>this.onWorker(e.data);this.worker.onerror=()=>{this.workerReady=false;};this.workerReady=true;}catch(e){this.workerReady=false;}
+  }
+  onWorker(m){if(m?.type!=='result')return;this.workerHash=m.hash>>>0;this.workerTick=m.tick||0;this.metrics.workerMessages++;for(const r of m.sectors||[]){const s=this.sectors.find(x=>x.id===r.id);if(s){s.playerPower=r.playerPower;s.enemyPower=r.enemyPower;}}}
+  serialize(){return {version:this.version,build:this.build,sectors:this.sectors.map(s=>({...s})),contacts:[...this.contacts.values()].map(c=>({...c})),operations:this.operations.map(o=>({...o,path:safeArray(o.path).map(p=>({...p})),unitIds:[...(o.unitIds||[])]})),nextOperationId:this.nextOperationId,reserveIds:[...this.reserveIds],commandLog:this.commandLog.slice(-10000),hashHistory:this.hashHistory.slice(-256),metrics:{...this.metrics}};}
+  hydrate(d){
+    if(!d)return;if(Array.isArray(d.sectors))for(const saved of d.sectors){const s=this.sectors.find(x=>x.id===saved.id);if(s)Object.assign(s,saved);}
+    this.contacts=new Map(safeArray(d.contacts).map(c=>[c.id,c]));this.operations=safeArray(d.operations).map(o=>({...o,path:safeArray(o.path),unitIds:safeArray(o.unitIds)}));this.nextOperationId=d.nextOperationId||1;this.reserveIds=safeArray(d.reserveIds);this.commandLog=safeArray(d.commandLog);this.hashHistory=safeArray(d.hashHistory);Object.assign(this.metrics,d.metrics||{});
+  }
+  update(dt){
+    const g=this.game;if(g.paused||g.ended)return;
+    for(const u of g.units||[]){if(!u.alive)continue;ensureUnitState(u);const faction=g.teams?.[u.team]?.faction||'';const recoveryDoctrine=faction==='vanguard'?1.18:faction==='dominion'?.96:1.04;const recovery=(g.time-u.lastSuppressedAt160>3?0.095:0.035)*dt*recoveryDoctrine;u.suppression160=clamp(u.suppression160-recovery,0,1);const supplyThreshold=faction==='specter'?.34:.45;const supplyPenalty=Math.max(0,supplyThreshold-u.supply160);const cohesionDoctrine=faction==='vanguard'?1.12:faction==='dominion'?.96:1.02;const targetC=clamp(1-u.suppression160*0.72-supplyPenalty*0.65,0.12,1);u.cohesion160+=clamp(targetC-u.cohesion160,-dt*0.035,dt*0.055*cohesionDoctrine);u.morale160=clamp(u.cohesion160*(0.72+0.28*u.supply160),0,1);}
+    for(const k of Object.keys(this.timers))this.timers[k]-=dt;
+    if(this.timers.sector<=0){this.timers.sector=0.8;this.updateSectors();}
+    if(this.timers.intel<=0){this.timers.intel=0.65;this.updateIntel();}
+    if(this.timers.supply<=0){this.timers.supply=1.2;this.updateSupply();}
+    if(this.timers.morale<=0){this.timers.morale=.4;this.manageMorale();}
+    if(this.timers.income<=0){this.timers.income=2;this.applyTerritoryIncome();}
+    if(this.timers.ai<=0){this.timers.ai=4.0;this.updateAI();}
+    if(this.timers.worker<=0){this.timers.worker=1.0;this.sendWorker();}
+    this.updateOperations(dt);
+  }
+  updateSectors(){
+    const g=this.game;
+    for(const s of this.sectors){let pp=0,ep=0;for(const u of g.units||[]){if(!combatUnit(u)||u.x<s.x0||u.x>=s.x1||u.y<s.y0||u.y>=s.y1)continue;ensureUnitState(u);const p=unitValue(u)*(0.3+0.7*u.healthRatio)*(0.45+0.55*u.cohesion160);if(u.team==='player')pp+=p;else if(u.team==='enemy')ep+=p;}s.playerPower=pp;s.enemyPower=ep;const total=pp+ep;const bias=total?(pp-ep)/total:0;s.control=clamp(s.control*0.86+bias*0.14,-1,1);const old=s.owner;s.owner=s.control>0.28?'player':s.control<-0.28?'enemy':'contested';if(old!==s.owner){s.lastChanged=g.time;this.metrics.sectorFlips++;}}
+  }
+  updateIntel(){
+    const g=this.game,now=g.time,seen=new Set();
+    for(const p of g.units||[]){if(!p.alive||p.team!=='player')continue;if(!enemyCanObserve(g,p)&&now-(p.lastShotAt||-999)>4)continue;const id=p.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'unit',firstSeenAt:now,confidence:0.45};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=p.x;c.y=p.y;c.typeId=p.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.105:0.18),0,1);c.value=unitValue(p);c.air=Boolean(p.air);c.infantry=Boolean(p.infantry);}
+--- supply160 #5 offset=11031 line=114 ---
+    for(const b of g.buildings||[]){if(!b.alive||b.team!=='player')continue;if(!enemyCanObserve(g,b))continue;const id=b.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'building',firstSeenAt:now,confidence:0.55};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=b.x;c.y=b.y;c.typeId=b.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.15:0.22),0,1);c.value=Number(b.stats?.cost)||1000;}
+    for(const [id,c] of this.contacts){if(!seen.has(id)){const age=now-(c.lastSeenAt||now);c.confidence=clamp(c.confidence-Math.min(0.12,age*0.0025),0,1);if(age>180||c.confidence<0.05)this.contacts.delete(id);}}
+  }
+  supplySources(team){const g=this.game,out=[];const faction=g.teams?.[team]?.faction||'';const radiusDoctrine=faction==='dominion'?1.16:faction==='specter'?.92:1;for(const b of g.buildings||[]){if(!b.alive||b.team!==team||b.buildProgress<0.9)continue;const t=`${b.typeId} ${b.stats?.name||''}`.toLowerCase();if(/command|logistics|refinery|silo|outpost|depot|airfield|barracks/.test(t))out.push({x:b.x,y:b.y,r:(700+(Number(b.stats?.radius)||50)*4)*radiusDoctrine,p:faction==='dominion'?1:.96});}for(const u of g.units||[])if(u.alive&&u.team===team&&/resourceTruck|transport|commandVehicle/i.test(u.typeId))out.push({x:u.x,y:u.y,r:420,p:0.72});return out;}
+  updateSupply(){
+    const sources={player:this.supplySources('player'),enemy:this.supplySources('enemy')};
+    for(const u of this.game.units||[]){if(!u.alive||!['player','enemy'].includes(u.team))continue;ensureUnitState(u);let best=0;for(const s of sources[u.team]){const d=dist(u,s);if(d<s.r)best=Math.max(best,s.p*(1-d/s.r*0.45));}const sec=sectorFor(this,u.x,u.y);const territorial=sec?.owner===u.team?0.18:sec?.owner==='contested'?0.04:-0.10;const target=clamp(best+territorial,0.12,1);u.supply160+=clamp(target-u.supply160,-0.055,0.12);}
+  }
+  manageMorale(){
+    const g=this.game;
+    for(const u of g.units||[]){
+      if(!combatUnit(u)||u.air)continue;ensureUnitState(u);
+      const broken=u.suppression160>.78||u.cohesion160<.24||u.morale160<.22;
+      if(broken&&g.time>(u._v160RetreatUntil||0)){
+        u._v160ResumeCommand=u.currentCommand?{...u.currentCommand}:null;
+        const sources=this.supplySources(u.team);let best=null,bestD=Infinity;
+        for(const s of sources){const d=dist(u,s);if(d<bestD){bestD=d;best=s;}}
+        if(!best){best=u.team==='enemy'?(g.enemyBase||{x:WORLD.width-1800,y:WORLD.height/2}):(g.playerBase||{x:1800,y:WORLD.height/2});}
+        u._v160RetreatUntil=g.time+9;u._v160Retreating=true;u.setCommand({type:'move',x:best.x+(hashString(u.id+'mx')%260)-130,y:best.y+(hashString(u.id+'my')%260)-130,v160Retreat:true});
+      } else if(u._v160Retreating&&g.time>(u._v160RetreatUntil||0)&&u.suppression160<.35&&u.cohesion160>.48){
+        const resume=u._v160ResumeCommand;u._v160Retreating=false;u._v160ResumeCommand=null;if(resume)u.setCommand(resume);
+      }
+    }
+  }
+  applyTerritoryIncome(){
+    const g=this.game;
+    if(!g.stats.territoryIncome160)g.stats.territoryIncome160=0;
+    for(const team of ['player','enemy']){
+      let income=0;
+      for(const s of this.sectors)if(s.owner===team)income+=0.8+s.value*0.55;
+      income=Math.floor(income);
+      if(income>0&&g.teams?.[team]){g.teams[team].credits+=income;if(team==='player')g.stats.territoryIncome160+=income;}
+    }
+  }
+  operationTargets(){
+    const live=[...this.contacts.values()].filter(c=>c.confidence>0.22);const bySector=new Map();for(const c of live){const s=sectorFor(this,c.x,c.y);if(!s)continue;const cur=bySector.get(s.id)||{sector:s,score:0,contacts:[]};cur.score+=(c.value||100)*c.confidence*(c.kind==='building'?1.25:1);cur.contacts.push(c);bySector.set(s.id,cur);}return [...bySector.values()].sort((a,b)=>(b.score*b.sector.value)-(a.score*a.sector.value));
+--- supply160 #7 offset=22760 line=197 ---
+  COMMANDS.record(this.game,this,command,append);core.commandLog.push(COMMANDS.events[COMMANDS.events.length-1]);if(core.commandLog.length>20000)core.commandLog.splice(0,2000);return baseSetCommand.call(this,command,append);
+};
+
+const baseTakeDamage=Unit.prototype.takeDamage;
+Unit.prototype.takeDamage=function(rawDamage,source=null,damageType=null){
+  ensureUnitState(this);const before=this.hp;const result=baseTakeDamage.call(this,rawDamage,source,damageType);const dealt=Math.max(0,before-this.hp);if(dealt>0){const ratio=dealt/Math.max(1,this.maxHp);let shock=ratio*1.8;const text=`${damageType?.type||''} ${damageType?.name||''} ${source?.stats?.visualRole||''}`.toLowerCase();if(/artillery|rocket|explosive|bomb|missile/.test(text))shock*=1.35;this.suppression160=clamp(this.suppression160+shock,0,1);this.lastSuppressedAt160=this.game.time;this.cohesion160=clamp(this.cohesion160-ratio*0.42,0.08,1);if(this.vehicle&&!this.air){const hr=this.healthRatio;if(hr<.72){const roll=hashString(`${this.id}:${Math.floor(this.game.time*4)}:${Math.round(before)}`)%3;const key=['engine','sensors','weapon'][roll];const severity=hr<.35?.65:hr<.52?.42:.24;this.functionalDamage160[key]=Math.max(this.functionalDamage160[key]||0,severity);}}}return result;
+};
+
+// Cohesion/supply affect capability but never replace existing movement/combat code.
+const baseUnitUpdate=Unit.prototype.update;
+Unit.prototype.update=function(dt){ensureUnitState(this);const speed0=this.stats.speed,weapon=this.stats.weapon,acc0=weapon?.accuracy,rate0=weapon?.reload;if(this.healthRatio>.90&&this.functionalDamage160){for(const k of ['engine','sensors','weapon'])this.functionalDamage160[k]=Math.max(0,(this.functionalDamage160[k]||0)-dt*.08);}const engine=this.functionalDamage160?.engine||0,sensor=this.functionalDamage160?.sensors||0,weaponFault=this.functionalDamage160?.weapon||0;const mobility=clamp((1-(this.suppression160||0)*0.20+(this.supply160-1)*0.12)*(1-engine*.55),0.38,1.04);this.stats.speed=speed0*mobility;if(weapon){weapon.accuracy=Number(acc0||1)*clamp((1-this.suppression160*0.38)*(1-sensor*.45)*(1-weaponFault*.18),0.28,1);weapon.reload=Number(rate0||1)*clamp((1+this.suppression160*0.42+(1-this.supply160)*0.28)*(1+weaponFault*.65),1,2.6);}try{return baseUnitUpdate.call(this,dt);}finally{this.stats.speed=speed0;if(weapon){weapon.accuracy=acc0;weapon.reload=rate0;}}};
+
+const baseGameUpdate=Game.prototype.update;
+Game.prototype.update=function(dt){const result=baseGameUpdate.call(this,dt);ensureCore(this).update(Math.min(dt,0.06));return result;};
+
+// Versioned extension state: old v15 saves still load; v16 state is optional and migrates forward.
+const baseUnitSerialize160=Unit.prototype.serialize;
+Unit.prototype.serialize=function(){const data=baseUnitSerialize160.call(this);ensureUnitState(this);data.suppression160=this.suppression160;data.cohesion160=this.cohesion160;data.supply160=this.supply160;data.morale160=this.morale160;data.lastSuppressedAt160=this.lastSuppressedAt160;data.functionalDamage160={...this.functionalDamage160};data.v160Retreating=!!this._v160Retreating;return data;};
+const baseHydrate=Game.prototype.hydrate;
+Game.prototype.hydrate=function(data){this.__pendingOperationalCore160=data?.operationalCore160||null;const result=baseHydrate.call(this,data);const savedUnits=new Map(safeArray(data?.entities).filter(e=>e.kind==='unit').map(e=>[e.id,e]));for(const u of this.units||[]){const d=savedUnits.get(u.id);if(d){for(const k of ['suppression160','cohesion160','supply160','morale160','lastSuppressedAt160'])if(Number.isFinite(d[k]))u[k]=d[k];}if(d.functionalDamage160)u.functionalDamage160={...d.functionalDamage160};u._v160Retreating=!!d.v160Retreating;ensureUnitState(u);}ensureCore(this);delete this.__pendingOperationalCore160;return result;};
+--- supply160 #9 offset=23723 line=204 ---
+  ensureUnitState(this);const before=this.hp;const result=baseTakeDamage.call(this,rawDamage,source,damageType);const dealt=Math.max(0,before-this.hp);if(dealt>0){const ratio=dealt/Math.max(1,this.maxHp);let shock=ratio*1.8;const text=`${damageType?.type||''} ${damageType?.name||''} ${source?.stats?.visualRole||''}`.toLowerCase();if(/artillery|rocket|explosive|bomb|missile/.test(text))shock*=1.35;this.suppression160=clamp(this.suppression160+shock,0,1);this.lastSuppressedAt160=this.game.time;this.cohesion160=clamp(this.cohesion160-ratio*0.42,0.08,1);if(this.vehicle&&!this.air){const hr=this.healthRatio;if(hr<.72){const roll=hashString(`${this.id}:${Math.floor(this.game.time*4)}:${Math.round(before)}`)%3;const key=['engine','sensors','weapon'][roll];const severity=hr<.35?.65:hr<.52?.42:.24;this.functionalDamage160[key]=Math.max(this.functionalDamage160[key]||0,severity);}}}return result;
+};
+
+// Cohesion/supply affect capability but never replace existing movement/combat code.
+const baseUnitUpdate=Unit.prototype.update;
+Unit.prototype.update=function(dt){ensureUnitState(this);const speed0=this.stats.speed,weapon=this.stats.weapon,acc0=weapon?.accuracy,rate0=weapon?.reload;if(this.healthRatio>.90&&this.functionalDamage160){for(const k of ['engine','sensors','weapon'])this.functionalDamage160[k]=Math.max(0,(this.functionalDamage160[k]||0)-dt*.08);}const engine=this.functionalDamage160?.engine||0,sensor=this.functionalDamage160?.sensors||0,weaponFault=this.functionalDamage160?.weapon||0;const mobility=clamp((1-(this.suppression160||0)*0.20+(this.supply160-1)*0.12)*(1-engine*.55),0.38,1.04);this.stats.speed=speed0*mobility;if(weapon){weapon.accuracy=Number(acc0||1)*clamp((1-this.suppression160*0.38)*(1-sensor*.45)*(1-weaponFault*.18),0.28,1);weapon.reload=Number(rate0||1)*clamp((1+this.suppression160*0.42+(1-this.supply160)*0.28)*(1+weaponFault*.65),1,2.6);}try{return baseUnitUpdate.call(this,dt);}finally{this.stats.speed=speed0;if(weapon){weapon.accuracy=acc0;weapon.reload=rate0;}}};
+
+const baseGameUpdate=Game.prototype.update;
+Game.prototype.update=function(dt){const result=baseGameUpdate.call(this,dt);ensureCore(this).update(Math.min(dt,0.06));return result;};
+
+// Versioned extension state: old v15 saves still load; v16 state is optional and migrates forward.
+const baseUnitSerialize160=Unit.prototype.serialize;
+Unit.prototype.serialize=function(){const data=baseUnitSerialize160.call(this);ensureUnitState(this);data.suppression160=this.suppression160;data.cohesion160=this.cohesion160;data.supply160=this.supply160;data.morale160=this.morale160;data.lastSuppressedAt160=this.lastSuppressedAt160;data.functionalDamage160={...this.functionalDamage160};data.v160Retreating=!!this._v160Retreating;return data;};
+const baseHydrate=Game.prototype.hydrate;
+Game.prototype.hydrate=function(data){this.__pendingOperationalCore160=data?.operationalCore160||null;const result=baseHydrate.call(this,data);const savedUnits=new Map(safeArray(data?.entities).filter(e=>e.kind==='unit').map(e=>[e.id,e]));for(const u of this.units||[]){const d=savedUnits.get(u.id);if(d){for(const k of ['suppression160','cohesion160','supply160','morale160','lastSuppressedAt160'])if(Number.isFinite(d[k]))u[k]=d[k];}if(d.functionalDamage160)u.functionalDamage160={...d.functionalDamage160};u._v160Retreating=!!d.v160Retreating;ensureUnitState(u);}ensureCore(this);delete this.__pendingOperationalCore160;return result;};
+const baseSave=Game.prototype.save;
+Game.prototype.save=function(notify=true){const ok=baseSave.call(this,notify);if(!ok)return ok;try{const raw=D.storageGet(D.SAVE_KEY);const data=raw?JSON.parse(raw):null;if(data){data.operationalCore160=ensureCore(this).serialize();data.operationalSchemaVersion=3;D.storageSet(D.SAVE_KEY,JSON.stringify(data));}}catch(e){console.warn('[v16] extension save failed',e);}return ok;};
+
+// Export deterministic diagnostics/replay snapshot for automated verification and multiplayer debugging.
+Game.prototype.operationalDiagnostics160=function(){const c=ensureCore(this);return {version:VERSION,build:BUILD,time:this.time,workerReady:c.workerReady,workerHash:c.workerHash,localHash:c.stateHash(),subsystemHashes:c.subsystemHashes(),canonicalTeams:{player:1,enemy:2,neutral:0},sectors:c.sectors.map(s=>({id:s.id,owner:s.owner,control:s.control,value:s.value})),contacts:c.contacts.size,operations:c.operations.map(o=>({id:o.id,state:o.state,target:o.targetSectorId,units:c.opUnits(o).length})),reserve:c.reserveIds.length,commandLog:c.commandLog.length,metrics:{...c.metrics}};};
+
+### NEEDLE supply count_sample=10
+--- supply #3 offset=4785 line=75 ---
+    s.value=1+s.resourceValue*0.75+s.infraValue+s.roadValue;
+  }
+  return arr;
+}
+function sectorFor(core,x,y){const c=clamp(Math.floor(x/(WORLD.width/3)),0,2),r=clamp(Math.floor(y/(WORLD.height/3)),0,2);return core.sectors[r*3+c];}
+function roadAxes(game){return (game.roads||[]).slice(0,6).map((r,i)=>({id:`R${i+1}`,kind:r.kind||'road',width:r.width||120,points:r.map(p=>({x:p.x,y:p.y}))}));}
+
+function ensureUnitState(u){
+  if(!Number.isFinite(u.suppression160))u.suppression160=0;
+  if(!Number.isFinite(u.cohesion160))u.cohesion160=1;
+  if(!Number.isFinite(u.supply160))u.supply160=1;
+  if(!Number.isFinite(u.morale160))u.morale160=1;
+  if(!Number.isFinite(u.lastSuppressedAt160))u.lastSuppressedAt160=-999;
+  if(!u.functionalDamage160)u.functionalDamage160={engine:0,sensors:0,weapon:0};
+  return u;
+}
+function detectionRadius(e){return Math.max(Number(e?.detector)||Number(e?.stats?.detector)||0,Number(e?.vision)||Number(e?.stats?.vision)||0)*1.05;}
+function enemyCanObserve(game,target){
+  const observers=[];
+  for(const u of game.units||[]) if(u.alive&&u.team==='enemy'&&!u.embarkedIn) observers.push(u);
+  for(const b of game.buildings||[]) if(b.alive&&b.team==='enemy'&&b.buildProgress>=0.85) observers.push(b);
+  for(const o of observers){const r=detectionRadius(o);if(r>0&&dist(o,target)<=r)return true;}
+  return false;
+}
+
+class OperationalCore160 {
+  constructor(game,data=null){
+    this.game=game;this.version=VERSION;this.build=BUILD;this.cols=3;this.rows=3;this.sectors=makeSectors(game);this.roads=roadAxes(game);
+    this.contacts=new Map();this.operations=[];this.nextOperationId=1;this.reserveIds=[];this.commandRegistry=COMMANDS;
+    this.commandLog=[];this.hashHistory=[];this.workerHash=0;this.workerTick=0;this.workerReady=false;this.lastWorkerAt=0;
+    this.timers={sector:0,intel:0,supply:0,morale:0.4,income:2,ai:4,worker:0.5,doctrine:0};
+    this.metrics={workerMessages:0,sectorFlips:0,contactsCreated:0,operationsCreated:0,operationsAborted:0,operationsSucceeded:0};
+    this.worker=null;this.initWorker(); if(data)this.hydrate(data);
+  }
+  initWorker(){
+    try{this.worker=new Worker('/frontline-dominion/operational-core-worker-v160.js?build=206');this.worker.onmessage=(e)=>this.onWorker(e.data);this.worker.onerror=()=>{this.workerReady=false;};this.workerReady=true;}catch(e){this.workerReady=false;}
+  }
+  onWorker(m){if(m?.type!=='result')return;this.workerHash=m.hash>>>0;this.workerTick=m.tick||0;this.metrics.workerMessages++;for(const r of m.sectors||[]){const s=this.sectors.find(x=>x.id===r.id);if(s){s.playerPower=r.playerPower;s.enemyPower=r.enemyPower;}}}
+  serialize(){return {version:this.version,build:this.build,sectors:this.sectors.map(s=>({...s})),contacts:[...this.contacts.values()].map(c=>({...c})),operations:this.operations.map(o=>({...o,path:safeArray(o.path).map(p=>({...p})),unitIds:[...(o.unitIds||[])]})),nextOperationId:this.nextOperationId,reserveIds:[...this.reserveIds],commandLog:this.commandLog.slice(-10000),hashHistory:this.hashHistory.slice(-256),metrics:{...this.metrics}};}
+  hydrate(d){
+    if(!d)return;if(Array.isArray(d.sectors))for(const saved of d.sectors){const s=this.sectors.find(x=>x.id===saved.id);if(s)Object.assign(s,saved);}
+    this.contacts=new Map(safeArray(d.contacts).map(c=>[c.id,c]));this.operations=safeArray(d.operations).map(o=>({...o,path:safeArray(o.path),unitIds:safeArray(o.unitIds)}));this.nextOperationId=d.nextOperationId||1;this.reserveIds=safeArray(d.reserveIds);this.commandLog=safeArray(d.commandLog);this.hashHistory=safeArray(d.hashHistory);Object.assign(this.metrics,d.metrics||{});
+  }
+  update(dt){
+--- supply #10 offset=7606 line=94 ---
+  serialize(){return {version:this.version,build:this.build,sectors:this.sectors.map(s=>({...s})),contacts:[...this.contacts.values()].map(c=>({...c})),operations:this.operations.map(o=>({...o,path:safeArray(o.path).map(p=>({...p})),unitIds:[...(o.unitIds||[])]})),nextOperationId:this.nextOperationId,reserveIds:[...this.reserveIds],commandLog:this.commandLog.slice(-10000),hashHistory:this.hashHistory.slice(-256),metrics:{...this.metrics}};}
+  hydrate(d){
+    if(!d)return;if(Array.isArray(d.sectors))for(const saved of d.sectors){const s=this.sectors.find(x=>x.id===saved.id);if(s)Object.assign(s,saved);}
+    this.contacts=new Map(safeArray(d.contacts).map(c=>[c.id,c]));this.operations=safeArray(d.operations).map(o=>({...o,path:safeArray(o.path),unitIds:safeArray(o.unitIds)}));this.nextOperationId=d.nextOperationId||1;this.reserveIds=safeArray(d.reserveIds);this.commandLog=safeArray(d.commandLog);this.hashHistory=safeArray(d.hashHistory);Object.assign(this.metrics,d.metrics||{});
+  }
+  update(dt){
+    const g=this.game;if(g.paused||g.ended)return;
+    for(const u of g.units||[]){if(!u.alive)continue;ensureUnitState(u);const faction=g.teams?.[u.team]?.faction||'';const recoveryDoctrine=faction==='vanguard'?1.18:faction==='dominion'?.96:1.04;const recovery=(g.time-u.lastSuppressedAt160>3?0.095:0.035)*dt*recoveryDoctrine;u.suppression160=clamp(u.suppression160-recovery,0,1);const supplyThreshold=faction==='specter'?.34:.45;const supplyPenalty=Math.max(0,supplyThreshold-u.supply160);const cohesionDoctrine=faction==='vanguard'?1.12:faction==='dominion'?.96:1.02;const targetC=clamp(1-u.suppression160*0.72-supplyPenalty*0.65,0.12,1);u.cohesion160+=clamp(targetC-u.cohesion160,-dt*0.035,dt*0.055*cohesionDoctrine);u.morale160=clamp(u.cohesion160*(0.72+0.28*u.supply160),0,1);}
+    for(const k of Object.keys(this.timers))this.timers[k]-=dt;
+    if(this.timers.sector<=0){this.timers.sector=0.8;this.updateSectors();}
+    if(this.timers.intel<=0){this.timers.intel=0.65;this.updateIntel();}
+    if(this.timers.supply<=0){this.timers.supply=1.2;this.updateSupply();}
+    if(this.timers.morale<=0){this.timers.morale=.4;this.manageMorale();}
+    if(this.timers.income<=0){this.timers.income=2;this.applyTerritoryIncome();}
+    if(this.timers.ai<=0){this.timers.ai=4.0;this.updateAI();}
+    if(this.timers.worker<=0){this.timers.worker=1.0;this.sendWorker();}
+    this.updateOperations(dt);
+  }
+  updateSectors(){
+    const g=this.game;
+    for(const s of this.sectors){let pp=0,ep=0;for(const u of g.units||[]){if(!combatUnit(u)||u.x<s.x0||u.x>=s.x1||u.y<s.y0||u.y>=s.y1)continue;ensureUnitState(u);const p=unitValue(u)*(0.3+0.7*u.healthRatio)*(0.45+0.55*u.cohesion160);if(u.team==='player')pp+=p;else if(u.team==='enemy')ep+=p;}s.playerPower=pp;s.enemyPower=ep;const total=pp+ep;const bias=total?(pp-ep)/total:0;s.control=clamp(s.control*0.86+bias*0.14,-1,1);const old=s.owner;s.owner=s.control>0.28?'player':s.control<-0.28?'enemy':'contested';if(old!==s.owner){s.lastChanged=g.time;this.metrics.sectorFlips++;}}
+  }
+  updateIntel(){
+    const g=this.game,now=g.time,seen=new Set();
+    for(const p of g.units||[]){if(!p.alive||p.team!=='player')continue;if(!enemyCanObserve(g,p)&&now-(p.lastShotAt||-999)>4)continue;const id=p.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'unit',firstSeenAt:now,confidence:0.45};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=p.x;c.y=p.y;c.typeId=p.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.105:0.18),0,1);c.value=unitValue(p);c.air=Boolean(p.air);c.infantry=Boolean(p.infantry);}
+    for(const b of g.buildings||[]){if(!b.alive||b.team!=='player')continue;if(!enemyCanObserve(g,b))continue;const id=b.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'building',firstSeenAt:now,confidence:0.55};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=b.x;c.y=b.y;c.typeId=b.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.15:0.22),0,1);c.value=Number(b.stats?.cost)||1000;}
+
+### NEEDLE resourceTruck count_sample=1
+--- resourceTruck #1 offset=10429 line=111 ---
+  updateIntel(){
+    const g=this.game,now=g.time,seen=new Set();
+    for(const p of g.units||[]){if(!p.alive||p.team!=='player')continue;if(!enemyCanObserve(g,p)&&now-(p.lastShotAt||-999)>4)continue;const id=p.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'unit',firstSeenAt:now,confidence:0.45};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=p.x;c.y=p.y;c.typeId=p.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.105:0.18),0,1);c.value=unitValue(p);c.air=Boolean(p.air);c.infantry=Boolean(p.infantry);}
+    for(const b of g.buildings||[]){if(!b.alive||b.team!=='player')continue;if(!enemyCanObserve(g,b))continue;const id=b.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'building',firstSeenAt:now,confidence:0.55};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=b.x;c.y=b.y;c.typeId=b.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.15:0.22),0,1);c.value=Number(b.stats?.cost)||1000;}
+    for(const [id,c] of this.contacts){if(!seen.has(id)){const age=now-(c.lastSeenAt||now);c.confidence=clamp(c.confidence-Math.min(0.12,age*0.0025),0,1);if(age>180||c.confidence<0.05)this.contacts.delete(id);}}
+  }
+  supplySources(team){const g=this.game,out=[];const faction=g.teams?.[team]?.faction||'';const radiusDoctrine=faction==='dominion'?1.16:faction==='specter'?.92:1;for(const b of g.buildings||[]){if(!b.alive||b.team!==team||b.buildProgress<0.9)continue;const t=`${b.typeId} ${b.stats?.name||''}`.toLowerCase();if(/command|logistics|refinery|silo|outpost|depot|airfield|barracks/.test(t))out.push({x:b.x,y:b.y,r:(700+(Number(b.stats?.radius)||50)*4)*radiusDoctrine,p:faction==='dominion'?1:.96});}for(const u of g.units||[])if(u.alive&&u.team===team&&/resourceTruck|transport|commandVehicle/i.test(u.typeId))out.push({x:u.x,y:u.y,r:420,p:0.72});return out;}
+  updateSupply(){
+    const sources={player:this.supplySources('player'),enemy:this.supplySources('enemy')};
+    for(const u of this.game.units||[]){if(!u.alive||!['player','enemy'].includes(u.team))continue;ensureUnitState(u);let best=0;for(const s of sources[u.team]){const d=dist(u,s);if(d<s.r)best=Math.max(best,s.p*(1-d/s.r*0.45));}const sec=sectorFor(this,u.x,u.y);const territorial=sec?.owner===u.team?0.18:sec?.owner==='contested'?0.04:-0.10;const target=clamp(best+territorial,0.12,1);u.supply160+=clamp(target-u.supply160,-0.055,0.12);}
+  }
+  manageMorale(){
+    const g=this.game;
+    for(const u of g.units||[]){
+      if(!combatUnit(u)||u.air)continue;ensureUnitState(u);
+      const broken=u.suppression160>.78||u.cohesion160<.24||u.morale160<.22;
+      if(broken&&g.time>(u._v160RetreatUntil||0)){
+        u._v160ResumeCommand=u.currentCommand?{...u.currentCommand}:null;
+        const sources=this.supplySources(u.team);let best=null,bestD=Infinity;
+        for(const s of sources){const d=dist(u,s);if(d<bestD){bestD=d;best=s;}}
+        if(!best){best=u.team==='enemy'?(g.enemyBase||{x:WORLD.width-1800,y:WORLD.height/2}):(g.playerBase||{x:1800,y:WORLD.height/2});}
+        u._v160RetreatUntil=g.time+9;u._v160Retreating=true;u.setCommand({type:'move',x:best.x+(hashString(u.id+'mx')%260)-130,y:best.y+(hashString(u.id+'my')%260)-130,v160Retreat:true});
+      } else if(u._v160Retreating&&g.time>(u._v160RetreatUntil||0)&&u.suppression160<.35&&u.cohesion160>.48){
+        const resume=u._v160ResumeCommand;u._v160Retreating=false;u._v160ResumeCommand=null;if(resume)u.setCommand(resume);
+      }
+    }
+  }
+  applyTerritoryIncome(){
+    const g=this.game;
+    if(!g.stats.territoryIncome160)g.stats.territoryIncome160=0;
+
+### NEEDLE resources count_sample=1
+--- resources #1 offset=2590 line=42 ---
+const supportUnit=u=>u?.alive&&u.kind==='unit'&&(u.typeId==='worker'||u.stats?.healer||u.stats?.repairRate||/repair|medic|engineer/i.test(`${u.typeId} ${u.stats?.visualRole||''}`));
+const unitValue=u=>Math.max(1,Number(u?.stats?.cost)||Number(u?.stats?.hp)||100);
+const safeArray=x=>Array.isArray(x)?x:[];
+
+class CommandRegistry160 {
+  constructor(){this.rules=new Map();this.events=[];}
+  define(type,rule={}){this.rules.set(type,{type,...rule});return this;}
+  validate(unit,command){
+    if(!command?.type) return {ok:false,reason:'empty'};
+    const rule=this.rules.get(command.type);
+    if(!rule) return {ok:true,command};
+    if(rule.supportForbidden&&supportUnit(unit)) return {ok:false,reason:'support-unit'};
+    if(rule.airForbidden&&unit.air) return {ok:false,reason:'air-unit'};
+    return {ok:true,command};
+  }
+  record(game,unit,command,append){
+    const c={tick:Math.round((game.time||0)*25),time:+(game.time||0).toFixed(3),unitId:unit.id,type:command.type,append:Boolean(append)};
+    for(const k of ['x','y','targetId','buildingId','resourceId']) if(command[k]!=null)c[k]=command[k];
+    this.events.push(c); if(this.events.length>50000)this.events.splice(0,5000);
+  }
+}
+const COMMANDS=new CommandRegistry160();
+['move','patrol','hold','stop','harvest','repair','heal','transport','unload','mineField','returnToBase'].forEach(x=>COMMANDS.define(x));
+['attack','attackMove'].forEach(x=>COMMANDS.define(x,{supportForbidden:true}));
+
+function makeSectors(game){
+  const cols=3,rows=3,arr=[];
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+    const id=`S${y*cols+x+1}`; const x0=x*WORLD.width/cols,y0=y*WORLD.height/rows,x1=(x+1)*WORLD.width/cols,y1=(y+1)*WORLD.height/rows;
+    arr.push({id,index:y*cols+x,x0,y0,x1,y1,x:(x0+x1)/2,y:(y0+y1)/2,control:0,owner:'neutral',value:1,playerPower:0,enemyPower:0,resourceValue:0,infraValue:0,roadValue:0,lastChanged:0});
+  }
+  for(const s of arr){
+    for(const r of game.resources||[]) if(r.x>=s.x0&&r.x<s.x1&&r.y>=s.y0&&r.y<s.y1) s.resourceValue+=Math.min(5,(Number(r.amount)||100000)/150000);
+    for(const b of game.buildings||[]) if(b.x>=s.x0&&b.x<s.x1&&b.y>=s.y0&&b.y<s.y1) s.infraValue+=b.team==='neutral'?1.5:0.4;
+    for(const road of game.roads||[]) for(const p of road||[]) if(p.x>=s.x0&&p.x<s.x1&&p.y>=s.y0&&p.y<s.y1){s.roadValue+=0.18;break;}
+    s.value=1+s.resourceValue*0.75+s.infraValue+s.roadValue;
+  }
+  return arr;
+}
+function sectorFor(core,x,y){const c=clamp(Math.floor(x/(WORLD.width/3)),0,2),r=clamp(Math.floor(y/(WORLD.height/3)),0,2);return core.sectors[r*3+c];}
+function roadAxes(game){return (game.roads||[]).slice(0,6).map((r,i)=>({id:`R${i+1}`,kind:r.kind||'road',width:r.width||120,points:r.map(p=>({x:p.x,y:p.y}))}));}
+
+function ensureUnitState(u){
+  if(!Number.isFinite(u.suppression160))u.suppression160=0;
+  if(!Number.isFinite(u.cohesion160))u.cohesion160=1;
+  if(!Number.isFinite(u.supply160))u.supply160=1;
+  if(!Number.isFinite(u.morale160))u.morale160=1;
+  if(!Number.isFinite(u.lastSuppressedAt160))u.lastSuppressedAt160=-999;
+  if(!u.functionalDamage160)u.functionalDamage160={engine:0,sensors:0,weapon:0};
+  return u;
+}
+function detectionRadius(e){return Math.max(Number(e?.detector)||Number(e?.stats?.detector)||0,Number(e?.vision)||Number(e?.stats?.vision)||0)*1.05;}
+function enemyCanObserve(game,target){
+  const observers=[];
+  for(const u of game.units||[]) if(u.alive&&u.team==='enemy'&&!u.embarkedIn) observers.push(u);
+  for(const b of game.buildings||[]) if(b.alive&&b.team==='enemy'&&b.buildProgress>=0.85) observers.push(b);
+  for(const o of observers){const r=detectionRadius(o);if(r>0&&dist(o,target)<=r)return true;}
+  return false;
+}
+
+class OperationalCore160 {
+  constructor(game,data=null){
+    this.game=game;this.version=VERSION;this.build=BUILD;this.cols=3;this.rows=3;this.sectors=makeSectors(game);this.roads=roadAxes(game);
+
+### NEEDLE airfield count_sample=1
+
+### NEEDLE artillery count_sample=4
+--- artillery #1 offset=13995 line=147 ---
+    const g=this.game;
+    if(!g.stats.territoryIncome160)g.stats.territoryIncome160=0;
+    for(const team of ['player','enemy']){
+      let income=0;
+      for(const s of this.sectors)if(s.owner===team)income+=0.8+s.value*0.55;
+      income=Math.floor(income);
+      if(income>0&&g.teams?.[team]){g.teams[team].credits+=income;if(team==='player')g.stats.territoryIncome160+=income;}
+    }
+  }
+  operationTargets(){
+    const live=[...this.contacts.values()].filter(c=>c.confidence>0.22);const bySector=new Map();for(const c of live){const s=sectorFor(this,c.x,c.y);if(!s)continue;const cur=bySector.get(s.id)||{sector:s,score:0,contacts:[]};cur.score+=(c.value||100)*c.confidence*(c.kind==='building'?1.25:1);cur.contacts.push(c);bySector.set(s.id,cur);}return [...bySector.values()].sort((a,b)=>(b.score*b.sector.value)-(a.score*a.sector.value));
+  }
+  availableEnemyUnits(){const assigned=new Set(this.operations.flatMap(o=>o.unitIds||[]));return (this.game.units||[]).filter(u=>combatUnit(u)&&u.team==='enemy'&&!assigned.has(u.id)&&!this.reserveIds.includes(u.id));}
+  refreshReserve(){const units=(this.game.units||[]).filter(u=>combatUnit(u)&&u.team==='enemy').sort((a,b)=>unitValue(b)-unitValue(a));const want=Math.min(20,Math.max(4,Math.floor(units.length*0.14)));this.reserveIds=units.slice(0,want).map(u=>u.id);}
+  composeStrike(target){const free=this.availableEnemyUnits(),need={ground:5,armor:2,air:1,aa:0,art:0,recon:1};const contacts=target.contacts||[];if(contacts.some(c=>c.air))need.aa=2;if(contacts.some(c=>/tank|vehicle|armor/i.test(c.typeId)))need.armor=4;if(contacts.some(c=>c.kind==='building'))need.art=2;const roles={ground:[],armor:[],air:[],aa:[],art:[],recon:[]};for(const u of free){const t=`${u.typeId} ${u.stats?.visualRole||''}`.toLowerCase();if(u.air)roles.air.push(u);else if(/artillery|howitzer|rocketartillery/.test(t))roles.art.push(u);else if(/sam|anti.?air|mobileaa|counteruas/.test(t))roles.aa.push(u);else if(/recon|scout|operator/.test(t))roles.recon.push(u);else if(u.vehicle)roles.armor.push(u);else roles.ground.push(u);}const pick=[];for(const [r,n] of Object.entries(need))pick.push(...roles[r].slice(0,n));if(pick.length<6)pick.push(...free.filter(u=>!pick.includes(u)).slice(0,8-pick.length));return [...new Map(pick.map(u=>[u.id,u])).values()];}
+  createOperation(target){
+    const units=this.composeStrike(target);if(units.length<5)return null;const sec=target.sector;const centroid={x:units.reduce((a,u)=>a+u.x,0)/units.length,y:units.reduce((a,u)=>a+u.y,0)/units.length};const flank=((hashString(`${this.nextOperationId}:${sec.id}`)&1)?1:-1);const dx=sec.x-centroid.x,dy=sec.y-centroid.y,len=Math.hypot(dx,dy)||1,nx=-dy/len*flank,ny=dx/len*flank;const path=[{x:clamp(centroid.x+dx*.48+nx*900,180,WORLD.width-180),y:clamp(centroid.y+dy*.48+ny*900,180,WORLD.height-180)},{x:sec.x,y:sec.y}];const op={id:`OP-${this.nextOperationId++}`,state:'recon',createdAt:this.game.time,stateAt:this.game.time,targetSectorId:sec.id,targetX:sec.x,targetY:sec.y,unitIds:units.map(u=>u.id),path,waypoint:0,confidence:Math.min(1,target.contacts.reduce((a,c)=>a+c.confidence,0)/Math.max(1,target.contacts.length)),lossBudget:0.38,startStrength:units.reduce((a,u)=>a+unitValue(u),0),artilleryPrepared:false,doctrine:this.game.teams?.enemy?.faction||'unknown'};this.operations.push(op);this.metrics.operationsCreated++;return op;
+  }
+  updateAI(){
+    this.refreshReserve();this.operations=this.operations.filter(o=>!['complete','aborted'].includes(o.state)||this.game.time-o.stateAt<20);const max=this.game.difficultyKey==='hard'?5:this.game.difficultyKey==='easy'?2:4;const active=this.operations.filter(o=>!['complete','aborted'].includes(o.state));if(active.length<max){for(const t of this.operationTargets()){if(active.some(o=>o.targetSectorId===t.sector.id))continue;if(this.createOperation(t))break;}}
+--- artillery #3 offset=15399 line=149 ---
+  composeStrike(target){const free=this.availableEnemyUnits(),need={ground:5,armor:2,air:1,aa:0,art:0,recon:1};const contacts=target.contacts||[];if(contacts.some(c=>c.air))need.aa=2;if(contacts.some(c=>/tank|vehicle|armor/i.test(c.typeId)))need.armor=4;if(contacts.some(c=>c.kind==='building'))need.art=2;const roles={ground:[],armor:[],air:[],aa:[],art:[],recon:[]};for(const u of free){const t=`${u.typeId} ${u.stats?.visualRole||''}`.toLowerCase();if(u.air)roles.air.push(u);else if(/artillery|howitzer|rocketartillery/.test(t))roles.art.push(u);else if(/sam|anti.?air|mobileaa|counteruas/.test(t))roles.aa.push(u);else if(/recon|scout|operator/.test(t))roles.recon.push(u);else if(u.vehicle)roles.armor.push(u);else roles.ground.push(u);}const pick=[];for(const [r,n] of Object.entries(need))pick.push(...roles[r].slice(0,n));if(pick.length<6)pick.push(...free.filter(u=>!pick.includes(u)).slice(0,8-pick.length));return [...new Map(pick.map(u=>[u.id,u])).values()];}
+  createOperation(target){
+    const units=this.composeStrike(target);if(units.length<5)return null;const sec=target.sector;const centroid={x:units.reduce((a,u)=>a+u.x,0)/units.length,y:units.reduce((a,u)=>a+u.y,0)/units.length};const flank=((hashString(`${this.nextOperationId}:${sec.id}`)&1)?1:-1);const dx=sec.x-centroid.x,dy=sec.y-centroid.y,len=Math.hypot(dx,dy)||1,nx=-dy/len*flank,ny=dx/len*flank;const path=[{x:clamp(centroid.x+dx*.48+nx*900,180,WORLD.width-180),y:clamp(centroid.y+dy*.48+ny*900,180,WORLD.height-180)},{x:sec.x,y:sec.y}];const op={id:`OP-${this.nextOperationId++}`,state:'recon',createdAt:this.game.time,stateAt:this.game.time,targetSectorId:sec.id,targetX:sec.x,targetY:sec.y,unitIds:units.map(u=>u.id),path,waypoint:0,confidence:Math.min(1,target.contacts.reduce((a,c)=>a+c.confidence,0)/Math.max(1,target.contacts.length)),lossBudget:0.38,startStrength:units.reduce((a,u)=>a+unitValue(u),0),artilleryPrepared:false,doctrine:this.game.teams?.enemy?.faction||'unknown'};this.operations.push(op);this.metrics.operationsCreated++;return op;
+  }
+  updateAI(){
+    this.refreshReserve();this.operations=this.operations.filter(o=>!['complete','aborted'].includes(o.state)||this.game.time-o.stateAt<20);const max=this.game.difficultyKey==='hard'?5:this.game.difficultyKey==='easy'?2:4;const active=this.operations.filter(o=>!['complete','aborted'].includes(o.state));if(active.length<max){for(const t of this.operationTargets()){if(active.some(o=>o.targetSectorId===t.sector.id))continue;if(this.createOperation(t))break;}}
+  }
+  opUnits(op){return op.unitIds.map(id=>this.game.getEntity(id)).filter(u=>u?.alive);}
+  setOpState(op,state){op.state=state;op.stateAt=this.game.time;}
+  updateOperations(dt){
+    for(const op of this.operations){if(['complete','aborted'].includes(op.state))continue;const units=this.opUnits(op);if(units.length<3){this.setOpState(op,'aborted');this.metrics.operationsAborted++;continue;}const current=units.reduce((a,u)=>a+unitValue(u)*(u.healthRatio||1),0);if(current<op.startStrength*(1-op.lossBudget)){for(const u of units){const bx=this.game.enemyBase?.x||WORLD.width-1800,by=this.game.enemyBase?.y||WORLD.height/2;u.setCommand({type:'move',x:bx+(hashString(u.id+'rx')%500)-250,y:by+(hashString(u.id+'ry')%500)-250});}this.setOpState(op,'aborted');this.metrics.operationsAborted++;continue;}
+      const age=this.game.time-op.stateAt;
+      if(op.state==='recon'&&age>3)this.setOpState(op,'form');
+      else if(op.state==='form'&&age>4){for(const u of units)u.setCommand({type:'move',x:op.path[0].x+(hashString(u.id)%240)-120,y:op.path[0].y+(hashString(u.id+'y')%240)-120});this.setOpState(op,'approach');}
+      else if(op.state==='approach'){const c={x:units.reduce((a,u)=>a+u.x,0)/units.length,y:units.reduce((a,u)=>a+u.y,0)/units.length};if(dist(c,op.path[0])<520||age>35)this.setOpState(op,'fires');}
+--- artillery #4 offset=21529 line=192 ---
+    const operations=fn(this.operations,(o,m)=>{m(hashString(o.id));m(hashString(o.state));m(hashString(o.targetSectorId));m(o.unitIds?.length||0);});
+    const sectors=fn(this.sectors,(s,m)=>{m(hashString(s.id));m(Math.round(s.control*10000));m(hashString(s.owner));});
+    return {units,buildings,projectiles,economy,operations,sectors};
+  }
+  stateHash(){const h=this.subsystemHashes();let out=2166136261>>>0;for(const k of ['units','buildings','projectiles','economy','operations','sectors']){out^=h[k]>>>0;out=Math.imul(out,16777619)>>>0;}return out>>>0;}
+}
+
+function ensureCore(game){if(!game.operationalCore160)game.operationalCore160=new OperationalCore160(game,game.__pendingOperationalCore160||null);return game.operationalCore160;}
+
+// One integration point for all v16 command policy and replay logging.
+const baseSetCommand=Unit.prototype.setCommand;
+Unit.prototype.setCommand=function(command,append=false){
+  const core=ensureCore(this.game),check=COMMANDS.validate(this,command);if(!check.ok){if(check.reason==='support-unit'&&command?.type==='attackMove')command={...command,type:'move'};else return false;}
+  COMMANDS.record(this.game,this,command,append);core.commandLog.push(COMMANDS.events[COMMANDS.events.length-1]);if(core.commandLog.length>20000)core.commandLog.splice(0,2000);return baseSetCommand.call(this,command,append);
+};
+
+const baseTakeDamage=Unit.prototype.takeDamage;
+Unit.prototype.takeDamage=function(rawDamage,source=null,damageType=null){
+  ensureUnitState(this);const before=this.hp;const result=baseTakeDamage.call(this,rawDamage,source,damageType);const dealt=Math.max(0,before-this.hp);if(dealt>0){const ratio=dealt/Math.max(1,this.maxHp);let shock=ratio*1.8;const text=`${damageType?.type||''} ${damageType?.name||''} ${source?.stats?.visualRole||''}`.toLowerCase();if(/artillery|rocket|explosive|bomb|missile/.test(text))shock*=1.35;this.suppression160=clamp(this.suppression160+shock,0,1);this.lastSuppressedAt160=this.game.time;this.cohesion160=clamp(this.cohesion160-ratio*0.42,0.08,1);if(this.vehicle&&!this.air){const hr=this.healthRatio;if(hr<.72){const roll=hashString(`${this.id}:${Math.floor(this.game.time*4)}:${Math.round(before)}`)%3;const key=['engine','sensors','weapon'][roll];const severity=hr<.35?.65:hr<.52?.42:.24;this.functionalDamage160[key]=Math.max(this.functionalDamage160[key]||0,severity);}}}return result;
+};
+
+// Cohesion/supply affect capability but never replace existing movement/combat code.
+const baseUnitUpdate=Unit.prototype.update;
+Unit.prototype.update=function(dt){ensureUnitState(this);const speed0=this.stats.speed,weapon=this.stats.weapon,acc0=weapon?.accuracy,rate0=weapon?.reload;if(this.healthRatio>.90&&this.functionalDamage160){for(const k of ['engine','sensors','weapon'])this.functionalDamage160[k]=Math.max(0,(this.functionalDamage160[k]||0)-dt*.08);}const engine=this.functionalDamage160?.engine||0,sensor=this.functionalDamage160?.sensors||0,weaponFault=this.functionalDamage160?.weapon||0;const mobility=clamp((1-(this.suppression160||0)*0.20+(this.supply160-1)*0.12)*(1-engine*.55),0.38,1.04);this.stats.speed=speed0*mobility;if(weapon){weapon.accuracy=Number(acc0||1)*clamp((1-this.suppression160*0.38)*(1-sensor*.45)*(1-weaponFault*.18),0.28,1);weapon.reload=Number(rate0||1)*clamp((1+this.suppression160*0.42+(1-this.supply160)*0.28)*(1+weaponFault*.65),1,2.6);}try{return baseUnitUpdate.call(this,dt);}finally{this.stats.speed=speed0;if(weapon){weapon.accuracy=acc0;weapon.reload=rate0;}}};
+
+const baseGameUpdate=Game.prototype.update;
+Game.prototype.update=function(dt){const result=baseGameUpdate.call(this,dt);ensureCore(this).update(Math.min(dt,0.06));return result;};
+
+### NEEDLE stateHash count_sample=3
+--- stateHash #1 offset=20062 line=178 ---
+  sendWorker(){if(!this.workerReady||!this.worker)return;const units=[];for(const u of this.game.units||[]){if(!u.alive)continue;ensureUnitState(u);units.push({idHash:hashString(u.id),x:u.x,y:u.y,hp:u.hp,hpRatio:u.healthRatio||1,suppression:u.suppression160,cohesion:u.cohesion160,team:u.team,value:unitValue(u),alive:true});}try{this.worker.postMessage({type:'snapshot',tick:Math.round(this.game.time*25),cols:3,rows:3,worldWidth:WORLD.width,worldHeight:WORLD.height,sectors:this.sectors.map(s=>({id:s.id,control:s.control})),units});}catch(e){this.workerReady=false;}}
+  subsystemHashes(){
+    const fn=(items,writer)=>{let h=2166136261>>>0;const mix=v=>{h^=(v>>>0);h=Math.imul(h,16777619)>>>0;};for(const item of items)writer(item,mix);return h>>>0;};
+    const units=fn((this.game.units||[]).filter(x=>x.alive),(u,m)=>{m(hashString(u.id));m(hashString(u.team));m(Math.round(u.x*4));m(Math.round(u.y*4));m(Math.round(u.hp*10));m(Math.round((u.suppression160||0)*1000));m(Math.round((u.cohesion160||1)*1000));m(hashString(u.currentCommand?.type||''));});
+    const buildings=fn((this.game.buildings||[]).filter(x=>x.alive),(b,m)=>{m(hashString(b.id));m(hashString(b.team));m(Math.round(b.x*4));m(Math.round(b.y*4));m(Math.round(b.hp*10));m(Math.round((b.buildProgress||1)*1000));});
+    const projectiles=fn((this.game.projectiles||[]).filter(x=>x.alive),(p,m)=>{m(hashString(p.id));m(Math.round(p.x*4));m(Math.round(p.y*4));m(Math.round((p.altitude||0)*4));m(hashString(p.team||''));});
+    const economy=fn(['player','enemy'],(team,m)=>{const t=this.game.teams?.[team]||{};m(hashString(team));m(Math.round((t.credits||0)*10));m(Math.round((t.powerProduced||0)*10));m(Math.round((t.powerUsed||0)*10));m(Math.round((t.powerFactor||0)*1000));});
+    const operations=fn(this.operations,(o,m)=>{m(hashString(o.id));m(hashString(o.state));m(hashString(o.targetSectorId));m(o.unitIds?.length||0);});
+    const sectors=fn(this.sectors,(s,m)=>{m(hashString(s.id));m(Math.round(s.control*10000));m(hashString(s.owner));});
+    return {units,buildings,projectiles,economy,operations,sectors};
+  }
+  stateHash(){const h=this.subsystemHashes();let out=2166136261>>>0;for(const k of ['units','buildings','projectiles','economy','operations','sectors']){out^=h[k]>>>0;out=Math.imul(out,16777619)>>>0;}return out>>>0;}
+}
+
+function ensureCore(game){if(!game.operationalCore160)game.operationalCore160=new OperationalCore160(game,game.__pendingOperationalCore160||null);return game.operationalCore160;}
+
+// One integration point for all v16 command policy and replay logging.
+const baseSetCommand=Unit.prototype.setCommand;
+Unit.prototype.setCommand=function(command,append=false){
+  const core=ensureCore(this.game),check=COMMANDS.validate(this,command);if(!check.ok){if(check.reason==='support-unit'&&command?.type==='attackMove')command={...command,type:'move'};else return false;}
+  COMMANDS.record(this.game,this,command,append);core.commandLog.push(COMMANDS.events[COMMANDS.events.length-1]);if(core.commandLog.length>20000)core.commandLog.splice(0,2000);return baseSetCommand.call(this,command,append);
+};
+
+const baseTakeDamage=Unit.prototype.takeDamage;
+Unit.prototype.takeDamage=function(rawDamage,source=null,damageType=null){
+  ensureUnitState(this);const before=this.hp;const result=baseTakeDamage.call(this,rawDamage,source,damageType);const dealt=Math.max(0,before-this.hp);if(dealt>0){const ratio=dealt/Math.max(1,this.maxHp);let shock=ratio*1.8;const text=`${damageType?.type||''} ${damageType?.name||''} ${source?.stats?.visualRole||''}`.toLowerCase();if(/artillery|rocket|explosive|bomb|missile/.test(text))shock*=1.35;this.suppression160=clamp(this.suppression160+shock,0,1);this.lastSuppressedAt160=this.game.time;this.cohesion160=clamp(this.cohesion160-ratio*0.42,0.08,1);if(this.vehicle&&!this.air){const hr=this.healthRatio;if(hr<.72){const roll=hashString(`${this.id}:${Math.floor(this.game.time*4)}:${Math.round(before)}`)%3;const key=['engine','sensors','weapon'][roll];const severity=hr<.35?.65:hr<.52?.42:.24;this.functionalDamage160[key]=Math.max(this.functionalDamage160[key]||0,severity);}}}return result;
+--- stateHash #2 offset=25337 line=211 ---
+const baseUnitSerialize160=Unit.prototype.serialize;
+Unit.prototype.serialize=function(){const data=baseUnitSerialize160.call(this);ensureUnitState(this);data.suppression160=this.suppression160;data.cohesion160=this.cohesion160;data.supply160=this.supply160;data.morale160=this.morale160;data.lastSuppressedAt160=this.lastSuppressedAt160;data.functionalDamage160={...this.functionalDamage160};data.v160Retreating=!!this._v160Retreating;return data;};
+const baseHydrate=Game.prototype.hydrate;
+Game.prototype.hydrate=function(data){this.__pendingOperationalCore160=data?.operationalCore160||null;const result=baseHydrate.call(this,data);const savedUnits=new Map(safeArray(data?.entities).filter(e=>e.kind==='unit').map(e=>[e.id,e]));for(const u of this.units||[]){const d=savedUnits.get(u.id);if(d){for(const k of ['suppression160','cohesion160','supply160','morale160','lastSuppressedAt160'])if(Number.isFinite(d[k]))u[k]=d[k];}if(d.functionalDamage160)u.functionalDamage160={...d.functionalDamage160};u._v160Retreating=!!d.v160Retreating;ensureUnitState(u);}ensureCore(this);delete this.__pendingOperationalCore160;return result;};
+const baseSave=Game.prototype.save;
+Game.prototype.save=function(notify=true){const ok=baseSave.call(this,notify);if(!ok)return ok;try{const raw=D.storageGet(D.SAVE_KEY);const data=raw?JSON.parse(raw):null;if(data){data.operationalCore160=ensureCore(this).serialize();data.operationalSchemaVersion=3;D.storageSet(D.SAVE_KEY,JSON.stringify(data));}}catch(e){console.warn('[v16] extension save failed',e);}return ok;};
+
+// Export deterministic diagnostics/replay snapshot for automated verification and multiplayer debugging.
+Game.prototype.operationalDiagnostics160=function(){const c=ensureCore(this);return {version:VERSION,build:BUILD,time:this.time,workerReady:c.workerReady,workerHash:c.workerHash,localHash:c.stateHash(),subsystemHashes:c.subsystemHashes(),canonicalTeams:{player:1,enemy:2,neutral:0},sectors:c.sectors.map(s=>({id:s.id,owner:s.owner,control:s.control,value:s.value})),contacts:c.contacts.size,operations:c.operations.map(o=>({id:o.id,state:o.state,target:o.targetSectorId,units:c.opUnits(o).length})),reserve:c.reserveIds.length,commandLog:c.commandLog.length,metrics:{...c.metrics}};};
+Game.prototype.exportReplay160=function(){const c=ensureCore(this);return {version:VERSION,build:BUILD,seed:this.seed,difficulty:this.difficultyKey,commands:c.commandLog.slice(),finalHash:c.stateHash(),subsystemHashes:c.subsystemHashes(),time:this.time};};
+
+// Operational information is rendered only on the minimap/UI; it never changes simulation detail from camera state.
+const baseRenderMinimap160=Game.prototype.renderMinimap;
+Game.prototype.renderMinimap=function(){
+  const result=baseRenderMinimap160.call(this);const core=ensureCore(this),canvas=document.querySelector('#minimap');if(!canvas)return result;
+  const c=canvas.getContext('2d'),sx=canvas.width/WORLD.width,sy=canvas.height/WORLD.height;c.save();
+  for(const s of core.sectors){const alpha=Math.min(.12,.025+Math.abs(s.control)*.08);c.fillStyle=s.owner==='player'?`rgba(90,210,145,${alpha})`:s.owner==='enemy'?`rgba(230,92,78,${alpha})`:`rgba(220,210,150,${alpha*.45})`;c.fillRect(s.x0*sx,s.y0*sy,(s.x1-s.x0)*sx,(s.y1-s.y0)*sy);c.strokeStyle='rgba(220,240,229,.12)';c.strokeRect(s.x0*sx+.5,s.y0*sy+.5,(s.x1-s.x0)*sx-1,(s.y1-s.y0)*sy-1);}
+  c.restore();return result;
+};
+const baseRenderSelection160=Game.prototype.renderSelectionUI;
+Game.prototype.renderSelectionUI=function(){const result=baseRenderSelection160.call(this);const one=this.selected?.length===1?this.selected[0]:null;if(one?.kind==='unit'){ensureUnitState(one);const box=document.querySelector('#selection-details');if(box&&!box.querySelector('.v160-operational-state'))box.insertAdjacentHTML('beforeend',`<div class="v160-operational-state"><div class="stat-line"><span>Подавление</span><strong>${Math.round(one.suppression160*100)}%</strong></div><div class="stat-line"><span>Сплочённость</span><strong>${Math.round(one.cohesion160*100)}%</strong></div><div class="stat-line"><span>Снабжение</span><strong>${Math.round(one.supply160*100)}%</strong></div></div>`);}return result;};
+--- stateHash #3 offset=25922 line=212 ---
+Game.prototype.hydrate=function(data){this.__pendingOperationalCore160=data?.operationalCore160||null;const result=baseHydrate.call(this,data);const savedUnits=new Map(safeArray(data?.entities).filter(e=>e.kind==='unit').map(e=>[e.id,e]));for(const u of this.units||[]){const d=savedUnits.get(u.id);if(d){for(const k of ['suppression160','cohesion160','supply160','morale160','lastSuppressedAt160'])if(Number.isFinite(d[k]))u[k]=d[k];}if(d.functionalDamage160)u.functionalDamage160={...d.functionalDamage160};u._v160Retreating=!!d.v160Retreating;ensureUnitState(u);}ensureCore(this);delete this.__pendingOperationalCore160;return result;};
+const baseSave=Game.prototype.save;
+Game.prototype.save=function(notify=true){const ok=baseSave.call(this,notify);if(!ok)return ok;try{const raw=D.storageGet(D.SAVE_KEY);const data=raw?JSON.parse(raw):null;if(data){data.operationalCore160=ensureCore(this).serialize();data.operationalSchemaVersion=3;D.storageSet(D.SAVE_KEY,JSON.stringify(data));}}catch(e){console.warn('[v16] extension save failed',e);}return ok;};
+
+// Export deterministic diagnostics/replay snapshot for automated verification and multiplayer debugging.
+Game.prototype.operationalDiagnostics160=function(){const c=ensureCore(this);return {version:VERSION,build:BUILD,time:this.time,workerReady:c.workerReady,workerHash:c.workerHash,localHash:c.stateHash(),subsystemHashes:c.subsystemHashes(),canonicalTeams:{player:1,enemy:2,neutral:0},sectors:c.sectors.map(s=>({id:s.id,owner:s.owner,control:s.control,value:s.value})),contacts:c.contacts.size,operations:c.operations.map(o=>({id:o.id,state:o.state,target:o.targetSectorId,units:c.opUnits(o).length})),reserve:c.reserveIds.length,commandLog:c.commandLog.length,metrics:{...c.metrics}};};
+Game.prototype.exportReplay160=function(){const c=ensureCore(this);return {version:VERSION,build:BUILD,seed:this.seed,difficulty:this.difficultyKey,commands:c.commandLog.slice(),finalHash:c.stateHash(),subsystemHashes:c.subsystemHashes(),time:this.time};};
+
+// Operational information is rendered only on the minimap/UI; it never changes simulation detail from camera state.
+const baseRenderMinimap160=Game.prototype.renderMinimap;
+Game.prototype.renderMinimap=function(){
+  const result=baseRenderMinimap160.call(this);const core=ensureCore(this),canvas=document.querySelector('#minimap');if(!canvas)return result;
+  const c=canvas.getContext('2d'),sx=canvas.width/WORLD.width,sy=canvas.height/WORLD.height;c.save();
+  for(const s of core.sectors){const alpha=Math.min(.12,.025+Math.abs(s.control)*.08);c.fillStyle=s.owner==='player'?`rgba(90,210,145,${alpha})`:s.owner==='enemy'?`rgba(230,92,78,${alpha})`:`rgba(220,210,150,${alpha*.45})`;c.fillRect(s.x0*sx,s.y0*sy,(s.x1-s.x0)*sx,(s.y1-s.y0)*sy);c.strokeStyle='rgba(220,240,229,.12)';c.strokeRect(s.x0*sx+.5,s.y0*sy+.5,(s.x1-s.x0)*sx-1,(s.y1-s.y0)*sy-1);}
+  c.restore();return result;
+};
+const baseRenderSelection160=Game.prototype.renderSelectionUI;
+Game.prototype.renderSelectionUI=function(){const result=baseRenderSelection160.call(this);const one=this.selected?.length===1?this.selected[0]:null;if(one?.kind==='unit'){ensureUnitState(one);const box=document.querySelector('#selection-details');if(box&&!box.querySelector('.v160-operational-state'))box.insertAdjacentHTML('beforeend',`<div class="v160-operational-state"><div class="stat-line"><span>Подавление</span><strong>${Math.round(one.suppression160*100)}%</strong></div><div class="stat-line"><span>Сплочённость</span><strong>${Math.round(one.cohesion160*100)}%</strong></div><div class="stat-line"><span>Снабжение</span><strong>${Math.round(one.supply160*100)}%</strong></div></div>`);}return result;};
+
+// Minimal operational overlay toggle, deliberately lightweight and off by default.
+
+### NEEDLE update count_sample=10
+--- update #1 offset=6578 line=88 ---
+    this.timers={sector:0,intel:0,supply:0,morale:0.4,income:2,ai:4,worker:0.5,doctrine:0};
+    this.metrics={workerMessages:0,sectorFlips:0,contactsCreated:0,operationsCreated:0,operationsAborted:0,operationsSucceeded:0};
+    this.worker=null;this.initWorker(); if(data)this.hydrate(data);
+  }
+  initWorker(){
+    try{this.worker=new Worker('/frontline-dominion/operational-core-worker-v160.js?build=206');this.worker.onmessage=(e)=>this.onWorker(e.data);this.worker.onerror=()=>{this.workerReady=false;};this.workerReady=true;}catch(e){this.workerReady=false;}
+  }
+  onWorker(m){if(m?.type!=='result')return;this.workerHash=m.hash>>>0;this.workerTick=m.tick||0;this.metrics.workerMessages++;for(const r of m.sectors||[]){const s=this.sectors.find(x=>x.id===r.id);if(s){s.playerPower=r.playerPower;s.enemyPower=r.enemyPower;}}}
+  serialize(){return {version:this.version,build:this.build,sectors:this.sectors.map(s=>({...s})),contacts:[...this.contacts.values()].map(c=>({...c})),operations:this.operations.map(o=>({...o,path:safeArray(o.path).map(p=>({...p})),unitIds:[...(o.unitIds||[])]})),nextOperationId:this.nextOperationId,reserveIds:[...this.reserveIds],commandLog:this.commandLog.slice(-10000),hashHistory:this.hashHistory.slice(-256),metrics:{...this.metrics}};}
+  hydrate(d){
+    if(!d)return;if(Array.isArray(d.sectors))for(const saved of d.sectors){const s=this.sectors.find(x=>x.id===saved.id);if(s)Object.assign(s,saved);}
+    this.contacts=new Map(safeArray(d.contacts).map(c=>[c.id,c]));this.operations=safeArray(d.operations).map(o=>({...o,path:safeArray(o.path),unitIds:safeArray(o.unitIds)}));this.nextOperationId=d.nextOperationId||1;this.reserveIds=safeArray(d.reserveIds);this.commandLog=safeArray(d.commandLog);this.hashHistory=safeArray(d.hashHistory);Object.assign(this.metrics,d.metrics||{});
+  }
+  update(dt){
+    const g=this.game;if(g.paused||g.ended)return;
+    for(const u of g.units||[]){if(!u.alive)continue;ensureUnitState(u);const faction=g.teams?.[u.team]?.faction||'';const recoveryDoctrine=faction==='vanguard'?1.18:faction==='dominion'?.96:1.04;const recovery=(g.time-u.lastSuppressedAt160>3?0.095:0.035)*dt*recoveryDoctrine;u.suppression160=clamp(u.suppression160-recovery,0,1);const supplyThreshold=faction==='specter'?.34:.45;const supplyPenalty=Math.max(0,supplyThreshold-u.supply160);const cohesionDoctrine=faction==='vanguard'?1.12:faction==='dominion'?.96:1.02;const targetC=clamp(1-u.suppression160*0.72-supplyPenalty*0.65,0.12,1);u.cohesion160+=clamp(targetC-u.cohesion160,-dt*0.035,dt*0.055*cohesionDoctrine);u.morale160=clamp(u.cohesion160*(0.72+0.28*u.supply160),0,1);}
+    for(const k of Object.keys(this.timers))this.timers[k]-=dt;
+    if(this.timers.sector<=0){this.timers.sector=0.8;this.updateSectors();}
+    if(this.timers.intel<=0){this.timers.intel=0.65;this.updateIntel();}
+    if(this.timers.supply<=0){this.timers.supply=1.2;this.updateSupply();}
+    if(this.timers.morale<=0){this.timers.morale=.4;this.manageMorale();}
+    if(this.timers.income<=0){this.timers.income=2;this.applyTerritoryIncome();}
+    if(this.timers.ai<=0){this.timers.ai=4.0;this.updateAI();}
+    if(this.timers.worker<=0){this.timers.worker=1.0;this.sendWorker();}
+    this.updateOperations(dt);
+  }
+  updateSectors(){
+    const g=this.game;
+    for(const s of this.sectors){let pp=0,ep=0;for(const u of g.units||[]){if(!combatUnit(u)||u.x<s.x0||u.x>=s.x1||u.y<s.y0||u.y>=s.y1)continue;ensureUnitState(u);const p=unitValue(u)*(0.3+0.7*u.healthRatio)*(0.45+0.55*u.cohesion160);if(u.team==='player')pp+=p;else if(u.team==='enemy')ep+=p;}s.playerPower=pp;s.enemyPower=ep;const total=pp+ep;const bias=total?(pp-ep)/total:0;s.control=clamp(s.control*0.86+bias*0.14,-1,1);const old=s.owner;s.owner=s.control>0.28?'player':s.control<-0.28?'enemy':'contested';if(old!==s.owner){s.lastChanged=g.time;this.metrics.sectorFlips++;}}
+--- update #6 offset=7962 line=99 ---
+    if(!d)return;if(Array.isArray(d.sectors))for(const saved of d.sectors){const s=this.sectors.find(x=>x.id===saved.id);if(s)Object.assign(s,saved);}
+    this.contacts=new Map(safeArray(d.contacts).map(c=>[c.id,c]));this.operations=safeArray(d.operations).map(o=>({...o,path:safeArray(o.path),unitIds:safeArray(o.unitIds)}));this.nextOperationId=d.nextOperationId||1;this.reserveIds=safeArray(d.reserveIds);this.commandLog=safeArray(d.commandLog);this.hashHistory=safeArray(d.hashHistory);Object.assign(this.metrics,d.metrics||{});
+  }
+  update(dt){
+    const g=this.game;if(g.paused||g.ended)return;
+    for(const u of g.units||[]){if(!u.alive)continue;ensureUnitState(u);const faction=g.teams?.[u.team]?.faction||'';const recoveryDoctrine=faction==='vanguard'?1.18:faction==='dominion'?.96:1.04;const recovery=(g.time-u.lastSuppressedAt160>3?0.095:0.035)*dt*recoveryDoctrine;u.suppression160=clamp(u.suppression160-recovery,0,1);const supplyThreshold=faction==='specter'?.34:.45;const supplyPenalty=Math.max(0,supplyThreshold-u.supply160);const cohesionDoctrine=faction==='vanguard'?1.12:faction==='dominion'?.96:1.02;const targetC=clamp(1-u.suppression160*0.72-supplyPenalty*0.65,0.12,1);u.cohesion160+=clamp(targetC-u.cohesion160,-dt*0.035,dt*0.055*cohesionDoctrine);u.morale160=clamp(u.cohesion160*(0.72+0.28*u.supply160),0,1);}
+    for(const k of Object.keys(this.timers))this.timers[k]-=dt;
+    if(this.timers.sector<=0){this.timers.sector=0.8;this.updateSectors();}
+    if(this.timers.intel<=0){this.timers.intel=0.65;this.updateIntel();}
+    if(this.timers.supply<=0){this.timers.supply=1.2;this.updateSupply();}
+    if(this.timers.morale<=0){this.timers.morale=.4;this.manageMorale();}
+    if(this.timers.income<=0){this.timers.income=2;this.applyTerritoryIncome();}
+    if(this.timers.ai<=0){this.timers.ai=4.0;this.updateAI();}
+    if(this.timers.worker<=0){this.timers.worker=1.0;this.sendWorker();}
+    this.updateOperations(dt);
+  }
+  updateSectors(){
+    const g=this.game;
+    for(const s of this.sectors){let pp=0,ep=0;for(const u of g.units||[]){if(!combatUnit(u)||u.x<s.x0||u.x>=s.x1||u.y<s.y0||u.y>=s.y1)continue;ensureUnitState(u);const p=unitValue(u)*(0.3+0.7*u.healthRatio)*(0.45+0.55*u.cohesion160);if(u.team==='player')pp+=p;else if(u.team==='enemy')ep+=p;}s.playerPower=pp;s.enemyPower=ep;const total=pp+ep;const bias=total?(pp-ep)/total:0;s.control=clamp(s.control*0.86+bias*0.14,-1,1);const old=s.owner;s.owner=s.control>0.28?'player':s.control<-0.28?'enemy':'contested';if(old!==s.owner){s.lastChanged=g.time;this.metrics.sectorFlips++;}}
+  }
+  updateIntel(){
+    const g=this.game,now=g.time,seen=new Set();
+    for(const p of g.units||[]){if(!p.alive||p.team!=='player')continue;if(!enemyCanObserve(g,p)&&now-(p.lastShotAt||-999)>4)continue;const id=p.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'unit',firstSeenAt:now,confidence:0.45};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=p.x;c.y=p.y;c.typeId=p.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.105:0.18),0,1);c.value=unitValue(p);c.air=Boolean(p.air);c.infantry=Boolean(p.infantry);}
+    for(const b of g.buildings||[]){if(!b.alive||b.team!=='player')continue;if(!enemyCanObserve(g,b))continue;const id=b.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'building',firstSeenAt:now,confidence:0.55};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=b.x;c.y=b.y;c.typeId=b.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.15:0.22),0,1);c.value=Number(b.stats?.cost)||1000;}
+    for(const [id,c] of this.contacts){if(!seen.has(id)){const age=now-(c.lastSeenAt||now);c.confidence=clamp(c.confidence-Math.min(0.12,age*0.0025),0,1);if(age>180||c.confidence<0.05)this.contacts.delete(id);}}
+--- update #8 offset=8615 line=105 ---
+    for(const u of g.units||[]){if(!u.alive)continue;ensureUnitState(u);const faction=g.teams?.[u.team]?.faction||'';const recoveryDoctrine=faction==='vanguard'?1.18:faction==='dominion'?.96:1.04;const recovery=(g.time-u.lastSuppressedAt160>3?0.095:0.035)*dt*recoveryDoctrine;u.suppression160=clamp(u.suppression160-recovery,0,1);const supplyThreshold=faction==='specter'?.34:.45;const supplyPenalty=Math.max(0,supplyThreshold-u.supply160);const cohesionDoctrine=faction==='vanguard'?1.12:faction==='dominion'?.96:1.02;const targetC=clamp(1-u.suppression160*0.72-supplyPenalty*0.65,0.12,1);u.cohesion160+=clamp(targetC-u.cohesion160,-dt*0.035,dt*0.055*cohesionDoctrine);u.morale160=clamp(u.cohesion160*(0.72+0.28*u.supply160),0,1);}
+    for(const k of Object.keys(this.timers))this.timers[k]-=dt;
+    if(this.timers.sector<=0){this.timers.sector=0.8;this.updateSectors();}
+    if(this.timers.intel<=0){this.timers.intel=0.65;this.updateIntel();}
+    if(this.timers.supply<=0){this.timers.supply=1.2;this.updateSupply();}
+    if(this.timers.morale<=0){this.timers.morale=.4;this.manageMorale();}
+    if(this.timers.income<=0){this.timers.income=2;this.applyTerritoryIncome();}
+    if(this.timers.ai<=0){this.timers.ai=4.0;this.updateAI();}
+    if(this.timers.worker<=0){this.timers.worker=1.0;this.sendWorker();}
+    this.updateOperations(dt);
+  }
+  updateSectors(){
+    const g=this.game;
+    for(const s of this.sectors){let pp=0,ep=0;for(const u of g.units||[]){if(!combatUnit(u)||u.x<s.x0||u.x>=s.x1||u.y<s.y0||u.y>=s.y1)continue;ensureUnitState(u);const p=unitValue(u)*(0.3+0.7*u.healthRatio)*(0.45+0.55*u.cohesion160);if(u.team==='player')pp+=p;else if(u.team==='enemy')ep+=p;}s.playerPower=pp;s.enemyPower=ep;const total=pp+ep;const bias=total?(pp-ep)/total:0;s.control=clamp(s.control*0.86+bias*0.14,-1,1);const old=s.owner;s.owner=s.control>0.28?'player':s.control<-0.28?'enemy':'contested';if(old!==s.owner){s.lastChanged=g.time;this.metrics.sectorFlips++;}}
+  }
+  updateIntel(){
+    const g=this.game,now=g.time,seen=new Set();
+    for(const p of g.units||[]){if(!p.alive||p.team!=='player')continue;if(!enemyCanObserve(g,p)&&now-(p.lastShotAt||-999)>4)continue;const id=p.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'unit',firstSeenAt:now,confidence:0.45};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=p.x;c.y=p.y;c.typeId=p.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.105:0.18),0,1);c.value=unitValue(p);c.air=Boolean(p.air);c.infantry=Boolean(p.infantry);}
+    for(const b of g.buildings||[]){if(!b.alive||b.team!=='player')continue;if(!enemyCanObserve(g,b))continue;const id=b.id;seen.add(id);let c=this.contacts.get(id);if(!c){c={id,kind:'building',firstSeenAt:now,confidence:0.55};this.contacts.set(id,c);this.metrics.contactsCreated++;}c.x=b.x;c.y=b.y;c.typeId=b.typeId;c.lastSeenAt=now;c.confidence=clamp((c.confidence||0)+(g.teams?.player?.faction==='specter'?0.15:0.22),0,1);c.value=Number(b.stats?.cost)||1000;}
+    for(const [id,c] of this.contacts){if(!seen.has(id)){const age=now-(c.lastSeenAt||now);c.confidence=clamp(c.confidence-Math.min(0.12,age*0.0025),0,1);if(age>180||c.confidence<0.05)this.contacts.delete(id);}}
+  }
+  supplySources(team){const g=this.game,out=[];const faction=g.teams?.[team]?.faction||'';const radiusDoctrine=faction==='dominion'?1.16:faction==='specter'?.92:1;for(const b of g.buildings||[]){if(!b.alive||b.team!==team||b.buildProgress<0.9)continue;const t=`${b.typeId} ${b.stats?.name||''}`.toLowerCase();if(/command|logistics|refinery|silo|outpost|depot|airfield|barracks/.test(t))out.push({x:b.x,y:b.y,r:(700+(Number(b.stats?.radius)||50)*4)*radiusDoctrine,p:faction==='dominion'?1:.96});}for(const u of g.units||[])if(u.alive&&u.team===team&&/resourceTruck|transport|commandVehicle/i.test(u.typeId))out.push({x:u.x,y:u.y,r:420,p:0.72});return out;}
+
+### NEEDLE serialize count_sample=6
+--- serialize #1 offset=5582 line=83 ---
+function detectionRadius(e){return Math.max(Number(e?.detector)||Number(e?.stats?.detector)||0,Number(e?.vision)||Number(e?.stats?.vision)||0)*1.05;}
+function enemyCanObserve(game,target){
+  const observers=[];
+  for(const u of game.units||[]) if(u.alive&&u.team==='enemy'&&!u.embarkedIn) observers.push(u);
+  for(const b of game.buildings||[]) if(b.alive&&b.team==='enemy'&&b.buildProgress>=0.85) observers.push(b);
+  for(const o of observers){const r=detectionRadius(o);if(r>0&&dist(o,target)<=r)return true;}
+  return false;
+}
+
+class OperationalCore160 {
+  constructor(game,data=null){
+    this.game=game;this.version=VERSION;this.build=BUILD;this.cols=3;this.rows=3;this.sectors=makeSectors(game);this.roads=roadAxes(game);
+    this.contacts=new Map();this.operations=[];this.nextOperationId=1;this.reserveIds=[];this.commandRegistry=COMMANDS;
+    this.commandLog=[];this.hashHistory=[];this.workerHash=0;this.workerTick=0;this.workerReady=false;this.lastWorkerAt=0;
+    this.timers={sector:0,intel:0,supply:0,morale:0.4,income:2,ai:4,worker:0.5,doctrine:0};
+    this.metrics={workerMessages:0,sectorFlips:0,contactsCreated:0,operationsCreated:0,operationsAborted:0,operationsSucceeded:0};
+    this.worker=null;this.initWorker(); if(data)this.hydrate(data);
+  }
+  initWorker(){
+    try{this.worker=new Worker('/frontline-dominion/operational-core-worker-v160.js?build=206');this.worker.onmessage=(e)=>this.onWorker(e.data);this.worker.onerror=()=>{this.workerReady=false;};this.workerReady=true;}catch(e){this.workerReady=false;}
+  }
+  onWorker(m){if(m?.type!=='result')return;this.workerHash=m.hash>>>0;this.workerTick=m.tick||0;this.metrics.workerMessages++;for(const r of m.sectors||[]){const s=this.sectors.find(x=>x.id===r.id);if(s){s.playerPower=r.playerPower;s.enemyPower=r.enemyPower;}}}
+  serialize(){return {version:this.version,build:this.build,sectors:this.sectors.map(s=>({...s})),contacts:[...this.contacts.values()].map(c=>({...c})),operations:this.operations.map(o=>({...o,path:safeArray(o.path).map(p=>({...p})),unitIds:[...(o.unitIds||[])]})),nextOperationId:this.nextOperationId,reserveIds:[...this.reserveIds],commandLog:this.commandLog.slice(-10000),hashHistory:this.hashHistory.slice(-256),metrics:{...this.metrics}};}
+  hydrate(d){
+    if(!d)return;if(Array.isArray(d.sectors))for(const saved of d.sectors){const s=this.sectors.find(x=>x.id===saved.id);if(s)Object.assign(s,saved);}
+    this.contacts=new Map(safeArray(d.contacts).map(c=>[c.id,c]));this.operations=safeArray(d.operations).map(o=>({...o,path:safeArray(o.path),unitIds:safeArray(o.unitIds)}));this.nextOperationId=d.nextOperationId||1;this.reserveIds=safeArray(d.reserveIds);this.commandLog=safeArray(d.commandLog);this.hashHistory=safeArray(d.hashHistory);Object.assign(this.metrics,d.metrics||{});
+  }
+  update(dt){
+    const g=this.game;if(g.paused||g.ended)return;
+    for(const u of g.units||[]){if(!u.alive)continue;ensureUnitState(u);const faction=g.teams?.[u.team]?.faction||'';const recoveryDoctrine=faction==='vanguard'?1.18:faction==='dominion'?.96:1.04;const recovery=(g.time-u.lastSuppressedAt160>3?0.095:0.035)*dt*recoveryDoctrine;u.suppression160=clamp(u.suppression160-recovery,0,1);const supplyThreshold=faction==='specter'?.34:.45;const supplyPenalty=Math.max(0,supplyThreshold-u.supply160);const cohesionDoctrine=faction==='vanguard'?1.12:faction==='dominion'?.96:1.02;const targetC=clamp(1-u.suppression160*0.72-supplyPenalty*0.65,0.12,1);u.cohesion160+=clamp(targetC-u.cohesion160,-dt*0.035,dt*0.055*cohesionDoctrine);u.morale160=clamp(u.cohesion160*(0.72+0.28*u.supply160),0,1);}
+    for(const k of Object.keys(this.timers))this.timers[k]-=dt;
+--- serialize #6 offset=24879 line=208 ---
+Unit.prototype.update=function(dt){ensureUnitState(this);const speed0=this.stats.speed,weapon=this.stats.weapon,acc0=weapon?.accuracy,rate0=weapon?.reload;if(this.healthRatio>.90&&this.functionalDamage160){for(const k of ['engine','sensors','weapon'])this.functionalDamage160[k]=Math.max(0,(this.functionalDamage160[k]||0)-dt*.08);}const engine=this.functionalDamage160?.engine||0,sensor=this.functionalDamage160?.sensors||0,weaponFault=this.functionalDamage160?.weapon||0;const mobility=clamp((1-(this.suppression160||0)*0.20+(this.supply160-1)*0.12)*(1-engine*.55),0.38,1.04);this.stats.speed=speed0*mobility;if(weapon){weapon.accuracy=Number(acc0||1)*clamp((1-this.suppression160*0.38)*(1-sensor*.45)*(1-weaponFault*.18),0.28,1);weapon.reload=Number(rate0||1)*clamp((1+this.suppression160*0.42+(1-this.supply160)*0.28)*(1+weaponFault*.65),1,2.6);}try{return baseUnitUpdate.call(this,dt);}finally{this.stats.speed=speed0;if(weapon){weapon.accuracy=acc0;weapon.reload=rate0;}}};
+
+const baseGameUpdate=Game.prototype.update;
+Game.prototype.update=function(dt){const result=baseGameUpdate.call(this,dt);ensureCore(this).update(Math.min(dt,0.06));return result;};
+
+// Versioned extension state: old v15 saves still load; v16 state is optional and migrates forward.
+const baseUnitSerialize160=Unit.prototype.serialize;
+Unit.prototype.serialize=function(){const data=baseUnitSerialize160.call(this);ensureUnitState(this);data.suppression160=this.suppression160;data.cohesion160=this.cohesion160;data.supply160=this.supply160;data.morale160=this.morale160;data.lastSuppressedAt160=this.lastSuppressedAt160;data.functionalDamage160={...this.functionalDamage160};data.v160Retreating=!!this._v160Retreating;return data;};
+const baseHydrate=Game.prototype.hydrate;
+Game.prototype.hydrate=function(data){this.__pendingOperationalCore160=data?.operationalCore160||null;const result=baseHydrate.call(this,data);const savedUnits=new Map(safeArray(data?.entities).filter(e=>e.kind==='unit').map(e=>[e.id,e]));for(const u of this.units||[]){const d=savedUnits.get(u.id);if(d){for(const k of ['suppression160','cohesion160','supply160','morale160','lastSuppressedAt160'])if(Number.isFinite(d[k]))u[k]=d[k];}if(d.functionalDamage160)u.functionalDamage160={...d.functionalDamage160};u._v160Retreating=!!d.v160Retreating;ensureUnitState(u);}ensureCore(this);delete this.__pendingOperationalCore160;return result;};
+const baseSave=Game.prototype.save;
+Game.prototype.save=function(notify=true){const ok=baseSave.call(this,notify);if(!ok)return ok;try{const raw=D.storageGet(D.SAVE_KEY);const data=raw?JSON.parse(raw):null;if(data){data.operationalCore160=ensureCore(this).serialize();data.operationalSchemaVersion=3;D.storageSet(D.SAVE_KEY,JSON.stringify(data));}}catch(e){console.warn('[v16] extension save failed',e);}return ok;};
+
+// Export deterministic diagnostics/replay snapshot for automated verification and multiplayer debugging.
+Game.prototype.operationalDiagnostics160=function(){const c=ensureCore(this);return {version:VERSION,build:BUILD,time:this.time,workerReady:c.workerReady,workerHash:c.workerHash,localHash:c.stateHash(),subsystemHashes:c.subsystemHashes(),canonicalTeams:{player:1,enemy:2,neutral:0},sectors:c.sectors.map(s=>({id:s.id,owner:s.owner,control:s.control,value:s.value})),contacts:c.contacts.size,operations:c.operations.map(o=>({id:o.id,state:o.state,target:o.targetSectorId,units:c.opUnits(o).length})),reserve:c.reserveIds.length,commandLog:c.commandLog.length,metrics:{...c.metrics}};};
+Game.prototype.exportReplay160=function(){const c=ensureCore(this);return {version:VERSION,build:BUILD,seed:this.seed,difficulty:this.difficultyKey,commands:c.commandLog.slice(),finalHash:c.stateHash(),subsystemHashes:c.subsystemHashes(),time:this.time};};
+
+// Operational information is rendered only on the minimap/UI; it never changes simulation detail from camera state.
+const baseRenderMinimap160=Game.prototype.renderMinimap;
+Game.prototype.renderMinimap=function(){
+  const result=baseRenderMinimap160.call(this);const core=ensureCore(this),canvas=document.querySelector('#minimap');if(!canvas)return result;
+  const c=canvas.getContext('2d'),sx=canvas.width/WORLD.width,sy=canvas.height/WORLD.height;c.save();
+  for(const s of core.sectors){const alpha=Math.min(.12,.025+Math.abs(s.control)*.08);c.fillStyle=s.owner==='player'?`rgba(90,210,145,${alpha})`:s.owner==='enemy'?`rgba(230,92,78,${alpha})`:`rgba(220,210,150,${alpha*.45})`;c.fillRect(s.x0*sx,s.y0*sy,(s.x1-s.x0)*sx,(s.y1-s.y0)*sy);c.strokeStyle='rgba(220,240,229,.12)';c.strokeRect(s.x0*sx+.5,s.y0*sy+.5,(s.x1-s.x0)*sx-1,(s.y1-s.y0)*sy-1);}

@@ -1,0 +1,1209 @@
+BUILD206 DETERMINISM AUDIT
+Simulation-time code must not branch on wall-clock or unseeded randomness.
+
+===== authoritative-simulation-bundle-v172.js =====
+bytes=1899971 lines=35408
+
+### Math.random: 7
+--- Math.random #1 @ line 6811 · enclosing line 6810: for ---
+  6807:       this.scorchMarks.push({ x, y, radius: massive ? radius * 0.55 : radius * 0.28, age: 0 });
+  6808:       this.sound.explosion(massive || damage > 300);
+  6809:       if (massive) {
+  6810:         for (let i = 0; i < 10; i += 1) {
+  6811:           const a = Math.random() * TWO_PI;
+  6812:           const r = Math.random() * radius * 0.6;
+  6813:           this.addEffect({ type: 'explosion', x: x + Math.cos(a) * r, y: y + Math.sin(a) * r, radius: 40 + Math.random() * 80, duration: 0.7 + Math.random() * 0.5 });
+  6814:         }
+  6815:       }
+--- Math.random #2 @ line 6812 · enclosing line 6810: for ---
+  6808:       this.sound.explosion(massive || damage > 300);
+  6809:       if (massive) {
+  6810:         for (let i = 0; i < 10; i += 1) {
+  6811:           const a = Math.random() * TWO_PI;
+  6812:           const r = Math.random() * radius * 0.6;
+  6813:           this.addEffect({ type: 'explosion', x: x + Math.cos(a) * r, y: y + Math.sin(a) * r, radius: 40 + Math.random() * 80, duration: 0.7 + Math.random() * 0.5 });
+  6814:         }
+  6815:       }
+  6816:     }
+--- Math.random #3 @ line 6813 · enclosing line 6810: for ---
+  6809:       if (massive) {
+  6810:         for (let i = 0; i < 10; i += 1) {
+  6811:           const a = Math.random() * TWO_PI;
+  6812:           const r = Math.random() * radius * 0.6;
+  6813:           this.addEffect({ type: 'explosion', x: x + Math.cos(a) * r, y: y + Math.sin(a) * r, radius: 40 + Math.random() * 80, duration: 0.7 + Math.random() * 0.5 });
+  6814:         }
+  6815:       }
+  6816:     }
+  6817: 
+--- Math.random #4 @ line 10581 · enclosing line 10571: if ---
+ 10577:         ctx.fillRect(0, 0, canvas.width, canvas.height);
+ 10578:       }
+ 10579:       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ 10580: 
+ 10581:       const shakeX = this.cameraShake ? (Math.random() - 0.5) * this.cameraShake : 0;
+ 10582:       const shakeY = this.cameraShake ? (Math.random() - 0.5) * this.cameraShake : 0;
+ 10583:       ctx.save();
+ 10584:       ctx.translate(shakeX, shakeY);
+ 10585:       this.applyGroundTransform(ctx);
+--- Math.random #5 @ line 10582 · enclosing line 10571: if ---
+ 10578:       }
+ 10579:       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ 10580: 
+ 10581:       const shakeX = this.cameraShake ? (Math.random() - 0.5) * this.cameraShake : 0;
+ 10582:       const shakeY = this.cameraShake ? (Math.random() - 0.5) * this.cameraShake : 0;
+ 10583:       ctx.save();
+ 10584:       ctx.translate(shakeX, shakeY);
+ 10585:       this.applyGroundTransform(ctx);
+ 10586:       this.drawTerrain();
+--- Math.random #6 @ line 14548 · enclosing line 14548: for ---
+ 14544:       const length = Math.floor(ac.sampleRate * 1.1);
+ 14545:       const buffer = ac.createBuffer(1, length, ac.sampleRate);
+ 14546:       const data = buffer.getChannelData(0);
+ 14547:       let last = 0;
+ 14548:       for (let i = 0; i < length; i += 1) { const white = Math.random() * 2 - 1; last = last * 0.88 + white * 0.12; data[i] = white * 0.62 + last * 0.38; }
+ 14549:       this._noiseBuffer = buffer;
+ 14550:     }
+ 14551:     const now = ac.currentTime;
+ 14552:     const src = ac.createBufferSource(); src.buffer = this._noiseBuffer;
+--- Math.random #7 @ line 16619 · enclosing line 16613: while ---
+ 16615:       const amount = Math.max(1, Math.round(node.extract(this.stats.extractPerTick || 20)));
+ 16616:       if (amount <= 0) break;
+ 16617:       this.game.teams[this.team].credits += amount;
+ 16618:       if (this.team === 'player') this.game.stats.resourcesCollected += amount;
+ 16619:       if (Math.random() < 0.18) this.game.addEffect({ type: 'spark', x: this.x + (Math.random() - 0.5) * this.radius * 0.5, y: this.y + (Math.random() - 0.5) * this.radius * 0.4, color: this.typeId === 'gasPump' ? '#8be7ff' : '#ffd27a', duration: 0.45 });
+ 16620:     }
+ 16621:   };
+ 16622: 
+ 16623:   const baseDie80 = Building.prototype.die;
+
+### Date.now: 4
+--- Date.now #1 @ line 4407 · enclosing line 4351: constructor ---
+  4403:         spyCellsCreated: 0,
+  4404:         interceptionSpend: 0,
+  4405:         strategicSpend: 0,
+  4406:         strategicLaunches: 0,
+  4407:         startedAt: Date.now()
+  4408:       };
+  4409:       this.camera = { x: 0, y: 0, zoom: 1.08, yaw: -0.42, pitch: 0.58 };
+  4410:       this.enemyStrategicTimer = 38;
+  4411:       this.input = {
+--- Date.now #2 @ line 7698 · enclosing line 7672: save ---
+  7694:           scorchMarks: this.scorchMarks.slice(-80),
+  7695:           selectedIds: this.selected.map((entity) => entity.id),
+  7696:           controlGroups: this.controlGroups,
+  7697:           ai: this.ai?.serialize() || null,
+  7698:           savedAt: Date.now()
+  7699:         };
+  7700:         storageSet(SAVE_KEY, JSON.stringify(data));
+  7701:         DOM.loadButton.disabled = false;
+  7702:         if (notify) this.alert('Игра сохранена', 'info');
+--- Date.now #3 @ line 30186 · enclosing line 30126: GameClass.prototype.renderSelectionUI ---
+ 30182:   const AIR_TOUCH_PAD = 24;
+ 30183:   const TAU = Math.PI * 2;
+ 30184:   const canvas = typeof document !== 'undefined' ? document.getElementById('game-canvas') : null;
+ 30185:   const context = canvas?.getContext?.('2d') || null;
+ 30186:   const now133 = () => typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+ 30187:   const clamp133 = (value, min, max) => Math.max(min, Math.min(max, value));
+ 30188:   const angleDelta133 = (from, to) => Math.atan2(Math.sin(to - from), Math.cos(to - from));
+ 30189:   const distance133 = (left, right) => Math.hypot((left?.x || 0) - (right?.x || 0), (left?.y || 0) - (right?.y || 0));
+ 30190:   const hash133 = (value) => {
+--- Date.now #4 @ line 33192 · enclosing line 33189: GameClass.prototype.selectAt ---
+ 33188: 
+ 33189:   GameClass.prototype.selectAt = function(worldX, worldY, additive = false) {
+ 33190:     const hits = this.getUnitFigureHits140(worldX, worldY);
+ 33191:     const pointer = this.worldToScreen(worldX, worldY, 0);
+ 33192:     const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+ 33193:     let entity = null;
+ 33194:     if (hits.length) {
+ 33195:       const signature = hits.map((hit) => hit.unit.id).join('|');
+ 33196:       const previous = this._figureClickCycle140;
+
+### performance.now: 28
+--- performance.now #1 @ line 1505 · enclosing line 1504: shot ---
+  1501:     click() { this.tone(520, 0.05, 0.018, 'sine', 80); }
+  1502:     build() { this.tone(280, 0.09, 0.025, 'triangle', 240); }
+  1503:     alert() { this.tone(680, 0.16, 0.025, 'sine', -120); }
+  1504:     shot(heavy = false) {
+  1505:       const now = performance.now();
+  1506:       if (now - this.lastShot < 55) return;
+  1507:       this.lastShot = now;
+  1508:       this.tone(heavy ? 95 : 190, heavy ? 0.14 : 0.055, heavy ? 0.038 : 0.015, 'square', heavy ? -40 : -70);
+  1509:     }
+--- performance.now #2 @ line 6965 · enclosing line 6963: selectAt ---
+  6961:     }
+  6962: 
+  6963:     selectAt(worldX, worldY, additive = false) {
+  6964:       const entity = this.hitTest(worldX, worldY, true);
+  6965:       const now = performance.now();
+  6966:       const isDouble = entity && now - this.input.lastClick.time < 330 && this.input.lastClick.typeId === entity.typeId && this.input.lastClick.kind === entity.kind;
+  6967:       this.input.lastClick = { time: now, typeId: entity?.typeId || null, kind: entity?.kind || null };
+  6968:       if (!entity) {
+  6969:         if (!additive) this.clearSelection();
+--- performance.now #3 @ line 7013 · enclosing line 7007: recallControlGroup ---
+  7009:       if (!entities.length) return;
+  7010:       this.setSelection(entities, false);
+  7011:       if (this.input.keys.has('ShiftLeft') || this.input.keys.has('ShiftRight')) return;
+  7012:       const center = entities.reduce((acc, entity) => ({ x: acc.x + entity.x / entities.length, y: acc.y + entity.y / entities.length }), { x: 0, y: 0 });
+  7013:       const now = performance.now();
+  7014:       if (this._lastGroupRecall?.index === index && now - this._lastGroupRecall.time < 350) this.centerCamera(center.x, center.y);
+  7015:       this._lastGroupRecall = { index, time: now };
+  7016:     }
+  7017: 
+--- performance.now #4 @ line 13536 · enclosing line 13520: Game.prototype.selectRect ---
+ 13532: 
+ 13533: 
+ 13534:   let game = null;
+ 13535:   let animationFrame = null;
+ 13536:   let lastFrameTime = performance.now();
+ 13537:   let selectedFaction = 'vanguard';
+ 13538:   let selectedDifficulty = 'normal';
+ 13539:   let fullscreenTransitionUntil = 0;
+ 13540: 
+--- performance.now #5 @ line 13572 · enclosing line 13571: toggleFullscreen ---
+ 13568:     setTimeout(() => message.remove(), 5000);
+ 13569:   }
+ 13570: 
+ 13571:   async function toggleFullscreen() {
+ 13572:     fullscreenTransitionUntil = performance.now() + 1200;
+ 13573:     try {
+ 13574:       const nativeFullscreen = getFullscreenElement();
+ 13575:       const fallbackActive = document.documentElement.classList.contains('fullscreen-fallback');
+ 13576:       if (!nativeFullscreen && !fallbackActive) {
+--- performance.now #6 @ line 13606 · enclosing line 13601: setPaused ---
+ 13602:     if (!game || game.ended) return;
+ 13603:     game.paused = paused;
+ 13604:     setModalVisibility(DOM.pauseScreen, paused);
+ 13605:     if (!paused) setModalVisibility(DOM.helpScreen, false);
+ 13606:     lastFrameTime = performance.now();
+ 13607:   }
+ 13608: 
+ 13609:   function startGame(options) {
+ 13610:     try {
+--- performance.now #7 @ line 13617 · enclosing line 13609: startGame ---
+ 13613:       setModalVisibility(DOM.endScreen, false);
+ 13614:       DOM.alerts.innerHTML = '';
+ 13615:       game = new Game(options);
+ 13616:       game.sound.ensure();
+ 13617:       lastFrameTime = performance.now();
+ 13618:       if (!animationFrame) animationFrame = requestAnimationFrame(loop);
+ 13619:     } catch (error) {
+ 13620:       console.error(error);
+ 13621:       storageRemove(SAVE_KEY);
+--- performance.now #8 @ line 13656 · enclosing line 13650: runLegionClockV125 ---
+ 13652:     if (!usesLegionClockV125() || !window.__FD_V9__ || !game?.simulateFixed) {
+ 13653:       stopLegionClockV125();
+ 13654:       return;
+ 13655:     }
+ 13656:     const now = performance.now();
+ 13657:     const simulationInterval = window.__FD_V9__.SIM_DT * 1000;
+ 13658:     const renderInterval = 80;
+ 13659:     if (!legionNextSimulationAtV125) {
+ 13660:       legionNextSimulationAtV125 = now;
+--- performance.now #9 @ line 13668 · enclosing line 13665: if ---
+ 13664: 
+ 13665:     if (!game.paused && !game.ended && now + .25 >= legionNextSimulationAtV125) {
+ 13666:       game.simulateFixed(window.__FD_V9__.SIM_DT);
+ 13667:       legionNextSimulationAtV125 += simulationInterval;
+ 13668:       if (performance.now() - legionNextSimulationAtV125 > simulationInterval) {
+ 13669:         legionNextSimulationAtV125 = performance.now() + simulationInterval;
+ 13670:       }
+ 13671:     } else if (game.paused || game.ended) {
+ 13672:       legionNextSimulationAtV125 = now + simulationInterval;
+--- performance.now #10 @ line 13669 · enclosing line 13665: if ---
+ 13665:     if (!game.paused && !game.ended && now + .25 >= legionNextSimulationAtV125) {
+ 13666:       game.simulateFixed(window.__FD_V9__.SIM_DT);
+ 13667:       legionNextSimulationAtV125 += simulationInterval;
+ 13668:       if (performance.now() - legionNextSimulationAtV125 > simulationInterval) {
+ 13669:         legionNextSimulationAtV125 = performance.now() + simulationInterval;
+ 13670:       }
+ 13671:     } else if (game.paused || game.ended) {
+ 13672:       legionNextSimulationAtV125 = now + simulationInterval;
+ 13673:     }
+--- performance.now #11 @ line 13675 · enclosing line 13665: if ---
+ 13671:     } else if (game.paused || game.ended) {
+ 13672:       legionNextSimulationAtV125 = now + simulationInterval;
+ 13673:     }
+ 13674: 
+ 13675:     const afterSimulation = performance.now();
+ 13676:     if (afterSimulation + .25 >= legionNextRenderAtV125) {
+ 13677:       const renderDt = Math.min(.10, Math.max(0, (afterSimulation - legionLastRenderAtV125) / 1000));
+ 13678:       legionLastRenderAtV125 = afterSimulation;
+ 13679:       game.updateCamera(renderDt);
+--- performance.now #12 @ line 13682 · enclosing line 13676: if ---
+ 13678:       legionLastRenderAtV125 = afterSimulation;
+ 13679:       game.updateCamera(renderDt);
+ 13680:       game.renderer.render(game.renderSnapshot, 1);
+ 13681:       legionNextRenderAtV125 += renderInterval;
+ 13682:       if (performance.now() - legionNextRenderAtV125 > renderInterval) {
+ 13683:         legionNextRenderAtV125 = performance.now() + renderInterval;
+ 13684:       }
+ 13685:     }
+ 13686: 
+--- performance.now #13 @ line 13683 · enclosing line 13676: if ---
+ 13679:       game.updateCamera(renderDt);
+ 13680:       game.renderer.render(game.renderSnapshot, 1);
+ 13681:       legionNextRenderAtV125 += renderInterval;
+ 13682:       if (performance.now() - legionNextRenderAtV125 > renderInterval) {
+ 13683:         legionNextRenderAtV125 = performance.now() + renderInterval;
+ 13684:       }
+ 13685:     }
+ 13686: 
+ 13687:     const nextDue = Math.min(legionNextSimulationAtV125, legionNextRenderAtV125);
+--- performance.now #14 @ line 13688 · enclosing line 13676: if ---
+ 13684:       }
+ 13685:     }
+ 13686: 
+ 13687:     const nextDue = Math.min(legionNextSimulationAtV125, legionNextRenderAtV125);
+ 13688:     const delay = clamp(nextDue - performance.now(), 0, 20);
+ 13689:     legionClockTimerV125 = setTimeout(runLegionClockV125, delay);
+ 13690:   }
+ 13691: 
+ 13692:   function ensureLegionClockV125() {
+--- performance.now #15 @ line 13972 · enclosing line 13912: if ---
+ 13968:     game?.input.keys.delete(event.code);
+ 13969:   });
+ 13970: 
+ 13971:   window.addEventListener('blur', () => {
+ 13972:     if (performance.now() < fullscreenTransitionUntil) return;
+ 13973:     if (!window.__FD_MULTIPLAYER_ACTIVE__ && game && !game.ended && !game.paused && DOM.helpScreen.classList.contains('hidden')) setPaused(true);
+ 13974:   });
+ 13975: 
+ 13976:   window.addEventListener('resize', () => game?.resize());
+--- performance.now #16 @ line 14561 · enclosing line 14560: SoundEngine.prototype.shot ---
+ 14557:   SoundEngine.prototype.click = function() { this.tone(690, 0.035, 0.012, 'sine', -80); this.tone(1160, 0.022, 0.006, 'triangle', -120); };
+ 14558:   SoundEngine.prototype.build = function() { this.noiseBurst(0.16, 0.018, 2100, 'bandpass'); this.tone(225, 0.14, 0.018, 'triangle', 165); this.tone(460, 0.08, 0.008, 'sine', 90); };
+ 14559:   SoundEngine.prototype.alert = function() { this.tone(760, 0.12, 0.018, 'sine', -95); setTimeout(() => this.tone(570, 0.11, 0.014, 'sine', -70), 65); };
+ 14560:   SoundEngine.prototype.shot = function(heavy = false) {
+ 14561:     const now = performance.now(); if (now - this.lastShot < (heavy ? 72 : 42)) return; this.lastShot = now;
+ 14562:     if (heavy) { this.noiseBurst(0.19, 0.032, 820, 'lowpass'); this.tone(78, 0.20, 0.029, 'sine', -38); this.tone(164, 0.055, 0.016, 'square', -75); }
+ 14563:     else { this.noiseBurst(0.055, 0.014, 2600, 'bandpass'); this.tone(205, 0.045, 0.010, 'triangle', -95); }
+ 14564:   };
+ 14565:   SoundEngine.prototype.explosion = function(large = false) {
+--- performance.now #17 @ line 17333 · enclosing line 17278: Game.prototype.updateUI ---
+ 17329:   const clampV9 = (v, a, b) => Math.max(a, Math.min(b, v));
+ 17330:   const lerpV9 = (a, b, t) => a + (b - a) * t;
+ 17331:   const angleLerpV9 = (a, b, t) => a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * t;
+ 17332:   const keyV9 = (cx, cy) => ((cx & 0xffff) << 16) ^ (cy & 0xffff);
+ 17333:   const nowV9 = () => performance.now();
+ 17334:   const hashPhaseV9 = (id) => {
+ 17335:     let h = 2166136261;
+ 17336:     const s = String(id || '0');
+ 17337:     for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+--- performance.now #18 @ line 18093 · enclosing line 17960: if ---
+ 18089:       zoom: game.camera.zoom,
+ 18090:       yaw: game.camera.yaw,
+ 18091:       anchorWorld: worldAt(game, center),
+ 18092:       startCenter: center,
+ 18093:       startedAt: performance.now(),
+ 18094:       moved: false,
+ 18095:       cancelled: false,
+ 18096:       modeAtStart: mode
+ 18097:     };
+--- performance.now #19 @ line 18228 · enclosing line 18223: if ---
+ 18224:         const gesture = multiGesture;
+ 18225:         multiUntilClear = false;
+ 18226:         multiGesture = null;
+ 18227:         clearLegacyPointerState(game);
+ 18228:         const quickTap = gesture && !gesture.cancelled && !gesture.moved && performance.now() - gesture.startedAt <= 520;
+ 18229:         if (quickTap && game && !game.paused && !game.ended && gesture.modeAtStart !== 'camera') {
+ 18230:           const selected = game.getSelectedUnits?.() || [];
+ 18231:           const primary = game.getPrimarySelection?.();
+ 18232:           const rallyBuilding = primary?.kind === 'building' && primary.team === 'player' && primary.completed && primary.stats?.produces?.length ? primary : null;
+--- performance.now #20 @ line 18271 · enclosing line 18269: if ---
+ 18267:     }
+ 18268: 
+ 18269:     if (gesture.type === 'selectTap') {
+ 18270:       if (cancelled || !game || game.paused || game.ended || Math.hypot(point.x - gesture.startX, point.y - gesture.startY) > 12) return;
+ 18271:       const now = performance.now();
+ 18272:       const previous = lastSelectTap;
+ 18273:       const target = game.hitTest?.(gesture.worldX, gesture.worldY, false);
+ 18274:       const selectedIds = (game.getSelectedUnits?.() || []).map((unit) => unit.id);
+ 18275:       lastSelectTap = { time: now, x: point.x, y: point.y, empty: !target, selectedIds };
+--- performance.now #21 @ line 18718 · enclosing line 18717: GameClass.prototype.issueContext ---
+ 18714:   // not duplicate them. The fallback covers trackpads and styluses whose
+ 18715:   // secondary click occasionally arrives without a conventional button-up.
+ 18716:   const baseIssueContext91 = GameClass.prototype.issueContext;
+ 18717:   GameClass.prototype.issueContext = function(...args) {
+ 18718:     this._v91LastCanvasOrderAt = performance.now();
+ 18719:     return baseIssueContext91.apply(this, args);
+ 18720:   };
+ 18721:   const baseIssueOrientedMove91 = GameClass.prototype.issueOrientedMove78;
+ 18722:   if (baseIssueOrientedMove91) {
+--- performance.now #22 @ line 18724 · enclosing line 18723: GameClass.prototype.issueOrientedMove78 ---
+ 18720:   };
+ 18721:   const baseIssueOrientedMove91 = GameClass.prototype.issueOrientedMove78;
+ 18722:   if (baseIssueOrientedMove91) {
+ 18723:     GameClass.prototype.issueOrientedMove78 = function(...args) {
+ 18724:       this._v91LastCanvasOrderAt = performance.now();
+ 18725:       return baseIssueOrientedMove91.apply(this, args);
+ 18726:     };
+ 18727:   }
+ 18728: 
+--- performance.now #23 @ line 18738 · enclosing line 18723: GameClass.prototype.issueOrientedMove78 ---
+ 18734:   canvas.addEventListener('contextmenu', (event) => {
+ 18735:     event.preventDefault();
+ 18736:     const game = debug.game;
+ 18737:     if (!game || game.paused || game.ended) return;
+ 18738:     if (performance.now() - (game._v91LastCanvasOrderAt || -999) < 180) return;
+ 18739:     const units = game.getSelectedUnits?.() || [];
+ 18740:     const building = game.getPrimarySelection?.();
+ 18741:     if (!units.length && !isRallyBuilding91(building)) return;
+ 18742:     const world = worldFromCanvasEvent91(game, event);
+--- performance.now #24 @ line 20342 · enclosing line 20293: Game.prototype.render ---
+ 20338:   const MINI_CELL = 256;
+ 20339:   const clamp94 = (value, min, max) => Math.max(min, Math.min(max, value));
+ 20340:   const lerp94 = (a, b, t) => a + (b - a) * t;
+ 20341:   const angleLerp94 = (a, b, t) => a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * t;
+ 20342:   const now94 = () => performance.now();
+ 20343:   const numberFormat94 = new Intl.NumberFormat('ru-RU');
+ 20344:   const lightUi94 = {
+ 20345:     credits: document.getElementById('credits-value'),
+ 20346:     power: document.getElementById('power-value'),
+--- performance.now #25 @ line 22649 · enclosing line 22645: GameClass.prototype.issueContext ---
+ 22645:   GameClass.prototype.issueContext = function(x, y, append = false) {
+ 22646:     const target = this.hitTestForContext?.(x, y) || this.hitTest?.(x, y, false);
+ 22647:     const selected = this.getSelectedUnits?.() || [];
+ 22648:     if (target && isTransport(target) && target.team === 'player' && compatibleSelected(this, target, selected).length) {
+ 22649:       this._v91LastCanvasOrderAt = performance.now();
+ 22650:       return this.issueLoadTransport95(target, selected, append);
+ 22651:     }
+ 22652:     return baseIssueContext95.call(this, x, y, append);
+ 22653:   };
+--- performance.now #26 @ line 24909 · enclosing line 24857: if ---
+ 24905:   const MASS_TARGET_THRESHOLD = 3000;
+ 24906:   const MASS_TARGET_CANDIDATES = 48;
+ 24907:   const TRAIL_BANDS = 3;
+ 24908:   const clamp120 = (value, min, max) => Math.max(min, Math.min(max, value));
+ 24909:   const now120 = () => performance.now();
+ 24910:   const classBits120 = Object.freeze({ drone: 1, low: 2, medium: 4, high: 8, hypersonic: 16 });
+ 24911:   const guidedTrajectories120 = new Set(['homing', 'cruise', 'swarm', 'aeroballistic', 'loitering', 'hypersonic']);
+ 24912:   const interceptableProfiles120 = new Set([
+ 24913:     'rocket', 'guidedMissile', 'lowObservableMissile', 'cruiseMissile', 'swarmMissile',
+--- performance.now #27 @ line 30186 · enclosing line 30126: GameClass.prototype.renderSelectionUI ---
+ 30182:   const AIR_TOUCH_PAD = 24;
+ 30183:   const TAU = Math.PI * 2;
+ 30184:   const canvas = typeof document !== 'undefined' ? document.getElementById('game-canvas') : null;
+ 30185:   const context = canvas?.getContext?.('2d') || null;
+ 30186:   const now133 = () => typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+ 30187:   const clamp133 = (value, min, max) => Math.max(min, Math.min(max, value));
+ 30188:   const angleDelta133 = (from, to) => Math.atan2(Math.sin(to - from), Math.cos(to - from));
+ 30189:   const distance133 = (left, right) => Math.hypot((left?.x || 0) - (right?.x || 0), (left?.y || 0) - (right?.y || 0));
+ 30190:   const hash133 = (value) => {
+--- performance.now #28 @ line 33192 · enclosing line 33189: GameClass.prototype.selectAt ---
+ 33188: 
+ 33189:   GameClass.prototype.selectAt = function(worldX, worldY, additive = false) {
+ 33190:     const hits = this.getUnitFigureHits140(worldX, worldY);
+ 33191:     const pointer = this.worldToScreen(worldX, worldY, 0);
+ 33192:     const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+ 33193:     let entity = null;
+ 33194:     if (hits.length) {
+ 33195:       const signature = hits.map((hit) => hit.unit.id).join('|');
+ 33196:       const previous = this._figureClickCycle140;
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 12
+--- setTimeout #1 @ line 6862 · enclosing line 6856: alert ---
+  6858:       el.className = `alert ${level}`;
+  6859:       el.textContent = message;
+  6860:       DOM.alerts.prepend(el);
+  6861:       while (DOM.alerts.children.length > 5) DOM.alerts.lastElementChild.remove();
+  6862:       setTimeout(() => el.remove(), 5200);
+  6863:       if (Number.isFinite(x) && Number.isFinite(y)) {
+  6864:         this.lastAlertPosition = { x, y };
+  6865:         this.alertHistory.push({ x, y, time: this.time });
+  6866:       }
+--- setTimeout #2 @ line 13568 · enclosing line 13562: reportFullscreenError ---
+ 13564:     const message = document.createElement('div');
+ 13565:     message.className = 'alert warning';
+ 13566:     message.textContent = 'Браузер заблокировал полноэкранный режим. Нажмите кнопку ещё раз или используйте F11.';
+ 13567:     DOM.alerts.prepend(message);
+ 13568:     setTimeout(() => message.remove(), 5000);
+ 13569:   }
+ 13570: 
+ 13571:   async function toggleFullscreen() {
+ 13572:     fullscreenTransitionUntil = performance.now() + 1200;
+--- setTimeout #3 @ line 13628 · enclosing line 13609: startGame ---
+ 13624:       const message = document.createElement('div');
+ 13625:       message.className = 'alert danger';
+ 13626:       message.textContent = 'Сохранение повреждено или несовместимо. Начните новую игру.';
+ 13627:       DOM.alerts.prepend(message);
+ 13628:       setTimeout(() => message.remove(), 6000);
+ 13629:     }
+ 13630:   }
+ 13631: 
+ 13632:   let performanceAccumulatorV9 = 0;
+--- setTimeout #4 @ line 13689 · enclosing line 13676: if ---
+ 13685:     }
+ 13686: 
+ 13687:     const nextDue = Math.min(legionNextSimulationAtV125, legionNextRenderAtV125);
+ 13688:     const delay = clamp(nextDue - performance.now(), 0, 20);
+ 13689:     legionClockTimerV125 = setTimeout(runLegionClockV125, delay);
+ 13690:   }
+ 13691: 
+ 13692:   function ensureLegionClockV125() {
+ 13693:     if (!legionClockTimerV125) legionClockTimerV125 = setTimeout(runLegionClockV125, 0);
+--- setTimeout #5 @ line 13693 · enclosing line 13692: ensureLegionClockV125 ---
+ 13689:     legionClockTimerV125 = setTimeout(runLegionClockV125, delay);
+ 13690:   }
+ 13691: 
+ 13692:   function ensureLegionClockV125() {
+ 13693:     if (!legionClockTimerV125) legionClockTimerV125 = setTimeout(runLegionClockV125, 0);
+ 13694:   }
+ 13695: 
+ 13696:   function loop(timestamp) {
+ 13697:     const frameDt = Math.min(0.20, Math.max(0, (timestamp - lastFrameTime) / 1000));
+--- setTimeout #6 @ line 14559 · enclosing line 14559: SoundEngine.prototype.alert ---
+ 14555:     src.connect(filter).connect(gain).connect(ac.destination); src.start(now); src.stop(now + duration);
+ 14556:   };
+ 14557:   SoundEngine.prototype.click = function() { this.tone(690, 0.035, 0.012, 'sine', -80); this.tone(1160, 0.022, 0.006, 'triangle', -120); };
+ 14558:   SoundEngine.prototype.build = function() { this.noiseBurst(0.16, 0.018, 2100, 'bandpass'); this.tone(225, 0.14, 0.018, 'triangle', 165); this.tone(460, 0.08, 0.008, 'sine', 90); };
+ 14559:   SoundEngine.prototype.alert = function() { this.tone(760, 0.12, 0.018, 'sine', -95); setTimeout(() => this.tone(570, 0.11, 0.014, 'sine', -70), 65); };
+ 14560:   SoundEngine.prototype.shot = function(heavy = false) {
+ 14561:     const now = performance.now(); if (now - this.lastShot < (heavy ? 72 : 42)) return; this.lastShot = now;
+ 14562:     if (heavy) { this.noiseBurst(0.19, 0.032, 820, 'lowpass'); this.tone(78, 0.20, 0.029, 'sine', -38); this.tone(164, 0.055, 0.016, 'square', -75); }
+ 14563:     else { this.noiseBurst(0.055, 0.014, 2600, 'bandpass'); this.tone(205, 0.045, 0.010, 'triangle', -95); }
+--- setTimeout #7 @ line 14568 · enclosing line 14565: SoundEngine.prototype.explosion ---
+ 14564:   };
+ 14565:   SoundEngine.prototype.explosion = function(large = false) {
+ 14566:     this.noiseBurst(large ? 0.58 : 0.31, large ? 0.052 : 0.032, large ? 520 : 760, 'lowpass');
+ 14567:     this.tone(large ? 42 : 61, large ? 0.62 : 0.34, large ? 0.048 : 0.027, 'sine', -18);
+ 14568:     if (large) setTimeout(() => this.noiseBurst(0.28, 0.019, 1550, 'bandpass'), 55);
+ 14569:   };
+ 14570:   SoundEngine.prototype.missileLaunch = function(heavy = false) { this.noiseBurst(heavy ? 0.52 : 0.30, heavy ? 0.034 : 0.023, 1800, 'bandpass'); this.tone(heavy ? 72 : 118, heavy ? 0.48 : 0.26, 0.018, 'sawtooth', heavy ? 160 : 230); };
+ 14571: 
+ 14572:   // Power-status and air-logistics hints in the top-level tactical interface.
+--- setTimeout #8 @ line 18038 · enclosing line 17960: if ---
+ 18034:   const showHint = (message, duration = 2400) => {
+ 18035:     hint.textContent = message;
+ 18036:     hint.classList.add('visible');
+ 18037:     clearTimeout(hintTimer);
+ 18038:     hintTimer = setTimeout(() => hint.classList.remove('visible'), duration);
+ 18039:   };
+ 18040: 
+ 18041:   const syncMode = () => {
+ 18042:     for (const button of dock.querySelectorAll('[data-touch-mode]')) {
+--- setTimeout #9 @ line 22297 · enclosing line 22289: if ---
+ 22293:     panel.dataset.state = 'waiting';
+ 22294:     panel.textContent = `MASS-STRESS: ожидается запуск матча · цель ${stressCount94.toLocaleString('ru-RU')}`;
+ 22295:     document.body.appendChild(panel);
+ 22296:     document.getElementById('start-game')?.addEventListener('click', () => {
+ 22297:       setTimeout(async () => {
+ 22298:         try {
+ 22299:           panel.dataset.state = 'adding';
+ 22300:           panel.textContent = `MASS-STRESS: создаются ${stressCount94.toLocaleString('ru-RU')} юнитов…`;
+ 22301:           const result = await spawnStressUnits94(stressCount94);
+--- setTimeout #10 @ line 25978 · enclosing line 25953: if ---
+ 25974:         }
+ 25975:         // Yield to input/paint without depending on rAF. Background or cloud
+ 25976:         // tabs may throttle rAF to 1 Hz, which would make the benchmark itself
+ 25977:         // take forty seconds even though object creation is fast.
+ 25978:         await new Promise((resolve) => setTimeout(resolve, 0));
+ 25979:       }
+ 25980:     };
+ 25981:     try {
+ 25982:       await makeSide('player', playerType, -1, players);
+--- setTimeout #11 @ line 26058 · enclosing line 26052: if ---
+ 26054:     panel.id = 'fd-combat-stress120';
+ 26055:     panel.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:100000;padding:9px 11px;border:1px solid rgba(126,238,181,.65);border-radius:8px;background:rgba(4,12,9,.94);color:#d9f6e5;font:12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;pointer-events:none';
+ 26056:     panel.textContent = 'COMBAT-STRESS: ожидается запуск матча';
+ 26057:     document.body.appendChild(panel);
+ 26058:     document.getElementById('start-game')?.addEventListener('click', () => setTimeout(async () => {
+ 26059:       try {
+ 26060:         panel.dataset.state = 'creating';
+ 26061:         panel.dataset.requestedPerSide = String(stressValue120);
+ 26062:         panel.textContent = `COMBAT-STRESS: создаются ${stressValue120.toLocaleString('ru-RU')} × 2 юнитов…`;
+--- setTimeout #12 @ line 26073 · enclosing line 26065: if ---
+ 26069:         if (game) game._v94MaxSimMs = 0;
+ 26070:         if (game) game._v94PerfMax = Object.create(null);
+ 26071:         panel.dataset.state = 'warming';
+ 26072:         panel.textContent = `COMBAT-STRESS: ${result.units.toLocaleString('ru-RU')} юнитов · ${result.missiles} ракет · прогрев 4 с…`;
+ 26073:         await new Promise((resolve) => setTimeout(resolve, 4000));
+ 26074:         panel.dataset.state = 'sampling';
+ 26075:         panel.textContent = `COMBAT-STRESS: ${result.units.toLocaleString('ru-RU')} юнитов · инструментальный замер 8 с…`;
+ 26076:         let frames = 0;
+ 26077:         const frameIntervals = [];
+
+### setInterval: 0
+
+===== authoritative-simulation-worker-v174.js =====
+bytes=188013 lines=1403
+
+### Math.random: 0
+
+### Date.now: 2
+--- Date.now #1 @ line 325 · enclosing line 297: captureSaveData ---
+   321:   };
+   322:   data.logistics206 = game.exportLogistics206?.() || null;
+   323:   data.workerTransient206 = game.exportWorkerTransient206?.() || null;
+   324:   if (data.authoritative172) data.authoritative172.networkAppliedSeq206 = Number(multiplayer.appliedSeq || 0);
+   325:   data.savedAt = Date.now();
+   326:   return data;
+   327: }
+   328: 
+   329: function canonicalTeamCode(team) {
+--- Date.now #2 @ line 1307 · enclosing line 1301: if ---
+  1303:     shared165.renderIds.subarray(renderBase165, renderBase165 + render.unitIds.length).set(render.unitIds);
+  1304:     publishSharedSlot165(sharedSlot165, sequence165, tick, units.length, projectiles.length, render.unitIds.length);
+  1305:   }
+  1306:   const message = {
+  1307:     type: 'snapshot', version: VERSION, build: BUILD, sequence: sequence165, wallClock165: Date.now(),
+  1308:     tick, time: game.time, simMs, stateHash: lastStateHash, subsystemHashes: lastSubsystemHashes, networkHash, networkHashTick: lastNetworkHashTick, networkLogisticsHash206: lastNetworkLogisticsHash206, networkLogisticsComponents206: lastNetworkLogisticsComponents206, networkBaseComponents206: lastNetworkBaseComponents206, initialNetworkHash206, initialNetworkLogisticsHash206, initialNetworkLogisticsComponents206, initialNetworkBaseComponents206, appliedSeq: multiplayer.appliedSeq || 0, rngSeed: game.rng?.seed || game.seed,
+  1309:     counts: { units: allAliveUnits.length, buildings: buildings.length, resources: resources.length, projectiles: projectiles.length },
+  1310:     counters: { idCounter: game.idCounter, projectileCounter: game.projectileCounter, formationCounter: game.formationCounter },
+  1311:     unitIds: sharedSlot165 >= 0 ? null : unitIds, unitFloats: sharedSlot165 >= 0 ? null : unitFloats, unitInts: sharedSlot165 >= 0 ? null : unitInts,
+
+### performance.now: 14
+--- performance.now #1 @ line 128 · enclosing line 66: D.Game.prototype.unitSimLodV9 ---
+   124: let endEvent = null;
+   125: let legacySave = null;
+   126: let lastStateHash = 0;
+   127: let lastSubsystemHashes = null;
+   128: let workerStartedAt = performance.now();
+   129: let ticksExecuted = 0;
+   130: let maxTickMs = 0;
+   131: let totalTickMs = 0;
+   132: let lastHashTick = -1;
+--- performance.now #2 @ line 670 · enclosing line 667: initGame ---
+   666: 
+   667: function initGame(message) {
+   668:   const saveData = canonicalFreshNetworkLogistics206(message.saveData || null, message.multiplayer || {});
+   669:   attachShared165(message.shared165 || null);
+   670:   multiplayer = { ...multiplayer, ...(message.multiplayer || {}), hostTickReceivedAt: performance.now(), appliedSeq: Number(message.multiplayer?.appliedSeq) || 0 };
+   671:   /* Constructor UI methods are replaced before instantiation. */
+   672:   for (const method of ['resize','showHud','hideHud','updateUI','render','renderMinimap','renderSelectionUI','renderActionUI','renderPowersUI']) {
+   673:     D.Game.prototype[method] = function noopHeadless() {};
+   674:   }
+--- performance.now #3 @ line 730 · enclosing line 689: if ---
+   726:   initialNetworkLogisticsHash206 = lastNetworkLogisticsHash206;
+   727:   initialNetworkLogisticsComponents206 = lastNetworkLogisticsComponents206 ? plainClone(lastNetworkLogisticsComponents206) : null;
+   728:   initialNetworkBaseComponents206 = lastNetworkBaseComponents206 ? plainClone(lastNetworkBaseComponents206) : null;
+   729:   running = true;
+   730:   workerStartedAt = performance.now();
+   731:   makeSnapshot(true);
+   732:   postMessage({
+   733:     type: 'ready', version: VERSION, build: BUILD, simHz: SIM_HZ,
+   734:     tick: game.simTick, time: game.time, stateHash: stateHash(),
+--- performance.now #4 @ line 975 · enclosing line 973: runTick ---
+   971: }
+   972: 
+   973: function runTick() {
+   974:   if (!game || paused || game.ended) return 0;
+   975:   const started = performance.now();
+   976:   drainActions();
+   977:   deterministicHotSet();
+   978:   game.simulateFixed(SIM_DT);
+   979:   const core = game.operationalCore160;
+--- performance.now #5 @ line 988 · enclosing line 981: if ---
+   984:       try { core.update(SIM_DT); } finally { core.updateAI = updateAI; core.updateOperations = updateOperations; }
+   985:     } else core.update(SIM_DT);
+   986:   }
+   987:   ticksExecuted += 1;
+   988:   const elapsed = performance.now() - started;
+   989:   totalTickMs += elapsed;
+   990:   maxTickMs = Math.max(maxTickMs, elapsed);
+   991:   const count = game.units.length;
+   992:   const snapshotEvery = count >= 80000 ? 8 : count >= 40000 ? 6 : count >= 12000 ? 4 : count >= 2500 ? 2 : 1;
+--- performance.now #6 @ line 999 · enclosing line 997: startClock ---
+   995: }
+   996: 
+   997: function startClock() {
+   998:   if (timer) clearTimeout(timer);
+   999:   nextTickAt = performance.now();
+  1000:   const pump = () => {
+  1001:     timer = 0;
+  1002:     if (!running || manualMode) return;
+  1003:     const now = performance.now();
+--- performance.now #7 @ line 1003 · enclosing line 997: startClock ---
+   999:   nextTickAt = performance.now();
+  1000:   const pump = () => {
+  1001:     timer = 0;
+  1002:     if (!running || manualMode) return;
+  1003:     const now = performance.now();
+  1004:     let steps = 0;
+  1005:     let guestTarget = Infinity;
+  1006:     if (multiplayer.active && multiplayer.role === 'guest') {
+  1007:       const age = now - (multiplayer.hostTickReceivedAt || 0);
+--- performance.now #8 @ line 1030 · enclosing line 1011: while ---
+  1026:       }
+  1027:       nextTickAt += 1000 / SIM_HZ;
+  1028:       steps += 1;
+  1029:     }
+  1030:     if (paused || game?.ended || guestTarget < 0 || (guestTarget !== Infinity && (game?.simTick || 0) >= guestTarget)) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1031:     if (performance.now() - nextTickAt > 200) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1032:     const delay = clamp(nextTickAt - performance.now(), 0, 20);
+  1033:     timer = setTimeout(pump, delay);
+  1034:   };
+--- performance.now #9 @ line 1031 · enclosing line 1011: while ---
+  1027:       nextTickAt += 1000 / SIM_HZ;
+  1028:       steps += 1;
+  1029:     }
+  1030:     if (paused || game?.ended || guestTarget < 0 || (guestTarget !== Infinity && (game?.simTick || 0) >= guestTarget)) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1031:     if (performance.now() - nextTickAt > 200) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1032:     const delay = clamp(nextTickAt - performance.now(), 0, 20);
+  1033:     timer = setTimeout(pump, delay);
+  1034:   };
+  1035:   timer = setTimeout(pump, 0);
+--- performance.now #10 @ line 1032 · enclosing line 1011: while ---
+  1028:       steps += 1;
+  1029:     }
+  1030:     if (paused || game?.ended || guestTarget < 0 || (guestTarget !== Infinity && (game?.simTick || 0) >= guestTarget)) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1031:     if (performance.now() - nextTickAt > 200) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1032:     const delay = clamp(nextTickAt - performance.now(), 0, 20);
+  1033:     timer = setTimeout(pump, delay);
+  1034:   };
+  1035:   timer = setTimeout(pump, 0);
+  1036: }
+--- performance.now #11 @ line 1332 · enclosing line 1301: if ---
+  1328:     minefields141: (force || tick % 8 === 0) ? plainClone(game.minefields141 || game.mineFields141 || []) : null,
+  1329:     effects: effectEvents.splice(0), alerts: alertEvents.splice(0), endEvent: endEvent ? { ...endEvent } : null,
+  1330:     performance: {
+  1331:       ticksExecuted, averageTickMs: ticksExecuted ? totalTickMs / ticksExecuted : 0,
+  1332:       maxTickMs, uptimeMs: performance.now() - workerStartedAt, actionQueue: actionQueue.length,
+  1333:       snapshotBytes: (sharedSlot165 >= 0 ? 0 : unitIds.byteLength + unitFloats.byteLength + unitInts.byteLength + projectileIds.byteLength + projectileFloats.byteLength + projectileInts.byteLength + render.unitIds.byteLength) + resourceIds.byteLength + resourceFloats.byteLength, transport165: sharedSlot165 >= 0 ? 'shared-triple' : 'transfer-fallback', combat166: game.combatScaleDiagnostics166?.() || null, deep182: game.deepOperationsDiagnostics182?.() || null, formation183: game.formationMarchDiagnostics183?.() || null, fortress183: game.fortressDefenseDiagnostics183?.() || null, action184: game.actionGroupDiagnostics184?.() || null, objective184: game.constructionVictoryDiagnostics184?.() || null
+  1334:     }
+  1335:   };
+  1336:   const transfers = [resourceIds.buffer, resourceFloats.buffer];
+--- performance.now #12 @ line 1353 · enclosing line 1350: if ---
+  1349:       case 'action': {
+  1350:         if (message.resumeIfMainRunning && paused && !game?.ended) {
+  1351:           paused = false;
+  1352:           if (game) game.paused = false;
+  1353:           nextTickAt = performance.now();
+  1354:         }
+  1355:         actionSequence = Math.max(actionSequence, message.seq || 0);
+  1356:         actionQueue.push({ ...message, seq: message.seq || ++actionSequence, atTick: Number.isFinite(message.atTick) ? message.atTick : (game?.simTick || 0) + 1 });
+  1357:         break;
+--- performance.now #13 @ line 1360 · enclosing line 1350: if ---
+  1356:         actionQueue.push({ ...message, seq: message.seq || ++actionSequence, atTick: Number.isFinite(message.atTick) ? message.atTick : (game?.simTick || 0) + 1 });
+  1357:         break;
+  1358:       }
+  1359:       case 'view': mainView = { ...mainView, ...(message.view || {}) }; break;
+  1360:       case 'clockSync': multiplayer.hostTick = Number(message.tick) || 0; multiplayer.hostTickReceivedAt = performance.now(); break;
+  1361:       case 'multiplayer': {
+  1362:         multiplayer = { ...multiplayer, ...(message.multiplayer || {}) };
+  1363:         if (game && multiplayer.active && multiplayer.mode === 'versus') {
+  1364:           if (game.ai) game.ai.update = () => undefined;
+--- performance.now #14 @ line 1369 · enclosing line 1363: if ---
+  1365:           game.updateEnemyStrategicArsenal = () => undefined;
+  1366:         }
+  1367:         break;
+  1368:       }
+  1369:       case 'pause': paused = Boolean(message.paused); if (game) game.paused = false; nextTickAt = performance.now() + 1000 / SIM_HZ; break;
+  1370:       case 'step': {
+  1371:         const count = clamp(Number(message.count) || 1, 1, 5000);
+  1372:         for (let index = 0; index < count; index += 1) runTick();
+  1373:         makeSnapshot(Boolean(message.force));
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 2
+--- setTimeout #1 @ line 1033 · enclosing line 1011: while ---
+  1029:     }
+  1030:     if (paused || game?.ended || guestTarget < 0 || (guestTarget !== Infinity && (game?.simTick || 0) >= guestTarget)) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1031:     if (performance.now() - nextTickAt > 200) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1032:     const delay = clamp(nextTickAt - performance.now(), 0, 20);
+  1033:     timer = setTimeout(pump, delay);
+  1034:   };
+  1035:   timer = setTimeout(pump, 0);
+  1036: }
+  1037: 
+--- setTimeout #2 @ line 1035 · enclosing line 1011: while ---
+  1031:     if (performance.now() - nextTickAt > 200) nextTickAt = performance.now() + 1000 / SIM_HZ;
+  1032:     const delay = clamp(nextTickAt - performance.now(), 0, 20);
+  1033:     timer = setTimeout(pump, delay);
+  1034:   };
+  1035:   timer = setTimeout(pump, 0);
+  1036: }
+  1037: 
+  1038: function makeMiniCells() {
+  1039:   const result = [];
+
+### setInterval: 0
+
+===== operational-core-v160.js =====
+bytes=28195 lines=230
+
+### Math.random: 0
+
+### Date.now: 0
+
+### performance.now: 0
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 0
+
+### setInterval: 0
+No nondeterministic-source tokens found.
+
+===== war-economy-ai-v126.js =====
+bytes=27331 lines=577
+
+### Math.random: 0
+
+### Date.now: 0
+
+### performance.now: 0
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 0
+
+### setInterval: 0
+No nondeterministic-source tokens found.
+
+===== campaign-offensive-ai-v129.js =====
+bytes=24460 lines=545
+
+### Math.random: 0
+
+### Date.now: 0
+
+### performance.now: 0
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 0
+
+### setInterval: 0
+No nondeterministic-source tokens found.
+
+===== adaptive-doctrine-ai-v131.js =====
+bytes=36005 lines=683
+
+### Math.random: 0
+
+### Date.now: 0
+
+### performance.now: 0
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 0
+
+### setInterval: 0
+No nondeterministic-source tokens found.
+
+===== deep-operations-ai-v182.js =====
+bytes=76653 lines=1592
+
+### Math.random: 0
+
+### Date.now: 0
+
+### performance.now: 0
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 0
+
+### setInterval: 0
+No nondeterministic-source tokens found.
+
+===== action-group-simulation-v184.js =====
+FILE MISSING
+
+===== resource-economy-v206.js =====
+bytes=15202 lines=267
+
+### Math.random: 0
+
+### Date.now: 0
+
+### performance.now: 0
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 0
+
+### setInterval: 0
+No nondeterministic-source tokens found.
+
+===== unit-sustainment-v206.js =====
+bytes=14668 lines=315
+
+### Math.random: 0
+
+### Date.now: 0
+
+### performance.now: 0
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 0
+
+### setInterval: 0
+No nondeterministic-source tokens found.
+
+===== ai-logistics-v206.js =====
+bytes=10457 lines=101
+
+### Math.random: 0
+
+### Date.now: 0
+
+### performance.now: 0
+
+### new Date: 0
+
+### crypto random: 0
+
+### setTimeout: 0
+
+### setInterval: 0
+No nondeterministic-source tokens found.
+
+===== SEEDED RNG SITES authoritative-simulation-bundle-v172.js: 55 =====
+--- line 2228 · enclosing line 2214: if ---
+  2226: 
+  2227:       const exposureChance = dt * Math.max(0, defense - skill * 0.30) * (mission === 'recruit' ? 0.032 : 0.022);
+  2228:       if (this.game.time > this.compromisedUntil && this.game.rng.next() < exposureChance) {
+  2229:         this.compromisedUntil = this.game.time + 18 + defense * 7;
+  2230:         this.coverIntegrity = Math.max(0.04, this.coverIntegrity - 0.30);
+--- line 2243 · enclosing line 2236: if ---
+  2241:         this.compromisedUntil = Math.max(this.compromisedUntil, this.game.time + (defense > 0.65 ? 9 : 3));
+  2242:         this.finishCommand();
+  2243:         const escapeAngle = Math.atan2(this.y - target.y, this.x - target.x) + (this.game.rng.next() - 0.5) * 0.9;
+  2244:         const escape = this.game.findReachablePoint(
+  2245:           this.x + Math.cos(escapeAngle) * (220 + this.game.rng.next() * 160),
+--- line 2245 · enclosing line 2236: if ---
+  2243:         const escapeAngle = Math.atan2(this.y - target.y, this.x - target.x) + (this.game.rng.next() - 0.5) * 0.9;
+  2244:         const escape = this.game.findReachablePoint(
+  2245:           this.x + Math.cos(escapeAngle) * (220 + this.game.rng.next() * 160),
+  2246:           this.y + Math.sin(escapeAngle) * (220 + this.game.rng.next() * 160),
+  2247:           this.radius
+--- line 2246 · enclosing line 2236: if ---
+  2244:         const escape = this.game.findReachablePoint(
+  2245:           this.x + Math.cos(escapeAngle) * (220 + this.game.rng.next() * 160),
+  2246:           this.y + Math.sin(escapeAngle) * (220 + this.game.rng.next() * 160),
+  2247:           this.radius
+  2248:         );
+--- line 2485 · enclosing line 2484: if ---
+  2483:         this.sabotagePulse -= dt;
+  2484:         if (this.sabotagePulse <= 0) {
+  2485:           this.sabotagePulse = 0.45 + this.game.rng.next() * 0.55;
+  2486:           this.game.addEffect({ type: 'smoke', x: this.x + (this.game.rng.next() - 0.5) * this.radius, y: this.y - this.radius * 0.25, radius: 18 + this.game.rng.next() * 16, duration: 1.7 });
+  2487:           if (this.game.rng.next() < 0.42) this.game.addEffect({ type: 'spark', x: this.x + (this.game.rng.next() - 0.5) * this.radius, y: this.y + (this.game.rng.next() - 0.5) * this.radius, duration: 0.42, color: '#ff9a5a' });
+--- line 2486 · enclosing line 2484: if ---
+  2484:         if (this.sabotagePulse <= 0) {
+  2485:           this.sabotagePulse = 0.45 + this.game.rng.next() * 0.55;
+  2486:           this.game.addEffect({ type: 'smoke', x: this.x + (this.game.rng.next() - 0.5) * this.radius, y: this.y - this.radius * 0.25, radius: 18 + this.game.rng.next() * 16, duration: 1.7 });
+  2487:           if (this.game.rng.next() < 0.42) this.game.addEffect({ type: 'spark', x: this.x + (this.game.rng.next() - 0.5) * this.radius, y: this.y + (this.game.rng.next() - 0.5) * this.radius, duration: 0.42, color: '#ff9a5a' });
+  2488:         }
+--- line 2487 · enclosing line 2484: if ---
+  2485:           this.sabotagePulse = 0.45 + this.game.rng.next() * 0.55;
+  2486:           this.game.addEffect({ type: 'smoke', x: this.x + (this.game.rng.next() - 0.5) * this.radius, y: this.y - this.radius * 0.25, radius: 18 + this.game.rng.next() * 16, duration: 1.7 });
+  2487:           if (this.game.rng.next() < 0.42) this.game.addEffect({ type: 'spark', x: this.x + (this.game.rng.next() - 0.5) * this.radius, y: this.y + (this.game.rng.next() - 0.5) * this.radius, duration: 0.42, color: '#ff9a5a' });
+  2488:         }
+  2489:         return;
+--- line 2651 · enclosing line 2612: constructor ---
+  2649:       this.age = 0;
+  2650:       this.ttl = data.ttl || Math.max(8, Math.hypot(this.targetX - this.x, this.targetY - this.y) / Math.max(80, this.speed) * 2.2 + 2);
+  2651:       this.phase = data.phase ?? game.rng.range(0, TWO_PI);
+  2652:       this.trail = [];
+  2653:       this.jammed = 0;
+--- line 2660 · enclosing line 2659: if ---
+  2658:       const spread = (1 - this.accuracy) * (24 + initialDistance * 0.16);
+  2659:       if (!data.preserveAim && spread > 0.25) {
+  2660:         const angle = game.rng.range(0, TWO_PI);
+  2661:         const magnitude = spread * Math.sqrt(game.rng.next());
+  2662:         this.targetX += Math.cos(angle) * magnitude;
+--- line 2661 · enclosing line 2659: if ---
+  2659:       if (!data.preserveAim && spread > 0.25) {
+  2660:         const angle = game.rng.range(0, TWO_PI);
+  2661:         const magnitude = spread * Math.sqrt(game.rng.next());
+  2662:         this.targetX += Math.cos(angle) * magnitude;
+  2663:         this.targetY += Math.sin(angle) * magnitude;
+--- line 2689 · enclosing line 2682: if ---
+  2687:       const softKill = this.game.getProjectileJamming ? this.game.getProjectileJamming(this) : 0;
+  2688:       this.jammed = lerp(this.jammed, softKill, clamp(dt * 3.2, 0, 1));
+  2689:       if (guided && this.jammed > 0.25 && this.game.rng.next() < dt * this.jammed * 0.12 / this.evasion) {
+  2690:         this.guidanceLost = true;
+  2691:         this.targetX += Math.cos(this.phase + this.age * 0.7) * (140 + this.jammed * 260);
+--- line 2759 · enclosing line 2757: if ---
+  2757:       if (softKill) {
+  2758:         this.jammed = Math.min(1, this.jammed + amount * 0.014);
+  2759:         if (this.game.rng.next() < clamp(amount * this.interceptability / (80 * this.evasion), 0.02, 0.48)) {
+  2760:           this.guidanceLost = true;
+  2761:           this.targetX += (this.game.rng.next() - 0.5) * 520;
+--- line 2761 · enclosing line 2757: if ---
+  2759:         if (this.game.rng.next() < clamp(amount * this.interceptability / (80 * this.evasion), 0.02, 0.48)) {
+  2760:           this.guidanceLost = true;
+  2761:           this.targetX += (this.game.rng.next() - 0.5) * 520;
+  2762:           this.targetY += (this.game.rng.next() - 0.5) * 520;
+  2763:         }
+--- line 2762 · enclosing line 2757: if ---
+  2760:           this.guidanceLost = true;
+  2761:           this.targetX += (this.game.rng.next() - 0.5) * 520;
+  2762:           this.targetY += (this.game.rng.next() - 0.5) * 520;
+  2763:         }
+  2764:         return false;
+--- line 2815 · enclosing line 2803: constructor ---
+  2813:       this.tick = data.tick || 0;
+  2814:       this.triggered = Boolean(data.triggered);
+  2815:       this.seed = data.seed ?? Math.floor(game.rng.next() * 1000000);
+  2816:       this.rng = new RNG(this.seed);
+  2817:     }
+--- line 2836 · enclosing line 2834: if ---
+  2834:       if (this.tick <= 0 && this.age < this.duration - 0.4) {
+  2835:         this.tick = 0.28;
+  2836:         const a = this.rng.range(0, TWO_PI);
+  2837:         const r = Math.sqrt(this.rng.next()) * this.radius;
+  2838:         const x = this.x + Math.cos(a) * r;
+--- line 2837 · enclosing line 2834: if ---
+  2835:         this.tick = 0.28;
+  2836:         const a = this.rng.range(0, TWO_PI);
+  2837:         const r = Math.sqrt(this.rng.next()) * this.radius;
+  2838:         const x = this.x + Math.cos(a) * r;
+  2839:         const y = this.y + Math.sin(a) * r;
+--- line 2919 · enclosing line 2919: random ---
+  2917:     }
+  2918: 
+  2919:     random() { return this.game.rng.next(); }
+  2920: 
+  2921:     update(dt) {
+--- line 4486 · enclosing line 4484: chooseEnemyFaction ---
+  4484:     chooseEnemyFaction(playerFaction) {
+  4485:       const options = Object.keys(FACTIONS).filter((id) => id !== playerFaction);
+  4486:       return options[Math.floor(this.rng.next() * options.length)];
+  4487:     }
+  4488: 
+--- line 4519 · enclosing line 4517: for ---
+  4517:       for (let i = 0; i < patchCount; i += 1) {
+  4518:         this.terrainPatches.push({
+  4519:           x: rng.range(0, WORLD.width),
+  4520:           y: rng.range(0, WORLD.height),
+  4521:           radius: rng.range(55, 260),
+--- line 4520 · enclosing line 4517: for ---
+  4518:         this.terrainPatches.push({
+  4519:           x: rng.range(0, WORLD.width),
+  4520:           y: rng.range(0, WORLD.height),
+  4521:           radius: rng.range(55, 260),
+  4522:           shade: rng.next(),
+--- line 4521 · enclosing line 4517: for ---
+  4519:           x: rng.range(0, WORLD.width),
+  4520:           y: rng.range(0, WORLD.height),
+  4521:           radius: rng.range(55, 260),
+  4522:           shade: rng.next(),
+  4523:           alpha: rng.range(0.018, 0.078)
+--- line 4522 · enclosing line 4517: for ---
+  4520:           y: rng.range(0, WORLD.height),
+  4521:           radius: rng.range(55, 260),
+  4522:           shade: rng.next(),
+  4523:           alpha: rng.range(0.018, 0.078)
+  4524:         });
+--- line 4523 · enclosing line 4517: for ---
+  4521:           radius: rng.range(55, 260),
+  4522:           shade: rng.next(),
+  4523:           alpha: rng.range(0.018, 0.078)
+  4524:         });
+  4525:       }
+--- line 4534 · enclosing line 4533: for ---
+  4532:       const decorationCount = Math.round(20 * WORLD_AREA_MULTIPLIER);
+  4533:       for (let i = 0; i < decorationCount; i += 1) {
+  4534:         const x = rng.range(70, WORLD.width - 70);
+  4535:         const y = rng.range(70, WORLD.height - 70);
+  4536:         if (!safeFromBase(x, y)) continue;
+--- line 4535 · enclosing line 4533: for ---
+  4533:       for (let i = 0; i < decorationCount; i += 1) {
+  4534:         const x = rng.range(70, WORLD.width - 70);
+  4535:         const y = rng.range(70, WORLD.height - 70);
+  4536:         if (!safeFromBase(x, y)) continue;
+  4537:         this.decorations.push({
+--- line 4539 · enclosing line 4533: for ---
+  4537:         this.decorations.push({
+  4538:           x, y,
+  4539:           radius: rng.range(5, 21),
+  4540:           type: rng.next() > 0.58 ? 'rock' : 'scrub',
+  4541:           rotation: rng.range(0, TWO_PI)
+--- line 4540 · enclosing line 4533: for ---
+  4538:           x, y,
+  4539:           radius: rng.range(5, 21),
+  4540:           type: rng.next() > 0.58 ? 'rock' : 'scrub',
+  4541:           rotation: rng.range(0, TWO_PI)
+  4542:         });
+--- line 4541 · enclosing line 4533: for ---
+  4539:           radius: rng.range(5, 21),
+  4540:           type: rng.next() > 0.58 ? 'rock' : 'scrub',
+  4541:           rotation: rng.range(0, TWO_PI)
+  4542:         });
+  4543:       }
+--- line 5191 · enclosing line 5177: if ---
+  5189:         expiresAt: this.time + 250 + strength * 70,
+  5190:         nextIntelAt: this.time + 2.5,
+  5191:         nextActionAt: this.time + 14 + this.rng.next() * 12,
+  5192:         assetReadyAt: this.time + 48 + this.rng.next() * 42,
+  5193:         assetSpawned: false,
+--- line 5192 · enclosing line 5177: if ---
+  5190:         nextIntelAt: this.time + 2.5,
+  5191:         nextActionAt: this.time + 14 + this.rng.next() * 12,
+  5192:         assetReadyAt: this.time + 48 + this.rng.next() * 42,
+  5193:         assetSpawned: false,
+  5194:         sourceAgentId: sourceAgent?.id || null,
+--- line 5269 · enclosing line 5262: if ---
+  5267:         const counter = this.getCounterIntelStrength(host.team, host.x, host.y, 820);
+  5268:         const exposureChance = step * clamp(counter * 0.008 / Math.max(0.35, cell.strength), 0, 0.045);
+  5269:         if (this.rng.next() < exposureChance) {
+  5270:           cell.expired = true;
+  5271:           this.addEffect({ type: 'reveal', x: host.x, y: host.y, radius: host.radius + 44, duration: 1.2, color: '#73d9ff' });
+--- line 5290 · enclosing line 5289: if ---
+  5288: 
+  5289:         if (this.time >= cell.nextActionAt) {
+  5290:           cell.nextActionAt = this.time + 18 + this.rng.next() * 22;
+  5291:           const victimState = this.teams[host.team];
+  5292:           const ownerState = this.teams[cell.ownerTeam];
+--- line 5299 · enclosing line 5293: if ---
+  5297:           }
+  5298:           const nearbyCritical = this.queryBuildings(host.x, host.y, 650).filter((building) => building.team === host.team && building.alive && building.completed && building.sabotagedUntil <= this.time && (building.stats.power || building.stats.category === 'production' || building.stats.category === 'technology'));
+  5299:           if (nearbyCritical.length && this.rng.next() < 0.22 * cell.strength) {
+  5300:             const target = nearbyCritical.sort((a, b) => (b.stats.power || b.stats.cost || 0) - (a.stats.power || a.stats.cost || 0))[0];
+  5301:             target.sabotagedUntil = this.time + 7 + cell.strength * 7;
+--- line 5312 · enclosing line 5311: if ---
+  5310:           const typeId = FACTION_UNIT_IDS[faction]?.[6] || (faction === 'specter' ? 'saboteur' : 'commando');
+  5311:           if (UNIT_TYPES[typeId]) {
+  5312:             const angle = this.rng.range(0, TWO_PI);
+  5313:             const point = this.findReachablePoint(host.x + Math.cos(angle) * (host.radius + 90), host.y + Math.sin(angle) * (host.radius + 90), UNIT_TYPES[typeId].radius || 14);
+  5314:             const asset = new Unit(this, { typeId, team: cell.ownerTeam, x: point.x, y: point.y, undercover: true, coverIntegrity: clamp(0.55 + cell.strength * 0.22, 0.6, 0.94) });
+--- line 5473 · enclosing line 5468: if ---
+  5471:         }
+  5472:         const speedPenalty = clamp(projectile.speed / 2200, 0, 0.28);
+  5473:         const hitChance = clamp(0.14 + tracking * 0.86 - speedPenalty + (this.rng.next() - 0.5) * 0.08, 0.06, 0.96);
+  5474:         if (this.rng.next() <= hitChance) {
+  5475:           const damage = (defender.stats.interceptPower || 20) * (0.84 + this.rng.next() * 0.34) * powerFactor;
+--- line 5474 · enclosing line 5468: if ---
+  5472:         const speedPenalty = clamp(projectile.speed / 2200, 0, 0.28);
+  5473:         const hitChance = clamp(0.14 + tracking * 0.86 - speedPenalty + (this.rng.next() - 0.5) * 0.08, 0.06, 0.96);
+  5474:         if (this.rng.next() <= hitChance) {
+  5475:           const damage = (defender.stats.interceptPower || 20) * (0.84 + this.rng.next() * 0.34) * powerFactor;
+  5476:           projectile.takeInterceptDamage(damage, defender, false);
+--- line 5475 · enclosing line 5468: if ---
+  5473:         const hitChance = clamp(0.14 + tracking * 0.86 - speedPenalty + (this.rng.next() - 0.5) * 0.08, 0.06, 0.96);
+  5474:         if (this.rng.next() <= hitChance) {
+  5475:           const damage = (defender.stats.interceptPower || 20) * (0.84 + this.rng.next() * 0.34) * powerFactor;
+  5476:           projectile.takeInterceptDamage(damage, defender, false);
+  5477:         } else {
+--- line 5478 · enclosing line 5468: if ---
+  5476:           projectile.takeInterceptDamage(damage, defender, false);
+  5477:         } else {
+  5478:           this.addEffect({ type: 'interceptMiss', x: projectile.x + (this.rng.next() - 0.5) * 34, y: projectile.y + (this.rng.next() - 0.5) * 34, z: projectile.altitude, radius: 12, duration: 0.32 });
+  5479:         }
+  5480:       }
+--- line 7539 · enclosing line 7530: for ---
+  7537:           ? (radarGuided ? 7 + i * 2 : 36 + i * 6)
+  7538:           : count > 1 ? 44 + i * 7 : 0;
+  7539:         const targetAngle = this.rng.range(0, TWO_PI);
+  7540:         const tx = clamp(x + Math.cos(targetAngle) * this.rng.range(0, dispersion), 20, WORLD.width - 20);
+  7541:         const ty = clamp(y + Math.sin(targetAngle) * this.rng.range(0, dispersion), 20, WORLD.height - 20);
+--- line 7540 · enclosing line 7530: for ---
+  7538:           : count > 1 ? 44 + i * 7 : 0;
+  7539:         const targetAngle = this.rng.range(0, TWO_PI);
+  7540:         const tx = clamp(x + Math.cos(targetAngle) * this.rng.range(0, dispersion), 20, WORLD.width - 20);
+  7541:         const ty = clamp(y + Math.sin(targetAngle) * this.rng.range(0, dispersion), 20, WORLD.height - 20);
+  7542:         const weapon = {
+--- line 7541 · enclosing line 7530: for ---
+  7539:         const targetAngle = this.rng.range(0, TWO_PI);
+  7540:         const tx = clamp(x + Math.cos(targetAngle) * this.rng.range(0, dispersion), 20, WORLD.width - 20);
+  7541:         const ty = clamp(y + Math.sin(targetAngle) * this.rng.range(0, dispersion), 20, WORLD.height - 20);
+  7542:         const weapon = {
+  7543:           damage: config.damage, range: config.maxRange, reload: config.cooldown,
+--- line 7579 · enclosing line 7576: updateEnemyStrategicArsenal ---
+  7577:       this.enemyStrategicTimer -= dt;
+  7578:       if (this.enemyStrategicTimer > 0 || this.ended) return;
+  7579:       this.enemyStrategicTimer = this.difficultyKey === 'hard' ? 9 + this.rng.range(0, 7) : this.difficultyKey === 'normal' ? 16 + this.rng.range(0, 11) : 27 + this.rng.range(0, 17);
+  7580:       const enemy = this.teams.enemy;
+  7581:       if (!enemy || this.time < (this.difficultyKey === 'hard' ? 120 : 180)) return;
+--- line 7591 · enclosing line 7576: updateEnemyStrategicArsenal ---
+  7589:         if (building.stats.interceptPower || building.stats.softKillPower) score += 3000;
+  7590:         if (building.stats.dropoff) score += 1600;
+  7591:         return score * (0.86 + this.rng.next() * 0.28);
+  7592:       };
+  7593:       const target = targets.sort((a, b) => scoreTarget(b) - scoreTarget(a))[0];
+--- line 17621 · enclosing line 17619: OriginalProjectileV9.prototype.resetV9 ---
+ 17619:   OriginalProjectileV9.prototype.resetV9=function(game,data){
+ 17620:     this.game=game;this.id=data.id||`p${game.projectileCounter++}`;this.sourceId=data.sourceId||null;this.team=data.team;this.x=data.x;this.y=data.y;this.startX=data.x;this.startY=data.y;this.targetId=data.targetId||null;
+ 17621:     {const w=data.weapon||{targets:['ground'],bonus:{}};this.weapon={...w,targets:Array.isArray(w.targets)?[...w.targets]:['ground'],bonus:{...(w.bonus||{})}};}this.profile=this.weapon.profile||'kinetic';this.trajectory=data.trajectory||this.weapon.trajectory||(data.ballistic?'ballistic':'straight');this.targetX=data.targetX;this.targetY=data.targetY;this.speed=data.speed||this.weapon.projectileSpeed||500;this.damage=data.damage||10;this.splash=data.splash||0;this.ballistic=Boolean(data.ballistic||this.weapon.ballistic||['ballistic','topAttack'].includes(this.trajectory));this.interceptability=clampV9(data.interceptability??this.weapon.interceptability??0,0,1);this.maxHp=Math.max(0,data.maxHp??this.weapon.projectileHp??0);this.hp=data.hp??this.maxHp;this.signature=Math.max(.01,data.signature??this.weapon.projectileSignature??.1);this.evasion=Math.max(.1,data.evasion??this.weapon.projectileEvasion??1);this.turnRate=data.turnRate??this.weapon.turnRate??0;this.weave=data.weave??this.weapon.weave??0;this.arcHeight=data.arcHeight??this.weapon.arcHeight??0;this.visualSize=data.visualSize??this.weapon.visualSize??3;this.color=data.color||this.weapon.projectileColor||(this.team==='player'?'#bfffe0':'#ffb0a5');this.trailColor=data.trailColor||this.weapon.trailColor||this.color;this.trailLength=data.trailLength??this.weapon.trailLength??20;this.accuracy=clampV9(data.accuracy??this.weapon.accuracy??.96,.25,1);this.defenseClass=data.defenseClass||this.weapon.defenseClass||'low';this.alive=true;this.intercepted=false;this.distanceTravelled=0;this.age=0;this.ttl=data.ttl||Math.max(8,Math.hypot(this.targetX-this.x,this.targetY-this.y)/Math.max(80,this.speed)*2.2+2);this.phase=data.phase??game.rng.range(0,TWO_PI_V9);if(!this.trail)this.trail=[];else this.trail.length=0;this.jammed=0;this.guidanceLost=Boolean(data.guidanceLost);this.launchAltitude=Math.max(0,data.launchAltitude||0);this.targetAltitude=Number.isFinite(data.targetAltitude)?data.targetAltitude:0;this._v9PrevX=this.x;this._v9PrevY=this.y;this._v9PrevAltitude=this.launchAltitude;
+ 17622:     const initialDistance=Math.max(1,Math.hypot(this.targetX-this.x,this.targetY-this.y)),spread=(1-this.accuracy)*(24+initialDistance*.16);if(!data.preserveAim&&spread>.25){const a=game.rng.range(0,TWO_PI_V9),m=spread*Math.sqrt(game.rng.next());this.targetX+=Math.cos(a)*m;this.targetY+=Math.sin(a)*m;}this.angle=data.angle??Math.atan2(this.targetY-this.y,this.targetX-this.x);this.totalDistance=Math.max(1,Math.hypot(this.targetX-this.startX,this.targetY-this.startY));this.altitude=this.launchAltitude;return this;
+ 17623:   };
+--- line 17622 · enclosing line 17619: OriginalProjectileV9.prototype.resetV9 ---
+ 17620:     this.game=game;this.id=data.id||`p${game.projectileCounter++}`;this.sourceId=data.sourceId||null;this.team=data.team;this.x=data.x;this.y=data.y;this.startX=data.x;this.startY=data.y;this.targetId=data.targetId||null;
+ 17621:     {const w=data.weapon||{targets:['ground'],bonus:{}};this.weapon={...w,targets:Array.isArray(w.targets)?[...w.targets]:['ground'],bonus:{...(w.bonus||{})}};}this.profile=this.weapon.profile||'kinetic';this.trajectory=data.trajectory||this.weapon.trajectory||(data.ballistic?'ballistic':'straight');this.targetX=data.targetX;this.targetY=data.targetY;this.speed=data.speed||this.weapon.projectileSpeed||500;this.damage=data.damage||10;this.splash=data.splash||0;this.ballistic=Boolean(data.ballistic||this.weapon.ballistic||['ballistic','topAttack'].includes(this.trajectory));this.interceptability=clampV9(data.interceptability??this.weapon.interceptability??0,0,1);this.maxHp=Math.max(0,data.maxHp??this.weapon.projectileHp??0);this.hp=data.hp??this.maxHp;this.signature=Math.max(.01,data.signature??this.weapon.projectileSignature??.1);this.evasion=Math.max(.1,data.evasion??this.weapon.projectileEvasion??1);this.turnRate=data.turnRate??this.weapon.turnRate??0;this.weave=data.weave??this.weapon.weave??0;this.arcHeight=data.arcHeight??this.weapon.arcHeight??0;this.visualSize=data.visualSize??this.weapon.visualSize??3;this.color=data.color||this.weapon.projectileColor||(this.team==='player'?'#bfffe0':'#ffb0a5');this.trailColor=data.trailColor||this.weapon.trailColor||this.color;this.trailLength=data.trailLength??this.weapon.trailLength??20;this.accuracy=clampV9(data.accuracy??this.weapon.accuracy??.96,.25,1);this.defenseClass=data.defenseClass||this.weapon.defenseClass||'low';this.alive=true;this.intercepted=false;this.distanceTravelled=0;this.age=0;this.ttl=data.ttl||Math.max(8,Math.hypot(this.targetX-this.x,this.targetY-this.y)/Math.max(80,this.speed)*2.2+2);this.phase=data.phase??game.rng.range(0,TWO_PI_V9);if(!this.trail)this.trail=[];else this.trail.length=0;this.jammed=0;this.guidanceLost=Boolean(data.guidanceLost);this.launchAltitude=Math.max(0,data.launchAltitude||0);this.targetAltitude=Number.isFinite(data.targetAltitude)?data.targetAltitude:0;this._v9PrevX=this.x;this._v9PrevY=this.y;this._v9PrevAltitude=this.launchAltitude;
+ 17622:     const initialDistance=Math.max(1,Math.hypot(this.targetX-this.x,this.targetY-this.y)),spread=(1-this.accuracy)*(24+initialDistance*.16);if(!data.preserveAim&&spread>.25){const a=game.rng.range(0,TWO_PI_V9),m=spread*Math.sqrt(game.rng.next());this.targetX+=Math.cos(a)*m;this.targetY+=Math.sin(a)*m;}this.angle=data.angle??Math.atan2(this.targetY-this.y,this.targetX-this.x);this.totalDistance=Math.max(1,Math.hypot(this.targetX-this.startX,this.targetY-this.startY));this.altitude=this.launchAltitude;return this;
+ 17623:   };
+ 17624:   class PooledProjectileV9 extends OriginalProjectileV9 {
+--- line 17664 · enclosing line 17664: Game.prototype.updateProjectileInterception ---
+ 17662: 
+ 17663:   // Projectile interception uses projectile spatial layer, not all projectiles per defender.
+ 17664:   Game.prototype.updateProjectileInterception=function(dt){ensureArchV9(this);this.interceptionTimer-=dt;if(this.interceptionTimer>0)return;const step=.10;this.interceptionTimer=step;const p=this.perf;const start=p.wantsTiming()?nowV9():0;const defenders=this._v9InterceptorCache||(this._v9InterceptorCache=[]);if(!this._v9InterceptorCacheAt||this.time-this._v9InterceptorCacheAt>.55){defenders.length=0;for(const u of this.units)if(u.alive&&(u.stats?.interceptPower||u.stats?.softKillPower))defenders.push(u);for(const b of this.buildings)if(b.alive&&(b.stats?.interceptPower||b.stats?.softKillPower))defenders.push(b);this._v9InterceptorCacheAt=this.time;}for(const defender of defenders){if(!defender.alive||defender.team==='neutral'||(defender.interceptCooldown||0)>0)continue;if(defender.kind==='building'&&(!defender.completed||defender.sabotagedUntil>this.time||this.teams[defender.team]?.powerFactor<.42))continue;const range=defender.stats.interceptRange||500,classes=defender.stats.interceptClasses||['low','medium'];let best=null,bestScore=-Infinity,bestTrack=0;const nearby=this.spatial.queryRadius('projectiles',defender.x,defender.y,range+64);this.perf.spatialQueries++;for(const pr of nearby){if(!pr.alive||pr.team===defender.team||!pr.canBeIntercepted()||!classes.includes(pr.defenseClass||'low'))continue;const dx=pr.x-defender.x,dy=pr.y-defender.y;if(dx*dx+dy*dy>range*range)continue;const tq=this.getDefenderTrackingQuality(defender,pr);if(tq<=.02)continue;const score=this.projectileThreatScore(pr,defender);if(score>bestScore){bestScore=score;best=pr;bestTrack=tq;}}if(!best)continue;const quality=defender.stats.interceptQuality||.45,powerFactor=defender.kind==='building'?this.teams[defender.team].powerFactor:1,tracking=quality*bestTrack*best.signature*best.interceptability/Math.max(.35,best.evasion),softKill=defender.stats.softKillPower>0&&!defender.stats.interceptPower;let origin={x:defender.x,y:defender.y,z:defender.kind==='building'?defender.radius*.72:(defender.air?18:5)};if(defender.kind==='building'&&!softKill){const heading=Math.atan2(best.y-defender.y,best.x-defender.x);defender.weaponRotation=angleLerpV9(defender.weaponRotation||heading,heading,clampV9(step*(defender.stats.turretTurnRate||5),0,1));origin=this.getBuildingWeaponMuzzle(defender,defender.weaponRotation,defender.shotSequence||0);}const baseCost=Math.max(1,defender.stats.interceptorCost??(softKill?8:30)),mult=best.defenseClass==='hypersonic'?1.85:best.defenseClass==='high'?1.35:best.defenseClass==='drone'?.62:1,shotCost=Math.max(1,Math.round(baseCost*mult)),team=this.teams[defender.team];if(!team||team.credits<shotCost)continue;team.credits-=shotCost;if(defender.team==='player')this.stats.interceptionSpend=(this.stats.interceptionSpend||0)+shotCost;defender.interceptCooldown=(defender.stats.interceptReload||.7)/Math.max(.35,powerFactor);this.addEffect({type:softKill?'jamBeam':'interceptBeam',x:origin.x,y:origin.y,z:origin.z||0,x2:best.x,y2:best.y,z2:best.altitude,color:defender.team==='player'?'#6df1d1':'#ff8c78',duration:.14});if(softKill){best.takeInterceptDamage((defender.stats.softKillPower||.25)*46,defender,true);continue;}const speedPenalty=clampV9(best.speed/2200,0,.28),hitChance=clampV9(.14+tracking*.86-speedPenalty+(this.rng.next()-.5)*.08,.06,.96);if(this.rng.next()<=hitChance)best.takeInterceptDamage((defender.stats.interceptPower||20)*(.84+this.rng.next()*.34)*powerFactor,defender,false);}
+ 17665:     if(start)p.add('combat',nowV9()-start);
+ 17666:   };
+--- line 19201 · enclosing line 19179: for ---
+ 19199:     const agilityBonus = this.stats?.mobilityClass === 'fixedWing' ? .04 : .01;
+ 19200:     const chance = clamp92(baseChance + stealthBonus + agilityBonus - Math.max(0, projectile.evasion - 1) * .08, .32, .88);
+ 19201:     if (this.game.rng.next() >= chance) return true;
+ 19202: 
+ 19203:     const rearAngle = this.rotation + Math.PI;
+--- line 19204 · enclosing line 19179: for ---
+ 19202: 
+ 19203:     const rearAngle = this.rotation + Math.PI;
+ 19204:     const lateral = this.game.rng.range(-95, 95);
+ 19205:     const decoyDistance = this.radius + 150 + this.game.rng.range(0, 80);
+ 19206:     projectile.guidanceLost = true;
+--- line 19205 · enclosing line 19179: for ---
+ 19203:     const rearAngle = this.rotation + Math.PI;
+ 19204:     const lateral = this.game.rng.range(-95, 95);
+ 19205:     const decoyDistance = this.radius + 150 + this.game.rng.range(0, 80);
+ 19206:     projectile.guidanceLost = true;
+ 19207:     projectile.targetId = null;
+--- line 25439 · enclosing line 25432: if ---
+ 25437: 
+ 25438:       const speedPenalty = clamp120(best.speed / 2200, 0, .28);
+ 25439:       const hitChance = clamp120(.14 + tracking * .86 - speedPenalty + (this.rng.next() - .5) * .08, .06, .96);
+ 25440:       const damage = (defender.stats.interceptPower || 20) * (.84 + this.rng.next() * .34) * powerFactor;
+ 25441:       reservations.set(best.id, (reservations.get(best.id) || 0) + damage * (.55 + hitChance * .45));
+--- line 25440 · enclosing line 25432: if ---
+ 25438:       const speedPenalty = clamp120(best.speed / 2200, 0, .28);
+ 25439:       const hitChance = clamp120(.14 + tracking * .86 - speedPenalty + (this.rng.next() - .5) * .08, .06, .96);
+ 25440:       const damage = (defender.stats.interceptPower || 20) * (.84 + this.rng.next() * .34) * powerFactor;
+ 25441:       reservations.set(best.id, (reservations.get(best.id) || 0) + damage * (.55 + hitChance * .45));
+ 25442:       if (this.rng.next() <= hitChance) {
+--- line 25442 · enclosing line 25432: if ---
+ 25440:       const damage = (defender.stats.interceptPower || 20) * (.84 + this.rng.next() * .34) * powerFactor;
+ 25441:       reservations.set(best.id, (reservations.get(best.id) || 0) + damage * (.55 + hitChance * .45));
+ 25442:       if (this.rng.next() <= hitChance) {
+ 25443:         best.takeInterceptDamage(damage, defender, false);
+ 25444:       } else {
+--- line 25447 · enclosing line 25432: if ---
+ 25445:         this.addEffect({
+ 25446:           type: 'interceptMiss',
+ 25447:           x: best.x + (this.rng.next() - .5) * 34,
+ 25448:           y: best.y + (this.rng.next() - .5) * 34,
+ 25449:           z: best.altitude,
+--- line 25448 · enclosing line 25432: if ---
+ 25446:           type: 'interceptMiss',
+ 25447:           x: best.x + (this.rng.next() - .5) * 34,
+ 25448:           y: best.y + (this.rng.next() - .5) * 34,
+ 25449:           z: best.altitude,
+ 25450:           radius: 12,
+
+===== SEEDED RNG SITES operational-core-v160.js: 0 =====
+
+===== SEEDED RNG SITES war-economy-ai-v126.js: 0 =====

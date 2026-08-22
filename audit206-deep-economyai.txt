@@ -1,0 +1,1175 @@
+BUILD206 DEEP AUDIT economyai: war-economy-ai-v126.js
+bytes=27331 lines=578
+
+### NEEDLE resourceTruck count_sample=8
+--- resourceTruck #1 offset=11269 line=260 ---
+      source.weaponCooldown = Math.max(source.weaponCooldown || 0, .45);
+      if (source.team === 'player' && source.game.time >= (source._noInterceptFundsAt126 || 0)) {
+        source._noInterceptFundsAt126 = source.game.time + 5;
+        source.game.alert?.('Нет средств на боеприпас для перехвата.', 'warning', source.x, source.y);
+      }
+      return { allowed: false, cost };
+    }
+    return { allowed: true, cost };
+  };
+
+  const baseUnitFire126 = UnitClass.prototype.fire;
+  UnitClass.prototype.fire = function(target) {
+    const payment = canAffordAirShot126(this, target);
+    if (!payment.allowed) return;
+    const previousShot = this.lastShotAt;
+    const previousCooldown = this.weaponCooldown || 0;
+    const result = baseUnitFire126.call(this, target);
+    if (payment.cost > 0 && (this.lastShotAt !== previousShot || (this.weaponCooldown || 0) > previousCooldown + .001)) {
+      this.game.recordAirEngagementSpend126(this, payment.cost);
+    }
+    return result;
+  };
+
+  const baseBuildingFire126 = BuildingClass.prototype.fire;
+  BuildingClass.prototype.fire = function(target) {
+    if (!this.game.isStationaryDefensePowered(this)) return;
+    const payment = canAffordAirShot126(this, target);
+    if (!payment.allowed) return;
+    const previousCooldown = this.weaponCooldown || 0;
+    const result = baseBuildingFire126.call(this, target);
+    if (payment.cost > 0 && (this.weaponCooldown || 0) > previousCooldown + .001) {
+      this.game.recordAirEngagementSpend126(this, payment.cost);
+    }
+    return result;
+  };
+
+  // A worker carries a hand-cart-sized lot. A truck carries an actual convoy
+  // load, making truck routes efficient and their destruction consequential.
+  UNIT_TYPES.worker.cargoCapacity = 320;
+  UNIT_TYPES.worker.harvestTime = Math.max(2.6, UNIT_TYPES.worker.harvestTime || 0);
+  if (UNIT_TYPES.resourceTruck) {
+    UNIT_TYPES.resourceTruck.cargoCapacity = 5600;
+    UNIT_TYPES.resourceTruck.harvestTime = .82;
+    UNIT_TYPES.resourceTruck.role = 'Массовая перевозка сырья; главная и уязвимая цель системы снабжения.';
+  }
+
+  // -------------------- Multi-vector opponent operations --------------------
+  const baseRememberEntity126 = TacticalAIClass.prototype.rememberEntity;
+  TacticalAIClass.prototype.rememberEntity = function(entity) {
+    const result = baseRememberEntity126.call(this, entity);
+    const intel = entity?.id ? this.intel?.get(entity.id) : null;
+    if (intel && entity.team === 'player') {
+      intel.cargo = Number(entity.cargo) || 0;
+      intel.cargoCapacity = Number(entity.stats?.cargoCapacity) || 0;
+      intel.logisticsExtractor = Boolean(entity.stats?.logisticsExtractor);
+      if (entity.typeId === 'resourceTruck') intel.value = Math.max(intel.value || 0, 300 + intel.cargo * .08);
+      else if (entity.typeId === 'worker' && intel.cargo > 0) intel.value = Math.max(intel.value || 0, 135 + intel.cargo * .12);
+      else if (entity.stats?.logisticsExtractor) intel.value = Math.max(intel.value || 0, 235);
+    }
+    return result;
+  };
+
+  TacticalAIClass.prototype.refreshWarPicture126 = function(force = false) {
+    const now = Number(this.game.time) || 0;
+    const difficulty = this.game.difficultyKey || 'normal';
+    const refresh = difficulty === 'hard' ? 3.2 : difficulty === 'easy' ? 7.5 : 4.8;
+    if (!force && this._warPicture126 && now < this._warPicture126.expiresAt) return this._warPicture126;
+
+    const entities = [];
+    const seen = new Set();
+    for (const item of this.knownTargets?.() || []) {
+      const entity = this.getActualTarget?.(item);
+      if (!entity?.alive || entity.team !== 'player' || seen.has(entity.id)) continue;
+      seen.add(entity.id);
+--- resourceTruck #5 offset=12110 line=275 ---
+    if (payment.cost > 0 && (this.lastShotAt !== previousShot || (this.weaponCooldown || 0) > previousCooldown + .001)) {
+      this.game.recordAirEngagementSpend126(this, payment.cost);
+    }
+    return result;
+  };
+
+  const baseBuildingFire126 = BuildingClass.prototype.fire;
+  BuildingClass.prototype.fire = function(target) {
+    if (!this.game.isStationaryDefensePowered(this)) return;
+    const payment = canAffordAirShot126(this, target);
+    if (!payment.allowed) return;
+    const previousCooldown = this.weaponCooldown || 0;
+    const result = baseBuildingFire126.call(this, target);
+    if (payment.cost > 0 && (this.weaponCooldown || 0) > previousCooldown + .001) {
+      this.game.recordAirEngagementSpend126(this, payment.cost);
+    }
+    return result;
+  };
+
+  // A worker carries a hand-cart-sized lot. A truck carries an actual convoy
+  // load, making truck routes efficient and their destruction consequential.
+  UNIT_TYPES.worker.cargoCapacity = 320;
+  UNIT_TYPES.worker.harvestTime = Math.max(2.6, UNIT_TYPES.worker.harvestTime || 0);
+  if (UNIT_TYPES.resourceTruck) {
+    UNIT_TYPES.resourceTruck.cargoCapacity = 5600;
+    UNIT_TYPES.resourceTruck.harvestTime = .82;
+    UNIT_TYPES.resourceTruck.role = 'Массовая перевозка сырья; главная и уязвимая цель системы снабжения.';
+  }
+
+  // -------------------- Multi-vector opponent operations --------------------
+  const baseRememberEntity126 = TacticalAIClass.prototype.rememberEntity;
+  TacticalAIClass.prototype.rememberEntity = function(entity) {
+    const result = baseRememberEntity126.call(this, entity);
+    const intel = entity?.id ? this.intel?.get(entity.id) : null;
+    if (intel && entity.team === 'player') {
+      intel.cargo = Number(entity.cargo) || 0;
+      intel.cargoCapacity = Number(entity.stats?.cargoCapacity) || 0;
+      intel.logisticsExtractor = Boolean(entity.stats?.logisticsExtractor);
+      if (entity.typeId === 'resourceTruck') intel.value = Math.max(intel.value || 0, 300 + intel.cargo * .08);
+      else if (entity.typeId === 'worker' && intel.cargo > 0) intel.value = Math.max(intel.value || 0, 135 + intel.cargo * .12);
+      else if (entity.stats?.logisticsExtractor) intel.value = Math.max(intel.value || 0, 235);
+    }
+    return result;
+  };
+
+  TacticalAIClass.prototype.refreshWarPicture126 = function(force = false) {
+    const now = Number(this.game.time) || 0;
+    const difficulty = this.game.difficultyKey || 'normal';
+    const refresh = difficulty === 'hard' ? 3.2 : difficulty === 'easy' ? 7.5 : 4.8;
+    if (!force && this._warPicture126 && now < this._warPicture126.expiresAt) return this._warPicture126;
+
+    const entities = [];
+    const seen = new Set();
+    for (const item of this.knownTargets?.() || []) {
+      const entity = this.getActualTarget?.(item);
+      if (!entity?.alive || entity.team !== 'player' || seen.has(entity.id)) continue;
+      seen.add(entity.id);
+      entities.push(entity);
+      if (entities.length >= 192) break;
+    }
+    const defenseHeat = new Map();
+    for (const entity of entities) {
+      const armed = entity.kind === 'unit' && entity.stats?.weapon;
+      const defensive = entity.kind === 'building' && entity.stats?.category === 'defense';
+      if (!armed && !defensive) continue;
+      const key = `${Math.floor(entity.x / TARGET_CELL)}:${Math.floor(entity.y / TARGET_CELL)}`;
+      const weight = defensive ? 3.4 : clamp126((entity.stats?.cost || 450) / 650, .4, 3.2);
+      defenseHeat.set(key, (defenseHeat.get(key) || 0) + weight);
+    }
+    this._warPicture126 = { entities, defenseHeat, expiresAt: now + refresh };
+    return this._warPicture126;
+  };
+
+  TacticalAIClass.prototype.warTargetScore126 = function(entity, purpose, picture) {
+    const stats = entity.stats || {};
+--- resourceTruck #6 offset=14802 line=326 ---
+      if (!entity?.alive || entity.team !== 'player' || seen.has(entity.id)) continue;
+      seen.add(entity.id);
+      entities.push(entity);
+      if (entities.length >= 192) break;
+    }
+    const defenseHeat = new Map();
+    for (const entity of entities) {
+      const armed = entity.kind === 'unit' && entity.stats?.weapon;
+      const defensive = entity.kind === 'building' && entity.stats?.category === 'defense';
+      if (!armed && !defensive) continue;
+      const key = `${Math.floor(entity.x / TARGET_CELL)}:${Math.floor(entity.y / TARGET_CELL)}`;
+      const weight = defensive ? 3.4 : clamp126((entity.stats?.cost || 450) / 650, .4, 3.2);
+      defenseHeat.set(key, (defenseHeat.get(key) || 0) + weight);
+    }
+    this._warPicture126 = { entities, defenseHeat, expiresAt: now + refresh };
+    return this._warPicture126;
+  };
+
+  TacticalAIClass.prototype.warTargetScore126 = function(entity, purpose, picture) {
+    const stats = entity.stats || {};
+    const category = stats.category || (entity.air ? 'air' : entity.vehicle ? 'vehicle' : 'infantry');
+    const cargo = Number(entity.cargo) || 0;
+    const cargoCapacity = Math.max(1, Number(stats.cargoCapacity) || 1);
+    const cargoRatio = clamp126(cargo / cargoCapacity, 0, 1);
+    const healthRatio = Number.isFinite(entity.healthRatio) ? entity.healthRatio : clamp126((entity.hp || 1) / Math.max(1, entity.maxHp || 1), 0, 1);
+    const cellX = Math.floor(entity.x / TARGET_CELL);
+    const cellY = Math.floor(entity.y / TARGET_CELL);
+    let defense = 0;
+    for (let ox = -1; ox <= 1; ox += 1) for (let oy = -1; oy <= 1; oy += 1) {
+      defense += picture.defenseHeat.get(`${cellX + ox}:${cellY + oy}`) || 0;
+    }
+    let score = (stats.cost || 300) * .035 + (1 - healthRatio) * 95;
+
+    if (purpose === 'supply') {
+      if (entity.typeId === 'resourceTruck') score += 760 + cargoRatio * 620;
+      else if (entity.typeId === 'worker' && cargo > 0) score += 320 + cargoRatio * 230;
+      else if (stats.logisticsExtractor || SUPPLY_BUILDINGS.has(entity.typeId)) score += 500;
+      else if (stats.dropoff) score += 330;
+      else score -= 420;
+      score -= defense * 16;
+    } else if (purpose === 'economy') {
+      if (stats.power) score += 540 + Number(stats.power) * 1.5;
+      if (stats.logisticsExtractor || stats.income || stats.dropoff || category === 'economy') score += 430;
+      if (entity.typeId === 'resourceTruck') score += 220 + cargoRatio * 260;
+      if (category === 'defense') score -= 260;
+      score -= defense * 12;
+    } else if (purpose === 'production') {
+      if (category === 'production') score += 650;
+      else if (category === 'strategy') score += 540;
+      else if (category === 'technology') score += 390;
+      else score -= 220;
+      if (entity.typeId === 'airfield' || entity.typeId === 'advancedAirfield' || entity.typeId === 'heavyFactory') score += 160;
+      score -= defense * 10;
+    } else if (purpose === 'weak') {
+      if (entity.kind === 'building') score += 260;
+      if (category === 'production' || category === 'economy' || stats.power) score += 210;
+      score += (1 - healthRatio) * 280;
+      score -= defense * 32;
+    } else {
+      if (entity.typeId === 'hq') score += 720;
+      if (category === 'production') score += 520;
+      if (category === 'strategy') score += 460;
+      if (stats.power) score += 350;
+      if (stats.logisticsExtractor || stats.dropoff) score += 260;
+      score -= defense * 5;
+    }
+    score -= Math.sqrt(distanceSquared126(entity, this.base)) / 1900;
+    score += this.random() * 18;
+    return score;
+  };
+
+  TacticalAIClass.prototype.pickWarTarget126 = function(purpose = 'assault') {
+--- resourceTruck #7 offset=15375 line=335 ---
+      const weight = defensive ? 3.4 : clamp126((entity.stats?.cost || 450) / 650, .4, 3.2);
+      defenseHeat.set(key, (defenseHeat.get(key) || 0) + weight);
+    }
+    this._warPicture126 = { entities, defenseHeat, expiresAt: now + refresh };
+    return this._warPicture126;
+  };
+
+  TacticalAIClass.prototype.warTargetScore126 = function(entity, purpose, picture) {
+    const stats = entity.stats || {};
+    const category = stats.category || (entity.air ? 'air' : entity.vehicle ? 'vehicle' : 'infantry');
+    const cargo = Number(entity.cargo) || 0;
+    const cargoCapacity = Math.max(1, Number(stats.cargoCapacity) || 1);
+    const cargoRatio = clamp126(cargo / cargoCapacity, 0, 1);
+    const healthRatio = Number.isFinite(entity.healthRatio) ? entity.healthRatio : clamp126((entity.hp || 1) / Math.max(1, entity.maxHp || 1), 0, 1);
+    const cellX = Math.floor(entity.x / TARGET_CELL);
+    const cellY = Math.floor(entity.y / TARGET_CELL);
+    let defense = 0;
+    for (let ox = -1; ox <= 1; ox += 1) for (let oy = -1; oy <= 1; oy += 1) {
+      defense += picture.defenseHeat.get(`${cellX + ox}:${cellY + oy}`) || 0;
+    }
+    let score = (stats.cost || 300) * .035 + (1 - healthRatio) * 95;
+
+    if (purpose === 'supply') {
+      if (entity.typeId === 'resourceTruck') score += 760 + cargoRatio * 620;
+      else if (entity.typeId === 'worker' && cargo > 0) score += 320 + cargoRatio * 230;
+      else if (stats.logisticsExtractor || SUPPLY_BUILDINGS.has(entity.typeId)) score += 500;
+      else if (stats.dropoff) score += 330;
+      else score -= 420;
+      score -= defense * 16;
+    } else if (purpose === 'economy') {
+      if (stats.power) score += 540 + Number(stats.power) * 1.5;
+      if (stats.logisticsExtractor || stats.income || stats.dropoff || category === 'economy') score += 430;
+      if (entity.typeId === 'resourceTruck') score += 220 + cargoRatio * 260;
+      if (category === 'defense') score -= 260;
+      score -= defense * 12;
+    } else if (purpose === 'production') {
+      if (category === 'production') score += 650;
+      else if (category === 'strategy') score += 540;
+      else if (category === 'technology') score += 390;
+      else score -= 220;
+      if (entity.typeId === 'airfield' || entity.typeId === 'advancedAirfield' || entity.typeId === 'heavyFactory') score += 160;
+      score -= defense * 10;
+    } else if (purpose === 'weak') {
+      if (entity.kind === 'building') score += 260;
+      if (category === 'production' || category === 'economy' || stats.power) score += 210;
+      score += (1 - healthRatio) * 280;
+      score -= defense * 32;
+    } else {
+      if (entity.typeId === 'hq') score += 720;
+      if (category === 'production') score += 520;
+      if (category === 'strategy') score += 460;
+      if (stats.power) score += 350;
+      if (stats.logisticsExtractor || stats.dropoff) score += 260;
+      score -= defense * 5;
+    }
+    score -= Math.sqrt(distanceSquared126(entity, this.base)) / 1900;
+    score += this.random() * 18;
+    return score;
+  };
+
+  TacticalAIClass.prototype.pickWarTarget126 = function(purpose = 'assault') {
+    const picture = this.refreshWarPicture126();
+    let best = null;
+    let bestScore = -Infinity;
+    for (const entity of picture.entities) {
+      const score = this.warTargetScore126(entity, purpose, picture);
+      if (score > bestScore) {
+        best = entity;
+        bestScore = score;
+      }
+    }
+    return best;
+  };
+
+  const basePickTarget126 = TacticalAIClass.prototype.pickTarget;
+  TacticalAIClass.prototype.pickTarget = function(purpose = 'assault') {
+    if (['supply', 'economy', 'production', 'weak'].includes(purpose)) {
+--- resourceTruck #8 offset=18178 line=397 ---
+      if (stats.logisticsExtractor || stats.dropoff) score += 260;
+      score -= defense * 5;
+    }
+    score -= Math.sqrt(distanceSquared126(entity, this.base)) / 1900;
+    score += this.random() * 18;
+    return score;
+  };
+
+  TacticalAIClass.prototype.pickWarTarget126 = function(purpose = 'assault') {
+    const picture = this.refreshWarPicture126();
+    let best = null;
+    let bestScore = -Infinity;
+    for (const entity of picture.entities) {
+      const score = this.warTargetScore126(entity, purpose, picture);
+      if (score > bestScore) {
+        best = entity;
+        bestScore = score;
+      }
+    }
+    return best;
+  };
+
+  const basePickTarget126 = TacticalAIClass.prototype.pickTarget;
+  TacticalAIClass.prototype.pickTarget = function(purpose = 'assault') {
+    if (['supply', 'economy', 'production', 'weak'].includes(purpose)) {
+      return this.pickWarTarget126(purpose) || basePickTarget126.call(this, purpose === 'weak' ? 'assault' : 'harass');
+    }
+    if (purpose === 'harass') {
+      const mission = (this.operationCycle126 || 0) % 2 ? 'supply' : 'economy';
+      return this.pickWarTarget126(mission) || basePickTarget126.call(this, purpose);
+    }
+    if (purpose === 'assault' || purpose === 'siege' || purpose === 'power') {
+      return this.pickWarTarget126(purpose === 'power' ? 'economy' : 'assault') || basePickTarget126.call(this, purpose);
+    }
+    return basePickTarget126.call(this, purpose);
+  };
+
+  const baseTargetPriority126 = TacticalAIClass.prototype.targetPriorityForSquad;
+  TacticalAIClass.prototype.targetPriorityForSquad = function(target, role) {
+    let score = baseTargetPriority126.call(this, target, role);
+    const squad = role && this.squads?.find((item) => item.role === role && item.targetId === target?.id);
+    const mission = squad?.mission;
+    if (target?.typeId === 'resourceTruck') score += 520 + clamp126((target.cargo || 0) / Math.max(1, target.stats?.cargoCapacity || 1), 0, 1) * 420;
+    if (target?.stats?.logisticsExtractor) score += mission === 'supply' ? 430 : 180;
+    if (mission === 'production' && target?.stats?.category === 'production') score += 430;
+    if (mission === 'economy' && (target?.stats?.category === 'economy' || target?.stats?.power)) score += 390;
+    return score;
+  };
+
+  const baseCovertScore126 = TacticalAIClass.prototype.covertTargetScore;
+  if (baseCovertScore126) {
+    TacticalAIClass.prototype.covertTargetScore = function(entity, mission) {
+      let score = baseCovertScore126.call(this, entity, mission);
+      if (mission === 'sabotage') {
+        if (entity?.stats?.power) score += 340;
+        if (entity?.stats?.category === 'production') score += 250;
+        if (entity?.stats?.logisticsExtractor || SUPPLY_BUILDINGS.has(entity?.typeId)) score += 210;
+      }
+      return score;
+    };
+  }
+
+  TacticalAIClass.prototype.launchWarOperations126 = function() {
+    const difficulty = this.game.difficultyKey || 'normal';
+    const config = OPERATION_CONFIG[difficulty] || OPERATION_CONFIG.normal;
+    const combatAvailable = () => this.availableCombatUnits((unit) =>
+      !this.isCovert(unit) && !unit.stats?.strategicLauncher?.length && Boolean(unit.stats?.weapon));
+    let available = combatAvailable();
+    if (!available.length) return false;
+    let launched = false;
+    const totalArmy = this.game.units.reduce((count, unit) => count + Number(Boolean(unit.alive && unit.team === 'enemy' && unit.stats?.weapon)), 0);
+    const massMode = totalArmy >= 500;
+    const assaultLimit = massMode ? Math.max(config.assaultLimit, 10) : config.assaultLimit;
+    let activeAssaults = this.squads.filter((squad) => squad.role === 'assault').length;
+
+### NEEDLE dropoff count_sample=3
+--- dropoff #3 offset=16381 line=355 ---
+    for (let ox = -1; ox <= 1; ox += 1) for (let oy = -1; oy <= 1; oy += 1) {
+      defense += picture.defenseHeat.get(`${cellX + ox}:${cellY + oy}`) || 0;
+    }
+    let score = (stats.cost || 300) * .035 + (1 - healthRatio) * 95;
+
+    if (purpose === 'supply') {
+      if (entity.typeId === 'resourceTruck') score += 760 + cargoRatio * 620;
+      else if (entity.typeId === 'worker' && cargo > 0) score += 320 + cargoRatio * 230;
+      else if (stats.logisticsExtractor || SUPPLY_BUILDINGS.has(entity.typeId)) score += 500;
+      else if (stats.dropoff) score += 330;
+      else score -= 420;
+      score -= defense * 16;
+    } else if (purpose === 'economy') {
+      if (stats.power) score += 540 + Number(stats.power) * 1.5;
+      if (stats.logisticsExtractor || stats.income || stats.dropoff || category === 'economy') score += 430;
+      if (entity.typeId === 'resourceTruck') score += 220 + cargoRatio * 260;
+      if (category === 'defense') score -= 260;
+      score -= defense * 12;
+    } else if (purpose === 'production') {
+      if (category === 'production') score += 650;
+      else if (category === 'strategy') score += 540;
+      else if (category === 'technology') score += 390;
+      else score -= 220;
+      if (entity.typeId === 'airfield' || entity.typeId === 'advancedAirfield' || entity.typeId === 'heavyFactory') score += 160;
+      score -= defense * 10;
+    } else if (purpose === 'weak') {
+      if (entity.kind === 'building') score += 260;
+      if (category === 'production' || category === 'economy' || stats.power) score += 210;
+      score += (1 - healthRatio) * 280;
+      score -= defense * 32;
+    } else {
+      if (entity.typeId === 'hq') score += 720;
+      if (category === 'production') score += 520;
+      if (category === 'strategy') score += 460;
+      if (stats.power) score += 350;
+      if (stats.logisticsExtractor || stats.dropoff) score += 260;
+      score -= defense * 5;
+    }
+    score -= Math.sqrt(distanceSquared126(entity, this.base)) / 1900;
+    score += this.random() * 18;
+    return score;
+  };
+
+  TacticalAIClass.prototype.pickWarTarget126 = function(purpose = 'assault') {
+    const picture = this.refreshWarPicture126();
+    let best = null;
+    let bestScore = -Infinity;
+    for (const entity of picture.entities) {
+      const score = this.warTargetScore126(entity, purpose, picture);
+      if (score > bestScore) {
+        best = entity;
+        bestScore = score;
+      }
+    }
+    return best;
+  };
+
+  const basePickTarget126 = TacticalAIClass.prototype.pickTarget;
+  TacticalAIClass.prototype.pickTarget = function(purpose = 'assault') {
+    if (['supply', 'economy', 'production', 'weak'].includes(purpose)) {
+      return this.pickWarTarget126(purpose) || basePickTarget126.call(this, purpose === 'weak' ? 'assault' : 'harass');
+    }
+    if (purpose === 'harass') {
+      const mission = (this.operationCycle126 || 0) % 2 ? 'supply' : 'economy';
+      return this.pickWarTarget126(mission) || basePickTarget126.call(this, purpose);
+    }
+    if (purpose === 'assault' || purpose === 'siege' || purpose === 'power') {
+      return this.pickWarTarget126(purpose === 'power' ? 'economy' : 'assault') || basePickTarget126.call(this, purpose);
+    }
+    return basePickTarget126.call(this, purpose);
+  };
+
+  const baseTargetPriority126 = TacticalAIClass.prototype.targetPriorityForSquad;
+  TacticalAIClass.prototype.targetPriorityForSquad = function(target, role) {
+    let score = baseTargetPriority126.call(this, target, role);
+    const squad = role && this.squads?.find((item) => item.role === role && item.targetId === target?.id);
+    const mission = squad?.mission;
+    if (target?.typeId === 'resourceTruck') score += 520 + clamp126((target.cargo || 0) / Math.max(1, target.stats?.cargoCapacity || 1), 0, 1) * 420;
+
+### NEEDLE extractor count_sample=10
+--- extractor #1 offset=3235 line=79 ---
+    const dx = (left?.x || 0) - (right?.x || 0);
+    const dy = (left?.y || 0) - (right?.y || 0);
+    return dx * dx + dy * dy;
+  };
+
+  // -------------------- Power is a hard operational resource --------------------
+  GameClass.prototype.isPowerGridOnline126 = function(teamKey) {
+    const team = this.teams?.[teamKey];
+    if (!team || teamKey === 'neutral') return false;
+    const produced = Number(team.powerProduced) || 0;
+    const used = Number(team.powerUsed) || 0;
+    return produced > 0 && produced + POWER_EPSILON >= used;
+  };
+
+  // Existing radar, interception and combat modules consult this hook at run
+  // time. A deficit of even one unit therefore drops every stationary defense
+  // from the common fire-control picture; mobile/manually crewed units remain.
+  GameClass.prototype.isStationaryDefensePowered = function(building) {
+    return Boolean(
+      building?.alive && building.completed && building.sabotagedUntil <= this.time &&
+      this.isPowerGridOnline126(building.team)
+    );
+  };
+
+  const baseBuildingUpdate126 = BuildingClass.prototype.update;
+  BuildingClass.prototype.update = function(dt) {
+    const poweredService = Boolean(this.completed && this.team !== 'neutral' && Number(this.stats?.powerUse) > 0);
+    const offline = poweredService && !this.game.isPowerGridOnline126(this.team);
+    this.powerOffline126 = offline;
+    if (!offline) return baseBuildingUpdate126.call(this, dt);
+
+    // Keep construction, damage, capture and cooldown state alive, but remove
+    // every powered service for this update. Building stats are per-instance,
+    // so this cannot leak into another structure or faction.
+    const stats = this.stats;
+    const saved = {
+      weapon: stats.weapon,
+      income: stats.income,
+      healAura: stats.healAura,
+      repairAura: stats.repairAura,
+      logisticsExtractor: stats.logisticsExtractor,
+    };
+    stats.weapon = null;
+    stats.income = 0;
+    stats.healAura = 0;
+    stats.repairAura = 0;
+    stats.logisticsExtractor = false;
+    try {
+      return baseBuildingUpdate126.call(this, dt);
+    } finally {
+      stats.weapon = saved.weapon;
+      stats.income = saved.income;
+      stats.healAura = saved.healAura;
+      stats.repairAura = saved.repairAura;
+      stats.logisticsExtractor = saved.logisticsExtractor;
+    }
+  };
+
+  const baseBuildingQueue126 = BuildingClass.prototype.updateQueue;
+  BuildingClass.prototype.updateQueue = function(dt) {
+    if (Number(this.stats?.powerUse) > 0 && !this.game.isPowerGridOnline126(this.team)) return;
+    return baseBuildingQueue126.call(this, dt);
+  };
+
+  const baseBuildingAuras126 = BuildingClass.prototype.updateAuras;
+  BuildingClass.prototype.updateAuras = function(dt) {
+    if (Number(this.stats?.powerUse) > 0 && !this.game.isPowerGridOnline126(this.team)) return;
+    return baseBuildingAuras126.call(this, dt);
+  };
+
+  const baseSensorSources126 = GameClass.prototype.getSensorSources;
+  GameClass.prototype.getSensorSources = function(teamKey) {
+    const sources = baseSensorSources126?.call(this, teamKey) || [];
+    return sources.filter((source) => source?.kind !== 'building' || !source.stats?.powerUse || this.isStationaryDefensePowered(source));
+  };
+
+  const baseAirState126 = GameClass.prototype.getIntegratedAirDefenseState119;
+  if (baseAirState126) {
+    GameClass.prototype.getIntegratedAirDefenseState119 = function(teamKey, force = false) {
+      const state = baseAirState126.call(this, teamKey, force);
+      if (state && !this.isPowerGridOnline126(teamKey)) {
+        state.online = false;
+        state.reason = 'no-power';
+        if (Array.isArray(state.radarNodes)) state.radarNodes.length = 0;
+--- extractor #4 offset=3664 line=93 ---
+    const used = Number(team.powerUsed) || 0;
+    return produced > 0 && produced + POWER_EPSILON >= used;
+  };
+
+  // Existing radar, interception and combat modules consult this hook at run
+  // time. A deficit of even one unit therefore drops every stationary defense
+  // from the common fire-control picture; mobile/manually crewed units remain.
+  GameClass.prototype.isStationaryDefensePowered = function(building) {
+    return Boolean(
+      building?.alive && building.completed && building.sabotagedUntil <= this.time &&
+      this.isPowerGridOnline126(building.team)
+    );
+  };
+
+  const baseBuildingUpdate126 = BuildingClass.prototype.update;
+  BuildingClass.prototype.update = function(dt) {
+    const poweredService = Boolean(this.completed && this.team !== 'neutral' && Number(this.stats?.powerUse) > 0);
+    const offline = poweredService && !this.game.isPowerGridOnline126(this.team);
+    this.powerOffline126 = offline;
+    if (!offline) return baseBuildingUpdate126.call(this, dt);
+
+    // Keep construction, damage, capture and cooldown state alive, but remove
+    // every powered service for this update. Building stats are per-instance,
+    // so this cannot leak into another structure or faction.
+    const stats = this.stats;
+    const saved = {
+      weapon: stats.weapon,
+      income: stats.income,
+      healAura: stats.healAura,
+      repairAura: stats.repairAura,
+      logisticsExtractor: stats.logisticsExtractor,
+    };
+    stats.weapon = null;
+    stats.income = 0;
+    stats.healAura = 0;
+    stats.repairAura = 0;
+    stats.logisticsExtractor = false;
+    try {
+      return baseBuildingUpdate126.call(this, dt);
+    } finally {
+      stats.weapon = saved.weapon;
+      stats.income = saved.income;
+      stats.healAura = saved.healAura;
+      stats.repairAura = saved.repairAura;
+      stats.logisticsExtractor = saved.logisticsExtractor;
+    }
+  };
+
+  const baseBuildingQueue126 = BuildingClass.prototype.updateQueue;
+  BuildingClass.prototype.updateQueue = function(dt) {
+    if (Number(this.stats?.powerUse) > 0 && !this.game.isPowerGridOnline126(this.team)) return;
+    return baseBuildingQueue126.call(this, dt);
+  };
+
+  const baseBuildingAuras126 = BuildingClass.prototype.updateAuras;
+  BuildingClass.prototype.updateAuras = function(dt) {
+    if (Number(this.stats?.powerUse) > 0 && !this.game.isPowerGridOnline126(this.team)) return;
+    return baseBuildingAuras126.call(this, dt);
+  };
+
+  const baseSensorSources126 = GameClass.prototype.getSensorSources;
+  GameClass.prototype.getSensorSources = function(teamKey) {
+    const sources = baseSensorSources126?.call(this, teamKey) || [];
+    return sources.filter((source) => source?.kind !== 'building' || !source.stats?.powerUse || this.isStationaryDefensePowered(source));
+  };
+
+  const baseAirState126 = GameClass.prototype.getIntegratedAirDefenseState119;
+  if (baseAirState126) {
+    GameClass.prototype.getIntegratedAirDefenseState119 = function(teamKey, force = false) {
+      const state = baseAirState126.call(this, teamKey, force);
+      if (state && !this.isPowerGridOnline126(teamKey)) {
+        state.online = false;
+        state.reason = 'no-power';
+        if (Array.isArray(state.radarNodes)) state.radarNodes.length = 0;
+        if (Array.isArray(state.sensors)) state.sensors.length = 0;
+        state.trackCache120?.clear?.();
+      }
+      return state;
+    };
+  }
+
+  const baseShield126 = GameClass.prototype.getShieldReduction;
+  GameClass.prototype.getShieldReduction = function(entity) {
+    if (entity?.team && !this.isPowerGridOnline126(entity.team)) return 0;
+    return baseShield126.call(this, entity);
+  };
+
+  const baseCommandAura126 = GameClass.prototype.getCommandAuraBonus;
+
+### NEEDLE gas count_sample=1
+--- gas #1 offset=549 line=17 ---
+(() => {
+  'use strict';
+
+  const debug = window.__FD_DEBUG__;
+  const GameClass = debug?.Game;
+  const UnitClass = debug?.Unit;
+  const BuildingClass = debug?.Building;
+  const TacticalAIClass = debug?.TacticalAI;
+  const UNIT_TYPES = debug?.UNIT_TYPES;
+  if (!GameClass || !UnitClass || !BuildingClass || !TacticalAIClass || !UNIT_TYPES) return;
+
+  const VERSION = '12.6';
+  const POWER_EPSILON = .001;
+  const TARGET_CELL = 720;
+  const SUPPLY_BUILDINGS = new Set([
+    'refinery', 'logisticsHub', 'resourceSilo', 'supplyBeacon',
+    'oilPump', 'gasPump', 'mineralQuarry', 'oreMine', 'deepMine', 'coreDrill',
+  ]);
+  const AIR_ENGAGEMENT_COSTS = Object.freeze({
+    rocket: 4,
+    aa: 18,
+    mobileFireGroup: 10,
+    counterUASVehicle: 24,
+    longRangeSAM: 118,
+    interceptor: 54,
+    aaTurret: 26,
+    counterUASTower: 18,
+    missileBattery: 92,
+    abmBattery: 185,
+    orbitalDefense: 285,
+  });
+  const OPERATION_CONFIG = Object.freeze({
+    easy: { interval: 34, assaultLimit: 2, raidLimit: 1, mainMin: 7, raidSize: 4, covertCeiling: 150 },
+    normal: { interval: 21, assaultLimit: 4, raidLimit: 2, mainMin: 10, raidSize: 6, covertCeiling: 72 },
+    hard: { interval: 13, assaultLimit: 6, raidLimit: 4, mainMin: 12, raidSize: 9, covertCeiling: 42 },
+  });
+  const clamp126 = (value, min, max) => Math.max(min, Math.min(max, value));
+  const distanceSquared126 = (left, right) => {
+    const dx = (left?.x || 0) - (right?.x || 0);
+    const dy = (left?.y || 0) - (right?.y || 0);
+    return dx * dx + dy * dy;
+  };
+
+  // -------------------- Power is a hard operational resource --------------------
+  GameClass.prototype.isPowerGridOnline126 = function(teamKey) {
+    const team = this.teams?.[teamKey];
+    if (!team || teamKey === 'neutral') return false;
+    const produced = Number(team.powerProduced) || 0;
+    const used = Number(team.powerUsed) || 0;
+    return produced > 0 && produced + POWER_EPSILON >= used;
+  };
+
+  // Existing radar, interception and combat modules consult this hook at run
+  // time. A deficit of even one unit therefore drops every stationary defense
+  // from the common fire-control picture; mobile/manually crewed units remain.
+  GameClass.prototype.isStationaryDefensePowered = function(building) {
+    return Boolean(
+      building?.alive && building.completed && building.sabotagedUntil <= this.ti
+
+### NEEDLE oil count_sample=1
+
+### NEEDLE resources count_sample=1
+
+### NEEDLE income count_sample=6
+
+### NEEDLE airfield count_sample=2
+--- airfield #1 offset=15759 line=343 ---
+    const category = stats.category || (entity.air ? 'air' : entity.vehicle ? 'vehicle' : 'infantry');
+    const cargo = Number(entity.cargo) || 0;
+    const cargoCapacity = Math.max(1, Number(stats.cargoCapacity) || 1);
+    const cargoRatio = clamp126(cargo / cargoCapacity, 0, 1);
+    const healthRatio = Number.isFinite(entity.healthRatio) ? entity.healthRatio : clamp126((entity.hp || 1) / Math.max(1, entity.maxHp || 1), 0, 1);
+    const cellX = Math.floor(entity.x / TARGET_CELL);
+    const cellY = Math.floor(entity.y / TARGET_CELL);
+    let defense = 0;
+    for (let ox = -1; ox <= 1; ox += 1) for (let oy = -1; oy <= 1; oy += 1) {
+      defense += picture.defenseHeat.get(`${cellX + ox}:${cellY + oy}`) || 0;
+    }
+    let score = (stats.cost || 300) * .035 + (1 - healthRatio) * 95;
+
+    if (purpose === 'supply') {
+      if (entity.typeId === 'resourceTruck') score += 760 + cargoRatio * 620;
+      else if (entity.typeId === 'worker' && cargo > 0) score += 320 + cargoRatio * 230;
+      else if (stats.logisticsExtractor || SUPPLY_BUILDINGS.has(entity.typeId)) score += 500;
+      else if (stats.dropoff) score += 330;
+      else score -= 420;
+      score -= defense * 16;
+    } else if (purpose === 'economy') {
+      if (stats.power) score += 540 + Number(stats.power) * 1.5;
+      if (stats.logisticsExtractor || stats.income || stats.dropoff || category === 'economy') score += 430;
+      if (entity.typeId === 'resourceTruck') score += 220 + cargoRatio * 260;
+      if (category === 'defense') score -= 260;
+      score -= defense * 12;
+    } else if (purpose === 'production') {
+      if (category === 'production') score += 650;
+      else if (category === 'strategy') score += 540;
+      else if (category === 'technology') score += 390;
+      else score -= 220;
+      if (entity.typeId === 'airfield' || entity.typeId === 'advancedAirfield' || entity.typeId === 'heavyFactory') score += 160;
+      score -= defense * 10;
+    } else if (purpose === 'weak') {
+      if (entity.kind === 'building') score += 260;
+      if (category === 'production' || category === 'economy' || stats.power) score += 210;
+      score += (1 - healthRatio) * 280;
+      score -= defense * 32;
+    } else {
+      if (entity.typeId === 'hq') score += 720;
+      if (category === 'production') score += 520;
+      if (category === 'strategy') score += 460;
+      if (stats.power) score += 350;
+      if (stats.logisticsExtractor || stats.dropoff) score += 260;
+      score -= defense * 5;
+    }
+    score -= Math.sqrt(distanceSquared126(entity, this.base)) / 1900;
+    score += this.random() * 18;
+    return score;
+  };
+
+  TacticalAIClass.prototype.pickWarTarget126 = function(purpose = 'assault') {
+    const picture = this.refreshWarPicture126();
+    let best = null;
+    let bestScore = -Infinity;
+    for (const entity of picture.entities) {
+      const score = this.warTargetScore126(entity, purpose, picture);
+      if (score > bestScore) {
+        best = entity;
+        bestScore = score;
+      }
+    }
+    return best;
+  };
+
+  const basePickTarget126 = TacticalAIClass.prototype.pickTarget;
+  TacticalAIClass.prototype.pickTarget = function(purpose = 'assault') {
+    if (['supply', 'economy', 'production', 'weak'].includes(purpose)) {
+      return this.pickWarTarget126(purpose) || basePickTarget126.call(this, purpose === 'weak' ? 'assault' : 'harass');
+    }
+    if (purpose === 'harass') {
+      const mission = (this.operationCycle126 || 0) % 2 ? 'supply' : 'economy';
+      return this.pickWarTarget126(mission) || basePickTarget126.call(this, purpose);
+    }
+    if (purpose === 'assault' || purpose === 'siege' || purpose === 'power') {
+
+### NEEDLE power count_sample=10
+--- power #7 offset=2217 line=56 ---
+  const TARGET_CELL = 720;
+  const SUPPLY_BUILDINGS = new Set([
+    'refinery', 'logisticsHub', 'resourceSilo', 'supplyBeacon',
+    'oilPump', 'gasPump', 'mineralQuarry', 'oreMine', 'deepMine', 'coreDrill',
+  ]);
+  const AIR_ENGAGEMENT_COSTS = Object.freeze({
+    rocket: 4,
+    aa: 18,
+    mobileFireGroup: 10,
+    counterUASVehicle: 24,
+    longRangeSAM: 118,
+    interceptor: 54,
+    aaTurret: 26,
+    counterUASTower: 18,
+    missileBattery: 92,
+    abmBattery: 185,
+    orbitalDefense: 285,
+  });
+  const OPERATION_CONFIG = Object.freeze({
+    easy: { interval: 34, assaultLimit: 2, raidLimit: 1, mainMin: 7, raidSize: 4, covertCeiling: 150 },
+    normal: { interval: 21, assaultLimit: 4, raidLimit: 2, mainMin: 10, raidSize: 6, covertCeiling: 72 },
+    hard: { interval: 13, assaultLimit: 6, raidLimit: 4, mainMin: 12, raidSize: 9, covertCeiling: 42 },
+  });
+  const clamp126 = (value, min, max) => Math.max(min, Math.min(max, value));
+  const distanceSquared126 = (left, right) => {
+    const dx = (left?.x || 0) - (right?.x || 0);
+    const dy = (left?.y || 0) - (right?.y || 0);
+    return dx * dx + dy * dy;
+  };
+
+  // -------------------- Power is a hard operational resource --------------------
+  GameClass.prototype.isPowerGridOnline126 = function(teamKey) {
+    const team = this.teams?.[teamKey];
+    if (!team || teamKey === 'neutral') return false;
+    const produced = Number(team.powerProduced) || 0;
+    const used = Number(team.powerUsed) || 0;
+    return produced > 0 && produced + POWER_EPSILON >= used;
+  };
+
+  // Existing radar, interception and combat modules consult this hook at run
+  // time. A deficit of even one unit therefore drops every stationary defense
+  // from the common fire-control picture; mobile/manually crewed units remain.
+  GameClass.prototype.isStationaryDefensePowered = function(building) {
+    return Boolean(
+      building?.alive && building.completed && building.sabotagedUntil <= this.time &&
+      this.isPowerGridOnline126(building.team)
+    );
+  };
+
+  const baseBuildingUpdate126 = BuildingClass.prototype.update;
+  BuildingClass.prototype.update = function(dt) {
+    const poweredService = Boolean(this.completed && this.team !== 'neutral' && Number(this.stats?.powerUse) > 0);
+    const offline = poweredService && !this.game.isPowerGridOnline126(this.team);
+    this.powerOffline126 = offline;
+    if (!offline) return baseBuildingUpdate126.call(this, dt);
+
+    // Keep construction, damage, capture and cooldown state alive, but remove
+    // every powered service for this update. Building stats are per-instance,
+    // so this cannot leak into another structure or faction.
+    const stats = this.stats;
+    const saved = {
+      weapon: stats.weapon,
+      income: stats.income,
+      healAura: stats.healAura,
+      repairAura: stats.repairAura,
+      logisticsExtractor: stats.logisticsExtractor,
+    };
+    stats.weapon = null;
+    stats.income = 0;
+    stats.healAura = 0;
+    stats.repairAura = 0;
+    stats.logisticsExtractor = false;
+    try {
+      return baseBuildingUpdate126.call(this, dt);
+    } finally {
+      stats.weapon = saved.weapon;
+      stats.income = saved.income;
+      stats.healAura = saved.healAura;
+      stats.repairAura = saved.repairAura;
+      stats.logisticsExtractor = saved.logisticsExtractor;
+    }
+  };
+
+  const baseBuildingQueue126 = BuildingClass.prototype.updateQueue;
+  BuildingClass.prototype.updateQueue = function(dt) {
+    if (Number(this.stats?.powerUse) > 0 && !this.game.isPowerGridOnline126(this.team)) return;
+    return baseBuildingQueue126.call(this, dt);
+  };
+
+  const baseBuildingAuras126 = BuildingClass.prototype.updateAuras;
+--- power #10 offset=2628 line=65 ---
+    counterUASTower: 18,
+    missileBattery: 92,
+    abmBattery: 185,
+    orbitalDefense: 285,
+  });
+  const OPERATION_CONFIG = Object.freeze({
+    easy: { interval: 34, assaultLimit: 2, raidLimit: 1, mainMin: 7, raidSize: 4, covertCeiling: 150 },
+    normal: { interval: 21, assaultLimit: 4, raidLimit: 2, mainMin: 10, raidSize: 6, covertCeiling: 72 },
+    hard: { interval: 13, assaultLimit: 6, raidLimit: 4, mainMin: 12, raidSize: 9, covertCeiling: 42 },
+  });
+  const clamp126 = (value, min, max) => Math.max(min, Math.min(max, value));
+  const distanceSquared126 = (left, right) => {
+    const dx = (left?.x || 0) - (right?.x || 0);
+    const dy = (left?.y || 0) - (right?.y || 0);
+    return dx * dx + dy * dy;
+  };
+
+  // -------------------- Power is a hard operational resource --------------------
+  GameClass.prototype.isPowerGridOnline126 = function(teamKey) {
+    const team = this.teams?.[teamKey];
+    if (!team || teamKey === 'neutral') return false;
+    const produced = Number(team.powerProduced) || 0;
+    const used = Number(team.powerUsed) || 0;
+    return produced > 0 && produced + POWER_EPSILON >= used;
+  };
+
+  // Existing radar, interception and combat modules consult this hook at run
+  // time. A deficit of even one unit therefore drops every stationary defense
+  // from the common fire-control picture; mobile/manually crewed units remain.
+  GameClass.prototype.isStationaryDefensePowered = function(building) {
+    return Boolean(
+      building?.alive && building.completed && building.sabotagedUntil <= this.time &&
+      this.isPowerGridOnline126(building.team)
+    );
+  };
+
+  const baseBuildingUpdate126 = BuildingClass.prototype.update;
+  BuildingClass.prototype.update = function(dt) {
+    const poweredService = Boolean(this.completed && this.team !== 'neutral' && Number(this.stats?.powerUse) > 0);
+    const offline = poweredService && !this.game.isPowerGridOnline126(this.team);
+    this.powerOffline126 = offline;
+    if (!offline) return baseBuildingUpdate126.call(this, dt);
+
+    // Keep construction, damage, capture and cooldown state alive, but remove
+    // every powered service for this update. Building stats are per-instance,
+    // so this cannot leak into another structure or faction.
+    const stats = this.stats;
+    const saved = {
+      weapon: stats.weapon,
+      income: stats.income,
+      healAura: stats.healAura,
+      repairAura: stats.repairAura,
+      logisticsExtractor: stats.logisticsExtractor,
+    };
+    stats.weapon = null;
+    stats.income = 0;
+    stats.healAura = 0;
+    stats.repairAura = 0;
+    stats.logisticsExtractor = false;
+    try {
+      return baseBuildingUpdate126.call(this, dt);
+    } finally {
+      stats.weapon = saved.weapon;
+      stats.income = saved.income;
+      stats.healAura = saved.healAura;
+      stats.repairAura = saved.repairAura;
+      stats.logisticsExtractor = saved.logisticsExtractor;
+    }
+  };
+
+  const baseBuildingQueue126 = BuildingClass.prototype.updateQueue;
+  BuildingClass.prototype.updateQueue = function(dt) {
+    if (Number(this.stats?.powerUse) > 0 && !this.game.isPowerGridOnline126(this.team)) return;
+    return baseBuildingQueue126.call(this, dt);
+  };
+
+  const baseBuildingAuras126 = BuildingClass.prototype.updateAuras;
+  BuildingClass.prototype.updateAuras = function(dt) {
+    if (Number(this.stats?.powerUse) > 0 && !this.game.isPowerGridOnline126(this.team)) return;
+    return baseBuildingAuras126.call(this, dt);
+  };
+
+  const baseSensorSources126 = GameClass.prototype.getSensorSources;
+  GameClass.prototype.getSensorSources = function(teamKey) {
+    const sources = baseSensorSources126?.call(this, teamKey) || [];
+
+### NEEDLE build count_sample=10
+
+### NEEDLE supply count_sample=10
+--- supply #5 offset=17127 line=379 ---
+      if (stats.logisticsExtractor || stats.income || stats.dropoff || category === 'economy') score += 430;
+      if (entity.typeId === 'resourceTruck') score += 220 + cargoRatio * 260;
+      if (category === 'defense') score -= 260;
+      score -= defense * 12;
+    } else if (purpose === 'production') {
+      if (category === 'production') score += 650;
+      else if (category === 'strategy') score += 540;
+      else if (category === 'technology') score += 390;
+      else score -= 220;
+      if (entity.typeId === 'airfield' || entity.typeId === 'advancedAirfield' || entity.typeId === 'heavyFactory') score += 160;
+      score -= defense * 10;
+    } else if (purpose === 'weak') {
+      if (entity.kind === 'building') score += 260;
+      if (category === 'production' || category === 'economy' || stats.power) score += 210;
+      score += (1 - healthRatio) * 280;
+      score -= defense * 32;
+    } else {
+      if (entity.typeId === 'hq') score += 720;
+      if (category === 'production') score += 520;
+      if (category === 'strategy') score += 460;
+      if (stats.power) score += 350;
+      if (stats.logisticsExtractor || stats.dropoff) score += 260;
+      score -= defense * 5;
+    }
+    score -= Math.sqrt(distanceSquared126(entity, this.base)) / 1900;
+    score += this.random() * 18;
+    return score;
+  };
+
+  TacticalAIClass.prototype.pickWarTarget126 = function(purpose = 'assault') {
+    const picture = this.refreshWarPicture126();
+    let best = null;
+    let bestScore = -Infinity;
+    for (const entity of picture.entities) {
+      const score = this.warTargetScore126(entity, purpose, picture);
+      if (score > bestScore) {
+        best = entity;
+        bestScore = score;
+      }
+    }
+    return best;
+  };
+
+  const basePickTarget126 = TacticalAIClass.prototype.pickTarget;
+  TacticalAIClass.prototype.pickTarget = function(purpose = 'assault') {
+    if (['supply', 'economy', 'production', 'weak'].includes(purpose)) {
+      return this.pickWarTarget126(purpose) || basePickTarget126.call(this, purpose === 'weak' ? 'assault' : 'harass');
+    }
+    if (purpose === 'harass') {
+      const mission = (this.operationCycle126 || 0) % 2 ? 'supply' : 'economy';
+      return this.pickWarTarget126(mission) || basePickTarget126.call(this, purpose);
+    }
+    if (purpose === 'assault' || purpose === 'siege' || purpose === 'power') {
+      return this.pickWarTarget126(purpose === 'power' ? 'economy' : 'assault') || basePickTarget126.call(this, purpose);
+    }
+    return basePickTarget126.call(this, purpose);
+  };
+
+  const baseTargetPriority126 = TacticalAIClass.prototype.targetPriorityForSquad;
+  TacticalAIClass.prototype.targetPriorityForSquad = function(target, role) {
+    let score = baseTargetPriority126.call(this, target, role);
+    const squad = role && this.squads?.find((item) => item.role === role && item.targetId === target?.id);
+    const mission = squad?.mission;
+    if (target?.typeId === 'resourceTruck') score += 520 + clamp126((target.cargo || 0) / Math.max(1, target.stats?.cargoCapacity || 1), 0, 1) * 420;
+    if (target?.stats?.logisticsExtractor) score += mission === 'supply' ? 430 : 180;
+    if (mission === 'production' && target?.stats?.category === 'production') score += 430;
+    if (mission === 'economy' && (target?.stats?.category === 'economy' || target?.stats?.power)) score += 390;
+    return score;
+  };
+
+  const baseCovertScore126 = TacticalAIClass.prototype.covertTargetScore;
+  if (baseCovertScore126) {
+    TacticalAIClass.prototype.covertTargetScore = function(entity, mission) {
+      let score = baseCovertScore126.call(this, entity, mission);
+      if (mission === 'sabotage') {
+        if (entity?.stats?.power) score += 340;
+--- supply #8 offset=19061 line=411 ---
+      return this.pickWarTarget126(purpose) || basePickTarget126.call(this, purpose === 'weak' ? 'assault' : 'harass');
+    }
+    if (purpose === 'harass') {
+      const mission = (this.operationCycle126 || 0) % 2 ? 'supply' : 'economy';
+      return this.pickWarTarget126(mission) || basePickTarget126.call(this, purpose);
+    }
+    if (purpose === 'assault' || purpose === 'siege' || purpose === 'power') {
+      return this.pickWarTarget126(purpose === 'power' ? 'economy' : 'assault') || basePickTarget126.call(this, purpose);
+    }
+    return basePickTarget126.call(this, purpose);
+  };
+
+  const baseTargetPriority126 = TacticalAIClass.prototype.targetPriorityForSquad;
+  TacticalAIClass.prototype.targetPriorityForSquad = function(target, role) {
+    let score = baseTargetPriority126.call(this, target, role);
+    const squad = role && this.squads?.find((item) => item.role === role && item.targetId === target?.id);
+    const mission = squad?.mission;
+    if (target?.typeId === 'resourceTruck') score += 520 + clamp126((target.cargo || 0) / Math.max(1, target.stats?.cargoCapacity || 1), 0, 1) * 420;
+    if (target?.stats?.logisticsExtractor) score += mission === 'supply' ? 430 : 180;
+    if (mission === 'production' && target?.stats?.category === 'production') score += 430;
+    if (mission === 'economy' && (target?.stats?.category === 'economy' || target?.stats?.power)) score += 390;
+    return score;
+  };
+
+  const baseCovertScore126 = TacticalAIClass.prototype.covertTargetScore;
+  if (baseCovertScore126) {
+    TacticalAIClass.prototype.covertTargetScore = function(entity, mission) {
+      let score = baseCovertScore126.call(this, entity, mission);
+      if (mission === 'sabotage') {
+        if (entity?.stats?.power) score += 340;
+        if (entity?.stats?.category === 'production') score += 250;
+        if (entity?.stats?.logisticsExtractor || SUPPLY_BUILDINGS.has(entity?.typeId)) score += 210;
+      }
+      return score;
+    };
+  }
+
+  TacticalAIClass.prototype.launchWarOperations126 = function() {
+    const difficulty = this.game.difficultyKey || 'normal';
+    const config = OPERATION_CONFIG[difficulty] || OPERATION_CONFIG.normal;
+    const combatAvailable = () => this.availableCombatUnits((unit) =>
+      !this.isCovert(unit) && !unit.stats?.strategicLauncher?.length && Boolean(unit.stats?.weapon));
+    let available = combatAvailable();
+    if (!available.length) return false;
+    let launched = false;
+    const totalArmy = this.game.units.reduce((count, unit) => count + Number(Boolean(unit.alive && unit.team === 'enemy' && unit.stats?.weapon)), 0);
+    const massMode = totalArmy >= 500;
+    const assaultLimit = massMode ? Math.max(config.assaultLimit, 10) : config.assaultLimit;
+    let activeAssaults = this.squads.filter((squad) => squad.role === 'assault').length;
+
+    const assaultBursts = massMode ? Math.min(3, assaultLimit - activeAssaults) : Math.min(1, assaultLimit - activeAssaults);
+    for (let burst = 0; burst < assaultBursts && available.length >= config.mainMin; burst += 1) {
+      const reserveForRaid = difficulty === 'easy' ? 0 : Math.min(config.raidSize, Math.floor(available.length * .22));
+      const usable = Math.max(config.mainMin, available.length - reserveForRaid);
+      const desired = massMode
+        ? Math.min(120, Math.max(36, Math.ceil(usable * .18)))
+        : Math.min(difficulty === 'hard' ? 58 : difficulty === 'easy' ? 24 : 42, Math.max(config.mainMin, Math.ceil(usable * .58)));
+      const units = [...available]
+        .sort((left, right) => this.assaultSelectionScore(right) - this.assaultSelectionScore(left))
+        .slice(0, desired);
+      if (units.length < config.mainMin) break;
+--- supply #9 offset=21273 line=451 ---
+      !this.isCovert(unit) && !unit.stats?.strategicLauncher?.length && Boolean(unit.stats?.weapon));
+    let available = combatAvailable();
+    if (!available.length) return false;
+    let launched = false;
+    const totalArmy = this.game.units.reduce((count, unit) => count + Number(Boolean(unit.alive && unit.team === 'enemy' && unit.stats?.weapon)), 0);
+    const massMode = totalArmy >= 500;
+    const assaultLimit = massMode ? Math.max(config.assaultLimit, 10) : config.assaultLimit;
+    let activeAssaults = this.squads.filter((squad) => squad.role === 'assault').length;
+
+    const assaultBursts = massMode ? Math.min(3, assaultLimit - activeAssaults) : Math.min(1, assaultLimit - activeAssaults);
+    for (let burst = 0; burst < assaultBursts && available.length >= config.mainMin; burst += 1) {
+      const reserveForRaid = difficulty === 'easy' ? 0 : Math.min(config.raidSize, Math.floor(available.length * .22));
+      const usable = Math.max(config.mainMin, available.length - reserveForRaid);
+      const desired = massMode
+        ? Math.min(120, Math.max(36, Math.ceil(usable * .18)))
+        : Math.min(difficulty === 'hard' ? 58 : difficulty === 'easy' ? 24 : 42, Math.max(config.mainMin, Math.ceil(usable * .58)));
+      const units = [...available]
+        .sort((left, right) => this.assaultSelectionScore(right) - this.assaultSelectionScore(left))
+        .slice(0, desired);
+      if (units.length < config.mainMin) break;
+      const target = this.pickWarTarget126('assault') || this.pickTarget('assault');
+      const squad = this.createAssaultSquad(units, target, this.laneRotation++ % 3 - 1, 'assault', 0);
+      if (!squad) break;
+      squad.mission = 'main-assault';
+      launched = true;
+      activeAssaults += 1;
+      available = combatAvailable();
+    }
+
+    const raidMissions = difficulty === 'easy'
+      ? ['supply']
+      : difficulty === 'hard'
+        ? ['supply', 'economy', 'production', 'weak']
+        : ['supply', 'economy', 'production'];
+    const mission = raidMissions[(this.operationCycle126 || 0) % raidMissions.length];
+    const activeRaids = this.squads.filter((squad) => ['harass', 'feint'].includes(squad.role)).length;
+    if (activeRaids < config.raidLimit) {
+      const target = this.pickWarTarget126(mission);
+      const candidates = combatAvailable()
+        .filter((unit) => this.isRaider(unit) || unit.air || unit.stats?.stealth)
+        .sort((left, right) => (right.stats.speed || 0) + (right.stats.stealth ? 90 : 0) - (left.stats.speed || 0) - (left.stats.stealth ? 90 : 0));
+      const raidSize = massMode ? Math.min(24, Math.max(config.raidSize, Math.ceil(candidates.length * .08))) : config.raidSize;
+      const units = candidates.slice(0, raidSize);
+      if (target && units.length >= Math.min(3, config.raidSize)) {
+        const flank = this.laneRotation++ % 2 ? 1 : -1;
+        const squad = this.createSquad('harass', units, {
+          targetId: target.id,
+          targetX: target.x,
+          targetY: target.y,
+          path: this.buildFlankPath(target, flank, mission === 'weak' ? .78 : 1.08),
+          state: 'raiding',
+          flank,
+          mission,
+          expiresAt: this.game.time + 250,
+        });
+        if (squad) {
+          this.issueRaidOrders(squad);
+          launched = true;
+        }
+      }
+    }
+    this.operationCycle126 = (this.operationCycle126 || 0) + 1;
+    return launched;
+  };
+
+  const baseManageRaid126 = TacticalAIClass.prototype.manageRaidSquad;
+  TacticalAIClass.prototype.manageRaidSquad = function(squad, units) {
+    if (!['supply', 'economy', 'production', 'weak'].includes(squad?.mission)) {
+      return baseManageRaid126.call(this, squad, units);

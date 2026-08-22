@@ -1,0 +1,1077 @@
+BUILD206 AI API AUDIT
+
+## TacticalAI\.prototype\.[A-Za-z0-9_]*(?:build|construct|place|econom|resource|produce)[A-Za-z0-9_]*\s*=
+-- L16224 --
+    ctx.fillStyle=shadeColor(pal.secondary,-.08);ctx.beginPath();ctx.ellipse(entrance.x,entrance.y,Math.max(4,r*this.camera.zoom*.20),Math.max(2.4,r*this.camera.zoom*.11),eAng,0,TWO_PI);ctx.fill();
+    ctx.strokeStyle=alphaColor(pal.accent,.80);ctx.lineWidth=Math.max(1.2,this.camera.zoom*1.1);ctx.beginPath();ctx.arc(entrance.x,entrance.y,Math.max(3,r*this.camera.zoom*.17),Math.PI*.12,Math.PI*.88);ctx.stroke();
+    ctx.restore();
+  };
+
+  // -------------------------------------------------------------------------
+  // Planned AI base. The AI now has local coordinates, building zones and two
+  // permanent traffic corridors instead of dropping every structure into the
+  // nearest free circle around HQ.
+  // -------------------------------------------------------------------------
+  TacticalAI.prototype.ensureBasePlan79 = function(){
+    if(this.basePlan79) return this.basePlan79;
+    const heading=Math.atan2(this.game.playerBase.y-this.base.y,this.game.playerBase.x-this.base.x);
+    const f={x:Math.cos(heading),y:Math.sin(heading)},s={x:-Math.sin(heading),y:Math.cos(heading)};
+    this.basePlan79={heading,f,s,
+      world:(forward,side)=>({x:this.base.x+f.x*forward+s.x*side,y:this.base.y+f.y*forward+s.y*side}),
+      local:(x,y)=>{const dx=x-this.base.x,dy=y-this.base.y;return {forward:dx*f.x+dy*f.y,side:dx*s.x+dy*s.y};}
+    };
+    return this.basePlan79;
+  };
+
+  TacticalAI.prototype.resourceAnchor79 = function(typeId,count){
+    const game=this.game, plan=this.ensureBasePlan79();
+    const dropoffs=game.buildings.filter(b=>b.alive&&b.team==='enemy'&&b.stats.dropoff);
+    const nodes=game.resources.filter(n=>n.alive&&n.amount>0);
+    if(!nodes.length) return null;
+    const nearestDrop=(node)=>dropoffs.length?Math.min(...dropoffs.map(b=>distance(node,b))):Infinity;
+    let node;
+    if(typeId==='refinery'&&count===0) node=[...nodes].sort((a,b)=>distanceSq(a,this.base)-distanceSq(b,this.base))[0];
+    else node=[...nodes].sort((a,b)=>((nearestDrop(b)*1.2+Math.min(2200,b.amount/420))-(nearestDrop(a)*1.2+Math.min(2200,a.amount/420))))[0];
+    if(!node)return null;
+    const dx=this.base.x-node.x,dy=this.base.y-node.y,len=Math.hypot(dx,dy)||1;
+    const offset=(node.radius||55)+(BUILDING_TYPES[typeId]?.radius||50)+150;
+    return {x:node.x+dx/len*offset,y:node.y+dy/len*offset};
+  };
+
+  const v79BaseAiAnchor=TacticalAI.prototype.aiBuildAnchor;
+  TacticalAI.prototype.aiBuildAnchor=function(typeId,count){
+    const stats=BUILDING_TYPES[typeId]||{};const plan=this.ensureBasePlan79();
+    if(typeId==='forwardOutpost') return v79BaseAiAnchor.call(this,typeId,count);
+    if(['refinery','logisticsHub','resourceSilo'].includes(typeId)){
+      const resource=this.resourceAnchor79(typeId,count); if(resource) return resource;
+    }
+    const category=stats.category||'support';
+    const existingByCategory=this.game.buildings.filter(b=>b.alive&&b.team==='enemy'&&(b.stats.category||'support')===category).length;
+    const n=Math.max(count,existingByCategory);
+    const pair=(index,base,step)=>{const k=Math.floor(index/2);return (index%2?1:-1)*(base+k*step);};
+
+    if(['power','solarArray','fusionPlant','geothermalPlant'].includes(typeId)) return plan.world(-650-Math.floor(n/4)*210,pair(n,320,250));
+    if(category==='economy') return plan.world(-430-Math.floor(n/4)*180,pair(n,470,230));
+    if(typeId==='airfield'||typeId==='advancedAirfield') return plan.world(-980-Math.floor(count/2)*260,pair(count,920,420));
+    if(category==='production'){
+      const forward=typeId==='barracks'?120:(['factory','vehicleDepot'].includes(typeId)?-120:-360);
+      return plan.world(forward-Math.floor(n/4)*170,pair(n,560,270));
+    }
+    if(category==='technology'||category==='strategy') return plan.world(-760-Math.floor(n/4)*170,pair(n,300,260));
+    if(category==='defense'){
+      const short=['turret','cannonTurret','bunker','flameTower','mineControl'].includes(typeId);
+      const long=['aaTurret','missileBattery','abmBattery','counterUASTower','orbitalDefense'].includes(typeId);
+-- L16240 --
+      world:(forward,side)=>({x:this.base.x+f.x*forward+s.x*side,y:this.base.y+f.y*forward+s.y*side}),
+      local:(x,y)=>{const dx=x-this.base.x,dy=y-this.base.y;return {forward:dx*f.x+dy*f.y,side:dx*s.x+dy*s.y};}
+    };
+    return this.basePlan79;
+  };
+
+  TacticalAI.prototype.resourceAnchor79 = function(typeId,count){
+    const game=this.game, plan=this.ensureBasePlan79();
+    const dropoffs=game.buildings.filter(b=>b.alive&&b.team==='enemy'&&b.stats.dropoff);
+    const nodes=game.resources.filter(n=>n.alive&&n.amount>0);
+    if(!nodes.length) return null;
+    const nearestDrop=(node)=>dropoffs.length?Math.min(...dropoffs.map(b=>distance(node,b))):Infinity;
+    let node;
+    if(typeId==='refinery'&&count===0) node=[...nodes].sort((a,b)=>distanceSq(a,this.base)-distanceSq(b,this.base))[0];
+    else node=[...nodes].sort((a,b)=>((nearestDrop(b)*1.2+Math.min(2200,b.amount/420))-(nearestDrop(a)*1.2+Math.min(2200,a.amount/420))))[0];
+    if(!node)return null;
+    const dx=this.base.x-node.x,dy=this.base.y-node.y,len=Math.hypot(dx,dy)||1;
+    const offset=(node.radius||55)+(BUILDING_TYPES[typeId]?.radius||50)+150;
+    return {x:node.x+dx/len*offset,y:node.y+dy/len*offset};
+  };
+
+  const v79BaseAiAnchor=TacticalAI.prototype.aiBuildAnchor;
+  TacticalAI.prototype.aiBuildAnchor=function(typeId,count){
+    const stats=BUILDING_TYPES[typeId]||{};const plan=this.ensureBasePlan79();
+    if(typeId==='forwardOutpost') return v79BaseAiAnchor.call(this,typeId,count);
+    if(['refinery','logisticsHub','resourceSilo'].includes(typeId)){
+      const resource=this.resourceAnchor79(typeId,count); if(resource) return resource;
+    }
+    const category=stats.category||'support';
+    const existingByCategory=this.game.buildings.filter(b=>b.alive&&b.team==='enemy'&&(b.stats.category||'support')===category).length;
+    const n=Math.max(count,existingByCategory);
+    const pair=(index,base,step)=>{const k=Math.floor(index/2);return (index%2?1:-1)*(base+k*step);};
+
+    if(['power','solarArray','fusionPlant','geothermalPlant'].includes(typeId)) return plan.world(-650-Math.floor(n/4)*210,pair(n,320,250));
+    if(category==='economy') return plan.world(-430-Math.floor(n/4)*180,pair(n,470,230));
+    if(typeId==='airfield'||typeId==='advancedAirfield') return plan.world(-980-Math.floor(count/2)*260,pair(count,920,420));
+    if(category==='production'){
+      const forward=typeId==='barracks'?120:(['factory','vehicleDepot'].includes(typeId)?-120:-360);
+      return plan.world(forward-Math.floor(n/4)*170,pair(n,560,270));
+    }
+    if(category==='technology'||category==='strategy') return plan.world(-760-Math.floor(n/4)*170,pair(n,300,260));
+    if(category==='defense'){
+      const short=['turret','cannonTurret','bunker','flameTower','mineControl'].includes(typeId);
+      const long=['aaTurret','missileBattery','abmBattery','counterUASTower','orbitalDefense'].includes(typeId);
+      if(short){const slot=n%7-3;const layer=Math.floor(n/7);return plan.world(720+layer*240,slot*300);}
+      if(long){const slot=n%6;const angle=plan.heading+slot*TWO_PI/6;const ring=500+Math.floor(n/6)*230;return {x:this.base.x+Math.cos(angle)*ring,y:this.base.y+Math.sin(angle)*ring};}
+      return plan.world(560,pair(n,460,250));
+    }
+    return v79BaseAiAnchor.call(this,typeId,count);
+  };
+
+  const v79BaseFindAiSpot=Game.prototype.findAiBuildSpot;
+  Game.prototype.findAiBuildSpot=function(typeId,anchor,salt=0){
+    const stats=getBuildingStats(typeId,this.teams.enemy);const ai=this.ai;const plan=ai?.ensureBasePlan79?.();
+    const category=stats.category||'support';
+    const extra=category==='production'||category==='strategy'?92:category==='technology'?78:category==='economy'?68:category==='defense'?34:62;
+    const valid=(x,y)=>{
+      if(x<stats.radius+45||y<stats.radius+45||x>WORLD.width-stats.radius-45||y>WORLD.height-stats.radius-45)return false;
+-- L16314 --
+    const radii=[0,75,125,185,260,350,460,600,780,980];
+    for(let ri=0;ri<radii.length;ri++){
+      const radius=radii[ri],samples=radius===0?1:14;
+      for(let i=0;i<samples;i++){
+        const a=(i/samples)*TWO_PI+salt*.43+ri*.31;const x=clamp(anchor.x+Math.cos(a)*radius,stats.radius+45,WORLD.width-stats.radius-45),y=clamp(anchor.y+Math.sin(a)*radius,stats.radius+45,WORLD.height-stats.radius-45);
+        if(valid(x,y))return{x,y};
+      }
+    }
+    return v79BaseFindAiSpot.call(this,typeId,anchor,salt);
+  };
+
+  // Orient AI structures toward the operational front and set rally points into
+  // the clear avenues rather than directly into neighbouring buildings.
+  const v79BaseAddEntity=Game.prototype.addEntity;
+  Game.prototype.addEntity=function(entity){
+    if(entity?.kind==='building'&&entity.team==='enemy'){
+      const heading=Math.atan2(this.playerBase.y-entity.y,this.playerBase.x-entity.x);
+      entity.rotation=heading;entity.weaponRotation=heading;
+      if(entity.stats?.category==='production') entity.rallyPoint={x:entity.x+Math.cos(heading)*(entity.radius+260),y:entity.y+Math.sin(heading)*(entity.radius+260)};
+    }
+    return v79BaseAddEntity.call(this,entity);
+  };
+
+  TacticalAI.prototype.buildPlanned79=function(typeId){
+    const stats=getBuildingStats(typeId,this.game.teams.enemy),team=this.game.teams.enemy;
+    if(!stats||team.credits<stats.cost||!this.game.requirementsMet('enemy',stats.requires||[],stats.rank||1))return false;
+    const count=this.game.buildings.filter(b=>b.alive&&b.team==='enemy'&&b.typeId===typeId).length;
+    const anchor=this.aiBuildAnchor(typeId,count),spot=this.game.findAiBuildSpot(typeId,anchor,this.wave+count*7+31);if(!spot)return false;
+    team.credits-=stats.cost;const b=new Building(this.game,{typeId,team:'enemy',x:spot.x,y:spot.y,construction:.03,autoConstruct:true,rotation:this.ensureBasePlan79().heading});this.game.addEntity(b);if(stats.category==='defense')this.defenseCount+=1;return true;
+  };
+
+  TacticalAI.prototype.criticalInfrastructure79=function(){
+    const g=this.game,t=g.teams.enemy,count=(id)=>g.buildings.filter(b=>b.alive&&b.team==='enemy'&&b.typeId===id).length;
+    const powerMargin=(t.powerProduced||0)-(t.powerUsed||0),desired=Math.max(42,(t.powerUsed||0)*.24);
+    if(!g.hasBuilding('enemy','power',true)&&count('power')<1){const ps=getBuildingStats('power',t);return t.credits>=ps.cost?'power':'__reservePower';}
+    if((t.powerFactor||1)<.94||powerMargin<desired){
+      const powerChoices=[];
+      if(g.hasBuilding('enemy','techLab',true)&&g.requirementsMet('enemy',BUILDING_TYPES.fusionPlant.requires||[],BUILDING_TYPES.fusionPlant.rank||1)&&count('fusionPlant')<2)powerChoices.push('fusionPlant');
+      if(g.hasBuilding('enemy','refinery',true)&&count('solarArray')<4)powerChoices.push('solarArray');
+      if(count('power')<6)powerChoices.push('power');
+      const affordable=powerChoices.find(id=>t.credits>=getBuildingStats(id,t).cost);
+      return affordable||'__reservePower';
+    }
+    if(count('refinery')<1)return'refinery';
+    const workers=g.units.filter(u=>u.alive&&u.team==='enemy'&&u.typeId==='worker').length;
+    const dropoffs=g.buildings.filter(b=>b.alive&&b.team==='enemy'&&b.stats.dropoff).length;
+    if(workers>=6&&dropoffs<Math.min(4,Math.ceil(workers/4))){
+      if(g.requirementsMet('enemy',BUILDING_TYPES.logisticsHub.requires||[],BUILDING_TYPES.logisticsHub.rank||1))return'logisticsHub';
+      if(g.requirementsMet('enemy',BUILDING_TYPES.resourceSilo.requires||[],BUILDING_TYPES.resourceSilo.rank||1))return'resourceSilo';
+    }
+    const defenses=g.buildings.filter(b=>b.alive&&b.team==='enemy'&&b.stats.category==='defense').length;
+    const maxDefense=g.difficultyKey==='hard'?17:g.difficultyKey==='easy'?9:13;
+    const desiredDefense=Math.min(maxDefense,3+Math.floor(Math.max(0,g.time-55)/(g.difficultyKey==='hard'?42:g.difficultyKey==='easy'?72:55)));
+-- L16353 --
+    const defenses=g.buildings.filter(b=>b.alive&&b.team==='enemy'&&b.stats.category==='defense').length;
+    const maxDefense=g.difficultyKey==='hard'?17:g.difficultyKey==='easy'?9:13;
+    const desiredDefense=Math.min(maxDefense,3+Math.floor(Math.max(0,g.time-55)/(g.difficultyKey==='hard'?42:g.difficultyKey==='easy'?72:55)));
+    if(g.time>70&&defenses<desiredDefense&&t.credits>1650){
+      const c=this.lastPlayerComposition||{air:0,vehicle:1,infantry:1};
+      const choices=c.air>c.vehicle*.55?['counterUASTower','aaTurret','missileBattery','abmBattery','turret','bunker']:c.vehicle>c.infantry?['cannonTurret','missileBattery','bunker','turret','aaTurret']:['bunker','turret','flameTower','cannonTurret','aaTurret'];
+      for(const id of choices){const bs=BUILDING_TYPES[id];if(bs&&g.requirementsMet('enemy',bs.requires||[],bs.rank||1)&&t.credits>=getBuildingStats(id,t).cost)return id;}
+    }
+    if(g.time>170&&t.credits<4200&&count('creditExchange')<(g.difficultyKey==='hard'?2:1)&&g.requirementsMet('enemy',BUILDING_TYPES.creditExchange.requires||[],BUILDING_TYPES.creditExchange.rank||1))return'creditExchange';
+    return null;
+  };
+  const v79BaseConsiderBuilding=TacticalAI.prototype.considerBuilding;
+  TacticalAI.prototype.considerBuilding=function(){
+    const urgent=this.criticalInfrastructure79();
+    if(urgent==='__reservePower') return;
+    if(urgent&&this.buildPlanned79(urgent))return;
+    return v79BaseConsiderBuilding.call(this);
+  };
+
+  // A standing defense exists even on Easy. It is deliberately smaller on Easy,
+  // but still layered: armor/infantry forward, AA in the middle, artillery/support rear.
+  TacticalAI.prototype.defensePost79=function(unit,index,total){
+    const plan=this.ensureBasePlan79();let forward=480,side=0;
+    const spread=(i,n,width)=>n<=1?0:((i/(n-1))-.5)*width;
+    if(this.isAntiAir(unit)){forward=240;side=spread(index,total,1250);}
+    else if(this.isSiege(unit)){forward=-170;side=spread(index,total,1050);}
+    else if(unit.vehicle){forward=650;side=spread(index,total,1450);}
+    else if(this.isSupport(unit)){forward=-40;side=spread(index,total,900);}
+    else {forward=760;side=spread(index,total,1550);}
+    let target=plan.world(forward,side);
+    for(let ring=0;ring<7;ring++){
+      const rr=ring*85;for(let k=0;k<(ring?8:1);k++){const a=k*TWO_PI/8+index*.53;const x=target.x+Math.cos(a)*rr,y=target.y+Math.sin(a)*rr;if(!this.game.findBuildingCollision(x,y,(unit.radius||12)+10))return{x,y};}
+    }
+    return target;
+  };
+  TacticalAI.prototype.maintainStandingDefense79=function(){
+    let squad=this.squads.find(s=>s.role==='defense');const desiredBase=this.game.difficultyKey==='hard'?15:this.game.difficultyKey==='easy'?7:11;const desired=Math.min(21,desiredBase+Math.floor(this.game.time/240)*2);
+    let existing=squad?this.squadUnits(squad):[];
+    if(existing.length<desired){
+      const need=desired-existing.length;const candidates=this.availableCombatUnits(u=>!this.isCovert(u)&&!u.stats.strategicLauncher?.length)
+        .sort((a,b)=>{
+          const sa=(this.isAntiAir(a)?22:0)+(a.vehicle?12:0)+(this.isSiege(a)?8:0)+(a.healthRatio*5);
+          const sb=(this.isAntiAir(b)?22:0)+(b.vehicle?12:0)+(this.isSiege(b)?8:0)+(b.healthRatio*5);return sb-sa;
+        }).slice(0,need);
+      if(!squad&&candidates.length)squad=this.createSquad('defense',candidates,{state:'garrison',targetX:this.base.x,targetY:this.base.y,expiresAt:this.game.time+999999});
+      else if(squad){for(const u of candidates){if(!squad.unitIds.includes(u.id)){squad.unitIds.push(u.id);u.aiSquadId=squad.id;}}squad.expiresAt=this.game.time+999999;}
+    }
+    if(squad)squad.expiresAt=this.game.time+999999;
+  };
+
+  const v79BaseManageDefense=TacticalAI.prototype.manageDefenseSquad;
+  TacticalAI.prototype.manageDefenseSquad=function(squad,units){
+    const threat=this.currentBaseThreat();
+
+## \b(?:tryBuild|buildStructure|placeBuildingAI|buildBuilding|queueProduction)\b
+-- L3181 --
+      return Boolean(stats?.weapon?.targets?.includes('air'));
+    }
+
+    ensureHarvesters() {
+      const game = this.game;
+      const workers = game.units.filter((unit) => unit.alive && unit.team === 'enemy' && unit.typeId === 'worker');
+      const desired = this.game.difficultyKey === 'hard' ? 8 : this.game.difficultyKey === 'easy' ? 4 : 6;
+      const nodes = game.resources.filter((node) => node.alive && node.amount > 0).sort((a, b) => distanceSq(a, this.base) - distanceSq(b, this.base));
+      workers.forEach((worker, index) => {
+        if (!worker.currentCommand) {
+          const node = nodes[index % Math.max(1, Math.min(nodes.length, 5))] || game.findNearestResource(worker.x, worker.y);
+          if (node) worker.setCommand({ type: 'harvest', resourceId: node.id });
+        }
+      });
+      const producers = game.buildings.filter((building) => building.alive && building.completed && building.team === 'enemy' && building.stats.produces?.includes('worker'));
+      if (workers.length < desired) {
+        const producer = producers.sort((a, b) => a.queue.length - b.queue.length)[0];
+        if (producer && producer.queue.filter((item) => item.kind === 'unit' && item.id === 'worker').length < 2) game.queueProduction(producer, 'worker', 'unit', true);
+      }
+    }
+
+    rememberEntity(entity) {
+      const base = entity.kind === 'building' ? BUILDING_TYPES[entity.typeId] : UNIT_TYPES[entity.typeId];
+      const category = entity.kind === 'building' ? (entity.stats.category || base?.category || 'support') : (entity.air ? 'air' : entity.vehicle ? 'vehicle' : 'infantry');
+      let value = entity.kind === 'building' ? 65 : 18;
+      if (entity.kind === 'building') {
+        if (entity.typeId === 'hq') value = 310;
+        else if (category === 'strategy') value = 270;
+        else if (category === 'technology') value = 175;
+        else if (category === 'production') value = 155;
+        else if (entity.stats.dropoff || entity.stats.income) value = 145;
+        else if (entity.stats.power) value = 120;
+        else if (category === 'defense') value = 95;
+      } else {
+        if (entity.typeId === 'worker') value = 80;
+        if (entity.stats.healer) value += 55;
+        if (this.isSiege(entity)) value += 65;
+        if (entity.air) value += 25;
+        value += Math.min(80, (entity.stats.cost || 0) / 35);
+      }
+      this.intel.set(entity.id, {
+        id: entity.id,
+        kind: entity.kind,
+        typeId: entity.typeId,
+        category,
+        x: entity.x,
+        y: entity.y,
+        hpRatio: entity.healthRatio,
+        air: Boolean(entity.air),
+        lastSeen: this.game.time,
+        value
+      });
+    }
+
+    collectIntel() {
+      const game = this.game;
+      const observers = [
+        ...game.units.filter((unit) => unit.alive && unit.team === 'enemy' && (this.isScout(unit) || unit.detector > 0 || unit.vision >= 480)),
+        ...game.buildings.filter((building) => building.alive && building.completed && building.team === 'enemy' && (building.detector > 0 || building.vision >= 560))
+      ].sort((a, b) => (b.vision || 0) - (a.vision || 0)).slice(0, this.game.difficultyKey === 'hard' ? 42 : 28);
+
+      for (const observer of observers) {
+        const range = Math.max(280, (observer.vision || 300) * (this.game.difficultyKey === 'hard' ? 1.08 : 1));
+        const candidates = [
+          ...game.querySpatial(game.unitSpatial, observer.x, observer.y, range + 65),
+          ...game.querySpatial(game.buildingSpatial, observer.x, observer.y, range + 120)
+        ];
+        for (const entity of candidates) {
+          if (!entity.alive || entity.team !== 'player') continue;
+          if (entity.kind === 'building' && !entity.completed) continue;
+          if (distance(observer, entity) > range + entity.radius) continue;
+          if (!game.isTargetableBy(entity, 'enemy', observer)) continue;
+-- L3523 --
+        { key: 'aero', after: 350, desired: 1 },
+        { key: 'strategic', after: 470, desired: this.game.difficultyKey === 'easy' ? 0 : 1 }
+      ];
+      for (const plan of plans) {
+        if (this.game.time < plan.after || plan.desired <= 0) continue;
+        const typeId = ids[plan.key];
+        const alive = this.game.units.filter((unit) => unit.alive && unit.team === 'enemy' && unit.typeId === typeId).length;
+        let queued = 0;
+        for (const building of this.game.buildings) {
+          if (!building.alive || building.team !== 'enemy') continue;
+          queued += building.queue.filter((item) => item.kind === 'unit' && item.id === typeId).length;
+        }
+        if (alive + queued >= plan.desired || !this.game.canProduceUnit('enemy', typeId)) continue;
+        const producer = this.game.buildings
+          .filter((building) => building.alive && building.completed && building.team === 'enemy' && building.stats.produces?.includes(typeId) && building.queue.length < 2)
+          .sort((a, b) => a.queue.length - b.queue.length)[0];
+        const stats = getUnitStats(typeId, this.game.teams.enemy);
+        if (producer && this.game.teams.enemy.credits >= stats.cost + 3800) this.game.queueProduction(producer, typeId, 'unit', true);
+      }
+    }
+
+    considerProduction() {
+      this.ensureStrategicPlatforms();
+      const game = this.game;
+      const team = game.teams.enemy;
+      const composition = this.lastPlayerComposition;
+      const army = game.units.filter((unit) => unit.alive && unit.team === 'enemy' && unit.typeId !== 'worker');
+      const roleCounts = {
+        scout: army.filter((unit) => this.isScout(unit)).length,
+        siege: army.filter((unit) => this.isSiege(unit)).length,
+        support: army.filter((unit) => this.isSupport(unit)).length,
+        antiAir: army.filter((unit) => this.isAntiAir(unit)).length,
+        covert: army.filter((unit) => this.isCovert(unit)).length,
+        total: army.length
+      };
+      const maxTier = team.rank >= 3 && game.time > 370 ? 3 : team.rank >= 2 && game.time > 125 ? 2 : 1;
+      const producers = game.buildings.filter((building) => building.alive && building.team === 'enemy' && building.completed && building.queue.length < (game.difficultyKey === 'hard' ? 3 : 2) && building.stats.produces?.length);
+
+      for (const building of producers) {
+        if (building.typeId === 'hq' || building.typeId === 'forwardOutpost') continue;
+        let candidates = building.stats.produces.filter((id) => game.canProduceUnit('enemy', id));
+        candidates = candidates.filter((id) => (UNIT_TYPES[id].tier || UNIT_TYPES[id].rank || 1) <= maxTier || ['rifle', 'rocket', 'medic', 'scout', 'tank', 'aa', 'helicopter'].includes(id));
+        if (!candidates.length) continue;
+        const scored = candidates.map((id) => ({ id, score: this.productionScore(id, composition, roleCounts, team.credits) }))
+          .sort((a, b) => b.score - a.score);
+        const choicePool = scored.slice(0, Math.min(3, scored.length));
+        const chosen = choicePool[Math.floor(this.random() * choicePool.length)]?.id;
+        if (chosen) game.queueProduction(building, chosen, 'unit', true);
+      }
+
+      const researchBuildings = game.buildings.filter((building) => building.alive && building.team === 'enemy' && building.completed && building.queue.length === 0 && building.stats.researches?.length);
+      const priorities = this.researchPriorities(composition);
+      for (const lab of researchBuildings) {
+        const missing = lab.stats.researches.filter((id) => !team.upgrades.has(id));
+        if (!missing.length) continue;
+        missing.sort((a, b) => priorities.indexOf(a) - priorities.indexOf(b));
+        game.queueProduction(lab, missing[0], 'upgrade', true);
+      }
+    }
+
+    productionScore(typeId, composition, roleCounts, credits) {
+-- L3553 --
+        covert: army.filter((unit) => this.isCovert(unit)).length,
+        total: army.length
+      };
+      const maxTier = team.rank >= 3 && game.time > 370 ? 3 : team.rank >= 2 && game.time > 125 ? 2 : 1;
+      const producers = game.buildings.filter((building) => building.alive && building.team === 'enemy' && building.completed && building.queue.length < (game.difficultyKey === 'hard' ? 3 : 2) && building.stats.produces?.length);
+
+      for (const building of producers) {
+        if (building.typeId === 'hq' || building.typeId === 'forwardOutpost') continue;
+        let candidates = building.stats.produces.filter((id) => game.canProduceUnit('enemy', id));
+        candidates = candidates.filter((id) => (UNIT_TYPES[id].tier || UNIT_TYPES[id].rank || 1) <= maxTier || ['rifle', 'rocket', 'medic', 'scout', 'tank', 'aa', 'helicopter'].includes(id));
+        if (!candidates.length) continue;
+        const scored = candidates.map((id) => ({ id, score: this.productionScore(id, composition, roleCounts, team.credits) }))
+          .sort((a, b) => b.score - a.score);
+        const choicePool = scored.slice(0, Math.min(3, scored.length));
+        const chosen = choicePool[Math.floor(this.random() * choicePool.length)]?.id;
+        if (chosen) game.queueProduction(building, chosen, 'unit', true);
+      }
+
+      const researchBuildings = game.buildings.filter((building) => building.alive && building.team === 'enemy' && building.completed && building.queue.length === 0 && building.stats.researches?.length);
+      const priorities = this.researchPriorities(composition);
+      for (const lab of researchBuildings) {
+        const missing = lab.stats.researches.filter((id) => !team.upgrades.has(id));
+        if (!missing.length) continue;
+        missing.sort((a, b) => priorities.indexOf(a) - priorities.indexOf(b));
+        game.queueProduction(lab, missing[0], 'upgrade', true);
+      }
+    }
+
+    productionScore(typeId, composition, roleCounts, credits) {
+      const stats = getUnitStats(typeId, this.game.teams.enemy);
+      const index = this.unitArchetype(stats, typeId);
+      const totalPlayer = Math.max(1, composition.total);
+      let score = 12 + this.random() * 12;
+      if (stats.strategicLauncher?.length) {
+        const existing = this.game.units.filter((unit) => unit.alive && unit.team === 'enemy' && unit.typeId === typeId).length;
+        return existing ? -90 : (this.game.time > 180 ? 42 : -55);
+      }
+      const weapon = stats.weapon;
+      const airRatio = composition.air / totalPlayer;
+      const vehicleRatio = composition.vehicle / totalPlayer;
+      const infantryRatio = composition.infantry / totalPlayer;
+      if (weapon) {
+        if (weapon.targets.includes('air')) score += 54 * airRatio + (roleCounts.antiAir < Math.ceil(composition.air * 0.7) ? 22 : 0);
+        if (weapon.bonus?.vehicle) score += 36 * vehicleRatio * weapon.bonus.vehicle;
+        if (weapon.bonus?.infantry) score += 28 * infantryRatio * weapon.bonus.infantry;
+        if (weapon.splash) score += infantryRatio * Math.min(34, weapon.splash / 3);
+        if (weapon.range >= 450) score += Math.min(28, composition.buildings * 2.5 + this.wave * 1.4);
+      }
+      if (this.isSupport(stats)) score += roleCounts.support < Math.max(2, roleCounts.total * 0.12) ? 38 : -12;
+      if (this.isCovert(stats)) {
+        const desiredCovert = this.game.difficultyKey === 'hard' ? 4 : this.game.difficultyKey === 'easy' ? 1 : 2;
+        score += roleCounts.covert < desiredCovert ? 72 : -24;
+        if (this.doctrine === 'deception') score += 28;
+      }
+      if (this.isScout({ stats, vision: stats.vision })) score += roleCounts.scout < (this.game.difficultyKey === 'hard' ? 5 : 3) ? 34 : -14;
+      if (this.isSiege(stats)) score += roleCounts.siege < Math.max(2, roleCounts.total * 0.18) && this.game.time > 120 ? 35 : 5;
+      if (stats.stealth && this.doctrine === 'deception') score += 28;
+-- L3562 --
+        let candidates = building.stats.produces.filter((id) => game.canProduceUnit('enemy', id));
+        candidates = candidates.filter((id) => (UNIT_TYPES[id].tier || UNIT_TYPES[id].rank || 1) <= maxTier || ['rifle', 'rocket', 'medic', 'scout', 'tank', 'aa', 'helicopter'].includes(id));
+        if (!candidates.length) continue;
+        const scored = candidates.map((id) => ({ id, score: this.productionScore(id, composition, roleCounts, team.credits) }))
+          .sort((a, b) => b.score - a.score);
+        const choicePool = scored.slice(0, Math.min(3, scored.length));
+        const chosen = choicePool[Math.floor(this.random() * choicePool.length)]?.id;
+        if (chosen) game.queueProduction(building, chosen, 'unit', true);
+      }
+
+      const researchBuildings = game.buildings.filter((building) => building.alive && building.team === 'enemy' && building.completed && building.queue.length === 0 && building.stats.researches?.length);
+      const priorities = this.researchPriorities(composition);
+      for (const lab of researchBuildings) {
+        const missing = lab.stats.researches.filter((id) => !team.upgrades.has(id));
+        if (!missing.length) continue;
+        missing.sort((a, b) => priorities.indexOf(a) - priorities.indexOf(b));
+        game.queueProduction(lab, missing[0], 'upgrade', true);
+      }
+    }
+
+    productionScore(typeId, composition, roleCounts, credits) {
+      const stats = getUnitStats(typeId, this.game.teams.enemy);
+      const index = this.unitArchetype(stats, typeId);
+      const totalPlayer = Math.max(1, composition.total);
+      let score = 12 + this.random() * 12;
+      if (stats.strategicLauncher?.length) {
+        const existing = this.game.units.filter((unit) => unit.alive && unit.team === 'enemy' && unit.typeId === typeId).length;
+        return existing ? -90 : (this.game.time > 180 ? 42 : -55);
+      }
+      const weapon = stats.weapon;
+      const airRatio = composition.air / totalPlayer;
+      const vehicleRatio = composition.vehicle / totalPlayer;
+      const infantryRatio = composition.infantry / totalPlayer;
+      if (weapon) {
+        if (weapon.targets.includes('air')) score += 54 * airRatio + (roleCounts.antiAir < Math.ceil(composition.air * 0.7) ? 22 : 0);
+        if (weapon.bonus?.vehicle) score += 36 * vehicleRatio * weapon.bonus.vehicle;
+        if (weapon.bonus?.infantry) score += 28 * infantryRatio * weapon.bonus.infantry;
+        if (weapon.splash) score += infantryRatio * Math.min(34, weapon.splash / 3);
+        if (weapon.range >= 450) score += Math.min(28, composition.buildings * 2.5 + this.wave * 1.4);
+      }
+      if (this.isSupport(stats)) score += roleCounts.support < Math.max(2, roleCounts.total * 0.12) ? 38 : -12;
+      if (this.isCovert(stats)) {
+        const desiredCovert = this.game.difficultyKey === 'hard' ? 4 : this.game.difficultyKey === 'easy' ? 1 : 2;
+        score += roleCounts.covert < desiredCovert ? 72 : -24;
+        if (this.doctrine === 'deception') score += 28;
+      }
+      if (this.isScout({ stats, vision: stats.vision })) score += roleCounts.scout < (this.game.difficultyKey === 'hard' ? 5 : 3) ? 34 : -14;
+      if (this.isSiege(stats)) score += roleCounts.siege < Math.max(2, roleCounts.total * 0.18) && this.game.time > 120 ? 35 : 5;
+      if (stats.stealth && this.doctrine === 'deception') score += 28;
+      if (stats.damageReduction && this.doctrine === 'siege') score += 24;
+      if (stats.healer && this.doctrine === 'combined') score += 18;
+      if (this.doctrine === 'siege' && [13, 15, 16, 18, 19, 25, 26, 29].includes(index)) score += 26;
+      if (this.doctrine === 'deception' && [6, 10, 11, 21, 22, 23, 24, 28].includes(index)) score += 25;
+      if (this.doctrine === 'combined' && [5, 12, 14, 17, 20, 24, 27].includes(index)) score += 18;
+      if (stats.variant === 'recon' && roleCounts.scout < 4) score += 14;
+      if (stats.variant === 'assault' && this.wave % 3 === 1) score += 16;
+-- L6687 --
+      const stats = getBuildingStats(typeId, this.teams.enemy);
+      for (let i = 0; i < 48; i += 1) {
+        const ring = 150 + Math.floor((i + salt) / 10) * 72;
+        const angle = (i * 2.399 + salt * 0.77) % TWO_PI;
+        const x = clamp(base.x + Math.cos(angle) * ring, stats.radius + 20, WORLD.width - stats.radius - 20);
+        const y = clamp(base.y + Math.sin(angle) * ring, stats.radius + 20, WORLD.height - stats.radius - 20);
+        if (!this.collidesWithBuilding(x, y, stats.radius + 12)) return { x, y };
+      }
+      return null;
+    }
+
+    hasBuilding(team, typeId, completedOnly = true) {
+      return this.buildings.some((building) => building.alive && building.team === team && building.typeId === typeId && (!completedOnly || building.completed));
+    }
+
+    requirementsMet(team, requirements = [], rank = 1) {
+      if (this.teams[team].rank < rank) return false;
+      return requirements.every((typeId) => this.hasBuilding(team, typeId, true));
+    }
+
+    canProduceUnit(team, typeId) {
+      const base = UNIT_TYPES[typeId];
+      if (!base) return false;
+      if (base.faction && base.faction !== this.teams[team].faction) return false;
+      return this.requirementsMet(team, base.requires || [], base.rank || 1);
+    }
+
+    queueProduction(building, itemId, kind = 'unit', silent = false) {
+      if (!building || !building.alive || !building.completed || building.queue.length >= 10) return false;
+      const team = this.teams[building.team];
+      let cost;
+      let time;
+      let name;
+      if (kind === 'unit') {
+        if (!building.stats.produces?.includes(itemId) || !this.canProduceUnit(building.team, itemId)) return false;
+        const stats = getUnitStats(itemId, team);
+        cost = stats.cost;
+        time = stats.time;
+        name = stats.name;
+      } else {
+        const upgrade = UPGRADES[itemId];
+        if (!upgrade || !building.stats.researches?.includes(itemId) || team.upgrades.has(itemId) || building.queue.some((item) => item.kind === 'upgrade' && item.id === itemId)) return false;
+        cost = upgrade.cost;
+        time = upgrade.time;
+        name = upgrade.name;
+      }
+      if (team.credits < cost) {
+        if (!silent && building.team === 'player') this.alert('Недостаточно ресурсов', 'warning');
+        return false;
+      }
+      team.credits -= cost;
+      building.queue.push({ kind, id: itemId, remaining: time, total: time, cost, name });
+      this.uiDirty = true;
+      if (!silent) this.sound.click();
+      return true;
+    }
+
+    cancelQueueItem(building, index) {
+      if (!building || index < 0 || index >= building.queue.length) return;
+      const [item] = building.queue.splice(index, 1);
+      this.teams[building.team].credits += item.cost * 0.75;
+      this.uiDirty = true;
+    }
+
+    completeUpgrade(team, upgradeId) {
+      const state = this.teams[team];
+      if (state.upgrades.has(upgradeId)) return;
+      state.upgrades.add(upgradeId);
+      for (const unit of this.units) {
+        if (unit.team !== team || !unit.alive) continue;
+        const oldMax = unit.maxHp;
+        const oldRatio = unit.hp / oldMax;
+        unit.stats = getUnitStats(unit.typeId, state);
+        unit.maxHp = unit.stats.hp * (1 + (unit.rank - 1) * 0.12);
+        if (upgradeId === 'armor' && unit.vehicle) unit.hp = Math.max(unit.hp, unit.maxHp * oldRatio);
+        else unit.hp = Math.min(unit.hp, unit.maxHp);
+      }
+      for (const building of this.buildings) {
+        if (building.team !== team || !building.alive || building.typeId === 'oil') continue;
+        const oldRatio = building.hp / building.maxHp;
+        building.stats = getBuildingStats(building.typeId, state);
+        building.maxHp = building.stats.hp;
+        if (upgradeId === 'fortification') building.hp = Math.max(building.hp, building.maxHp * oldRatio);
+        else building.hp = Math.min(building.hp, building.maxHp);
+-- L8081 --
+        } else if (primary?.kind === 'building' && primary.team === 'player') {
+          if (!primary.completed) {
+            DOM.actionTitle.textContent = 'Строительство';
+            const info = document.createElement('div');
+            info.className = 'queue-item';
+            info.dataset.actionInfo = 'construction';
+            DOM.actionButtons.appendChild(info);
+          } else if (primary.stats.produces?.length) {
+            DOM.actionTitle.textContent = `Производство: ${primary.stats.name}`;
+            for (const typeId of primary.stats.produces) {
+              const base = UNIT_TYPES[typeId];
+              if (!base || (base.faction && base.faction !== this.teams.player.faction)) continue;
+              const stats = getUnitStats(typeId, this.teams.player);
+              const button = this.makeActionButton({
+                icon: stats.icon,
+                name: stats.name,
+                detail: `${formatNumber(stats.cost)} ¤ · ${Math.round(stats.time)} с`,
+                title: stats.role
+              });
+              button.dataset.actionKind = 'unit';
+              button.dataset.typeId = typeId;
+              button.addEventListener('click', () => this.queueProduction(primary, typeId, 'unit'));
+              DOM.actionButtons.appendChild(button);
+            }
+          } else if (primary.stats.upgrades && primary.stats.researches?.length) {
+            DOM.actionTitle.textContent = `Исследования: ${primary.stats.name}`;
+            for (const upgradeId of primary.stats.researches) {
+              const upgrade = UPGRADES[upgradeId];
+              if (!upgrade) continue;
+              const button = this.makeActionButton({
+                icon: upgrade.icon,
+                name: upgrade.name,
+                detail: `${formatNumber(upgrade.cost)} ¤ · ${upgrade.time} с`,
+                title: upgrade.description
+              });
+              button.dataset.actionKind = 'upgrade';
+              button.dataset.typeId = upgradeId;
+              button.addEventListener('click', () => this.queueProduction(primary, upgradeId, 'upgrade'));
+              DOM.actionButtons.appendChild(button);
+            }
+          } else {
+            DOM.actionTitle.textContent = primary.stats.name;
+            const info = document.createElement('div');
+            info.className = 'queue-item';
+            info.dataset.actionInfo = 'role';
+            DOM.actionButtons.appendChild(info);
+          }
+        } else {
+          DOM.actionTitle.textContent = 'Тактическая сводка';
+          const info = document.createElement('div');
+          info.className = 'queue-item';
+          info.dataset.actionInfo = 'summary';
+          info.textContent = 'Экономика сочетает крупные и регенерирующие месторождения, логистические точки разгрузки, пассивные экономические здания и захватываемые объекты. Карта увеличена в 100 раз по площади.';
+          DOM.actionButtons.appendChild(info);
+        }
+      }
+
+      this.refreshActionUI(primary);
+      this.renderQueue(primary, force);
+    }
+
+    refreshActionUI(primary) {
+      const team = this.teams.player;
+      for (const tab of DOM.actionButtons.querySelectorAll('[data-category-id]')) {
+        tab.classList.toggle('active', tab.dataset.categoryId === this.buildCategory);
+      }
+
+      for (const button of DOM.actionButtons.querySelectorAll('[data-action-kind]')) {
+        const kind = button.dataset.actionKind;
+        const typeId = button.dataset.typeId;
+        if (kind === 'build') {
+          const stats = getBuildingStats(typeId, team);
+          const unlocked = this.requirementsMet('player', stats.requires || [], stats.rank || 1);
+          const affordable = team.credits >= stats.cost;
+          const reason = !unlocked ? 'Требования не выполнены' : !affordable ? 'Недостаточно ресурсов' : stats.role;
+-- L8097 --
+                icon: stats.icon,
+                name: stats.name,
+                detail: `${formatNumber(stats.cost)} ¤ · ${Math.round(stats.time)} с`,
+                title: stats.role
+              });
+              button.dataset.actionKind = 'unit';
+              button.dataset.typeId = typeId;
+              button.addEventListener('click', () => this.queueProduction(primary, typeId, 'unit'));
+              DOM.actionButtons.appendChild(button);
+            }
+          } else if (primary.stats.upgrades && primary.stats.researches?.length) {
+            DOM.actionTitle.textContent = `Исследования: ${primary.stats.name}`;
+            for (const upgradeId of primary.stats.researches) {
+              const upgrade = UPGRADES[upgradeId];
+              if (!upgrade) continue;
+              const button = this.makeActionButton({
+                icon: upgrade.icon,
+                name: upgrade.name,
+                detail: `${formatNumber(upgrade.cost)} ¤ · ${upgrade.time} с`,
+                title: upgrade.description
+              });
+              button.dataset.actionKind = 'upgrade';
+              button.dataset.typeId = upgradeId;
+              button.addEventListener('click', () => this.queueProduction(primary, upgradeId, 'upgrade'));
+              DOM.actionButtons.appendChild(button);
+            }
+          } else {
+            DOM.actionTitle.textContent = primary.stats.name;
+            const info = document.createElement('div');
+            info.className = 'queue-item';
+            info.dataset.actionInfo = 'role';
+            DOM.actionButtons.appendChild(info);
+          }
+        } else {
+          DOM.actionTitle.textContent = 'Тактическая сводка';
+          const info = document.createElement('div');
+          info.className = 'queue-item';
+          info.dataset.actionInfo = 'summary';
+          info.textContent = 'Экономика сочетает крупные и регенерирующие месторождения, логистические точки разгрузки, пассивные экономические здания и захватываемые объекты. Карта увеличена в 100 раз по площади.';
+          DOM.actionButtons.appendChild(info);
+        }
+      }
+
+      this.refreshActionUI(primary);
+      this.renderQueue(primary, force);
+    }
+
+    refreshActionUI(primary) {
+      const team = this.teams.player;
+      for (const tab of DOM.actionButtons.querySelectorAll('[data-category-id]')) {
+        tab.classList.toggle('active', tab.dataset.categoryId === this.buildCategory);
+      }
+
+      for (const button of DOM.actionButtons.querySelectorAll('[data-action-kind]')) {
+        const kind = button.dataset.actionKind;
+        const typeId = button.dataset.typeId;
+        if (kind === 'build') {
+          const stats = getBuildingStats(typeId, team);
+          const unlocked = this.requirementsMet('player', stats.requires || [], stats.rank || 1);
+          const affordable = team.credits >= stats.cost;
+          const reason = !unlocked ? 'Требования не выполнены' : !affordable ? 'Недостаточно ресурсов' : stats.role;
+          button.disabled = !unlocked || !affordable;
+          button.title = `${stats.role}
+${reason}`;
+          this.updateActionButtonContent(button, stats.icon, stats.name, `${formatNumber(stats.cost)} ¤ · ${Math.round(stats.time)} с`);
+        } else if (kind === 'unit') {
+          const stats = getUnitStats(typeId, team);
+          const unlocked = this.canProduceUnit('player', typeId);
+          const affordable = team.credits >= stats.cost;
+          const queueFull = !primary || primary.queue.length >= 10;
+          button.disabled = !unlocked || !affordable || queueFull;
+          button.title = `${stats.role}${!unlocked ? '\nТехнология пока недоступна' : ''}${queueFull ? '\nОчередь заполнена' : ''}`;
+          this.updateActionButtonContent(button, stats.icon, stats.name, `${formatNumber(stats.cost)} ¤ · ${Math.round(stats.time)} с`);
+-- L16411 --
+    if(threat.score>.5){squad.state='engaged';if(this.game.time-squad.lastOrderAt>2.6)this.issueDefenseOrders(squad,threat.targets);return;}
+    squad.state='garrison';squad.expiresAt=this.game.time+999999;
+    if(this.game.time-squad.lastOrderAt<6)return;
+    units.forEach((unit,index)=>{
+      const post=this.defensePost79(unit,index,units.length);const d=Math.hypot(unit.x-post.x,unit.y-post.y);
+      if(d>95)unit.setCommand({type:'move',x:post.x,y:post.y});
+      else if(!unit.currentCommand||unit.currentCommand.type==='move')unit.setCommand({type:'hold'});
+    });
+    squad.lastOrderAt=this.game.time;
+  };
+
+  const v79BaseEnsureHarvesters=TacticalAI.prototype.ensureHarvesters;
+  TacticalAI.prototype.ensureHarvesters=function(){
+    v79BaseEnsureHarvesters.call(this);
+    const g=this.game;const desired=g.difficultyKey==='hard'?12:g.difficultyKey==='easy'?6:9;const workers=g.units.filter(u=>u.alive&&u.team==='enemy'&&u.typeId==='worker');
+    if(workers.length>=desired)return;
+    const producers=g.buildings.filter(b=>b.alive&&b.completed&&b.team==='enemy'&&b.stats.produces?.includes('worker')).sort((a,b)=>a.queue.length-b.queue.length);
+    const p=producers[0];if(p&&p.queue.filter(i=>i.kind==='unit'&&i.id==='worker').length<2)g.queueProduction(p,'worker','unit',true);
+  };
+
+  TacticalAI.prototype.normalizeInitialBase79=function(){
+    if(this.initialBaseNormalized79)return;this.initialBaseNormalized79=true;
+    const plan=this.ensureBasePlan79();
+    const movable=this.game.buildings.filter(b=>b.alive&&b.team==='enemy'&&b.typeId!=='hq'&&Math.hypot(b.x-this.base.x,b.y-this.base.y)<520);
+    for(const b of movable){
+      const l=plan.local(b.x,b.y);if(Math.abs(l.side)>=170)continue;
+      const desired=b.stats.category==='production'?plan.world(140,520):plan.world(-420,-420);
+      const stats=getBuildingStats(b.typeId,this.game.teams.enemy);const spot=this.game.findAiBuildSpot(b.typeId,desired,97+(Number(String(b.id).replace(/\D/g,''))||0));
+      if(!spot)continue;b.x=spot.x;b.y=spot.y;b.rotation=plan.heading;b.weaponRotation=plan.heading;
+      if(b.stats.category==='production')b.rallyPoint=plan.world(650,520);
+    }
+    this.game.navRevision=(this.game.navRevision||0)+1;this.game.navPathCache?.clear?.();this.game.rebuildSpatialIndexes?.();
+  };
+  const v79BaseAIUpdate=TacticalAI.prototype.update;
+  TacticalAI.prototype.update=function(dt){
+    this.normalizeInitialBase79();
+    v79BaseAIUpdate.call(this,dt);
+    this.garrisonTimer79=(this.garrisonTimer79??0)-dt;
+    if(this.garrisonTimer79<=0){this.garrisonTimer79=4.5;this.maintainStandingDefense79();}
+  };
+
+  // Expose deterministic layout diagnostics for browser tests.
+  TacticalAI.prototype.baseLayoutMetrics79=function(){
+    const bs=this.game.buildings.filter(b=>b.alive&&b.team==='enemy');
+    let minGap=Infinity,overlaps=0;
+    for(let i=0;i<bs.length;i++)for(let j=i+1;j<bs.length;j++){
+      const gap=Math.hypot(bs[i].x-bs[j].x,bs[i].y-bs[j].y)-bs[i].radius-bs[j].radius;minGap=Math.min(minGap,gap);if(gap<0)overlaps++;
+    }
+    const plan=this.ensureBasePlan79();let corridorIntrusions=0;
+    for(const b of bs){if(b.typeId==='hq')continue;const l=plan.local(b.x,b.y);if(Math.hypot(b.x-this.base.x,b.y-this.base.y)<1500&&Math.abs(l.side)<145&&l.forward>-900&&l.forward<1350)corridorIntrusions++;}
+    const categories={};for(const b of bs)categories[b.stats.category||'support']=(categories[b.stats.category||'support']||0)+1;
+    return{count:bs.length,minGap:Number.isFinite(minGap)?minGap:null,overlaps,corridorIntrusions,categories,powerProduced:this.game.teams.enemy.powerProduced,powerUsed:this.game.teams.enemy.powerUsed,credits:this.game.teams.enemy.credits,workers:this.game.units.filter(u=>u.alive&&u.team==='enemy'&&u.typeId==='worker').length,defenders:this.squads.find(s=>s.role==='defense')?.unitIds.length||0};
+  };
+
+  // Version copy.
+-- L17063 --
+      const button=document.createElement('button');button.type='button';button.className='resource-build-button';button.disabled=!!existing||!workers||!unlocked||!affordable;
+      button.textContent=existing?`✓ ${stats.name} построена`:`Построить: ${stats.name} · ${Math.round(stats.cost).toLocaleString('ru-RU')} ¤`;
+      button.title=existing?'Эта скважина уже осваивается.':!workers?'Нет доступных инженеров.':!unlocked?'Не выполнены технологические требования.':!affordable?'Недостаточно ресурсов.':`Установить фундамент на скважине и автоматически направить до 3 ближайших инженеров.`;
+      button.addEventListener('click',()=>this.buildExtractorFromResource83(primary));DOM83.actionButtons.appendChild(button);
+    }
+    return result;
+  };
+
+  // AI: workers construct/repair; trucks move the resource. No raw hand-harvesting.
+  TacticalAI.prototype.ensureHarvesters=function(){
+    const g=this.game;const workers=g.units.filter(u=>u.alive&&u.team==='enemy'&&u.typeId==='worker');
+    const desiredWorkers=g.difficultyKey==='hard'?8:g.difficultyKey==='easy'?5:6;
+    if(workers.length<desiredWorkers){const p=g.buildings.filter(b=>b.alive&&b.completed&&b.team==='enemy'&&b.stats.produces?.includes('worker')).sort((a,b)=>a.queue.length-b.queue.length)[0];if(p&&p.queue.length<9)g.queueProduction(p,'worker','unit',true);}
+    const extractors=g.buildings.filter(b=>b.alive&&b.completed&&b.team==='enemy'&&b.stats?.logisticsExtractor);
+    const trucks=g.units.filter(u=>u.alive&&u.team==='enemy'&&u.typeId==='resourceTruck');const desiredTrucks=Math.max(2,Math.min(7,extractors.length+1));
+    if(trucks.length<desiredTrucks){const hq=g.buildings.filter(b=>b.alive&&b.completed&&b.team==='enemy'&&b.stats.produces?.includes('resourceTruck')).sort((a,b)=>a.queue.length-b.queue.length)[0];if(hq&&hq.queue.length<9)g.queueProduction(hq,'resourceTruck','unit',true);}
+    for(const truck of trucks){if(!truck.currentCommand||truck.currentCommand.type==='hold'){const src=extractors.slice().sort((a,b)=>(b.resourceBuffer83||0)-(a.resourceBuffer83||0))[0];if(src)truck.setCommand({type:'harvest',resourceId:src.id});}}
+  };
+  const prevEnsureExtractors83=TacticalAI.prototype.ensureExtractors80;
+  TacticalAI.prototype.ensureExtractors80=function(){
+    const before=this.game.buildings.length;prevEnsureExtractors83?.call(this);
+    for(const b of this.game.buildings.slice(before)){if(b.stats?.placeOnResource){b.stats.logisticsExtractor=true;b.stats.extractor=false;b.resourceBuffer83=0;b.extractTimer83=0;}}
+  };
+
+  // Add buffer information to the left selection card.
+  const prevSelection83=Game.prototype.updateSelectionPanel;
+  Game.prototype.updateSelectionPanel=function(){
+    const result=prevSelection83.call(this);const e=this.getPrimarySelection();
+    if(e?.kind==='building'&&e.stats?.logisticsExtractor&&DOM83.selectionDetails){
+      const cap=e.stats.bufferCapacity||16000;const line=document.createElement('div');line.className='stat-line extractor-buffer';line.innerHTML=`<span>Накоплено сырья</span><strong>${Math.round(e.resourceBuffer83||0).toLocaleString('ru-RU')} / ${cap.toLocaleString('ru-RU')}</strong>`;DOM83.selectionDetails.appendChild(line);
+    }
+    if(e?.kind==='unit'&&e.typeId==='resourceTruck'&&DOM83.selectionSummary)DOM83.selectionSummary.textContent='Ресурсный грузовик';
+    return result;
+  };
+
+  // --- Opaque low-poly building renderer: no older transparent/internal geometry is drawn. ---
+  const solidPoly=(pts,fill,stroke='rgba(18,24,22,.72)',lw=1)=>{if(!pts?.length)return;ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}};
+  Game.prototype.drawBuilding3D=function(b){
+    if(!b?.alive)return;const r=b.radius*(b.stats.visualScale||1),rot=Number.isFinite(b.rotation)?b.rotation:0,prog=b.completed?1:clamp83(b.construction,.04,1);const c=Math.cos(rot),s=Math.sin(rot),pal=this.getVisualPalette(b.team);
+-- L17066 --
+      button.addEventListener('click',()=>this.buildExtractorFromResource83(primary));DOM83.actionButtons.appendChild(button);
+    }
+    return result;
+  };
+
+  // AI: workers construct/repair; trucks move the resource. No raw hand-harvesting.
+  TacticalAI.prototype.ensureHarvesters=function(){
+    const g=this.game;const workers=g.units.filter(u=>u.alive&&u.team==='enemy'&&u.typeId==='worker');
+    const desiredWorkers=g.difficultyKey==='hard'?8:g.difficultyKey==='easy'?5:6;
+    if(workers.length<desiredWorkers){const p=g.buildings.filter(b=>b.alive&&b.completed&&b.team==='enemy'&&b.stats.produces?.includes('worker')).sort((a,b)=>a.queue.length-b.queue.length)[0];if(p&&p.queue.length<9)g.queueProduction(p,'worker','unit',true);}
+    const extractors=g.buildings.filter(b=>b.alive&&b.completed&&b.team==='enemy'&&b.stats?.logisticsExtractor);
+    const trucks=g.units.filter(u=>u.alive&&u.team==='enemy'&&u.typeId==='resourceTruck');const desiredTrucks=Math.max(2,Math.min(7,extractors.length+1));
+    if(trucks.length<desiredTrucks){const hq=g.buildings.filter(b=>b.alive&&b.completed&&b.team==='enemy'&&b.stats.produces?.includes('resourceTruck')).sort((a,b)=>a.queue.length-b.queue.length)[0];if(hq&&hq.queue.length<9)g.queueProduction(hq,'resourceTruck','unit',true);}
+    for(const truck of trucks){if(!truck.currentCommand||truck.currentCommand.type==='hold'){const src=extractors.slice().sort((a,b)=>(b.resourceBuffer83||0)-(a.resourceBuffer83||0))[0];if(src)truck.setCommand({type:'harvest',resourceId:src.id});}}
+  };
+  const prevEnsureExtractors83=TacticalAI.prototype.ensureExtractors80;
+  TacticalAI.prototype.ensureExtractors80=function(){
+    const before=this.game.buildings.length;prevEnsureExtractors83?.call(this);
+    for(const b of this.game.buildings.slice(before)){if(b.stats?.placeOnResource){b.stats.logisticsExtractor=true;b.stats.extractor=false;b.resourceBuffer83=0;b.extractTimer83=0;}}
+  };
+
+  // Add buffer information to the left selection card.
+  const prevSelection83=Game.prototype.updateSelectionPanel;
+  Game.prototype.updateSelectionPanel=function(){
+    const result=prevSelection83.call(this);const e=this.getPrimarySelection();
+    if(e?.kind==='building'&&e.stats?.logisticsExtractor&&DOM83.selectionDetails){
+      const cap=e.stats.bufferCapacity||16000;const line=document.createElement('div');line.className='stat-line extractor-buffer';line.innerHTML=`<span>Накоплено сырья</span><strong>${Math.round(e.resourceBuffer83||0).toLocaleString('ru-RU')} / ${cap.toLocaleString('ru-RU')}</strong>`;DOM83.selectionDetails.appendChild(line);
+    }
+    if(e?.kind==='unit'&&e.typeId==='resourceTruck'&&DOM83.selectionSummary)DOM83.selectionSummary.textContent='Ресурсный грузовик';
+    return result;
+  };
+
+  // --- Opaque low-poly building renderer: no older transparent/internal geometry is drawn. ---
+  const solidPoly=(pts,fill,stroke='rgba(18,24,22,.72)',lw=1)=>{if(!pts?.length)return;ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}};
+  Game.prototype.drawBuilding3D=function(b){
+    if(!b?.alive)return;const r=b.radius*(b.stats.visualScale||1),rot=Number.isFinite(b.rotation)?b.rotation:0,prog=b.completed?1:clamp83(b.construction,.04,1);const c=Math.cos(rot),s=Math.sin(rot),pal=this.getVisualPalette(b.team);
+    const p=(fx,fy,fz=0)=>this.worldToScreen(b.x+fx*c-fy*s,b.y+fx*s+fy*c,fz);const shadow=[p(-r*.92,-r*.68,0),p(r*.92,-r*.68,0),p(r*.92,r*.68,0),p(-r*.92,r*.68,0)];solidPoly(shadow,'rgba(0,0,0,.20)',null,0);
+    const type=b.typeId;const body='#5d6763',body2='#75807b',roof='#89928b',dark='#3d4743',metal='#a0aaa6';const defenseKind83={turret:'turret',cannonTurret:'cannonTurret',aaTurret:'aaTurret',missileBattery:'missileBattery',abmBattery:'abmBattery',counterUASTower:'counterUAS',bunker:'bunker',flameTower:'flameTower',mineControl:'mineControl',orbitalDefense:'orbitalDefense'};
+-- L19740 --
+    // A completed point-to-point order is not an order to land. The fixed-wing
+    // flight model below this wrapper already enters a safe holding orbit when
+    // the queue becomes empty. Logistics still orders a return when fuel,
+    // ammunition or hull condition reaches its service threshold.
+    return result;
+  };
+
+  const baseSpawnUnit93 = BuildingClass.prototype.spawnUnit;
+  BuildingClass.prototype.spawnUnit = function(typeId) {
+    const before = this.game.units.length;
+    const result = baseSpawnUnit93.call(this, typeId);
+    const created = this.game.units.slice(before).find((unit) => unit.typeId === typeId && unit.team === this.team);
+    if (isAirfield93(this) && isFixedWing93(created)) {
+      this.game.invalidateTeamAirFleetState93(this.team);
+      created.commandQueue = [];
+      created.airSavedCommands = [];
+      ensureSortieResource93(created);
+      created.sortieFuel = created.sortieFuelMax;
+      created.airAmmo = created.airAmmoMax;
+      created.hp = created.maxHp;
+      if (created.ensureCountermeasures92?.()) created.countermeasureCharges92 = created.countermeasureMax92;
+      created.requestAirHangar93('новый самолёт', this, false);
+    }
+    return result;
+  };
+
+  const baseQueueProduction93 = GameClass.prototype.queueProduction;
+  GameClass.prototype.queueProduction = function(building, itemId, kind = 'unit', silent = false) {
+    if (kind === 'unit' && isAirfield93(building)) {
+      const stats = debug.getUnitStats?.(itemId, this.teams[building.team]);
+      if (isFixedWingStats93(stats, itemId)) {
+        const fleet = this.getTeamAirFleetState93(building.team, true);
+        if (fleet.committed >= fleet.capacity) {
+          if (!silent && building.team === 'player') {
+            const message = fleet.capacity > 0
+              ? `Авиапарк заполнен: ${fleet.committed} / ${fleet.capacity}. Постройте дополнительный аэродром для нового самолёта.`
+              : 'Для производства самолёта нужен хотя бы один полностью построенный аэродром.';
+            this.alert(message, 'warning', building.x, building.y);
+          }
+          return false;
+        }
+      }
+    }
+    const accepted = baseQueueProduction93.call(this, building, itemId, kind, silent);
+    if (accepted && kind === 'unit') this.invalidateTeamAirFleetState93(building.team);
+    return accepted;
+  };
+
+  const baseCancelQueueItem93 = GameClass.prototype.cancelQueueItem;
+  GameClass.prototype.cancelQueueItem = function(building, index) {
+    const result = baseCancelQueueItem93.call(this, building, index);
+    if (building?.team) this.invalidateTeamAirFleetState93(building.team);
+    return result;
+  };
+
+  const baseUnitDie93 = UnitClass.prototype.die;
+  UnitClass.prototype.die = function(...args) {
+    const wasFixedWing = isFixedWing93(this);
+    const result = baseUnitDie93.apply(this, args);
+    if (wasFixedWing) this.game.invalidateTeamAirFleetState93(this.team);
+    return result;
+  };
+
+  GameClass.prototype.getAirfieldRosterAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).hangar.slice().sort((a, b) => {
+      const stageOrder = { ready: 0, service: 1, return: 2, launch: 3 };
+      const stageA = stageOrder[a.currentCommand?.stage] ?? 9;
+      const stageB = stageOrder[b.currentCommand?.stage] ?? 9;
+      return stageA - stageB || String(a.stats.name).localeCompare(String(b.stats.name), 'ru') || String(a.id).localeCompare(String(b.id));
+    });
+  };
+
+  GameClass.prototype.getAircraftReadiness93 = function(unit) {
+    const ratios = [unit.healthRatio];
+    if (Number.isFinite(unit.sortieFuelMax) && unit.sortieFuelMax > 0) ratios.push(unit.sortieFuel / unit.sortieFuelMax);
+    if (Number.isFinite(unit.airAmmoMax) && unit.airAmmoMax > 0) ratios.push(unit.airAmmo / unit.airAmmoMax);
+    if (Number.isFinite(unit.countermeasureMax92) && unit.countermeasureMax92 > 0) ratios.push(unit.countermeasureCharges92 / unit.countermeasureMax92);
+-- L19741 --
+    // flight model below this wrapper already enters a safe holding orbit when
+    // the queue becomes empty. Logistics still orders a return when fuel,
+    // ammunition or hull condition reaches its service threshold.
+    return result;
+  };
+
+  const baseSpawnUnit93 = BuildingClass.prototype.spawnUnit;
+  BuildingClass.prototype.spawnUnit = function(typeId) {
+    const before = this.game.units.length;
+    const result = baseSpawnUnit93.call(this, typeId);
+    const created = this.game.units.slice(before).find((unit) => unit.typeId === typeId && unit.team === this.team);
+    if (isAirfield93(this) && isFixedWing93(created)) {
+      this.game.invalidateTeamAirFleetState93(this.team);
+      created.commandQueue = [];
+      created.airSavedCommands = [];
+      ensureSortieResource93(created);
+      created.sortieFuel = created.sortieFuelMax;
+      created.airAmmo = created.airAmmoMax;
+      created.hp = created.maxHp;
+      if (created.ensureCountermeasures92?.()) created.countermeasureCharges92 = created.countermeasureMax92;
+      created.requestAirHangar93('новый самолёт', this, false);
+    }
+    return result;
+  };
+
+  const baseQueueProduction93 = GameClass.prototype.queueProduction;
+  GameClass.prototype.queueProduction = function(building, itemId, kind = 'unit', silent = false) {
+    if (kind === 'unit' && isAirfield93(building)) {
+      const stats = debug.getUnitStats?.(itemId, this.teams[building.team]);
+      if (isFixedWingStats93(stats, itemId)) {
+        const fleet = this.getTeamAirFleetState93(building.team, true);
+        if (fleet.committed >= fleet.capacity) {
+          if (!silent && building.team === 'player') {
+            const message = fleet.capacity > 0
+              ? `Авиапарк заполнен: ${fleet.committed} / ${fleet.capacity}. Постройте дополнительный аэродром для нового самолёта.`
+              : 'Для производства самолёта нужен хотя бы один полностью построенный аэродром.';
+            this.alert(message, 'warning', building.x, building.y);
+          }
+          return false;
+        }
+      }
+    }
+    const accepted = baseQueueProduction93.call(this, building, itemId, kind, silent);
+    if (accepted && kind === 'unit') this.invalidateTeamAirFleetState93(building.team);
+    return accepted;
+  };
+
+  const baseCancelQueueItem93 = GameClass.prototype.cancelQueueItem;
+  GameClass.prototype.cancelQueueItem = function(building, index) {
+    const result = baseCancelQueueItem93.call(this, building, index);
+    if (building?.team) this.invalidateTeamAirFleetState93(building.team);
+    return result;
+  };
+
+  const baseUnitDie93 = UnitClass.prototype.die;
+  UnitClass.prototype.die = function(...args) {
+    const wasFixedWing = isFixedWing93(this);
+    const result = baseUnitDie93.apply(this, args);
+    if (wasFixedWing) this.game.invalidateTeamAirFleetState93(this.team);
+    return result;
+  };
+
+  GameClass.prototype.getAirfieldRosterAircraft93 = function(field) {
+    return this.getAirfieldAircraftState93(field).hangar.slice().sort((a, b) => {
+      const stageOrder = { ready: 0, service: 1, return: 2, launch: 3 };
+      const stageA = stageOrder[a.currentCommand?.stage] ?? 9;
+      const stageB = stageOrder[b.currentCommand?.stage] ?? 9;
+      return stageA - stageB || String(a.stats.name).localeCompare(String(b.stats.name), 'ru') || String(a.id).localeCompare(String(b.id));
+    });
+  };
+
+  GameClass.prototype.getAircraftReadiness93 = function(unit) {
+    const ratios = [unit.healthRatio];
+    if (Number.isFinite(unit.sortieFuelMax) && unit.sortieFuelMax > 0) ratios.push(unit.sortieFuel / unit.sortieFuelMax);
+    if (Number.isFinite(unit.airAmmoMax) && unit.airAmmoMax > 0) ratios.push(unit.airAmmo / unit.airAmmoMax);
+    if (Number.isFinite(unit.countermeasureMax92) && unit.countermeasureMax92 > 0) ratios.push(unit.countermeasureCharges92 / unit.countermeasureMax92);
+-- L35030 --
+    const queuedIds = new Set((this.game.buildings || []).filter((building) => building.team === 'enemy').flatMap((building) => (building.queue || []).filter((item) => item.kind === 'unit').map((item) => item.id)));
+    const candidates = Object.entries(UNIT_TYPES)
+      .filter(([typeId, stats]) => !queuedIds.has(typeId) && stats?.weapon && !stats.air && (stats.vehicle || stats.visualRole?.toLowerCase?.().includes('vehicle')))
+      .filter(([typeId]) => this.game.canProduceUnit?.('enemy', typeId))
+      .sort((left, right) => {
+        const ls = (Number(left[1].hp) || 0) + (Number(left[1].weapon?.range) || 0) * .8 - (Number(left[1].cost) || 0) * .04;
+        const rs = (Number(right[1].hp) || 0) + (Number(right[1].weapon?.range) || 0) * .8 - (Number(right[1].cost) || 0) * .04;
+        return rs - ls;
+      });
+    for (const [typeId, stats] of candidates) {
+      if ((Number(team.credits) || 0) < (Number(stats.cost) || 0) + 900) continue;
+      const producer = (this.game.buildings || [])
+        .filter((building) => building.alive && building.completed && building.team === 'enemy' && (building.queue?.length || 0) < 3 && building.stats?.produces?.includes(typeId))
+        .sort((left, right) => (left.queue?.length || 0) - (right.queue?.length || 0))[0];
+      if (producer && this.game.queueProduction?.(producer, typeId, 'unit', true)) return true;
+    }
+    return false;
+  };
+
+  TacticalAIClass.prototype.guardLogisticsRoutes141 = function() {
+    const trucks = (this.game.units || []).filter((unit) => unit?.alive && unit.team === 'enemy' && unit.typeId === 'resourceTruck');
+    if (!trucks.length) return 0;
+    let assigned = 0;
+    for (const truck of trucks.slice(0, this.game.difficultyKey === 'hard' ? 5 : 3)) {
+      const protectedAlready = this.squads.some((squad) => squad.role === 'defense' && squad.defenseAssetId141 === truck.id && squad.unitIds?.length);
+      if (protectedAlready || this.assetThreatScore141(truck) < .2) continue;
+      const escorts = this.availableCombatUnits((unit) => isGroundCombat141(unit) && distance141(unit, truck) < 2600)
+        .sort((left, right) => distance141(left, truck) - distance141(right, truck))
+        .slice(0, 2);
+      if (!escorts.length) continue;
+      const squad = this.createSquad('defense', escorts, { targetId: truck.id, targetX: truck.x, targetY: truck.y, expiresAt: this.game.time + 180 });
+      if (!squad) continue;
+      squad.defenseAssetId141 = truck.id;
+      for (const unit of escorts) unit.setCommand({ type: 'guard', targetId: truck.id, aiLogisticsGuard141: true });
+      assigned += 1;
+    }
+    return assigned;
+  };
+
+  const baseCreateSquad141 = TacticalAIClass.prototype.createSquad;
+  TacticalAIClass.prototype.createSquad = function(role, units, options = {}) {
+    const filtered = (units || []).filter((unit) => !isEngineer141(unit));
+    const squad = baseCreateSquad141.call(this, role, filtered, options);
+    if (squad && offensiveRole141(squad)) this.balanceSquad141(squad, false);
+    return squad;
+  };
+
+  const baseAIUpdate141 = TacticalAIClass.prototype.update;
+  TacticalAIClass.prototype.update = function(dt) {
+    const result = baseAIUpdate141.call(this, dt);
+    const ops = this.ensureOperationalState141();
+    this.processSaturationQueue141();
+    ops.economyTimer -= dt;
+    ops.balanceTimer -= dt;
+    ops.defenseTimer -= dt;
+    ops.pressureTimer -= dt;
+    ops.saturationTimer -= dt;
+
+    if (ops.economyTimer <= 0) {
+      this.economyPosture141();
+      ops.economyTimer = 2.8;
+      if (ops.economyPosture !== 'healthy') {
+        // Force the existing economy/build planner to reconsider power and
+        // resource infrastructure before spending on another offensive burst.
+        this.buildTimer = Math.min(this.buildTimer, .35);
+        this.productionTimer = Math.max(this.productionTimer, ops.economyPosture === 'emergency' ? 1.8 : .8);
+      }
+    }
+    if (ops.balanceTimer <= 0) {

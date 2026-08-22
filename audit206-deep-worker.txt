@@ -1,0 +1,2442 @@
+BUILD206 DEEP AUDIT worker: authoritative-simulation-worker-v174.js
+bytes=188013 lines=1404
+
+### NEEDLE applyAction count_sample=2
+--- applyAction #1 offset=150539 line=768 ---
+    type: 'ready', version: VERSION, build: BUILD, simHz: SIM_HZ,
+    tick: game.simTick, time: game.time, stateHash: stateHash(),
+    counts: { units: game.units.length, buildings: game.buildings.length, resources: game.resources.length, projectiles: game.projectiles.length }
+  });
+  if (!manualMode) startClock();
+}
+
+let hotSetRefreshTick173 = -1;
+function deterministicHotSet() {
+  if (!game?.renderSnapshot) return;
+  const units = game.units;
+  const count = units.length;
+  const cadence = count >= 50000 ? 5 : count >= 20000 ? 4 : count >= 8000 ? 2 : 1;
+  if (hotSetRefreshTick173 >= 0 && (game.simTick - hotSetRefreshTick173) < cadence) return;
+  hotSetRefreshTick173 = game.simTick;
+  const cap = count >= 50000 ? 128 : count >= 20000 ? 160 : count >= 8000 ? 300 : count >= 3000 ? 720 : Math.min(2200, count);
+  const out = game.renderSnapshot.units || (game.renderSnapshot.units = []);
+  out.length = 0;
+  const stamp = (game.simTick || 0) + 1;
+  const add = unit => {
+    if (!unit?.alive || unit.embarkedIn || unit._fdHotStamp173 === stamp || out.length >= cap) return;
+    unit._fdHotStamp173 = stamp; out.push(unit);
+  };
+  /* Camera and selection never participate. Combat, air missions and specialist tasks do. */
+  for (let i = 0; i < count && out.length < cap; i += 1) {
+    const unit = units[i];
+    const recent = game.time - Math.max(unit.lastDamagedAt || -999, unit.lastShotAt || -999) < 3;
+    const command = unit.currentCommand?.type || '';
+    if (recent || unit.air || /repair|build|harvest|capture|infiltrate|air|transport|mine/i.test(command)) add(unit);
+  }
+  const start = count ? ((game.simTick * Math.max(1, cap)) % count) : 0;
+  for (let offset = 0; offset < count && out.length < cap; offset += 1) add(units[(start + offset) % count]);
+  game.selected.length = 0;
+}
+
+function applyAction(event) {
+  if (!game || !event) return false;
+  const payload = event.payload || {};
+  const selected = (event.selectedIds || []).map(id => game.getEntity(id)).filter(entity => entity?.alive);
+  const previous = game.selected;
+  game.selected = selected;
+  for (const entity of selected) entity.selected = true;
+  const target = payload.targetId ? game.getEntity(payload.targetId) : null;
+  let result = false;
+  try {
+    result = withEventPerspective(event, () => {
+    if (payload.formationSettings && typeof payload.formationSettings === 'object') {
+      game.formationSettings = plainClone(payload.formationSettings);
+    }
+    switch (event.action) {
+      case 'move': {
+        result = game.issueMove(payload.x, payload.y, payload.append);
+        if (result !== false) {
+          const tagged197 = self.__FD_FORMATION_TARGET_FIDELITY_197__?.tagIssuedOrder?.(
+            game,
+            event.selectedIds || [],
+            { x: payload.x, y: payload.y },
+            payload.append
+          ) || 0;
+          if (!tagged197) throw new Error('Build 197 move target was not attached to authoritative commands');
+        }
+        break;
+      }
+      case 'attack': result = target ? game.issueAttack(target, payload.append) : false; break;
+      case 'attackMove': {
+        result = game.issueAttackMove(payload.x, payload.y, payload.append);
+        if (result !== false) {
+          const tagged197 = self.__FD_FORMATION_TARGET_FIDELITY_197__?.tagIssuedOrder?.(
+            game,
+            event.selectedIds || [],
+            { x: payload.x, y: payload.y },
+            payload.append
+          ) || 0;
+          if (!tagged197) throw new Error('Build 197 attack-move target was not attached to authoritative commands');
+        }
+        break;
+      }
+      case 'patrol': result = game.issuePatrol(payload.x, payload.y, payload.append); break;
+--- applyAction #2 offset=160740 line=970 ---
+      case 'unload': result = game.unloadSelectedTransports78?.(); break;
+      case 'airReturn': result = game.issueAirReturn93?.(); break;
+      case 'logisticsMission': result = game.setLogisticsMission206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsPriority': result = game.setSupplyPriority206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsThreshold': result = game.setSupplyThreshold206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsTrade': result = game.configureTradeContract206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsEmergencyImport': result = game.emergencyPurchase206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsCreateTransport': result = game.createSupplyTransport206?.(plainClone(payload)) ?? false; break;
+      case 'unitCommand': {
+        const unit = game.getEntity(payload.unitId);
+        result = unit?.setCommand?.(plainClone(payload.command), Boolean(payload.append));
+        break;
+      }
+      case 'unitStop': {
+        const unit = game.getEntity(payload.unitId);
+        result = unit?.stop?.();
+        break;
+      }
+      default: result = false;
+    }
+    return result;
+    });
+  } finally {
+    for (const entity of selected) entity.selected = false;
+    game.selected = previous || [];
+  }
+  if (event.networkSeq) multiplayer.appliedSeq = Math.max(multiplayer.appliedSeq || 0, Number(event.networkSeq) || 0);
+  postMessage({ type: 'actionAck', seq: event.seq, networkSeq: event.networkSeq || 0, tick: game.simTick, ok: result !== false, action: event.action });
+  return result !== false;
+}
+
+function drainActions() {
+  if (!actionQueue.length) return;
+  actionQueue.sort((a, b) => (a.atTick - b.atTick) || (a.seq - b.seq));
+  while (actionQueue.length && actionQueue[0].atTick <= game.simTick + 1) applyAction(actionQueue.shift());
+}
+
+function runTick() {
+  if (!game || paused || game.ended) return 0;
+  const started = performance.now();
+  drainActions();
+  deterministicHotSet();
+  game.simulateFixed(SIM_DT);
+  const core = game.operationalCore160;
+  if (core?.update) {
+    if (multiplayer.active && multiplayer.mode === 'versus') {
+      const updateAI = core.updateAI, updateOperations = core.updateOperations;
+      core.updateAI = () => {}; core.updateOperations = () => {};
+      try { core.update(SIM_DT); } finally { core.updateAI = updateAI; core.updateOperations = updateOperations; }
+    } else core.update(SIM_DT);
+  }
+  ticksExecuted += 1;
+  const elapsed = performance.now() - started;
+  totalTickMs += elapsed;
+  maxTickMs = Math.max(maxTickMs, elapsed);
+  const count = game.units.length;
+  const snapshotEvery = count >= 80000 ? 8 : count >= 40000 ? 6 : count >= 12000 ? 4 : count >= 2500 ? 2 : 1;
+  if ((game.simTick - lastSnapshotTick) >= snapshotEvery) makeSnapshot(false, elapsed);
+  return elapsed;
+}
+
+function startClock() {
+  if (timer) clearTimeout(timer);
+  nextTickAt = performance.now();
+  const pump = () => {
+    timer = 0;
+    if (!running || manualMode) return;
+    const now = performance.now();
+    let steps = 0;
+    let guestTarget = Infinity;
+    if (multiplayer.active && multiplayer.role === 'guest') {
+      const age = now - (multiplayer.hostTickReceivedAt || 0);
+      const fresh = Number.isFinite(multiplayer.hostTick) && age < 2400;
+      guestTarget = fresh ? Math.max(0, Number(multiplayer.hostTick) + Math.floor(Math.max(0, age) / 40) - 6) : -1;
+    }
+    while (!paused && !game?.ended && now + 0.25 >= nextTickAt && steps < 4) {
+      if (guestTarget >= 0 && (game.simTick || 0) >= guestTarget) break;
+      if (guestTarget < 0) break;
+      try {
+
+### NEEDLE actionAck count_sample=1
+--- actionAck #1 offset=160373 line=963 ---
+      case 'modifyBatch': result = game.applyUnitModificationBatch132?.(payload.unitIds || [], payload.variant, false); break;
+      case 'loadTransport': {
+        const transport = game.getEntity(payload.transportId);
+        const units = (payload.unitIds || []).map(id => game.getEntity(id)).filter(Boolean);
+        result = transport ? game.issueLoadTransport95?.(transport, units, payload.append) : false;
+        break;
+      }
+      case 'unload': result = game.unloadSelectedTransports78?.(); break;
+      case 'airReturn': result = game.issueAirReturn93?.(); break;
+      case 'logisticsMission': result = game.setLogisticsMission206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsPriority': result = game.setSupplyPriority206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsThreshold': result = game.setSupplyThreshold206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsTrade': result = game.configureTradeContract206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsEmergencyImport': result = game.emergencyPurchase206?.(plainClone(payload)) ?? false; break;
+      case 'logisticsCreateTransport': result = game.createSupplyTransport206?.(plainClone(payload)) ?? false; break;
+      case 'unitCommand': {
+        const unit = game.getEntity(payload.unitId);
+        result = unit?.setCommand?.(plainClone(payload.command), Boolean(payload.append));
+        break;
+      }
+      case 'unitStop': {
+        const unit = game.getEntity(payload.unitId);
+        result = unit?.stop?.();
+        break;
+      }
+      default: result = false;
+    }
+    return result;
+    });
+  } finally {
+    for (const entity of selected) entity.selected = false;
+    game.selected = previous || [];
+  }
+  if (event.networkSeq) multiplayer.appliedSeq = Math.max(multiplayer.appliedSeq || 0, Number(event.networkSeq) || 0);
+  postMessage({ type: 'actionAck', seq: event.seq, networkSeq: event.networkSeq || 0, tick: game.simTick, ok: result !== false, action: event.action });
+  return result !== false;
+}
+
+function drainActions() {
+  if (!actionQueue.length) return;
+  actionQueue.sort((a, b) => (a.atTick - b.atTick) || (a.seq - b.seq));
+  while (actionQueue.length && actionQueue[0].atTick <= game.simTick + 1) applyAction(actionQueue.shift());
+}
+
+function runTick() {
+  if (!game || paused || game.ended) return 0;
+  const started = performance.now();
+  drainActions();
+  deterministicHotSet();
+  game.simulateFixed(SIM_DT);
+  const core = game.operationalCore160;
+  if (core?.update) {
+    if (multiplayer.active && multiplayer.mode === 'versus') {
+      const updateAI = core.updateAI, updateOperations = core.updateOperations;
+      core.updateAI = () => {}; core.updateOperations = () => {};
+      try { core.update(SIM_DT); } finally { core.updateAI = updateAI; core.updateOperations = updateOperations; }
+    } else core.update(SIM_DT);
+  }
+  ticksExecuted += 1;
+  const elapsed = performance.now() - started;
+  totalTickMs += elapsed;
+  maxTickMs = Math.max(maxTickMs, elapsed);
+  const count = game.units.length;
+  const snapshotEvery = count >= 80000 ? 8 : count >= 40000 ? 6 : count >= 12000 ? 4 : count >= 2500 ? 2 : 1;
+  if ((game.simTick - lastSnapshotTick) >= snapshotEvery) makeSnapshot(false, elapsed);
+  return elapsed;
+}
+
+function startClock() {
+  if (timer) clearTimeout(timer);
+  nextTickAt = performance.now();
+  const pump = () => {
+    timer = 0;
+    if (!running || manualMode) return;
+    const now = performance.now();
+    let steps = 0;
+    let guestTarget = Infinity;
+    if (multiplayer.active && multiplayer.role === 'guest') {
+      const age = now - (multiplayer.hostTickReceivedAt || 0);
+      const fresh = Number.isFinite(multiplayer.hostTick) && age < 2400;
+
+### NEEDLE buildResourceExtractor count_sample=1
+--- buildResourceExtractor #1 offset=154045 line=842 ---
+          if (!tagged197) throw new Error('Build 197 attack-move target was not attached to authoritative commands');
+        }
+        break;
+      }
+      case 'patrol': result = game.issuePatrol(payload.x, payload.y, payload.append); break;
+      case 'stop': result = game.issueStop(); break;
+      case 'hold': result = game.issueHold(); break;
+      case 'fireDiscipline177': result = game.issueFireDiscipline177?.(payload.mode); break;
+      case 'orientedMove': result = game.issueOrientedMove78?.(payload.x, payload.y, payload.angle, payload.append); break;
+      case 'context': {
+        if (!target) {
+          result = game.issueMove(payload.x, payload.y, payload.append);
+          if (result !== false) {
+            const tagged197 = self.__FD_FORMATION_TARGET_FIDELITY_197__?.tagIssuedOrder?.(
+              game,
+              event.selectedIds || [],
+              { x: payload.x, y: payload.y },
+              payload.append
+            ) || 0;
+            if (!tagged197) throw new Error('Build 197 context move target was not attached to authoritative commands');
+          }
+        } else {
+          const previousContext = game.hitTestForContext;
+          const previousHit = game.hitTest;
+          game.hitTestForContext = () => target;
+          game.hitTest = (_x, _y, selectableOnly = true) => selectableOnly ? previousHit.call(game, _x, _y, selectableOnly) : target;
+          try { result = game.issueContext(payload.x, payload.y, payload.append); }
+          finally { game.hitTestForContext = previousContext; game.hitTest = previousHit; }
+        }
+        break;
+      }
+      case 'covert': {
+        const agents = (payload.unitIds || []).map(id => game.getEntity(id)).filter(Boolean);
+        result = target ? game.issueCovertMission(target, payload.mission, payload.append, agents) : false;
+        break;
+      }
+      case 'buildResourceExtractor': {
+        const node = game.getEntity(payload.resourceId);
+        const requestedWorkerIds = [...(payload.workerIds || [])];
+        const workers = requestedWorkerIds
+          .map(id => game.getEntity(id))
+          .filter(unit => unit?.alive && unit.team === 'player' && unit.typeId === 'worker' && !unit.embarkedIn);
+        if (!node?.alive || node.kind !== 'resource' || !workers.length || workers.length !== requestedWorkerIds.length) {
+          result = false;
+          break;
+        }
+        if (payload.resourceKnown !== true) {
+          result = false;
+          break;
+        }
+        const beforeUnits = new Map(game.units.filter(unit => unit?.alive).map(unit => [unit.id, unit]));
+        const beforeBuildings = new Map(game.buildings.filter(building => building?.alive).map(building => [building.id, building]));
+        const originalVisibleAt = game.isVisibleAt;
+        const originalExploredAt = game.isExploredAt;
+        const resourceKnownRadius = Math.max(160, Number(node.radius || 42) + 110);
+        const knownPoint = (x, y) => Math.hypot(Number(x || 0) - node.x, Number(y || 0) - node.y) <= resourceKnownRadius;
+        if (payload.resourceKnown) {
+          if (typeof originalVisibleAt === 'function') {
+            game.isVisibleAt = function(x, y, ...rest) {
+              if (knownPoint(x, y)) return true;
+              return originalVisibleAt.call(this, x, y, ...rest);
+            };
+          }
+          if (typeof originalExploredAt === 'function') {
+            game.isExploredAt = function(x, y, ...rest) {
+              if (knownPoint(x, y)) return true;
+              return originalExploredAt.call(this, x, y, ...rest);
+            };
+          }
+        }
+        try {
+          result = game.buildExtractorFromResource83?.(node) ?? false;
+
+### NEEDLE stateHash count_sample=10
+--- stateHash #1 offset=119466 line=126 ---
+217,"mode":"length","readabilityScale":1.85}},"worker":{"modelBoundsMeters":[1.25,0.9,2.2],"modelCode":"C-U01","modelCollision":"capsule","modelCollisionFootprintMeters":{"maxX":0.5750000000000001,"maxY":0.405,"minX":-0.5750000000000001,"minY":-0.405},"modelUnitScale":{"factor":2.99,"mode":"height","readabilityScale":2.3}}};
+(function installDeterministicUnitGeometry206() {
+  const types = D.UNIT_TYPES || {};
+  for (const [typeId, geometry] of Object.entries(deterministicUnitGeometry206)) {
+    const stats = types[typeId];
+    if (!stats) continue;
+    Object.assign(stats, {
+      modelCode: geometry.modelCode || null,
+      modelManifest: '/frontline-dominion/models/pilot/manifest.json?build=206',
+      modelBoundsMeters: Array.isArray(geometry.modelBoundsMeters) ? [...geometry.modelBoundsMeters] : null,
+      modelCollisionFootprintMeters: geometry.modelCollisionFootprintMeters ? { ...geometry.modelCollisionFootprintMeters } : null,
+      modelUnitScale: geometry.modelUnitScale ? { ...geometry.modelUnitScale } : null,
+      modelCollision: geometry.modelCollision || null,
+    });
+  }
+  Object.defineProperty(self, '__fdDeterministicUnitGeometry206', { value: true, configurable: false });
+})();
+
+let game = null;
+let running = false;
+let paused = false;
+let manualMode = false;
+let timer = 0;
+let nextTickAt = 0;
+let snapshotSequence = 0;
+let actionSequence = 0;
+let lastSnapshotTick = -1;
+let lastStructureTick = -1;
+let lastFogTick = -1;
+let lastMiniTick = -1;
+let lastDetailsTick = -1;
+let mainView = { left: 0, top: 0, right: D.WORLD.width, bottom: D.WORLD.height, zoom: 1, selectedIds: [] };
+let knownEntities = new Set();
+let knownProjectiles = new Set();
+let actionQueue = [];
+let effectEvents = [];
+let alertEvents = [];
+let endEvent = null;
+let legacySave = null;
+let lastStateHash = 0;
+let lastSubsystemHashes = null;
+let workerStartedAt = performance.now();
+let ticksExecuted = 0;
+let maxTickMs = 0;
+let totalTickMs = 0;
+let lastHashTick = -1;
+let lastNetworkHashTick = -1;
+let lastNetworkHash = '00000000';
+let lastNetworkLogisticsHash206 = 0;
+let lastNetworkLogisticsComponents206 = null;
+let lastNetworkBaseComponents206 = null;
+let initialNetworkHash206 = '00000000';
+let initialNetworkLogisticsHash206 = 0;
+let initialNetworkLogisticsComponents206 = null;
+let initialNetworkBaseComponents206 = null;
+let multiplayer = { active: false, role: null, mode: 'coop', perspectiveSwapped: false, hostTick: null, hostTickReceivedAt: 0, appliedSeq: 0 };
+
+let shared165 = null;
+let sharedFallbacks165 = 0;
+let buildingStateSequence165 = 0;
+let minimapStateSequence165 = 0;
+let lastBuildingStateTick165 = -1;
+let lastMinimapStateTick165 = -1;
+let buildingStateCache165 = new Map();
+let buildingDetailCache165 = new Map();
+
+function attachShared165(desc) {
+  shared165 = null;
+  if (!desc || typeof SharedArrayBuffer === 'undefined' || typeof Atomics === 'undefined') return;
+  try {
+    shared165 = {
+      ...desc,
+      header: new Int32Array(desc.headerBuffer), unitIds: new Uint32Array(desc.unitIdsBuffer),
+      unitFloats: new Float32Array(desc.unitFloatsBuffer), unitInts: new Int32Array(desc.unitIntsBuffer),
+      projectileIds: new Uint32Array(desc.projectileIdsBuffer), projectileFloats: new Float32Array(desc.projectileFloatsBuffer),
+      projectileInts: new Int32Array(desc.projectileIntsBuffer), renderIds: new Uint32Array(desc.renderIdsBuffer)
+    };
+  } catch (error) {
+    shared165 = null;
+  }
+}
+
+function reserveSharedSlot165(unitCount, projectileCount, renderCount) {
+  if (!shared165 || unitCount > shared165.maxUnits || projectileCount > shared165.maxPro
+--- stateHash #2 offset=127451 line=320 ---
+      airAmmo: Number.isFinite(entity.airAmmo) ? entity.airAmmo : null,
+      airAmmoMax: Number.isFinite(entity.airAmmoMax) ? entity.airAmmoMax : null,
+      sortieFuel: Number.isFinite(entity.sortieFuel) ? entity.sortieFuel : null,
+      sortieFuelMax: Number.isFinite(entity.sortieFuelMax) ? entity.sortieFuelMax : null,
+      suppression160: finite(entity.suppression160), cohesion160: finite(entity.cohesion160, 1),
+      supply160: finite(entity.supply160, 1), morale160: finite(entity.morale160, 1),
+      functionalDamage160: plainClone(entity.functionalDamage160),
+      v160Retreating: Boolean(entity._v160Retreating)
+    });
+  } else if (entity.kind === 'building') {
+    Object.assign(data, {
+      buildProgress: finite(entity.buildProgress ?? entity.construction, 1),
+      queue: plainClone(entity.queue), rallyPoint: plainClone(entity.rallyPoint),
+      recoil: finite(entity.recoil), weaponRotation: finite(entity.weaponRotation),
+      desiredWeaponRotation: finite(entity.desiredWeaponRotation)
+    });
+  }
+  return data;
+}
+
+function captureSaveData() {
+  if (!game || !legacySave) return null;
+  const previous = D.storageGet(D.SAVE_KEY);
+  let data = null;
+  try {
+    legacySave.call(game, false);
+    const raw = D.storageGet(D.SAVE_KEY);
+    data = raw ? JSON.parse(raw) : null;
+  } finally {
+    if (previous == null) localStorage.removeItem(D.SAVE_KEY);
+    else D.storageSet(D.SAVE_KEY, previous);
+  }
+  if (!data) return null;
+  data.authoritative172 = {
+    version: VERSION,
+    build: BUILD,
+    simTick: game.simTick || Math.round(game.time * SIM_HZ),
+    rngSeed: game.rng?.seed ?? game.seed,
+    projectiles: game.projectiles.filter(projectile => projectile.alive).map(serializeProjectile),
+    paused: false,
+    idCounter: game.idCounter,
+    projectileCounter: game.projectileCounter,
+    formationCounter: game.formationCounter,
+    stateHash: stateHash()
+  };
+  data.logistics206 = game.exportLogistics206?.() || null;
+  data.workerTransient206 = game.exportWorkerTransient206?.() || null;
+  if (data.authoritative172) data.authoritative172.networkAppliedSeq206 = Number(multiplayer.appliedSeq || 0);
+  data.savedAt = Date.now();
+  return data;
+}
+
+function canonicalTeamCode(team) {
+  const local = TEAM_CODES[team] || 0;
+  if (!multiplayer.perspectiveSwapped || local === 0) return local;
+  return local === 1 ? 2 : 1;
+}
+
+function computeSubsystemHashes(force = false) {
+  const tick = game?.simTick || 0;
+  if (!force && lastSubsystemHashes && tick - lastHashTick < 25) return lastSubsystemHashes;
+  lastSubsystemHashes = game?.operationalCore160?.subsystemHashes?.() || { units: 0, buildings: 0, projectiles: 0, economy: 0, operations: 0, sectors: 0 };
+  let hash = 2166136261 >>> 0;
+  for (const key of ['units','buildings','projectiles','economy','operations','sectors','logistics206']) {
+    hash ^= lastSubsystemHashes[key] >>> 0;
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+  lastStateHash = hash >>> 0;
+  lastHashTick = tick;
+  return lastSubsystemHashes;
+}
+
+function stateHash(force = false) {
+  computeSubsystemHashes(force);
+  return lastStateHash >>> 0;
+}
+
+
+
+const baseAIUpdateCreditTrace206 = D.TacticalAI?.prototype?.update;
+if (typeof baseAIUpdateCreditTrace206 === 'function' && !baseAIUpdateCreditTrace206.__fdCreditTrace206) {
+  const wrappedAIUpdateCreditTrace206 = function(dt) {
+    const game206 = this.game;
+    const before206 = Number(game206?.teams?.enemy?.credits) || 0;
+    const result206 = baseAIUpdateCreditTrace206.call(this, dt);
+    const after206 = Number(game206?.teams?.enemy?.credits) || 0;
+    const current206 = game206?.creditTraceCurrent206;
+    if (current206) current206.enemyAIDelta = after206 - before206;
+--- stateHash #4 offset=128511 line=344 ---
+  const previous = D.storageGet(D.SAVE_KEY);
+  let data = null;
+  try {
+    legacySave.call(game, false);
+    const raw = D.storageGet(D.SAVE_KEY);
+    data = raw ? JSON.parse(raw) : null;
+  } finally {
+    if (previous == null) localStorage.removeItem(D.SAVE_KEY);
+    else D.storageSet(D.SAVE_KEY, previous);
+  }
+  if (!data) return null;
+  data.authoritative172 = {
+    version: VERSION,
+    build: BUILD,
+    simTick: game.simTick || Math.round(game.time * SIM_HZ),
+    rngSeed: game.rng?.seed ?? game.seed,
+    projectiles: game.projectiles.filter(projectile => projectile.alive).map(serializeProjectile),
+    paused: false,
+    idCounter: game.idCounter,
+    projectileCounter: game.projectileCounter,
+    formationCounter: game.formationCounter,
+    stateHash: stateHash()
+  };
+  data.logistics206 = game.exportLogistics206?.() || null;
+  data.workerTransient206 = game.exportWorkerTransient206?.() || null;
+  if (data.authoritative172) data.authoritative172.networkAppliedSeq206 = Number(multiplayer.appliedSeq || 0);
+  data.savedAt = Date.now();
+  return data;
+}
+
+function canonicalTeamCode(team) {
+  const local = TEAM_CODES[team] || 0;
+  if (!multiplayer.perspectiveSwapped || local === 0) return local;
+  return local === 1 ? 2 : 1;
+}
+
+function computeSubsystemHashes(force = false) {
+  const tick = game?.simTick || 0;
+  if (!force && lastSubsystemHashes && tick - lastHashTick < 25) return lastSubsystemHashes;
+  lastSubsystemHashes = game?.operationalCore160?.subsystemHashes?.() || { units: 0, buildings: 0, projectiles: 0, economy: 0, operations: 0, sectors: 0 };
+  let hash = 2166136261 >>> 0;
+  for (const key of ['units','buildings','projectiles','economy','operations','sectors','logistics206']) {
+    hash ^= lastSubsystemHashes[key] >>> 0;
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+  lastStateHash = hash >>> 0;
+  lastHashTick = tick;
+  return lastSubsystemHashes;
+}
+
+function stateHash(force = false) {
+  computeSubsystemHashes(force);
+  return lastStateHash >>> 0;
+}
+
+
+
+const baseAIUpdateCreditTrace206 = D.TacticalAI?.prototype?.update;
+if (typeof baseAIUpdateCreditTrace206 === 'function' && !baseAIUpdateCreditTrace206.__fdCreditTrace206) {
+  const wrappedAIUpdateCreditTrace206 = function(dt) {
+    const game206 = this.game;
+    const before206 = Number(game206?.teams?.enemy?.credits) || 0;
+    const result206 = baseAIUpdateCreditTrace206.call(this, dt);
+    const after206 = Number(game206?.teams?.enemy?.credits) || 0;
+    const current206 = game206?.creditTraceCurrent206;
+    if (current206) current206.enemyAIDelta = after206 - before206;
+    return result206;
+  };
+  Object.defineProperty(wrappedAIUpdateCreditTrace206, '__fdCreditTrace206', { value: true });
+  D.TacticalAI.prototype.update = wrappedAIUpdateCreditTrace206;
+}
+
+const baseSimulateCreditTrace206 = D.Game.prototype.simulateFixed;
+if (typeof baseSimulateCreditTrace206 === 'function' && !baseSimulateCreditTrace206.__fdCreditTrace206) {
+  const wrappedSimulateCreditTrace206 = function(dt) {
+    const logistics206 = this.logistics206 || null;
+    const beforePlayer206 = Number(this.teams?.player?.credits) || 0;
+    const beforeEnemy206 = Number(this.teams?.enemy?.credits) || 0;
+    const record206 = {
+      tick: (Number(this.simTick) || 0) + 1,
+      dt1e6: Math.round((Number(dt) || 0) * 1000000),
+      playerBefore1e3: Math.round(beforePlayer206 * 1000),
+      enemyBefore1e3: Math.round(beforeEnemy206 * 1000),
+      enemyAIDelta: 0,
+      incomeAccBefore1e6: Math.round((Number(logistics206?._incomeAccumulator206) || 0) * 1000000),
+      importAccBefore1e6: Math.round((Number(logistics206?._importAccumulator206) || 0) * 1000000),
+--- stateHash #7 offset=136746 line=489 ---
+    projectileHash = fold(projectileHash, Math.round((Number(item.x) || 0) * 4)); projectileHash = fold(projectileHash, Math.round((Number(item.y) || 0) * 4));
+    projectileHash = fold(projectileHash, Math.round((Number(item.altitude) || 0) * 4));
+  }
+  const canonicalPlayer = multiplayer.perspectiveSwapped ? game.teams?.enemy : game.teams?.player;
+  const canonicalEnemy = multiplayer.perspectiveSwapped ? game.teams?.player : game.teams?.enemy;
+  return {
+    tick: Number(game.simTick) || 0,
+    simTimeTick: Math.round((Number(game.time) || 0) * SIM_HZ),
+    rngSeed: Number(game.rng?.seed || 0) >>> 0,
+    playerCredits10: Math.round((Number(canonicalPlayer?.credits) || 0) * 10),
+    enemyCredits10: Math.round((Number(canonicalEnemy?.credits) || 0) * 10),
+    unitsOrderHash: hashList(aliveUnits), unitsSortedHash: hashList(byId(aliveUnits)),
+    buildingsOrderHash: hashList(aliveBuildings), buildingsSortedHash: hashList(byId(aliveBuildings)),
+    projectilesOrderHash: projectileHash >>> 0,
+    unitOrder: aliveUnits.map(item => String(item.id)), buildingOrder: aliveBuildings.map(item => String(item.id)),
+    units: byId(aliveUnits).map(fp), buildings: byId(aliveBuildings).map(fp),
+    aiLogisticsTrace206: game.__aiLogisticsTrace206 || null,
+    creditTrace206: Array.isArray(game.creditTrace206) ? game.creditTrace206.slice(-20) : [],
+    logisticsPrivate206: game.logistics206 ? {
+      incomeAccumulator1e6: Math.round((Number(game.logistics206._incomeAccumulator206) || 0) * 1000000),
+      importAccumulator1e6: Math.round((Number(game.logistics206._importAccumulator206) || 0) * 1000000),
+      enemySupportSpent1e3: Math.round((Number(game.logistics206.team?.enemy?.supportSpent) || 0) * 1000),
+      enemyImportSpent1e3: Math.round((Number(game.logistics206.team?.enemy?.importSpent) || 0) * 1000),
+    } : null,
+  };
+}
+
+function networkStateHash(force = false) {
+  if (!game) return '00000000';
+  const tick = game.simTick || 0;
+  const interval = game.units.length >= 50000 ? 50 : game.units.length >= 8000 ? 25 : 5;
+  if (!force && tick % interval !== 0) return lastNetworkHash;
+  if (!force && lastNetworkHashTick === tick) return lastNetworkHash;
+  let hash = 2166136261 >>> 0;
+  const mix = value => { hash ^= value >>> 0; hash = Math.imul(hash, 16777619) >>> 0; };
+  mix(tick); mix(Math.round(game.time * SIM_HZ)); mix(game.rng?.seed || 0);
+  const canonicalPlayer = multiplayer.perspectiveSwapped ? game.teams?.enemy : game.teams?.player;
+  const canonicalEnemy = multiplayer.perspectiveSwapped ? game.teams?.player : game.teams?.enemy;
+  mix(Math.round((canonicalPlayer?.credits || 0) * 10));
+  mix(Math.round((canonicalEnemy?.credits || 0) * 10));
+  lastNetworkLogisticsHash206 = Number(game.networkLogisticsHash206?.(multiplayer.perspectiveSwapped) || 0) >>> 0;
+  lastNetworkLogisticsComponents206 = game.networkLogisticsComponents206?.(multiplayer.perspectiveSwapped) || null;
+  mix(lastNetworkLogisticsHash206);
+  const entities = [...game.units, ...game.buildings];
+  for (const item of entities) {
+    if (!item?.alive) continue;
+    mix(idNumber(item.id)); mix(canonicalTeamCode(item.team));
+    mix(Math.round(item.x * 4)); mix(Math.round(item.y * 4)); mix(Math.round(item.hp * 10));
+    const command = item.currentCommand?.type || '';
+    for (let i = 0; i < command.length; i += 1) mix(command.charCodeAt(i));
+  }
+  for (const projectile of game.projectiles) {
+    if (!projectile?.alive) continue;
+    mix(idNumber(projectile.id)); mix(canonicalTeamCode(projectile.team));
+    mix(Math.round(projectile.x * 4)); mix(Math.round(projectile.y * 4)); mix(Math.round((projectile.altitude || 0) * 4));
+  }
+  lastNetworkBaseComponents206 = networkBaseComponents206();
+--- stateHash #8 offset=148303 line=725 ---
+  if (multiplayer.active && multiplayer.mode === 'versus') {
+    if (game.ai) game.ai.update = () => undefined;
+    game.updateEnemyStrategicArsenal = () => undefined;
+  }
+  const extension = message.authoritative || saveData?.authoritative172 || {};
+  if (Number.isFinite(extension.rngSeed) && game.rng) game.rng.seed = extension.rngSeed >>> 0;
+  game.simTick = Number.isFinite(extension.simTick) ? extension.simTick : Math.round(game.time * SIM_HZ);
+  game.idCounter = Math.max(game.idCounter || 1, extension.idCounter || 1);
+  game.projectileCounter = Math.max(game.projectileCounter || 1, extension.projectileCounter || 1);
+  game.formationCounter = Math.max(game.formationCounter || 1, extension.formationCounter || 1);
+  restoreProjectiles(message.projectiles || extension.projectiles || []);
+  game.paused = false;
+  paused = Boolean(message.paused);
+  manualMode = Boolean(message.manual);
+  knownEntities = new Set();
+  knownProjectiles = new Set();
+  actionQueue = [];
+  effectEvents = [];
+  alertEvents = [];
+  endEvent = null;
+  lastSnapshotTick = -1;
+  lastStructureTick = -1;
+  lastFogTick = -1;
+  lastMiniTick = -1;
+  lastDetailsTick = -1;
+  lastBuildingStateTick165 = -1;
+  lastMinimapStateTick165 = -1;
+  buildingStateSequence165 = 0;
+  minimapStateSequence165 = 0;
+  buildingStateCache165 = new Map();
+  buildingDetailCache165 = new Map();
+  sharedFallbacks165 = 0;
+  ticksExecuted = 0;
+  totalTickMs = 0;
+  maxTickMs = 0;
+  lastHashTick = -1; lastNetworkHashTick = -1; lastNetworkHash = '00000000'; lastNetworkLogisticsHash206 = 0; lastNetworkLogisticsComponents206 = null; lastNetworkBaseComponents206 = null; initialNetworkHash206 = '00000000'; initialNetworkLogisticsHash206 = 0; initialNetworkLogisticsComponents206 = null; initialNetworkBaseComponents206 = null;
+  initialNetworkHash206 = networkStateHash(true);
+  initialNetworkLogisticsHash206 = lastNetworkLogisticsHash206;
+  initialNetworkLogisticsComponents206 = lastNetworkLogisticsComponents206 ? plainClone(lastNetworkLogisticsComponents206) : null;
+  initialNetworkBaseComponents206 = lastNetworkBaseComponents206 ? plainClone(lastNetworkBaseComponents206) : null;
+  running = true;
+  workerStartedAt = performance.now();
+  makeSnapshot(true);
+  postMessage({
+    type: 'ready', version: VERSION, build: BUILD, simHz: SIM_HZ,
+    tick: game.simTick, time: game.time, stateHash: stateHash(),
+    counts: { units: game.units.length, buildings: game.buildings.length, resources: game.resources.length, projectiles: game.projectiles.length }
+  });
+  if (!manualMode) startClock();
+}
+
+let hotSetRefreshTick173 = -1;
+function deterministicHotSet() {
+  if (!game?.renderSnapshot) return;
+  const units = game.units;
+  const count = units.length;
+  const cadence = count >= 50000 ? 5 : count >= 20000 ? 4 : count >= 8000 ? 2 : 1;
+  if (hotSetRefreshTick173 >= 0 && (game.simTick - hotSetRefreshTick173) < cadence) return;
+  hotSetRefreshTick173 = game.simTick;
+  const cap = count >= 50000 ? 128 : count >= 20000 ? 160 : count >= 8000 ? 300 : count >= 3000 ? 720 : Math.min(2200, count);
+  const out = game.renderSnapshot.units || (game.renderSnapshot.units = []);
+  out.length = 0;
+  const stamp = (game.simTick || 0) + 1;
+  const add = unit => {
+    if (!unit?.alive || unit.embarkedIn || unit._fdHotStamp173 === stamp || out.length >= cap) return;
+    unit._fdHotStamp173 = stamp; out.push(unit);
+  };
+  /* Camera and selection never participate. Combat, air missions and specialist tasks do. */
+  for (let i = 0; i < count && out.length < cap; i += 1) {
+    const unit = units[i];
+    const recent = game.time - Math.max(unit.lastDamagedAt || -999, unit.lastShotAt || -999) < 3;
+--- stateHash #9 offset=148833 line=734 ---
+  game.projectileCounter = Math.max(game.projectileCounter || 1, extension.projectileCounter || 1);
+  game.formationCounter = Math.max(game.formationCounter || 1, extension.formationCounter || 1);
+  restoreProjectiles(message.projectiles || extension.projectiles || []);
+  game.paused = false;
+  paused = Boolean(message.paused);
+  manualMode = Boolean(message.manual);
+  knownEntities = new Set();
+  knownProjectiles = new Set();
+  actionQueue = [];
+  effectEvents = [];
+  alertEvents = [];
+  endEvent = null;
+  lastSnapshotTick = -1;
+  lastStructureTick = -1;
+  lastFogTick = -1;
+  lastMiniTick = -1;
+  lastDetailsTick = -1;
+  lastBuildingStateTick165 = -1;
+  lastMinimapStateTick165 = -1;
+  buildingStateSequence165 = 0;
+  minimapStateSequence165 = 0;
+  buildingStateCache165 = new Map();
+  buildingDetailCache165 = new Map();
+  sharedFallbacks165 = 0;
+  ticksExecuted = 0;
+  totalTickMs = 0;
+  maxTickMs = 0;
+  lastHashTick = -1; lastNetworkHashTick = -1; lastNetworkHash = '00000000'; lastNetworkLogisticsHash206 = 0; lastNetworkLogisticsComponents206 = null; lastNetworkBaseComponents206 = null; initialNetworkHash206 = '00000000'; initialNetworkLogisticsHash206 = 0; initialNetworkLogisticsComponents206 = null; initialNetworkBaseComponents206 = null;
+  initialNetworkHash206 = networkStateHash(true);
+  initialNetworkLogisticsHash206 = lastNetworkLogisticsHash206;
+  initialNetworkLogisticsComponents206 = lastNetworkLogisticsComponents206 ? plainClone(lastNetworkLogisticsComponents206) : null;
+  initialNetworkBaseComponents206 = lastNetworkBaseComponents206 ? plainClone(lastNetworkBaseComponents206) : null;
+  running = true;
+  workerStartedAt = performance.now();
+  makeSnapshot(true);
+  postMessage({
+    type: 'ready', version: VERSION, build: BUILD, simHz: SIM_HZ,
+    tick: game.simTick, time: game.time, stateHash: stateHash(),
+    counts: { units: game.units.length, buildings: game.buildings.length, resources: game.resources.length, projectiles: game.projectiles.length }
+  });
+  if (!manualMode) startClock();
+}
+
+let hotSetRefreshTick173 = -1;
+function deterministicHotSet() {
+  if (!game?.renderSnapshot) return;
+  const units = game.units;
+  const count = units.length;
+  const cadence = count >= 50000 ? 5 : count >= 20000 ? 4 : count >= 8000 ? 2 : 1;
+  if (hotSetRefreshTick173 >= 0 && (game.simTick - hotSetRefreshTick173) < cadence) return;
+  hotSetRefreshTick173 = game.simTick;
+  const cap = count >= 50000 ? 128 : count >= 20000 ? 160 : count >= 8000 ? 300 : count >= 3000 ? 720 : Math.min(2200, count);
+  const out = game.renderSnapshot.units || (game.renderSnapshot.units = []);
+  out.length = 0;
+  const stamp = (game.simTick || 0) + 1;
+  const add = unit => {
+    if (!unit?.alive || unit.embarkedIn || unit._fdHotStamp173 === stamp || out.length >= cap) return;
+    unit._fdHotStamp173 = stamp; out.push(unit);
+  };
+  /* Camera and selection never participate. Combat, air missions and specialist tasks do. */
+  for (let i = 0; i < count && out.length < cap; i += 1) {
+    const unit = units[i];
+    const recent = game.time - Math.max(unit.lastDamagedAt || -999, unit.lastShotAt || -999) < 3;
+    const command = unit.currentCommand?.type || '';
+    if (recent || unit.air || /repair|build|harvest|capture|infiltrate|air|transport|mine/i.test(command)) add(unit);
+  }
+  const start = count ? ((game.simTick * Math.max(1, cap)) % count) : 0;
+  for (let offset = 0; offset < count && out.length < cap; offset += 1) add(units[(start + offset) % count]);
+  game.selected.length = 0;
+}
+
+function applyAction(event) {
+  if (!game || !event) return false;
+  const payload = event.payload || {};
+
+### NEEDLE networkStateHash count_sample=4
+--- networkStateHash #3 offset=179984 line=1299 ---
+    const projectile = projectiles[index], f = index * PROJECTILE_FLOAT_STRIDE, n = index * PROJECTILE_INT_STRIDE;
+    projectileIds[index] = idNumber(projectile.id);
+    projectileFloats[f] = finite(projectile.x); projectileFloats[f+1] = finite(projectile.y); projectileFloats[f+2] = finite(projectile.angle);
+    projectileFloats[f+3] = finite(projectile.altitude); projectileFloats[f+4] = finite(projectile.hp); projectileFloats[f+5] = finite(projectile.maxHp);
+    projectileFloats[f+6] = finite(projectile.targetX); projectileFloats[f+7] = finite(projectile.targetY);
+    projectileFloats[f+8] = finite(projectile.age); projectileFloats[f+9] = finite(projectile.ttl);
+    projectileFloats[f+10] = finite(projectile.visualSize, 3); projectileFloats[f+11] = finite(projectile.launchAltitude); projectileFloats[f+12] = finite(projectile.distanceTravelled);
+    let flags = 1; if (projectile.ballistic) flags |= 2; if (projectile.intercepted) flags |= 4; if (projectile.guidanceLost) flags |= 8;
+    projectileInts[n] = TEAM_CODES[projectile.team] || 0; projectileInts[n+1] = flags; projectileInts[n+2] = idNumber(projectile.targetId);
+    projectileInts[n+3] = projectile.defenseClass === 'hypersonic' ? 3 : projectile.defenseClass === 'high' ? 2 : projectile.defenseClass === 'medium' ? 1 : 0;
+    projectileInts[n+4] = idNumber(projectile.sourceId); projectileInts[n+5] = 0;
+  }
+
+  const detailsDue = force || tick - lastDetailsTick >= (game.units.length >= 16000 ? 10 : 5);
+  const structureDue = force || createdEntities.length || removedEntities.length || createdProjectiles.length || removedProjectiles.length || tick - lastStructureTick >= 25;
+  if (detailsDue) lastDetailsTick = tick;
+  if (structureDue) lastStructureTick = tick;
+
+  lastStateHash = stateHash(force);
+  lastSubsystemHashes = subsystemHashes(force);
+  const networkHash = networkStateHash(force);
+  const sequence165 = ++snapshotSequence;
+  if (sharedSlot165 >= 0) {
+    const renderBase165 = sharedSlot165 * shared165.maxRenderIds;
+    shared165.renderIds.subarray(renderBase165, renderBase165 + render.unitIds.length).set(render.unitIds);
+    publishSharedSlot165(sharedSlot165, sequence165, tick, units.length, projectiles.length, render.unitIds.length);
+  }
+  const message = {
+    type: 'snapshot', version: VERSION, build: BUILD, sequence: sequence165, wallClock165: Date.now(),
+    tick, time: game.time, simMs, stateHash: lastStateHash, subsystemHashes: lastSubsystemHashes, networkHash, networkHashTick: lastNetworkHashTick, networkLogisticsHash206: lastNetworkLogisticsHash206, networkLogisticsComponents206: lastNetworkLogisticsComponents206, networkBaseComponents206: lastNetworkBaseComponents206, initialNetworkHash206, initialNetworkLogisticsHash206, initialNetworkLogisticsComponents206, initialNetworkBaseComponents206, appliedSeq: multiplayer.appliedSeq || 0, rngSeed: game.rng?.seed || game.seed,
+    counts: { units: allAliveUnits.length, buildings: buildings.length, resources: resources.length, projectiles: projectiles.length },
+    counters: { idCounter: game.idCounter, projectileCounter: game.projectileCounter, formationCounter: game.formationCounter },
+    unitIds: sharedSlot165 >= 0 ? null : unitIds, unitFloats: sharedSlot165 >= 0 ? null : unitFloats, unitInts: sharedSlot165 >= 0 ? null : unitInts,
+    buildingIds: null, buildingFloats: null, buildingInts: null, resourceIds, resourceFloats,
+    projectileIds: sharedSlot165 >= 0 ? null : projectileIds, projectileFloats: sharedSlot165 >= 0 ? null : projectileFloats, projectileInts: sharedSlot165 >= 0 ? null : projectileInts,
+    renderUnitIds: sharedSlot165 >= 0 ? null : render.unitIds, sharedSlot165, sharedFallbacks165, clusters: render.clusters,
+--- networkStateHash #4 offset=186725 line=1385 ---
+    nextTickAt = performance.now();
+        }
+        actionSequence = Math.max(actionSequence, message.seq || 0);
+        actionQueue.push({ ...message, seq: message.seq || ++actionSequence, atTick: Number.isFinite(message.atTick) ? message.atTick : (game?.simTick || 0) + 1 });
+        break;
+      }
+      case 'view': mainView = { ...mainView, ...(message.view || {}) }; break;
+      case 'clockSync': multiplayer.hostTick = Number(message.tick) || 0; multiplayer.hostTickReceivedAt = performance.now(); break;
+      case 'multiplayer': {
+        multiplayer = { ...multiplayer, ...(message.multiplayer || {}) };
+        if (game && multiplayer.active && multiplayer.mode === 'versus') {
+          if (game.ai) game.ai.update = () => undefined;
+          game.updateEnemyStrategicArsenal = () => undefined;
+        }
+        break;
+      }
+      case 'pause': paused = Boolean(message.paused); if (game) game.paused = false; nextTickAt = performance.now() + 1000 / SIM_HZ; break;
+      case 'step': {
+        const count = clamp(Number(message.count) || 1, 1, 5000);
+        for (let index = 0; index < count; index += 1) runTick();
+        makeSnapshot(Boolean(message.force));
+        break;
+      }
+      case 'saveRequest': {
+        const data = captureSaveData();
+        postMessage({ type: 'saveData', requestId: message.requestId, data, notify: Boolean(message.notify) });
+        break;
+      }
+      case 'snapshotRequest': makeSnapshot(true); break;
+      case 'diagnosticsRequest': postMessage({
+        type: 'diagnostics', requestId: message.requestId, version: VERSION, build: BUILD,
+        authoritative: true, tick: game?.simTick || 0, time: game?.time || 0,
+        paused, running, manualMode, stateHash: stateHash(true), subsystemHashes: subsystemHashes(true), networkHash: networkStateHash(true), multiplayer: { ...multiplayer },
+        aiEnabled: !(multiplayer.active && multiplayer.mode === 'versus'),
+        counts: game ? { units: game.units.length, buildings: game.buildings.length, resources: game.resources.length, projectiles: game.projectiles.length } : null,
+        hierarchical164: game?.hierarchicalDiagnostics164?.() || null,
+        mass163: game?.massDiagnostics163?.() || null,
+        groupMovement201: self.__FD_GROUP_MOVEMENT_201__?.diagnostics?.() || null,
+        commandPower202: self.__FD_COMMAND_POWER_AUTHORITY_202__?.diagnostics?.() || null,
+        reconMemoryQueue203: self.__FD_RECON_MEMORY_QUEUE_203__?.diagnostics?.() || null,
+        performance: { ticksExecuted, averageTickMs: ticksExecuted ? totalTickMs / ticksExecuted : 0, maxTickMs, actionQueue: actionQueue.length, combat166: game?.combatScaleDiagnostics166?.() || null }
+      }); break;
+      case 'shutdown': running = false; if (timer) clearTimeout(timer); timer = 0; close(); break;
+      default: break;
+    }
+  } catch (error) {
+    postMessage({ type: 'fatal', stage: message.type || 'message', message: error.message, stack: error.stack, tick: game?.simTick || 0 });
+  }
+};
+
+postMessage({ type: 'bundleReady', version: VERSION, build: BUILD, classes: true });
+
+
+### NEEDLE getSaveData count_sample=0
+
+### NEEDLE resources count_sample=10
+--- resources #3 offset=171652 line=1196 ---
+    floats[f] = finite(building.x); floats[f+1] = finite(building.y); floats[f+2] = finite(building.rotation);
+    floats[f+3] = finite(building.hp); floats[f+4] = finite(building.maxHp, 1); floats[f+5] = finite(building.construction, 1);
+    floats[f+6] = finite(building.weaponRotation); floats[f+7] = finite(building.desiredWeaponRotation); floats[f+8] = finite(building.weaponCooldown);
+    floats[f+9] = finite(building.recoil); floats[f+10] = finite(building.captureProgress); floats[f+11] = finite(building.sabotagedUntil); floats[f+12] = finite(building.compromisedUntil);
+    ints[n] = TEAM_CODES[building.team] || 0; ints[n+1] = 1; ints[n+2] = idNumber(building.weaponTargetId);
+    ints[n+3] = building.queue?.length || 0; ints[n+4] = building.completed ? 1 : 0;
+  }
+  const bytes165 = ids.byteLength + floats.byteLength + ints.byteLength;
+  postMessage({ type: 'buildingState165', sequence: ++buildingStateSequence165, tick, buildingIds: ids, buildingFloats: floats, buildingInts: ints, details, bytes165 }, [ids.buffer, floats.buffer, ints.buffer]);
+}
+
+function sendMinimapState165(force = false) {
+  if (!game) return;
+  const tick = game.simTick || 0;
+  if (!force && tick - lastMinimapStateTick165 < 5) return;
+  lastMinimapStateTick165 = tick;
+  const visible = game.visible.slice();
+  const explored = game.explored.slice();
+  const miniCells = makeMiniCells();
+  const bytes165 = visible.byteLength + explored.byteLength + miniCells.length * 40;
+  postMessage({ type: 'minimapState165', sequence: ++minimapStateSequence165, tick, visible, explored, miniCells, bytes165 }, [visible.buffer, explored.buffer]);
+}
+
+function makeSnapshot(force = false, simMs = 0) {
+  if (!game) return;
+  const tick = game.simTick || Math.round(game.time * SIM_HZ);
+  const aliveEntities = new Set();
+  const createdEntities = [];
+  for (const entity of [...game.units, ...game.buildings, ...game.resources]) {
+    if (!entity.alive) continue;
+    aliveEntities.add(entity.id);
+    if (!knownEntities.has(entity.id)) createdEntities.push(serializeEntity(entity));
+  }
+  const removedEntities = [...knownEntities].filter(id => !aliveEntities.has(id));
+  knownEntities = aliveEntities;
+
+  const aliveProjectiles = new Set();
+  const createdProjectiles = [];
+  for (const projectile of game.projectiles) {
+    if (!projectile.alive) continue;
+    aliveProjectiles.add(projectile.id);
+    if (!knownProjectiles.has(projectile.id)) createdProjectiles.push(serializeProjectile(projectile));
+  }
+  const removedProjectiles = [...knownProjectiles].filter(id => !aliveProjectiles.has(id));
+  knownProjectiles = aliveProjectiles;
+
+  const render = renderPayload();
+  const renderNumbers = new Set(render.unitIds);
+  const selectedNumbers = new Set((mainView.selectedIds || []).map(idNumber));
+  const allAliveUnits = game.units.filter(unit => unit.alive);
+  let units;
+  if (multiplayer.active || force || allAliveUnits.length < 3000) units = allAliveUnits;
+  else {
+    const cap = allAliveUnits.length >= 40000 ? 1400 : allAliveUnits.length >= 12000 ? 1900 : 2600;
+    const chosen = [], seen = new Set();
+    const add = unit => { if (!unit?.alive || seen.has(unit.id) || chosen.length >= cap) return; seen.add(unit.id); chosen.push(unit); };
+    for (const unit of allAliveUnits) {
+      const number = idNumber(unit.id);
+      const recent = game.time - Math.max(unit.lastDamagedAt || -999, unit.lastShotAt || -999) < 3;
+      if (renderNumbers.has(number) || selectedNumbers.has(number) || recent || unit.airServiceState) add(unit);
+    }
+    const cold = allAliveUnits.length >= 40000 ? 420 : allAliveUnits.length >= 12000 ? 650 : 900;
+    const offset = allAliveUnits.length ? ((tick * cold) % allAliveUnits.length) : 0;
+--- resources #4 offset=176616 line=1264 ---
+    unitFloats[f+3] = finite(unit.hp); unitFloats[f+4] = finite(unit.maxHp, 1); unitFloats[f+5] = finite(unit.weaponCooldown);
+    unitFloats[f+6] = finite(unit.visualSpeed); unitFloats[f+7] = finite(unit.flightAltitude ?? unit.altitude);
+    unitFloats[f+8] = finite(unit.airBank); unitFloats[f+9] = finite(unit.airPitch);
+    unitFloats[f+10] = Number.isFinite(unit.airAmmo) ? unit.airAmmo : -1; unitFloats[f+11] = Number.isFinite(unit.airAmmoMax) ? unit.airAmmoMax : -1;
+    unitFloats[f+12] = Number.isFinite(unit.sortieFuel) ? unit.sortieFuel : -1; unitFloats[f+13] = Number.isFinite(unit.sortieFuelMax) ? unit.sortieFuelMax : -1;
+    unitFloats[f+14] = finite(unit.suppression160); unitFloats[f+15] = finite(unit.cohesion160, 1);
+    unitFloats[f+16] = finite(unit.supply160, 1); unitFloats[f+17] = finite(unit.morale160, 1);
+    unitFloats[f+18] = finite(unit.coverIntegrity, 1); unitFloats[f+19] = finite(unit.revealTimer);
+    unitFloats[f+20] = finite(unit.lastDamagedAt, -999); unitFloats[f+21] = finite(unit.lastShotAt, -999);
+    let flags = 1;
+    if (unit.air) flags |= 2; if (unit.embarkedIn) flags |= 4; if (unit.cloaked) flags |= 8; if (unit.undercover) flags |= 16;
+    if (unit.vehicle) flags |= 32; if (unit.infantry) flags |= 64; if (unit._v160Retreating) flags |= 128;
+    unitInts[n] = TEAM_CODES[unit.team] || 0; unitInts[n+1] = flags; unitInts[n+2] = unit.rank || 1; unitInts[n+3] = Math.round(finite(unit.cargo));
+    unitInts[n+4] = COMMAND_CODES[unit.currentCommand?.type || ''] || 0;
+    unitInts[n+5] = idNumber(unit.currentCommand?.targetId || unit.currentCommand?.buildingId || unit.currentCommand?.resourceId);
+    unitInts[n+6] = SERVICE_CODES[unit.airServiceState || ''] || 0; unitInts[n+7] = idNumber(unit.embarkedIn);
+  }
+
+  const buildings = game.buildings.filter(building => building.alive);
+
+  const resources = game.resources.filter(resource => resource.alive);
+  const resourceIds = new Uint32Array(resources.length);
+  const resourceFloats = new Float32Array(resources.length * RESOURCE_FLOAT_STRIDE);
+  for (let index = 0; index < resources.length; index += 1) {
+    const resource = resources[index], f = index * RESOURCE_FLOAT_STRIDE;
+    resourceIds[index] = idNumber(resource.id); resourceFloats[f] = finite(resource.x); resourceFloats[f+1] = finite(resource.y);
+    resourceFloats[f+2] = finite(resource.amount); resourceFloats[f+3] = finite(resource.maxAmount); resourceFloats[f+4] = finite(resource.regenTimer);
+  }
+
+  const projectiles = aliveProjectiles165;
+  const projectileBase165 = sharedSlot165 >= 0 ? sharedSlot165 * shared165.maxProjectiles : 0;
+  const projectileIds = sharedSlot165 >= 0 ? shared165.projectileIds.subarray(projectileBase165, projectileBase165 + projectiles.length) : new Uint32Array(projectiles.length);
+  const projectileFloats = sharedSlot165 >= 0 ? shared165.projectileFloats.subarray(projectileBase165 * PROJECTILE_FLOAT_STRIDE, (projectileBase165 + projectiles.length) * PROJECTILE_FLOAT_STRIDE) : new Float32Array(projectiles.length * PROJECTILE_FLOAT_STRIDE);
+  const projectileInts = sharedSlot165 >= 0 ? shared165.projectileInts.subarray(projectileBase165 * PROJECTILE_INT_STRIDE, (projectileBase165 + projectiles.length) * PROJECTILE_INT_STRIDE) : new Int32Array(projectiles.length * PROJECTILE_INT_STRIDE);
+  for (let index = 0; index < projectiles.length; index += 1) {
+    const projectile = projectiles[index], f = index * PROJECTILE_FLOAT_STRIDE, n = index * PROJECTILE_INT_STRIDE;
+    projectileIds[index] = idNumber(projectile.id);
+    projectileFloats[f] = finite(projectile.x); projectileFloats[f+1] = finite(projectile.y); projectileFloats[f+2] = finite(projectile.angle);
+--- resources #10 offset=181099 line=1309 ---
+    projectileInts[n+3] = projectile.defenseClass === 'hypersonic' ? 3 : projectile.defenseClass === 'high' ? 2 : projectile.defenseClass === 'medium' ? 1 : 0;
+    projectileInts[n+4] = idNumber(projectile.sourceId); projectileInts[n+5] = 0;
+  }
+
+  const detailsDue = force || tick - lastDetailsTick >= (game.units.length >= 16000 ? 10 : 5);
+  const structureDue = force || createdEntities.length || removedEntities.length || createdProjectiles.length || removedProjectiles.length || tick - lastStructureTick >= 25;
+  if (detailsDue) lastDetailsTick = tick;
+  if (structureDue) lastStructureTick = tick;
+
+  lastStateHash = stateHash(force);
+  lastSubsystemHashes = subsystemHashes(force);
+  const networkHash = networkStateHash(force);
+  const sequence165 = ++snapshotSequence;
+  if (sharedSlot165 >= 0) {
+    const renderBase165 = sharedSlot165 * shared165.maxRenderIds;
+    shared165.renderIds.subarray(renderBase165, renderBase165 + render.unitIds.length).set(render.unitIds);
+    publishSharedSlot165(sharedSlot165, sequence165, tick, units.length, projectiles.length, render.unitIds.length);
+  }
+  const message = {
+    type: 'snapshot', version: VERSION, build: BUILD, sequence: sequence165, wallClock165: Date.now(),
+    tick, time: game.time, simMs, stateHash: lastStateHash, subsystemHashes: lastSubsystemHashes, networkHash, networkHashTick: lastNetworkHashTick, networkLogisticsHash206: lastNetworkLogisticsHash206, networkLogisticsComponents206: lastNetworkLogisticsComponents206, networkBaseComponents206: lastNetworkBaseComponents206, initialNetworkHash206, initialNetworkLogisticsHash206, initialNetworkLogisticsComponents206, initialNetworkBaseComponents206, appliedSeq: multiplayer.appliedSeq || 0, rngSeed: game.rng?.seed || game.seed,
+    counts: { units: allAliveUnits.length, buildings: buildings.length, resources: resources.length, projectiles: projectiles.length },
+    counters: { idCounter: game.idCounter, projectileCounter: game.projectileCounter, formationCounter: game.formationCounter },
+    unitIds: sharedSlot165 >= 0 ? null : unitIds, unitFloats: sharedSlot165 >= 0 ? null : unitFloats, unitInts: sharedSlot165 >= 0 ? null : unitInts,
+    buildingIds: null, buildingFloats: null, buildingInts: null, resourceIds, resourceFloats,
+    projectileIds: sharedSlot165 >= 0 ? null : projectileIds, projectileFloats: sharedSlot165 >= 0 ? null : projectileFloats, projectileInts: sharedSlot165 >= 0 ? null : projectileInts,
+    renderUnitIds: sharedSlot165 >= 0 ? null : render.unitIds, sharedSlot165, sharedFallbacks165, clusters: render.clusters,
+    createdEntities: structureDue ? createdEntities : [], removedEntities: structureDue ? removedEntities : [],
+    createdProjectiles: structureDue ? createdProjectiles : [], removedProjectiles: structureDue ? removedProjectiles : [],
+    details: detailsDue ? dynamicDetails(force) : [],
+    visible: null, explored: null, miniCells: null,
+    teams: {
+      player: game.serializeTeam(game.teams.player), enemy: game.serializeTeam(game.teams.enemy)
+    },
+    stats: plainClone(game.stats), objective: game.objective,
+    formations: (force || tick % 8 === 0) ? [...(game.formations || new Map()).values()].map(group => plainClone(group)) : null,
+    operationalCore160: (force || tick % 25 === 0) ? (() => { const data = game.operationalCore160?.serialize?.() || null; if (data) { data.commandLog = (data.commandLog || []).slice(-128); data.hashHistory = (data.hashHistory || []).slice(-32); } return data; })() : null,
+    logistics206: (force || tick % 25 === 0) ? (game.exportLogistics206?.() || null) : null,
+    abilityZones: (force || tick % 8 === 0) ? game.abilityZones.filter(zone => zone.alive).map(zone => zone.serialize?.() || plainClone(zone)) : null,
+
+### NEEDLE supply160 count_sample=5
+--- supply160 #1 offset=126007 line=282 ---
+    turnRate: projectile.turnRate,
+    weave: projectile.weave,
+    arcHeight: projectile.arcHeight,
+    visualSize: projectile.visualSize,
+    color: projectile.color,
+    trailColor: projectile.trailColor,
+    trailLength: projectile.trailLength,
+    accuracy: projectile.accuracy,
+    defenseClass: projectile.defenseClass,
+    ttl: projectile.ttl,
+    age: projectile.age,
+    phase: projectile.phase,
+    angle: projectile.angle,
+    altitude: projectile.altitude,
+    launchAltitude: projectile.launchAltitude,
+    guidanceLost: projectile.guidanceLost,
+    preserveAim: true
+  };
+}
+
+function serializeEntity(entity) {
+  const data = entity.serialize ? entity.serialize() : plainClone(entity);
+  if (entity.kind === 'unit') {
+    Object.assign(data, {
+      visualSpeed: finite(entity.visualSpeed),
+      flightAltitude: finite(entity.flightAltitude ?? entity.altitude),
+      airBank: finite(entity.airBank),
+      airPitch: finite(entity.airPitch),
+      embarkedIn: entity.embarkedIn || null,
+      cargoUnits: Array.isArray(entity.cargoUnits) ? [...entity.cargoUnits] : undefined,
+      transportReserved: finite(entity.transportReserved),
+      airOrbitCenter: plainClone(entity.airOrbitCenter),
+      airOrbitAngle: finite(entity.airOrbitAngle),
+      airServiceState: entity.airServiceState || null,
+      airServiceTargetId: entity.airServiceTargetId || null,
+      airAmmo: Number.isFinite(entity.airAmmo) ? entity.airAmmo : null,
+      airAmmoMax: Number.isFinite(entity.airAmmoMax) ? entity.airAmmoMax : null,
+      sortieFuel: Number.isFinite(entity.sortieFuel) ? entity.sortieFuel : null,
+      sortieFuelMax: Number.isFinite(entity.sortieFuelMax) ? entity.sortieFuelMax : null,
+      suppression160: finite(entity.suppression160), cohesion160: finite(entity.cohesion160, 1),
+      supply160: finite(entity.supply160, 1), morale160: finite(entity.morale160, 1),
+      functionalDamage160: plainClone(entity.functionalDamage160),
+      v160Retreating: Boolean(entity._v160Retreating)
+    });
+  } else if (entity.kind === 'building') {
+    Object.assign(data, {
+      buildProgress: finite(entity.buildProgress ?? entity.construction, 1),
+      queue: plainClone(entity.queue), rallyPoint: plainClone(entity.rallyPoint),
+      recoil: finite(entity.recoil), weaponRotation: finite(entity.weaponRotation),
+      desiredWeaponRotation: finite(entity.desiredWeaponRotation)
+    });
+  }
+  return data;
+}
+
+function captureSaveData() {
+  if (!game || !legacySave) return null;
+  const previous = D.storageGet(D.SAVE_KEY);
+  let data = null;
+  try {
+    legacySave.call(game, false);
+    const raw = D.storageGet(D.SAVE_KEY);
+    data = raw ? JSON.parse(raw) : null;
+  } finally {
+    if (previous == null) localStorage.removeItem(D.SAVE_KEY);
+    else D.storageSet(D.SAVE_KEY, previous);
+  }
+  if (!data) return null;
+  data.authoritative172 = {
+    version: VERSION,
+    build: BUILD,
+    simTick: game.simTick || Math.round(game.time * SIM_HZ),
+    rngSeed: game.rng?.seed ?? game.seed,
+    projectiles: game.projectiles.filter(projectile => projectile.alive).map(serializeProjectile),
+    paused: false,
+    idCounter: game.idCounter,
+    projectileCounter: game.projectileCounter,
+    formationCounter: game.formationCounter,
+    stateHash: stateHash()
+  };
+  data.logistics206 = game.exportLogistics206?.() || null;
+  data.workerTransient206 = game.exportWorkerTransient206?.() || null;
+  if (data.authoritative172) data.authoritative172.networkAppliedSeq206 = Number(multiplayer.appliedSeq || 0);
+  data.savedAt = Date.now();
+  return data;
+}
+
+function canonicalTeamCode(team) {
+  const local = TEAM_CODES[team] || 0;
+--- supply160 #3 offset=133638 line=440 ---
+      record206.supportSpentEnemyAfter1e3 = Math.round((Number(afterLogistics206?.team?.enemy?.supportSpent) || 0) * 1000);
+      record206.importSpentEnemyAfter1e3 = Math.round((Number(afterLogistics206?.team?.enemy?.importSpent) || 0) * 1000);
+      delete this.creditTraceCurrent206;
+      this.creditTrace206 ||= [];
+      this.creditTrace206.push(record206);
+      if (this.creditTrace206.length > 20) this.creditTrace206.splice(0, this.creditTrace206.length - 20);
+    }
+  };
+  Object.defineProperty(wrappedSimulateCreditTrace206, '__fdCreditTrace206', { value: true });
+  D.Game.prototype.simulateFixed = wrappedSimulateCreditTrace206;
+}
+
+function networkBaseComponents206() {
+  if (!game) return null;
+  const fold = (hash, value) => { hash ^= value >>> 0; return Math.imul(hash, 16777619) >>> 0; };
+  const fp = item => {
+    const c = item.currentCommand || {};
+    const p = c.target || c.point || c.destination || c.position || {};
+    const firstNumber = (...values) => {
+      for (const value of values) if (Number.isFinite(Number(value))) return Number(value);
+      return null;
+    };
+    const cx = firstNumber(c.x, c.targetX, c.buildX, c.destinationX, p.x);
+    const cy = firstNumber(c.y, c.targetY, c.buildY, c.destinationY, p.y);
+    const commandDetail = {
+      type: c.type || '',
+      x1000: cx == null ? null : Math.round(cx * 1000),
+      y1000: cy == null ? null : Math.round(cy * 1000),
+      targetId: String(c.targetId ?? c.entityId ?? c.target?.id ?? ''),
+      buildType: String(c.buildingType ?? c.structureType ?? c.buildType ?? c.typeId ?? c.payload?.typeId ?? ''),
+      phase: String(c.phase ?? c.state ?? ''),
+    };
+    return {
+      id: String(item.id), team: canonicalTeamCode(item.team),
+      x: Math.round((Number(item.x) || 0) * 4), y: Math.round((Number(item.y) || 0) * 4),
+      hp: Math.round((Number(item.hp) || 0) * 10), command: c.type || '', commandDetail,
+      supply160: Math.round((Number(item.supply160) || 0) * 1000000),
+      speed1000: Math.round((Number(item.speedCurrent) || 0) * 1000),
+      velocityX1000: Math.round((Number(item.velocityX) || 0) * 1000),
+      velocityY1000: Math.round((Number(item.velocityY) || 0) * 1000),
+    };
+  };
+  const hashList = list => {
+    let hash = 2166136261 >>> 0;
+    for (const item of list) {
+      const value = fp(item);
+      hash = fold(hash, idNumber(item.id)); hash = fold(hash, value.team); hash = fold(hash, value.x); hash = fold(hash, value.y); hash = fold(hash, value.hp);
+      for (let i = 0; i < value.command.length; i += 1) hash = fold(hash, value.command.charCodeAt(i));
+    }
+    return hash >>> 0;
+  };
+  const aliveUnits = (game.units || []).filter(item => item?.alive);
+  const aliveBuildings = (game.buildings || []).filter(item => item?.alive);
+  const aliveProjectiles = (game.projectiles || []).filter(item => item?.alive);
+  const byId = list => [...list].sort((a, b) => String(a.id).localeCompare(String(b.id), 'en'));
+  let projectileHash = 2166136261 >>> 0;
+  for (const item of aliveProjectiles) {
+    projectileHash = fold(projectileHash, idNumber(item.id)); projectileHash = fold(projectileHash, canonicalTeamCode(item.team));
+    projectileHash = fold(projectileHash, Math.round((Number(item.x) || 0) * 4)); projectileHash = fold(projectileHash, Math.round((Number(item.y) || 0) * 4));
+    projectileHash = fold(projectileHash, Math.round((Number(item.altitude) || 0) * 4));
+  }
+  const canonicalPlayer = multiplayer.perspectiveSwapped ? game.teams?.enemy : game.teams?.player;
+  const canonicalEnemy = multiplayer.perspectiveSwapped ? game.teams?.player : game.teams?.enemy;
+  return {
+    tick: Number(game.simTick) || 0,
+    simTimeTick: Math.round((Number(game.time) || 0) * SIM_HZ),
+--- supply160 #5 offset=175546 line=1250 ---
+  const sharedSlot165 = reserveSharedSlot165(units.length, aliveProjectiles165.length, render.unitIds.length);
+  const unitBase165 = sharedSlot165 >= 0 ? sharedSlot165 * shared165.maxUnits : 0;
+  const unitIds = sharedSlot165 >= 0 ? shared165.unitIds.subarray(unitBase165, unitBase165 + units.length) : new Uint32Array(units.length);
+  const unitFloats = sharedSlot165 >= 0 ? shared165.unitFloats.subarray(unitBase165 * UNIT_FLOAT_STRIDE, (unitBase165 + units.length) * UNIT_FLOAT_STRIDE) : new Float32Array(units.length * UNIT_FLOAT_STRIDE);
+  const unitInts = sharedSlot165 >= 0 ? shared165.unitInts.subarray(unitBase165 * UNIT_INT_STRIDE, (unitBase165 + units.length) * UNIT_INT_STRIDE) : new Int32Array(units.length * UNIT_INT_STRIDE);
+  for (let index = 0; index < units.length; index += 1) {
+    const unit = units[index], f = index * UNIT_FLOAT_STRIDE, n = index * UNIT_INT_STRIDE;
+    unitIds[index] = idNumber(unit.id);
+    unitFloats[f] = finite(unit.x); unitFloats[f+1] = finite(unit.y); unitFloats[f+2] = finite(unit.rotation);
+    unitFloats[f+3] = finite(unit.hp); unitFloats[f+4] = finite(unit.maxHp, 1); unitFloats[f+5] = finite(unit.weaponCooldown);
+    unitFloats[f+6] = finite(unit.visualSpeed); unitFloats[f+7] = finite(unit.flightAltitude ?? unit.altitude);
+    unitFloats[f+8] = finite(unit.airBank); unitFloats[f+9] = finite(unit.airPitch);
+    unitFloats[f+10] = Number.isFinite(unit.airAmmo) ? unit.airAmmo : -1; unitFloats[f+11] = Number.isFinite(unit.airAmmoMax) ? unit.airAmmoMax : -1;
+    unitFloats[f+12] = Number.isFinite(unit.sortieFuel) ? unit.sortieFuel : -1; unitFloats[f+13] = Number.isFinite(unit.sortieFuelMax) ? unit.sortieFuelMax : -1;
+    unitFloats[f+14] = finite(unit.suppression160); unitFloats[f+15] = finite(unit.cohesion160, 1);
+    unitFloats[f+16] = finite(unit.supply160, 1); unitFloats[f+17] = finite(unit.morale160, 1);
+    unitFloats[f+18] = finite(unit.coverIntegrity, 1); unitFloats[f+19] = finite(unit.revealTimer);
+    unitFloats[f+20] = finite(unit.lastDamagedAt, -999); unitFloats[f+21] = finite(unit.lastShotAt, -999);
+    let flags = 1;
+    if (unit.air) flags |= 2; if (unit.embarkedIn) flags |= 4; if (unit.cloaked) flags |= 8; if (unit.undercover) flags |= 16;
+    if (unit.vehicle) flags |= 32; if (unit.infantry) flags |= 64; if (unit._v160Retreating) flags |= 128;
+    unitInts[n] = TEAM_CODES[unit.team] || 0; unitInts[n+1] = flags; unitInts[n+2] = unit.rank || 1; unitInts[n+3] = Math.round(finite(unit.cargo));
+    unitInts[n+4] = COMMAND_CODES[unit.currentCommand?.type || ''] || 0;
+    unitInts[n+5] = idNumber(unit.currentCommand?.targetId || unit.currentCommand?.buildingId || unit.currentCommand?.resourceId);
+    unitInts[n+6] = SERVICE_CODES[unit.airServiceState || ''] || 0; unitInts[n+7] = idNumber(unit.embarkedIn);
+  }
+
+  const buildings = game.buildings.filter(building => building.alive);
+
+  const resources = game.resources.filter(resource => resource.alive);
+  const resourceIds = new Uint32Array(resources.length);
+  const resourceFloats = new Float32Array(resources.length * RESOURCE_FLOAT_STRIDE);
+  for (let index = 0; index < resources.length; index += 1) {
+    const resource = resources[index], f = index * RESOURCE_FLOAT_STRIDE;
+    resourceIds[index] = idNumber(resource.id); resourceFloats[f] = finite(resource.x); resourceFloats[f+1] = finite(resource.y);
+    resourceFloats[f+2] = finite(resource.amount); resourceFloats[f+3] = finite(resource.maxAmount); resourceFloats[f+4] = finite(resource.regenTimer);
+  }
+
+  const projectiles = aliveProjectiles165;
+  const projectileBase165 = sharedSlot165 >= 0 ? sharedSlot165 * shared165.maxProjectiles : 0;
+
+### NEEDLE snapshot count_sample=10
+--- snapshot #1 offset=119002 line=111 ---
+BoundsMeters":[9.6,3.969,2.75],"modelCode":"V-U14","modelCollision":"box","modelCollisionFootprintMeters":{"maxX":4.416,"maxY":1.78605,"minX":-4.416,"minY":-1.78605},"modelUnitScale":{"factor":5.217,"mode":"length","readabilityScale":1.85}},"v_tankHunter_recon":{"modelBoundsMeters":[9.6,3.969,2.75],"modelCode":"V-U14","modelCollision":"box","modelCollisionFootprintMeters":{"maxX":4.416,"maxY":1.78605,"minX":-4.416,"minY":-1.78605},"modelUnitScale":{"factor":5.217,"mode":"length","readabilityScale":1.85}},"worker":{"modelBoundsMeters":[1.25,0.9,2.2],"modelCode":"C-U01","modelCollision":"capsule","modelCollisionFootprintMeters":{"maxX":0.5750000000000001,"maxY":0.405,"minX":-0.5750000000000001,"minY":-0.405},"modelUnitScale":{"factor":2.99,"mode":"height","readabilityScale":2.3}}};
+(function installDeterministicUnitGeometry206() {
+  const types = D.UNIT_TYPES || {};
+  for (const [typeId, geometry] of Object.entries(deterministicUnitGeometry206)) {
+    const stats = types[typeId];
+    if (!stats) continue;
+    Object.assign(stats, {
+      modelCode: geometry.modelCode || null,
+      modelManifest: '/frontline-dominion/models/pilot/manifest.json?build=206',
+      modelBoundsMeters: Array.isArray(geometry.modelBoundsMeters) ? [...geometry.modelBoundsMeters] : null,
+      modelCollisionFootprintMeters: geometry.modelCollisionFootprintMeters ? { ...geometry.modelCollisionFootprintMeters } : null,
+      modelUnitScale: geometry.modelUnitScale ? { ...geometry.modelUnitScale } : null,
+      modelCollision: geometry.modelCollision || null,
+    });
+  }
+  Object.defineProperty(self, '__fdDeterministicUnitGeometry206', { value: true, configurable: false });
+})();
+
+let game = null;
+let running = false;
+let paused = false;
+let manualMode = false;
+let timer = 0;
+let nextTickAt = 0;
+let snapshotSequence = 0;
+let actionSequence = 0;
+let lastSnapshotTick = -1;
+let lastStructureTick = -1;
+let lastFogTick = -1;
+let lastMiniTick = -1;
+let lastDetailsTick = -1;
+let mainView = { left: 0, top: 0, right: D.WORLD.width, bottom: D.WORLD.height, zoom: 1, selectedIds: [] };
+let knownEntities = new Set();
+let knownProjectiles = new Set();
+let actionQueue = [];
+let effectEvents = [];
+let alertEvents = [];
+let endEvent = null;
+let legacySave = null;
+let lastStateHash = 0;
+let lastSubsystemHashes = null;
+let workerStartedAt = performance.now();
+let ticksExecuted = 0;
+let maxTickMs = 0;
+let totalTickMs = 0;
+let lastHashTick = -1;
+let lastNetworkHashTick = -1;
+let lastNetworkHash = '00000000';
+let lastNetworkLogisticsHash206 = 0;
+let lastNetworkLogisticsComponents206 = null;
+let lastNetworkBaseComponents206 = null;
+let initialNetworkHash206 = '00000000';
+let initialNetworkLogisticsHash206 = 0;
+let initialNetworkLogisticsComponents206 = null;
+let initialNetworkBaseComponents206 = null;
+let multiplayer = { active: false, role: null, mode: 'coop', perspectiveSwapped: false, hostTick: null, hostTickReceivedAt: 0, appliedSeq: 0 };
+
+let shared165 = null;
+let sharedFallbacks165 = 0;
+let buildingStateSequence165 = 0;
+let minimapStateSequence165 = 0;
+let lastBuildingStateTick165 = -1;
+let lastMinimapStateTick165 = -1;
+let buildingStateCache165 = new Map();
+let buildingDetailCache165 = new Map();
+
+function attachShared165(desc) {
+  shared165 = null;
+  if (!desc || typeof SharedArrayBuffer === 'undefined' || typeof Atomics === 'undefined') return;
+  try {
+    shared165 = {
+      ...desc,
+      header: new Int32Array(desc.headerBuffer), unitIds: new Uint32Array(desc.unitIdsBuffer),
+      unitFloats: new Float32Array(desc.unitFloatsBuffer), unitInts: new Int32Array(desc.unitIntsBuffe
+--- snapshot #3 offset=143746 line=631 ---
+    if (data) postMessage({ type: 'saveData', data, notify: Boolean(notify), autosave: !notify });
+    return Boolean(data);
+  };
+  const oldCoreWorker = instance.operationalCore160?.worker;
+  try { oldCoreWorker?.terminate?.(); } catch (_) {}
+  if (instance.operationalCore160) {
+    instance.operationalCore160.worker = null;
+    instance.operationalCore160.workerReady = false;
+    instance.operationalCore160.sendWorker = () => {};
+  }
+}
+
+function restoreProjectiles(items) {
+  game.projectiles.length = 0;
+  for (const data of items || []) {
+    try {
+      const projectile = new D.Projectile(game, { ...data, preserveAim: true });
+      projectile.age = finite(data.age);
+      projectile.ttl = finite(data.ttl, projectile.ttl);
+      projectile.altitude = finite(data.altitude, projectile.altitude);
+      projectile.angle = finite(data.angle, projectile.angle);
+      projectile.hp = finite(data.hp, projectile.hp);
+      projectile.alive = data.alive !== false;
+      projectile.intercepted = Boolean(data.intercepted);
+      projectile.guidanceLost = Boolean(data.guidanceLost);
+      game.projectiles.push(projectile);
+    } catch (error) {
+      console.warn('[v16.3 worker] projectile restore failed', error);
+    }
+  }
+}
+
+function canonicalFreshNetworkLogistics206(saveData, multiplayerState) {
+  if (!saveData || !multiplayerState?.active || saveData.__mp) return saveData;
+
+  // The lobby creates host and guest games independently before their
+  // authoritative Workers launch.  Build-206 modules may have had a few local
+  // presentation/startup ticks in that interval.  Persisting those locally
+  // accumulated logistics fields would make otherwise identical Workers start
+  // with different Fuel/Ammo/Support, sampling coordinates or support costs.
+  // A fresh network match therefore derives logistics from canonical entity
+  // definitions inside the Worker.  Resync snapshots carry __mp and are never
+  // normalized here: their physical stocks/cargo are already authoritative.
+  const rootLogistics = saveData.logistics206;
+  if (rootLogistics?.team && saveData.teams) {
+    // Reverse only build-206 pre-Worker expenditures.  Scheduled imports cannot
+    // occur during normal lobby startup, but including them makes the reset
+    // mathematically complete.  Financial income is second-gated and does not
+    // execute before the initial Worker handoff.
+    for (const teamKey of ['player', 'enemy']) {
+      const team = saveData.teams?.[teamKey];
+      const ledger = rootLogistics.team?.[teamKey];
+      if (!team || !ledger) continue;
+      const spent = Math.max(0, Number(ledger.supportSpent) || 0) + Math.max(0, Number(ledger.importSpent) || 0);
+      if (spent > 0) team.credits = (Number(team.credits) || 0) + spent;
+    }
+  }
+  delete saveData.logistics206;
+
+  const visited = new Set();
+  for (const collection of [saveData.entities, saveData.units, saveData.buildings]) {
+    if (!Array.isArray(collection)) continue;
+    for (const raw of collection) {
+      if (!raw || typeof raw !== 'object' || visited.has(raw)) continue;
+      visited.add(raw);
+      delete raw.logistics206;
+      delete raw.resourceType206;
+      delete raw.resourceBufferMax206;
+      // resourceBuffer83 is a physical extractor output buffer.  A fresh
+      // network match starts it from the canonical empty state; production
+      // after Worker tick zero remains fully physical and deterministic.
+      if (Number.isFinite(raw.resourceBuffer83)) raw.resourceBuffer83 = 0;
+    }
+  }
+  return saveData;
+}
+
+function initGame(message) {
+  const saveData = canonicalFreshNetworkLogistics206(message.saveData || null, message.multiplayer || {});
+  attachShared165(message.shared165 || null);
+--- snapshot #4 offset=147528 line=709 ---
+  multiplayer = { ...multiplayer, ...(message.multiplayer || {}), hostTickReceivedAt: performance.now(), appliedSeq: Number(message.multiplayer?.appliedSeq) || 0 };
+  /* Constructor UI methods are replaced before instantiation. */
+  for (const method of ['resize','showHud','hideHud','updateUI','render','renderMinimap','renderSelectionUI','renderActionUI','renderPowersUI']) {
+    D.Game.prototype[method] = function noopHeadless() {};
+  }
+  const options = saveData ? {
+    loadData: saveData,
+    faction: saveData.teams?.player?.faction,
+    enemyFaction: saveData.teams?.enemy?.faction,
+    difficulty: saveData.difficultyKey,
+    seed: saveData.seed
+  } : {
+    faction: message.faction || 'vanguard',
+    enemyFaction: message.enemyFaction || 'dominion',
+    difficulty: message.difficulty || 'normal',
+    seed: Number(message.seed) || 123456
+  };
+  game = new D.Game(options);
+  installHeadlessRuntime(game);
+  if (multiplayer.active && multiplayer.mode === 'versus') {
+    if (game.ai) game.ai.update = () => undefined;
+    game.updateEnemyStrategicArsenal = () => undefined;
+  }
+  const extension = message.authoritative || saveData?.authoritative172 || {};
+  if (Number.isFinite(extension.rngSeed) && game.rng) game.rng.seed = extension.rngSeed >>> 0;
+  game.simTick = Number.isFinite(extension.simTick) ? extension.simTick : Math.round(game.time * SIM_HZ);
+  game.idCounter = Math.max(game.idCounter || 1, extension.idCounter || 1);
+  game.projectileCounter = Math.max(game.projectileCounter || 1, extension.projectileCounter || 1);
+  game.formationCounter = Math.max(game.formationCounter || 1, extension.formationCounter || 1);
+  restoreProjectiles(message.projectiles || extension.projectiles || []);
+  game.paused = false;
+  paused = Boolean(message.paused);
+  manualMode = Boolean(message.manual);
+  knownEntities = new Set();
+  knownProjectiles = new Set();
+  actionQueue = [];
+  effectEvents = [];
+  alertEvents = [];
+  endEvent = null;
+  lastSnapshotTick = -1;
+  lastStructureTick = -1;
+  lastFogTick = -1;
+  lastMiniTick = -1;
+  lastDetailsTick = -1;
+  lastBuildingStateTick165 = -1;
+  lastMinimapStateTick165 = -1;
+  buildingStateSequence165 = 0;
+  minimapStateSequence165 = 0;
+  buildingStateCache165 = new Map();
+  buildingDetailCache165 = new Map();
+  sharedFallbacks165 = 0;
+  ticksExecuted = 0;
+  totalTickMs = 0;
+  maxTickMs = 0;
+  lastHashTick = -1; lastNetworkHashTick = -1; lastNetworkHash = '00000000'; lastNetworkLogisticsHash206 = 0; lastNetworkLogisticsComponents206 = null; lastNetworkBaseComponents206 = null; initialNetworkHash206 = '00000000'; initialNetworkLogisticsHash206 = 0; initialNetworkLogisticsComponents206 = null; initialNetworkBaseComponents206 = null;
+  initialNetworkHash206 = networkStateHash(true);
+  initialNetworkLogisticsHash206 = lastNetworkLogisticsHash206;
+  initialNetworkLogisticsComponents206 = lastNetworkLogisticsComponents206 ? plainClone(lastNetworkLogisticsComponents206) : null;
+  initialNetworkBaseComponents206 = lastNetworkBaseComponents206 ? plainClone(lastNetworkBaseComponents206) : null;
+  running = true;
+  workerStartedAt = performance.now();
+  makeSnapshot(true);
+  postMessage({
+    type: 'ready', version: VERSION, build: BUILD, simHz: SIM_HZ,
+    tick: game.simTick, time: game.time, stateHash: stateHash(),
+    counts: { units: game.units.length, buildings: game.buildings.length, resources: game.resources.length, projectiles: game.projectiles.length }
+  });
+  if (!manualMode) startClock();
+}
+
+let hotSetRefreshTick173 = -1;
+function deterministicHotSet() {
+  if (!game?.renderSnapshot) return;
+  const units = game.units;
+  const count = units.length;
+  const cadence = count >= 50000 ? 5 : count >= 20000 ? 4 : count >= 8000 ? 2 : 1;
+  if (hotSetRefreshTick173 >= 0 && (game.simTick - hotSetRefreshTick173) < cadence) return;
+--- snapshot #7 offset=149571 line=749 ---
+  buildingStateCache165 = new Map();
+  buildingDetailCache165 = new Map();
+  sharedFallbacks165 = 0;
+  ticksExecuted = 0;
+  totalTickMs = 0;
+  maxTickMs = 0;
+  lastHashTick = -1; lastNetworkHashTick = -1; lastNetworkHash = '00000000'; lastNetworkLogisticsHash206 = 0; lastNetworkLogisticsComponents206 = null; lastNetworkBaseComponents206 = null; initialNetworkHash206 = '00000000'; initialNetworkLogisticsHash206 = 0; initialNetworkLogisticsComponents206 = null; initialNetworkBaseComponents206 = null;
+  initialNetworkHash206 = networkStateHash(true);
+  initialNetworkLogisticsHash206 = lastNetworkLogisticsHash206;
+  initialNetworkLogisticsComponents206 = lastNetworkLogisticsComponents206 ? plainClone(lastNetworkLogisticsComponents206) : null;
+  initialNetworkBaseComponents206 = lastNetworkBaseComponents206 ? plainClone(lastNetworkBaseComponents206) : null;
+  running = true;
+  workerStartedAt = performance.now();
+  makeSnapshot(true);
+  postMessage({
+    type: 'ready', version: VERSION, build: BUILD, simHz: SIM_HZ,
+    tick: game.simTick, time: game.time, stateHash: stateHash(),
+    counts: { units: game.units.length, buildings: game.buildings.length, resources: game.resources.length, projectiles: game.projectiles.length }
+  });
+  if (!manualMode) startClock();
+}
+
+let hotSetRefreshTick173 = -1;
+function deterministicHotSet() {
+  if (!game?.renderSnapshot) return;
+  const units = game.units;
+  const count = units.length;
+  const cadence = count >= 50000 ? 5 : count >= 20000 ? 4 : count >= 8000 ? 2 : 1;
+  if (hotSetRefreshTick173 >= 0 && (game.simTick - hotSetRefreshTick173) < cadence) return;
+  hotSetRefreshTick173 = game.simTick;
+  const cap = count >= 50000 ? 128 : count >= 20000 ? 160 : count >= 8000 ? 300 : count >= 3000 ? 720 : Math.min(2200, count);
+  const out = game.renderSnapshot.units || (game.renderSnapshot.units = []);
+  out.length = 0;
+  const stamp = (game.simTick || 0) + 1;
+  const add = unit => {
+    if (!unit?.alive || unit.embarkedIn || unit._fdHotStamp173 === stamp || out.length >= cap) return;
+    unit._fdHotStamp173 = stamp; out.push(unit);
+  };
+  /* Camera and selection never participate. Combat, air missions and specialist tasks do. */
+  for (let i = 0; i < count && out.length < cap; i += 1) {
+    const unit = units[i];
+    const recent = game.time - Math.max(unit.lastDamagedAt || -999, unit.lastShotAt || -999) < 3;
+    const command = unit.currentCommand?.type || '';
+    if (recent || unit.air || /repair|build|harvest|capture|infiltrate|air|transport|mine/i.test(command)) add(unit);
+  }
+  const start = count ? ((game.simTick * Math.max(1, cap)) % count) : 0;
+  for (let offset = 0; offset < count && out.length < cap; offset += 1) add(units[(start + offset) % count]);
+  game.selected.length = 0;
+}
+
+function applyAction(event) {
+  if (!game || !event) return false;
+  const payload = event.payload || {};
+  const selected = (event.selectedIds || []).map(id => game.getEntity(id)).filter(entity => entity?.alive);
+  const previous = game.selected;
+  game.selected = selected;
+  for (const entity of selected) entity.selected = true;
+  const target = payload.targetId ? game.getEntity(payload.targetId) : null;
+  let result = false;
+  try {
+    result = withEventPerspective(event, () => {
+    if (payload.formationSettings && typeof payload.formationSettings === 'object') {
+      game.formationSettings = plainClone(payload.formationSettings);
+    }
+    switch (event.action) {
+      case 'move': {
+        result = game.issueMove(payload.x, payload.y, payload.append);
+        if (result !== false) {
+          const tagged197 = self.__FD_FORMATION_TARGET_FIDELITY_197__?.tagIssuedOrder?.(
+--- snapshot #9 offset=161559 line=992 ---
+        const unit = game.getEntity(payload.unitId);
+        result = unit?.setCommand?.(plainClone(payload.command), Boolean(payload.append));
+        break;
+      }
+      case 'unitStop': {
+        const unit = game.getEntity(payload.unitId);
+        result = unit?.stop?.();
+        break;
+      }
+      default: result = false;
+    }
+    return result;
+    });
+  } finally {
+    for (const entity of selected) entity.selected = false;
+    game.selected = previous || [];
+  }
+  if (event.networkSeq) multiplayer.appliedSeq = Math.max(multiplayer.appliedSeq || 0, Number(event.networkSeq) || 0);
+  postMessage({ type: 'actionAck', seq: event.seq, networkSeq: event.networkSeq || 0, tick: game.simTick, ok: result !== false, action: event.action });
+  return result !== false;
+}
+
+function drainActions() {
+  if (!actionQueue.length) return;
+  actionQueue.sort((a, b) => (a.atTick - b.atTick) || (a.seq - b.seq));
+  while (actionQueue.length && actionQueue[0].atTick <= game.simTick + 1) applyAction(actionQueue.shift());
+}
+
+function runTick() {
+  if (!game || paused || game.ended) return 0;
+  const started = performance.now();
+  drainActions();
+  deterministicHotSet();
+  game.simulateFixed(SIM_DT);
+  const core = game.operationalCore160;
+  if (core?.update) {
+    if (multiplayer.active && multiplayer.mode === 'versus') {
+      const updateAI = core.updateAI, updateOperations = core.updateOperations;
+      core.updateAI = () => {}; core.updateOperations = () => {};
+      try { core.update(SIM_DT); } finally { core.updateAI = updateAI; core.updateOperations = updateOperations; }
+    } else core.update(SIM_DT);
+  }
+  ticksExecuted += 1;
+  const elapsed = performance.now() - started;
+  totalTickMs += elapsed;
+  maxTickMs = Math.max(maxTickMs, elapsed);
+  const count = game.units.length;
+  const snapshotEvery = count >= 80000 ? 8 : count >= 40000 ? 6 : count >= 12000 ? 4 : count >= 2500 ? 2 : 1;
+  if ((game.simTick - lastSnapshotTick) >= snapshotEvery) makeSnapshot(false, elapsed);
+  return elapsed;
+}
+
+function startClock() {
+  if (timer) clearTimeout(timer);
+  nextTickAt = performance.now();
+  const pump = () => {
+    timer = 0;
+    if (!running || manualMode) return;
+    const now = performance.now();
+    let steps = 0;
+    let guestTarget = Infinity;
+    if (multiplayer.active && multiplayer.role === 'guest') {
+      const age = now - (multiplayer.hostTickReceivedAt || 0);
+      const fresh = Number.isFinite(multiplayer.hostTick) && age < 2400;
+      guestTarget = fresh ? Math.max(0, Number(multiplayer.hostTick) + Math.floor(Math.max(0, age) / 40) - 6) : -1;
+    }
+    while (!paused && !game?.ended && now + 0.25 >= nextTickAt && steps < 4) {
+      if (guestTarget >= 0 && (game.simTick || 0) >= guestTarget) break;
+      if (guestTarget < 0) break;
+      try {
+        runTick();
+      } catch (error) {
+        running = false;
+        postMessage({
+          type: 'fatal',
+          stage: 'tick',
+          message: String(error?.message || error || 'unknown tick failure'),
+          stack: String(error?.stack || ''),
+          tick: Number(game?.simTick || 0),
+        });
+        return;
+      }
+      nextTickAt += 1000 / SIM_HZ;
+      steps += 1;
+    }
+    if (paused || game?.ended || guestTarget < 0 || (guestTarget !== Infinity && (game?.simTick || 0) >= guestTarget)) nextTickAt = performance.now() + 1000 / SIM_HZ;
+    if (performance.now() - nextTickAt > 200) nextTickAt = performance.now() + 1000 / SIM_HZ;
+    const delay = clamp(nextTickAt - performance.now(), 0, 20);
+    timer = setTimeout(pump, delay);
+  };
+  timer = setTimeout(pump, 0);
+}
+
+function makeMiniCells() {
+
+### NEEDLE serialize count_sample=10
+--- serialize #1 offset=123466 line=219 ---
+function publishSharedSlot165(slot, sequence, tick, unitCount, projectileCount, renderCount) {
+  if (slot < 0 || !shared165) return;
+  const base = slot * shared165.metaStride;
+  Atomics.store(shared165.header, base, sequence | 0);
+  Atomics.store(shared165.header, base + 1, tick | 0);
+  Atomics.store(shared165.header, base + 2, unitCount | 0);
+  Atomics.store(shared165.header, base + 3, projectileCount | 0);
+  Atomics.store(shared165.header, base + 4, renderCount | 0);
+  Atomics.store(shared165.header, base + 5, 2);
+}
+
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const idNumber = (id) => {
+  const value = Number.parseInt(String(id || '').replace(/^\D+/, ''), 10);
+  return Number.isFinite(value) ? value >>> 0 : 0;
+};
+const entityId = (number) => number ? `e${number >>> 0}` : null;
+const projectileId = (number) => number ? `p${number >>> 0}` : null;
+const finite = (value, fallback = 0) => Number.isFinite(value) ? value : fallback;
+const plainClone = (value, depth = 0) => {
+  if (value == null || typeof value === 'string' || typeof value === 'boolean') return value;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  if (depth > 5) return null;
+  if (Array.isArray(value)) return value.slice(0, 256).map(item => plainClone(item, depth + 1));
+  if (value instanceof Set) return [...value].map(item => plainClone(item, depth + 1));
+  if (value instanceof Map) return [...value.entries()].map(([key, item]) => [key, plainClone(item, depth + 1)]);
+  if (typeof value === 'object') {
+    const out = {};
+    for (const [key, item] of Object.entries(value)) {
+      if (key === 'game' || key === 'stats' || key === 'source' || key === 'target' || typeof item === 'function') continue;
+      out[key] = plainClone(item, depth + 1);
+    }
+    return out;
+  }
+  return null;
+};
+
+function serializeProjectile(projectile) {
+  return {
+    id: projectile.id,
+    sourceId: projectile.sourceId,
+    sourceTypeId: projectile.sourceTypeId || null,
+    team: projectile.team,
+    x: projectile.x,
+    y: projectile.y,
+    targetId: projectile.targetId,
+    targetX: projectile.targetX,
+    targetY: projectile.targetY,
+    speed: projectile.speed,
+    damage: projectile.damage,
+    splash: projectile.splash,
+    weapon: plainClone(projectile.weapon),
+    profile: projectile.profile,
+    trajectory: projectile.trajectory,
+    ballistic: projectile.ballistic,
+    interceptability: projectile.interceptability,
+    maxHp: projectile.maxHp,
+    hp: projectile.hp,
+    signature: projectile.signature,
+    evasion: projectile.evasion,
+    turnRate: projectile.turnRate,
+    weave: projectile.weave,
+    arcHeight: projectile.arcHeight,
+    visualSize: projectile.visualSize,
+    color: projectile.color,
+    trailColor: projectile.trailColor,
+    trailLength: projectile.trailLength,
+    accuracy: projectile.accuracy,
+    defenseClass: projectile.defenseClass,
+    ttl: projectile.ttl,
+    age: projectile.age,
+    phase: projectile.phase,
+    angle: projectile.angle,
+    altitude: projectile.altitude,
+    launchAltitude: projectile.launchAltitude,
+    guidanceLost: projectile.guidanceLost,
+    preserveAim: true
+  };
+}
+
+function serializeEntity(entity) {
+  const data = entity.serialize ? entity.serialize() : plainClone(entity);
+  if (entity.kind === 'unit') {
+    Object.assign(data, {
+      visualSpeed: finite(entity.visualSpeed),
+      flightAltitude: finite(entity.flightAltitude ?? entity.altitude),
+      airBank: finite(entity.airBank),
+      airPitch: finite(entity.airPitch),
+      embarkedIn: entity.embarkedIn || null,
+      cargoUnits: Array.isArray(entity.cargoUnits) ? [...entity.cargoUnits] : undefined,
+--- serialize #2 offset=124805 line=262 ---
+  if (value instanceof Set) return [...value].map(item => plainClone(item, depth + 1));
+  if (value instanceof Map) return [...value.entries()].map(([key, item]) => [key, plainClone(item, depth + 1)]);
+  if (typeof value === 'object') {
+    const out = {};
+    for (const [key, item] of Object.entries(value)) {
+      if (key === 'game' || key === 'stats' || key === 'source' || key === 'target' || typeof item === 'function') continue;
+      out[key] = plainClone(item, depth + 1);
+    }
+    return out;
+  }
+  return null;
+};
+
+function serializeProjectile(projectile) {
+  return {
+    id: projectile.id,
+    sourceId: projectile.sourceId,
+    sourceTypeId: projectile.sourceTypeId || null,
+    team: projectile.team,
+    x: projectile.x,
+    y: projectile.y,
+    targetId: projectile.targetId,
+    targetX: projectile.targetX,
+    targetY: projectile.targetY,
+    speed: projectile.speed,
+    damage: projectile.damage,
+    splash: projectile.splash,
+    weapon: plainClone(projectile.weapon),
+    profile: projectile.profile,
+    trajectory: projectile.trajectory,
+    ballistic: projectile.ballistic,
+    interceptability: projectile.interceptability,
+    maxHp: projectile.maxHp,
+    hp: projectile.hp,
+    signature: projectile.signature,
+    evasion: projectile.evasion,
+    turnRate: projectile.turnRate,
+    weave: projectile.weave,
+    arcHeight: projectile.arcHeight,
+    visualSize: projectile.visualSize,
+    color: projectile.color,
+    trailColor: projectile.trailColor,
+    trailLength: projectile.trailLength,
+    accuracy: projectile.accuracy,
+    defenseClass: projectile.defenseClass,
+    ttl: projectile.ttl,
+    age: projectile.age,
+    phase: projectile.phase,
+    angle: projectile.angle,
+    altitude: projectile.altitude,
+    launchAltitude: projectile.launchAltitude,
+    guidanceLost: projectile.guidanceLost,
+    preserveAim: true
+  };
+}
+
+function serializeEntity(entity) {
+  const data = entity.serialize ? entity.serialize() : plainClone(entity);
+  if (entity.kind === 'unit') {
+    Object.assign(data, {
+      visualSpeed: finite(entity.visualSpeed),
+      flightAltitude: finite(entity.flightAltitude ?? entity.altitude),
+      airBank: finite(entity.airBank),
+      airPitch: finite(entity.airPitch),
+      embarkedIn: entity.embarkedIn || null,
+      cargoUnits: Array.isArray(entity.cargoUnits) ? [...entity.cargoUnits] : undefined,
+      transportReserved: finite(entity.transportReserved),
+      airOrbitCenter: plainClone(entity.airOrbitCenter),
+      airOrbitAngle: finite(entity.airOrbitAngle),
+      airServiceState: entity.airServiceState || null,
+      airServiceTargetId: entity.airServiceTargetId || null,
+      airAmmo: Number.isFinite(entity.airAmmo) ? entity.airAmmo : null,
+      airAmmoMax: Number.isFinite(entity.airAmmoMax) ? entity.airAmmoMax : null,
+      sortieFuel: Number.isFinite(entity.sortieFuel) ? entity.sortieFuel : null,
+      sortieFuelMax: Number.isFinite(entity.sortieFuelMax) ? entity.sortieFuelMax : null,
+      suppression160: finite(entity.suppression160), cohesion160: finite(entity.cohesion160, 1),
+      supply160: finite(entity.supply160, 1), morale160: finite(entity.morale160, 1),
+      functionalDamage160: plainClone(entity.functionalDamage160),
+      v160Retreating: Boolean(entity._v160Retreating)
+    });
+  } else if (entity.kind === 'building') {
+    Object.assign(data, {
+      buildProgress: finite(entity.buildProgress ?? entity.construction, 1),
+      queue: plainClone(entity.queue), rallyPoint: plainClone(entity.rallyPoint),
+      recoil: finite(entity.recoil), weaponRotation: finite(entity.weaponRotation),
+      desiredWeaponRotation: finite(entity.desiredWeaponRotation)
+    });
+  }
+--- serialize #6 offset=166518 line=1105 ---
+      if (unit.x < bounds.left - margin || unit.x > bounds.right + margin || unit.y < bounds.top - margin || unit.y > bounds.bottom + margin) continue;
+      add(unit);
+      if (ids.length >= detailLimit) break;
+    }
+  }
+  const clusters = [];
+  if (strategic) {
+    for (const [key, cell] of game._v94MiniCells || []) {
+      const cx = key & 255, cy = key >> 8;
+      const centerX = (cx + 0.5) * 360, centerY = (cy + 0.5) * 360;
+      if (centerX < bounds.left - 360 || centerX > bounds.right + 360 || centerY < bounds.top - 360 || centerY > bounds.bottom + 360) continue;
+      for (let bandIndex = 0; bandIndex < (cell.bands || []).length; bandIndex += 1) {
+        const band = cell.bands[bandIndex];
+        if (!band?.count) continue;
+        const team = bandIndex < 2 ? 'player' : bandIndex < 4 ? 'enemy' : 'neutral';
+        const air = (bandIndex % 2) === 1;
+        const x = (band.x || centerX * band.count) / band.count;
+        const y = (band.y || centerY * band.count) / band.count;
+        if (team === 'enemy' && !game.isVisibleAt(x, y)) continue;
+        clusters.push({ team, air, typeId: band.typeId, x, y, count: band.count, hp: 1, rotation: Math.atan2(band.dirY || 0, band.dirX || (team === 'enemy' ? -1 : 1)) });
+      }
+    }
+  }
+  return { unitIds: new Uint32Array(ids), clusters };
+}
+
+function dynamicDetails(force = false) {
+  const selected = new Set(mainView.selectedIds || []);
+  const bounds = mainView;
+  const margin = 420;
+  const records = [];
+  const max = game.units.length >= 16000 ? 1000 : 3000;
+  for (const unit of game.units) {
+    if (!unit.alive) continue;
+    const inView = bounds && unit.x >= bounds.left - margin && unit.x <= bounds.right + margin && unit.y >= bounds.top - margin && unit.y <= bounds.bottom + margin;
+    if (!force && !selected.has(unit.id) && !inView) continue;
+    records.push(serializeEntity(unit));
+    if (records.length >= max) break;
+  }
+  return records;
+}
+
+
+function buildingStateSignature165(building) {
+  return [
+    Math.round(finite(building.x) * 8), Math.round(finite(building.y) * 8), Math.round(finite(building.rotation) * 4096),
+    Math.round(finite(building.hp) * 10), Math.round(finite(building.maxHp, 1) * 10), Math.round(finite(building.construction, 1) * 1000),
+    Math.round(finite(building.weaponRotation) * 4096), Math.round(finite(building.desiredWeaponRotation) * 4096),
+    Math.round(finite(building.weaponCooldown) * 100), Math.round(finite(building.recoil) * 100),
+    Math.round(finite(building.captureProgress) * 1000), Math.round(finite(building.sabotagedUntil) * 10), Math.round(finite(building.compromisedUntil) * 10),
+    TEAM_CODES[building.team] || 0, idNumber(building.weaponTargetId), building.queue?.length || 0, building.completed ? 1 : 0
+  ].join(',');
+}
+
+function buildingDetailSignature165(building) {
+  const authority203 = self.__FD_RECON_MEMORY_QUEUE_203__;
+  if (!authority203?.queueSignature) throw new Error('Build 203 production queue authority is unavailable');
+  const logistics = building.logistics206 || null;
+  const stock = logistics?.stock || null;
+  const imported = logistics?.importBuffer || null;
+  return [
+    authority203.queueSignature(building), logistics?.priority || '', logistics?.nodeType || '',
+    Math.round((stock?.fuel || 0) * 10), Math.round((stock?.ammo || 0) * 10), Math.round((stock?.support || 0) * 10),
+    Math.round((imported?.fuel || 0) * 10), Math.round((imported?.ammo || 0) * 10),
+    Math.round((building.resourceBuffer83 || 0) * 10), building.resourceType206 || ''
+  ].join('|');
+}
+
+function sendBuildingState165(force = false) {
+  if (!game) return;
+  const tick = game.simTick || 0;
+--- serialize #7 offset=169039 line=1156 ---
+    Math.round(finite(building.captureProgress) * 1000), Math.round(finite(building.sabotagedUntil) * 10), Math.round(finite(building.compromisedUntil) * 10),
+    TEAM_CODES[building.team] || 0, idNumber(building.weaponTargetId), building.queue?.length || 0, building.completed ? 1 : 0
+  ].join(',');
+}
+
+function buildingDetailSignature165(building) {
+  const authority203 = self.__FD_RECON_MEMORY_QUEUE_203__;
+  if (!authority203?.queueSignature) throw new Error('Build 203 production queue authority is unavailable');
+  const logistics = building.logistics206 || null;
+  const stock = logistics?.stock || null;
+  const imported = logistics?.importBuffer || null;
+  return [
+    authority203.queueSignature(building), logistics?.priority || '', logistics?.nodeType || '',
+    Math.round((stock?.fuel || 0) * 10), Math.round((stock?.ammo || 0) * 10), Math.round((stock?.support || 0) * 10),
+    Math.round((imported?.fuel || 0) * 10), Math.round((imported?.ammo || 0) * 10),
+    Math.round((building.resourceBuffer83 || 0) * 10), building.resourceType206 || ''
+  ].join('|');
+}
+
+function sendBuildingState165(force = false) {
+  if (!game) return;
+  const tick = game.simTick || 0;
+  if (!force && tick - lastBuildingStateTick165 < 5) return;
+  lastBuildingStateTick165 = tick;
+  const alive = game.buildings.filter(building => building.alive);
+  const changed = [];
+  const details = [];
+  const aliveIds = new Set();
+  for (const building of alive) {
+    aliveIds.add(building.id);
+    const sig = buildingStateSignature165(building);
+    if (force || buildingStateCache165.get(building.id) !== sig) {
+      buildingStateCache165.set(building.id, sig);
+      changed.push(building);
+    }
+    const detailSig = buildingDetailSignature165(building);
+    if (force || buildingDetailCache165.get(building.id) !== detailSig) {
+      buildingDetailCache165.set(building.id, detailSig);
+      details.push(serializeEntity(building));
+    }
+  }
+  for (const id of [...buildingStateCache165.keys()]) if (!aliveIds.has(id)) buildingStateCache165.delete(id);
+  for (const id of [...buildingDetailCache165.keys()]) if (!aliveIds.has(id)) buildingDetailCache165.delete(id);
+  if (!force && !changed.length && !details.length) return;
+  const ids = new Uint32Array(changed.length);
+  const floats = new Float32Array(changed.length * BUILDING_FLOAT_STRIDE);
+  const ints = new Int32Array(changed.length * BUILDING_INT_STRIDE);
+  for (let index = 0; index < changed.length; index += 1) {
+    const building = changed[index], f = index * BUILDING_FLOAT_STRIDE, n = index * BUILDING_INT_STRIDE;
+    ids[index] = idNumber(building.id);
+    floats[f] = finite(building.x); floats[f+1] = finite(building.y); floats[f+2] = finite(building.rotation);
+    floats[f+3] = finite(building.hp); floats[f+4] = finite(building.maxHp, 1); floats[f+5] = finite(building.construction, 1);
+    floats[f+6] = finite(building.weaponRotation); floats[f+7] = finite(building.desiredWeaponRotation); floats[f+8] = finite(building.weaponCooldown);
+    floats[f+9] = finite(building.recoil); floats[f+10] = finite(building.captureProgress); floats[f+11] = finite(building.sabotagedUntil); floats[f+12] = finite(building.compromisedUntil);
+    ints[n] = TEAM_CODES[building.team] || 0; ints[n+1] = 1; ints[n+2] = idNumber(building.weaponTargetId);
+    ints[n+3] = building.queue?.length || 0; ints[n+4] = building.completed ? 1 : 0;
+  }
+  const bytes165 = ids.byteLength + floats.byteLength + ints.byteLength;
+  postMessage({ type: 'buildingState165', sequence: ++buildingStateSequence165, tick, buildingIds: ids, buildingFloats: floats, buildingInts: ints, details, bytes165 }, [ids.buffer, floats.buffer, ints.buffer]);
+}
+
+function sendMinimapState165(force = false) {
+--- serialize #9 offset=172206 line=1209 ---
+    ints[n] = TEAM_CODES[building.team] || 0; ints[n+1] = 1; ints[n+2] = idNumber(building.weaponTargetId);
+    ints[n+3] = building.queue?.length || 0; ints[n+4] = building.completed ? 1 : 0;
+  }
+  const bytes165 = ids.byteLength + floats.byteLength + ints.byteLength;
+  postMessage({ type: 'buildingState165', sequence: ++buildingStateSequence165, tick, buildingIds: ids, buildingFloats: floats, buildingInts: ints, details, bytes165 }, [ids.buffer, floats.buffer, ints.buffer]);
+}
+
+function sendMinimapState165(force = false) {
+  if (!game) return;
+  const tick = game.simTick || 0;
+  if (!force && tick - lastMinimapStateTick165 < 5) return;
+  lastMinimapStateTick165 = tick;
+  const visible = game.visible.slice();
+  const explored = game.explored.slice();
+  const miniCells = makeMiniCells();
+  const bytes165 = visible.byteLength + explored.byteLength + miniCells.length * 40;
+  postMessage({ type: 'minimapState165', sequence: ++minimapStateSequence165, tick, visible, explored, miniCells, bytes165 }, [visible.buffer, explored.buffer]);
+}
+
+function makeSnapshot(force = false, simMs = 0) {
+  if (!game) return;
+  const tick = game.simTick || Math.round(game.time * SIM_HZ);
+  const aliveEntities = new Set();
+  const createdEntities = [];
+  for (const entity of [...game.units, ...game.buildings, ...game.resources]) {
+    if (!entity.alive) continue;
+    aliveEntities.add(entity.id);
+    if (!knownEntities.has(entity.id)) createdEntities.push(serializeEntity(entity));
+  }
+  const removedEntities = [...knownEntities].filter(id => !aliveEntities.has(id));
+  knownEntities = aliveEntities;
+
+  const aliveProjectiles = new Set();
+  const createdProjectiles = [];
+  for (const projectile of game.projectiles) {
+    if (!projectile.alive) continue;
+    aliveProjectiles.add(projectile.id);
+    if (!knownProjectiles.has(projectile.id)) createdProjectiles.push(serializeProjectile(projectile));
+  }
+  const removedProjectiles = [...knownProjectiles].filter(id => !aliveProjectiles.has(id));
+  knownProjectiles = aliveProjectiles;
+
+  const render = renderPayload();
+  const renderNumbers = new Set(render.unitIds);
+  const selectedNumbers = new Set((mainView.selectedIds || []).map(idNumber));
+  const allAliveUnits = game.units.filter(unit => unit.alive);
+  let units;
+  if (multiplayer.active || force || allAliveUnits.length < 3000) units = allAliveUnits;
+  else {
+    const cap = allAliveUnits.length >= 40000 ? 1400 : allAliveUnits.length >= 12000 ? 1900 : 2600;
+    const chosen = [], seen = new Set();
+    const add = unit => { if (!unit?.alive || seen.has(unit.id) || chosen.length >= cap) return; seen.add(unit.id); chosen.push(unit); };
+    for (const unit of allAliveUnits) {
+      const number = idNumber(unit.id);
+      const recent = game.time - Math.max(unit.lastDamagedAt || -999, unit.lastShotAt || -999) < 3;
+      if (renderNumbers.has(number) || selectedNumbers.has(number) || recent || unit.airServiceState) add(unit);
+    }
+    const cold = allAliveUnits.length >= 40000 ? 420 : allAliveUnits.length >= 12000 ? 650 : 900;
+    const offset = allAliveUnits.length ? ((tick * cold) % allAliveUnits.length) : 0;
+    for (let i = 0; i < allAliveUnits.length && i < cold * 2 && chosen.length < cap; i += 1) add(allAliveUnits[(offset + i) % allAliveUnits.length]);
+    units = chosen;
+  }
+  const aliveProjectiles165 = game.projectiles.filter(projectile => projectile.alive);
+  const sharedSlot165 = reserveSharedSlot165(units.length, aliveProjectiles165.length, render.unitIds.length);
+  const unitBase165 = sharedSlot165 >= 0 ? sharedSlot165 * shared165.maxUnits : 0;
+  const unitIds = sharedSlot165 >= 0 ? shared165.unitIds.subarray(unitBase165, unitBase165 + units.length) : new Uint32Array(units.length);
+--- serialize #10 offset=182221 line=1320 ---
+    type: 'snapshot', version: VERSION, build: BUILD, sequence: sequence165, wallClock165: Date.now(),
+    tick, time: game.time, simMs, stateHash: lastStateHash, subsystemHashes: lastSubsystemHashes, networkHash, networkHashTick: lastNetworkHashTick, networkLogisticsHash206: lastNetworkLogisticsHash206, networkLogisticsComponents206: lastNetworkLogisticsComponents206, networkBaseComponents206: lastNetworkBaseComponents206, initialNetworkHash206, initialNetworkLogisticsHash206, initialNetworkLogisticsComponents206, initialNetworkBaseComponents206, appliedSeq: multiplayer.appliedSeq || 0, rngSeed: game.rng?.seed || game.seed,
+    counts: { units: allAliveUnits.length, buildings: buildings.length, resources: resources.length, projectiles: projectiles.length },
+    counters: { idCounter: game.idCounter, projectileCounter: game.projectileCounter, formationCounter: game.formationCounter },
+    unitIds: sharedSlot165 >= 0 ? null : unitIds, unitFloats: sharedSlot165 >= 0 ? null : unitFloats, unitInts: sharedSlot165 >= 0 ? null : unitInts,
+    buildingIds: null, buildingFloats: null, buildingInts: null, resourceIds, resourceFloats,
+    projectileIds: sharedSlot165 >= 0 ? null : projectileIds, projectileFloats: sharedSlot165 >= 0 ? null : projectileFloats, projectileInts: sharedSlot165 >= 0 ? null : projectileInts,
+    renderUnitIds: sharedSlot165 >= 0 ? null : render.unitIds, sharedSlot165, sharedFallbacks165, clusters: render.clusters,
+    createdEntities: structureDue ? createdEntities : [], removedEntities: structureDue ? removedEntities : [],
+    createdProjectiles: structureDue ? createdProjectiles : [], removedProjectiles: structureDue ? removedProjectiles : [],
+    details: detailsDue ? dynamicDetails(force) : [],
+    visible: null, explored: null, miniCells: null,
+    teams: {
+      player: game.serializeTeam(game.teams.player), enemy: game.serializeTeam(game.teams.enemy)
+    },
+    stats: plainClone(game.stats), objective: game.objective,
+    formations: (force || tick % 8 === 0) ? [...(game.formations || new Map()).values()].map(group => plainClone(group)) : null,
+    operationalCore160: (force || tick % 25 === 0) ? (() => { const data = game.operationalCore160?.serialize?.() || null; if (data) { data.commandLog = (data.commandLog || []).slice(-128); data.hashHistory = (data.hashHistory || []).slice(-32); } return data; })() : null,
+    logistics206: (force || tick % 25 === 0) ? (game.exportLogistics206?.() || null) : null,
+    abilityZones: (force || tick % 8 === 0) ? game.abilityZones.filter(zone => zone.alive).map(zone => zone.serialize?.() || plainClone(zone)) : null,
+    spyCells: (force || tick % 12 === 0) ? plainClone(game.spyCells) : null,
+    minefields141: (force || tick % 8 === 0) ? plainClone(game.minefields141 || game.mineFields141 || []) : null,
+    effects: effectEvents.splice(0), alerts: alertEvents.splice(0), endEvent: endEvent ? { ...endEvent } : null,
+    performance: {
+      ticksExecuted, averageTickMs: ticksExecuted ? totalTickMs / ticksExecuted : 0,
+      maxTickMs, uptimeMs: performance.now() - workerStartedAt, actionQueue: actionQueue.length,
+      snapshotBytes: (sharedSlot165 >= 0 ? 0 : unitIds.byteLength + unitFloats.byteLength + unitInts.byteLength + projectileIds.byteLength + projectileFloats.byteLength + projectileInts.byteLength + render.unitIds.byteLength) + resourceIds.byteLength + resourceFloats.byteLength, transport165: sharedSlot165 >= 0 ? 'shared-triple' : 'transfer-fallback', combat166: game.combatScaleDiagnostics166?.() || null, deep182: game.deepOperationsDiagnostics182?.() || null, formation183: game.formationMarchDiagnostics183?.() || null, fortress183: game.fortressDefenseDiagnostics183?.() || null, action184: game.actionGroupDiagnostics184?.() || null, objective184: game.constructionVictoryDiagnostics184?.() || null
+
+### NEEDLE save count_sample=10
+--- save #2 offset=126640 line=297 ---
+  const data = entity.serialize ? entity.serialize() : plainClone(entity);
+  if (entity.kind === 'unit') {
+    Object.assign(data, {
+      visualSpeed: finite(entity.visualSpeed),
+      flightAltitude: finite(entity.flightAltitude ?? entity.altitude),
+      airBank: finite(entity.airBank),
+      airPitch: finite(entity.airPitch),
+      embarkedIn: entity.embarkedIn || null,
+      cargoUnits: Array.isArray(entity.cargoUnits) ? [...entity.cargoUnits] : undefined,
+      transportReserved: finite(entity.transportReserved),
+      airOrbitCenter: plainClone(entity.airOrbitCenter),
+      airOrbitAngle: finite(entity.airOrbitAngle),
+      airServiceState: entity.airServiceState || null,
+      airServiceTargetId: entity.airServiceTargetId || null,
+      airAmmo: Number.isFinite(entity.airAmmo) ? entity.airAmmo : null,
+      airAmmoMax: Number.isFinite(entity.airAmmoMax) ? entity.airAmmoMax : null,
+      sortieFuel: Number.isFinite(entity.sortieFuel) ? entity.sortieFuel : null,
+      sortieFuelMax: Number.isFinite(entity.sortieFuelMax) ? entity.sortieFuelMax : null,
+      suppression160: finite(entity.suppression160), cohesion160: finite(entity.cohesion160, 1),
+      supply160: finite(entity.supply160, 1), morale160: finite(entity.morale160, 1),
+      functionalDamage160: plainClone(entity.functionalDamage160),
+      v160Retreating: Boolean(entity._v160Retreating)
+    });
+  } else if (entity.kind === 'building') {
+    Object.assign(data, {
+      buildProgress: finite(entity.buildProgress ?? entity.construction, 1),
+      queue: plainClone(entity.queue), rallyPoint: plainClone(entity.rallyPoint),
+      recoil: finite(entity.recoil), weaponRotation: finite(entity.weaponRotation),
+      desiredWeaponRotation: finite(entity.desiredWeaponRotation)
+    });
+  }
+  return data;
+}
+
+function captureSaveData() {
+  if (!game || !legacySave) return null;
+  const previous = D.storageGet(D.SAVE_KEY);
+  let data = null;
+  try {
+    legacySave.call(game, false);
+    const raw = D.storageGet(D.SAVE_KEY);
+    data = raw ? JSON.parse(raw) : null;
+  } finally {
+    if (previous == null) localStorage.removeItem(D.SAVE_KEY);
+    else D.storageSet(D.SAVE_KEY, previous);
+  }
+  if (!data) return null;
+  data.authoritative172 = {
+    version: VERSION,
+    build: BUILD,
+    simTick: game.simTick || Math.round(game.time * SIM_HZ),
+    rngSeed: game.rng?.seed ?? game.seed,
+    projectiles: game.projectiles.filter(projectile => projectile.alive).map(serializeProjectile),
+    paused: false,
+    idCounter: game.idCounter,
+    projectileCounter: game.projectileCounter,
+    formationCounter: game.formationCounter,
+    stateHash: stateHash()
+  };
+  data.logistics206 = game.exportLogistics206?.() || null;
+  data.workerTransient206 = game.exportWorkerTransient206?.() || null;
+  if (data.authoritative172) data.authoritative172.networkAppliedSeq206 = Number(multiplayer.appliedSeq || 0);
+  data.savedAt = Date.now();
+  return data;
+}
+
+function canonicalTeamCode(team) {
+  const local = TEAM_CODES[team] || 0;
+  if (!multiplayer.perspectiveSwapped || local === 0) return local;
+  return local === 1 ? 2 : 1;
+}
+
+function computeSubsystemHashes(force = false) {
+  const tick = game?.simTick || 0;
+  if (!force && lastSubsystemHashes && tick - lastHashTick < 25) return lastSubsystemHashes;
+  lastSubsystemHashes = game?.operationalCore160?.subsystemHashes?.() || { units: 0, buildings: 0, projectiles: 0, economy: 0, operations: 0, sectors: 0 };
+  let hash = 2166136261 >>> 0;
+  for (const key of ['units','buildings','projectiles','economy','operations','sectors','logistics206']) {
+    hash ^= lastSubsystemHashes[key] >>> 0;
+--- save #10 offset=141754 line=587 ---
+      if ('ownerTeam' in item) item.ownerTeam = item.ownerTeam === 'player' ? 'enemy' : item.ownerTeam === 'enemy' ? 'player' : item.ownerTeam;
+    }
+  }
+}
+
+function withEventPerspective(event, operation) {
+  if (!multiplayer.active || multiplayer.mode !== 'versus') return operation();
+  const canonicalEnemy = event?.team === 'enemy';
+  const needsSwap = canonicalEnemy !== Boolean(multiplayer.perspectiveSwapped);
+  if (!needsSwap) return operation();
+  swapPerspective();
+  try { return operation(); }
+  finally { swapPerspective(); }
+}
+
+function installHeadlessRuntime(instance) {
+  instance.resize = () => {};
+  instance.showHud = () => {};
+  instance.hideHud = () => {};
+  instance.updateUI = () => {};
+  instance.render = () => {};
+  instance.renderMinimap = () => {};
+  instance.renderSelectionUI = () => {};
+  instance.renderActionUI = () => {};
+  instance.renderPowersUI = () => {};
+  instance.updateCamera = () => {};
+  instance.centerCamera = (x, y) => { instance.camera.x = x; instance.camera.y = y; };
+  instance.sound = { ensure(){}, click(){}, build(){}, alert(){}, shot(){}, explosion(){} };
+  const originalAddEffect = instance.addEffect.bind(instance);
+  instance.addEffect = effect => {
+    originalAddEffect(effect);
+    const copy = plainClone(effect);
+    if (copy) effectEvents.push(copy);
+  };
+  instance.alert = (message, type = 'info', x = null, y = null) => {
+    alertEvents.push({ message: String(message), alertType: type, x: finite(x, null), y: finite(y, null), at: instance.time });
+    if (alertEvents.length > 96) alertEvents.splice(0, 32);
+    return true;
+  };
+  instance.endGame = victory => {
+    if (instance.ended) return false;
+    instance.ended = true;
+    instance.paused = true;
+    endEvent = { victory: Boolean(victory), time: instance.time, stats: plainClone(instance.stats) };
+    return true;
+  };
+  legacySave = instance.save;
+  instance.save = (notify = true) => {
+    const data = captureSaveData();
+    if (data) postMessage({ type: 'saveData', data, notify: Boolean(notify), autosave: !notify });
+    return Boolean(data);
+  };
+  const oldCoreWorker = instance.operationalCore160?.worker;
+  try { oldCoreWorker?.terminate?.(); } catch (_) {}
+  if (instance.operationalCore160) {
+    instance.operationalCore160.worker = null;
+    instance.operationalCore160.workerReady = false;
+    instance.operationalCore160.sendWorker = () => {};
+  }
+}
+
+function restoreProjectiles(items) {
+  game.projectiles.length = 0;
+  for (const data of items || []) {
+    try {
+      const projectile = new D.Projectile(game, { ...data, preserveAim: true });
+      projectile.age = finite(data.age);
+      projectile.ttl = finite(data.ttl, projectile.ttl);
+      projectile.altitude = finite(data.altitude, projectile.altitude);
+      projectile.angle = finite(data.angle, projectile.angle);
+      projectile.hp = finite(data.hp, projectile.hp);
+      projectile.alive = data.alive !== false;
+      projectile.intercepted = Boolean(data.intercepted);
+      projectile.guidanceLost = Boolean(data.guidanceLost);
+      game.projectiles.push(projectile);
+    } catch (error) {
+      console.warn('[v16.3 worker] projectile restore failed', error);
+    }
+  }
+}
+
+function canonicalFreshNetworkLogistics206(saveData, multiplayerState) {
+  if (!saveData || !multiplayerState?.active || saveData.__mp) return saveData;
+
+  // The lobby creates host and guest games independently before their
+  // authoritative Workers launch.  Build-206 modules may have had a few local
+  // presentation/startup ticks in that interval.  Persisting those locally
+  // accumulated logistics fields would make otherwise identical Workers start
+  // with different Fuel/Ammo/Support, sampling coordinates or support costs.
+
+### NEEDLE load count_sample=10
+--- load #1 offset=3186 line=54 ---
+ation-resilience-v200.js?build=206');
+importScripts('/frontline-dominion/group-movement-v201.js?build=206');
+importScripts('/frontline-dominion/command-power-authority-v202.js?build=206');
+importScripts('/frontline-dominion/recon-memory-production-v203.js?build=206');
+importScripts('/frontline-dominion/logistics-core-v206.js?build=206');
+importScripts('/frontline-dominion/economic-buildings-v206.js?build=206');
+importScripts('/frontline-dominion/resource-economy-v206.js?build=206');
+importScripts('/frontline-dominion/supply-transport-v206.js?build=206');
+importScripts('/frontline-dominion/unit-sustainment-v206.js?build=206');
+importScripts('/frontline-dominion/air-logistics-v206.js?build=206');
+importScripts('/frontline-dominion/production-logistics-v206.js?build=206');
+importScripts('/frontline-dominion/authoritative-logistics-v206.js?build=206');
+importScripts('/frontline-dominion/ai-logistics-v206.js?build=206');
+importScripts('/frontline-dominion/resync-continuity-v206.js?build=206');
+
+const D = self.__FD_DEBUG__;
+if (!D?.Game || !D?.Unit || !D?.Building || !D?.ResourceNode || !D?.Projectile) {
+  throw new Error('Authoritative engine bundle did not expose the game classes');
+}
+
+const BUILD = 206;
+const VERSION = '16.9.0';
+const SIM_HZ = 25;
+const SIM_DT = 1 / SIM_HZ;
+const UNIT_FLOAT_STRIDE = 22;
+const UNIT_INT_STRIDE = 8;
+const BUILDING_FLOAT_STRIDE = 13;
+const BUILDING_INT_STRIDE = 5;
+const RESOURCE_FLOAT_STRIDE = 5;
+const PROJECTILE_FLOAT_STRIDE = 13;
+const PROJECTILE_INT_STRIDE = 6;
+const COMMAND_CODES = Object.freeze({
+  '': 0, move: 1, attack: 2, attackMove: 3, patrol: 4, hold: 5, harvest: 6,
+  repair: 7, heal: 8, build: 9, capture: 10, infiltrate: 11, infiltrateBuilding: 12,
+  guard: 13, formation: 14, airHangar93: 15, airService: 16, returnToAirfield: 17,
+  loadTransport: 18, unloadTransport: 19, mineField: 20, returnPost132: 21, logistics206: 22
+});
+const TEAM_CODES = Object.freeze({ neutral: 0, player: 1, enemy: 2 });
+const SERVICE_CODES = Object.freeze({ '': 0, approach: 1, landing: 2, servicing: 3, launch: 4, hangar: 5, ready: 6 });
+
+
+// Build 206 deterministic authoritative unit simulation cadence.
+// Network physics may not depend on local camera/render visibility. Any unit
+// executing a command advances at full fixed-tick rate; inactive cohorts keep
+// deterministic simulation LOD for large-army scalability.
+const baseUnitSimLod206 = D.Game.prototype.unitSimLodV9;
+if (typeof baseUnitSimLod206 === 'function') {
+  D.Game.prototype.unitSimLodV9 = function deterministicNetworkLod206(unit) {
+    if (!multiplayer.active) return baseUnitSimLod206.call(this, unit);
+    if (!unit?.alive || unit.embarkedIn) return 3;
+    const command = unit.currentCommand;
+    const recentDamage = this.time - (unit.lastDamagedAt || -999) < 2.2;
+    const recentShot = this.time - (unit.lastShotAt || -999) < 1.0;
+    const hasCombatTarget = Boolean(
+      unit.weaponTargetId || command?.combatTargetId || command?.engagedTargetId ||
+      (command?.type === 'attack' && command?.targetId)
+    );
+    if (recentDamage || recentShot || hasCombatTarget || command) return 0;
+    if (unit.aiSquadId || unit.air) return 2;
+    return 3;
+  };
+  Object.defineProperty(D.Game.prototype.unitSimLodV9, '__fdDeterministicNetworkLod206', { value: true });
+}
+
+
+// Multiplayer physics must not depend on asynchronous model-manifest timing.
+// Freeze every unit collision/model footprint from the assembled build manifest
+// synchronously before the first authoritative simulation tick.
+const deterministicUnitGeometry206 = {"aa":{"modelBoundsMeters":[8.5,3.9,4.55],"mod
+--- load #4 offset=146041 line=676 ---
+    for (const teamKey of ['player', 'enemy']) {
+      const team = saveData.teams?.[teamKey];
+      const ledger = rootLogistics.team?.[teamKey];
+      if (!team || !ledger) continue;
+      const spent = Math.max(0, Number(ledger.supportSpent) || 0) + Math.max(0, Number(ledger.importSpent) || 0);
+      if (spent > 0) team.credits = (Number(team.credits) || 0) + spent;
+    }
+  }
+  delete saveData.logistics206;
+
+  const visited = new Set();
+  for (const collection of [saveData.entities, saveData.units, saveData.buildings]) {
+    if (!Array.isArray(collection)) continue;
+    for (const raw of collection) {
+      if (!raw || typeof raw !== 'object' || visited.has(raw)) continue;
+      visited.add(raw);
+      delete raw.logistics206;
+      delete raw.resourceType206;
+      delete raw.resourceBufferMax206;
+      // resourceBuffer83 is a physical extractor output buffer.  A fresh
+      // network match starts it from the canonical empty state; production
+      // after Worker tick zero remains fully physical and deterministic.
+      if (Number.isFinite(raw.resourceBuffer83)) raw.resourceBuffer83 = 0;
+    }
+  }
+  return saveData;
+}
+
+function initGame(message) {
+  const saveData = canonicalFreshNetworkLogistics206(message.saveData || null, message.multiplayer || {});
+  attachShared165(message.shared165 || null);
+  multiplayer = { ...multiplayer, ...(message.multiplayer || {}), hostTickReceivedAt: performance.now(), appliedSeq: Number(message.multiplayer?.appliedSeq) || 0 };
+  /* Constructor UI methods are replaced before instantiation. */
+  for (const method of ['resize','showHud','hideHud','updateUI','render','renderMinimap','renderSelectionUI','renderActionUI','renderPowersUI']) {
+    D.Game.prototype[method] = function noopHeadless() {};
+  }
+  const options = saveData ? {
+    loadData: saveData,
+    faction: saveData.teams?.player?.faction,
+    enemyFaction: saveData.teams?.enemy?.faction,
+    difficulty: saveData.difficultyKey,
+    seed: saveData.seed
+  } : {
+    faction: message.faction || 'vanguard',
+    enemyFaction: message.enemyFaction || 'dominion',
+    difficulty: message.difficulty || 'normal',
+    seed: Number(message.seed) || 123456
+  };
+  game = new D.Game(options);
+  installHeadlessRuntime(game);
+  if (multiplayer.active && multiplayer.mode === 'versus') {
+    if (game.ai) game.ai.update = () => undefined;
+    game.updateEnemyStrategicArsenal = () => undefined;
+  }
+  const extension = message.authoritative || saveData?.authoritative172 || {};
+  if (Number.isFinite(extension.rngSeed) && game.rng) game.rng.seed = extension.rngSeed >>> 0;
+  game.simTick = Number.isFinite(extension.simTick) ? extension.simTick : Math.round(game.time * SIM_HZ);
+  game.idCounter = Math.max(game.idCounter || 1, extension.idCounter || 1);
+  game.projectileCounter = Math.max(game.projectileCounter || 1, extension.projectileCounter || 1);
+  game.formationCounter = Math.max(game.formationCounter || 1, extension.formationCounter || 1);
+  restoreProjectiles(message.projectiles || extension.projectiles || []);
+  game.paused = false;
+  paused = Boolean(message.paused);
+  manualMode = Boolean(message.manual);
+  knownEntities = new Set();
+  knownProjectiles = new Set();
+  actionQueue = [];
+  effectEvents = [];
+  alertEvents = [];
+  endEvent = null;
+  lastSnapshotTick = -1;
+  lastStructureTick = -1;
+  lastFogTick = -1;
+  lastMiniTick = -1;
+  lastDetailsTick = -1;
+  lastBuildingStateTick165 = -1;
+  lastMinimapStateTick165 = -1;
+  buildingStateSequence165 = 0;
+  minimapStateSequence165 = 0;
+  buildingStateCache165 = new Map();
+  buildingDetailCache165 = new Map();
+  sharedFallbacks165 = 0;
+--- load #8 offset=150917 line=775 ---
+  if (!game?.renderSnapshot) return;
+  const units = game.units;
+  const count = units.length;
+  const cadence = count >= 50000 ? 5 : count >= 20000 ? 4 : count >= 8000 ? 2 : 1;
+  if (hotSetRefreshTick173 >= 0 && (game.simTick - hotSetRefreshTick173) < cadence) return;
+  hotSetRefreshTick173 = game.simTick;
+  const cap = count >= 50000 ? 128 : count >= 20000 ? 160 : count >= 8000 ? 300 : count >= 3000 ? 720 : Math.min(2200, count);
+  const out = game.renderSnapshot.units || (game.renderSnapshot.units = []);
+  out.length = 0;
+  const stamp = (game.simTick || 0) + 1;
+  const add = unit => {
+    if (!unit?.alive || unit.embarkedIn || unit._fdHotStamp173 === stamp || out.length >= cap) return;
+    unit._fdHotStamp173 = stamp; out.push(unit);
+  };
+  /* Camera and selection never participate. Combat, air missions and specialist tasks do. */
+  for (let i = 0; i < count && out.length < cap; i += 1) {
+    const unit = units[i];
+    const recent = game.time - Math.max(unit.lastDamagedAt || -999, unit.lastShotAt || -999) < 3;
+    const command = unit.currentCommand?.type || '';
+    if (recent || unit.air || /repair|build|harvest|capture|infiltrate|air|transport|mine/i.test(command)) add(unit);
+  }
+  const start = count ? ((game.simTick * Math.max(1, cap)) % count) : 0;
+  for (let offset = 0; offset < count && out.length < cap; offset += 1) add(units[(start + offset) % count]);
+  game.selected.length = 0;
+}
+
+function applyAction(event) {
+  if (!game || !event) return false;
+  const payload = event.payload || {};
+  const selected = (event.selectedIds || []).map(id => game.getEntity(id)).filter(entity => entity?.alive);
+  const previous = game.selected;
+  game.selected = selected;
+  for (const entity of selected) entity.selected = true;
+  const target = payload.targetId ? game.getEntity(payload.targetId) : null;
+  let result = false;
+  try {
+    result = withEventPerspective(event, () => {
+    if (payload.formationSettings && typeof payload.formationSettings === 'object') {
+      game.formationSettings = plainClone(payload.formationSettings);
+    }
+    switch (event.action) {
+      case 'move': {
+        result = game.issueMove(payload.x, payload.y, payload.append);
+        if (result !== false) {
+          const tagged197 = self.__FD_FORMATION_TARGET_FIDELITY_197__?.tagIssuedOrder?.(
+            game,
+            event.selectedIds || [],
+            { x: payload.x, y: payload.y },
+            payload.append
+          ) || 0;
+          if (!tagged197) throw new Error('Build 197 move target was not attached to authoritative commands');
+        }
+        break;
+      }
+      case 'attack': result = target ? game.issueAttack(target, payload.append) : false; break;
+      case 'attackMove': {
+        result = game.issueAttackMove(payload.x, payload.y, payload.append);
+        if (result !== false) {
+          const tagged197 = self.__FD_FORMATION_TARGET_FIDELITY_197__?.tagIssuedOrder?.(
+            game,
+            event.selectedIds || [],
+            { x: payload.x, y: payload.y },
+            payload.append
+          ) || 0;
+          if (!tagged197) throw new Error('Build 197 attack-move target was not attached to authoritative commands');
+        }
+        break;
+      }
+      case 'patrol': result = game.issuePatrol(payload.x, payload.y, payload.append); break;
+      case 'stop': result = game.issueStop(); break;
+      case 'hold': result = game.issueHold(); break;
+      case 'fireDiscipline177': result = game.issueFireDiscipline177?.(payload.mode); break;
+      case 'orientedMove': result = game.issueOrientedMove78?.(payload.x, payload.y, payload.angle, payload.append); break;
