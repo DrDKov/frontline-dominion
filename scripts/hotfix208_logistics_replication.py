@@ -34,10 +34,34 @@ if single.count(old_fuel_store) != 1:
 single = single.replace(old_fuel_store, new_fuel_store, 1)
 SINGLEPLAYER207.write_text(single, 'utf-8')
 
+supply = SUPPLY.read_text('utf-8')
+
+# A manual mission change must not reinterpret arbitrary leftover cargo as the
+# correct manifest for the new mission. Preserve the cargo physically, return
+# it to the source that loaded it, then plan/load the new mission. This prevents
+# e.g. a Fuel-heavy remainder from trapping a SUPPLY_GROUP mission in SERVICE
+# when its infantry recipients actually need Ammo/Support.
+old_return_block = "    if(s.missionType==='RETURN_TO_SOURCE') {\n      const src=game.getEntity?.(s.sourceNodeId||s.homeNodeId);if(!src?.alive){s.status='IDLE';return;}s.status='RETURNING';\n      if(moveTruck206(truck,src,dt,'logistics-return')){s.status='WAITING';}return;\n    }"
+new_return_block = "    if(s.missionType==='RETURN_TO_SOURCE') {\n      const src=game.getEntity?.(s.sourceNodeId||s.homeNodeId);if(!src?.alive){s.status='IDLE';return;}s.status=s.phase206==='REBALANCE208'?'REBALANCING':'RETURNING';\n      if(moveTruck206(truck,src,dt,'logistics-return')){\n        if(s.phase206==='REBALANCE208'){\n          let budget=UNLOAD_RATE*dt,moved=0;const node=L.ensureNode(src),ex=L.ensureExtractor(src);\n          for(const key of L.STOCK_KEYS){if(budget<=EPS)break;let amount=0;\n            if(node?.nodeType==='trade'&&node.importBuffer&&Number(s.cargo[key])>EPS){const available=Math.max(0,Number(s.cargo[key])||0);amount=L.round(Math.min(available,budget));node.importBuffer[key]=L.round((Number(node.importBuffer[key])||0)+amount);s.cargo[key]=L.round(available-amount);}\n            else if(node?.stock)amount=unloadToNode206(s,node,key,Math.min(Number(s.cargo[key])||0,budget));\n            else if(ex?.resourceType===key&&Number(s.cargo[key])>EPS){const max=Math.max(0,Number(src.resourceBufferMax206||src.stats?.bufferCapacity)||0),have=Math.max(0,Number(src.resourceBuffer83)||0),available=Math.max(0,Number(s.cargo[key])||0);amount=L.round(Math.min(available,Math.max(0,max-have),budget));if(amount>EPS){src.resourceBuffer83=L.round(have+amount);s.cargo[key]=L.round(available-amount);}}\n            budget-=amount;moved+=amount;\n          }\n          truck.cargo=L.round(L.manifestTotal(s.cargo));\n          if(truck.cargo<=EPS||moved<=EPS){const pending=s.pendingMission208;if(pending){s.pendingMission208=null;s.missionType=pending;s.phase206='PLAN';s.status='ASSIGNED';s.waitUntil206=0;}else{s.status='WAITING';}}\n        }else{s.status='WAITING';}\n      }return;\n    }"
+if supply.count(old_return_block) != 1:
+    raise RuntimeError(f'build 208 rebalance return anchor count={supply.count(old_return_block)}')
+supply = supply.replace(old_return_block, new_return_block, 1)
+
+old_mission_start = "    for(const id of ids){const truck=this.getEntity?.(id);if(!truck?.alive||!L.isTruck(truck))continue;const s=L.ensureUnit(truck,false);const mission=MISSIONS.includes(payload.missionType)?payload.missionType:'AUTO';\n      s.missionType=mission;"
+new_mission_start = "    for(const id of ids){const truck=this.getEntity?.(id);if(!truck?.alive||!L.isTruck(truck))continue;const s=L.ensureUnit(truck,false);const mission=MISSIONS.includes(payload.missionType)?payload.missionType:'AUTO';const previousMission208=s.missionType;\n      s.missionType=mission;"
+if supply.count(old_mission_start) != 1:
+    raise RuntimeError(f'build 208 mission previous-state anchor count={supply.count(old_mission_start)}')
+supply = supply.replace(old_mission_start, new_mission_start, 1)
+
+old_mission_phase = "      s.phase206=L.manifestTotal(s.cargo)>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';\n      truck.commandQueue=[{type:'logistics206',missionType:mission}];truck.invalidateNavigation?.();changed+=1;"
+new_mission_phase = "      const rebalance208=previousMission208&&previousMission208!==mission&&L.manifestTotal(s.cargo)>EPS&&mission!=='RETURN_TO_SOURCE';\n      if(rebalance208){s.pendingMission208=mission;s.missionType='RETURN_TO_SOURCE';s.phase206='REBALANCE208';s.status='REBALANCING';}\n      else{s.pendingMission208=null;s.phase206=L.manifestTotal(s.cargo)>EPS?'TO_DEST':'PLAN';s.status='ASSIGNED';}\n      truck.commandQueue=[{type:'logistics206',missionType:s.missionType}];truck.invalidateNavigation?.();changed+=1;"
+if supply.count(old_mission_phase) != 1:
+    raise RuntimeError(f'build 208 mission rebalance anchor count={supply.count(old_mission_phase)}')
+supply = supply.replace(old_mission_phase, new_mission_phase, 1)
+
 # Mark only units that actually received physical resources. This gives the
 # presentation bridge a short replication window without making every unit a
 # permanent high-detail snapshot participant.
-supply = SUPPLY.read_text('utf-8')
 old_resupply = "if(moved>EPS){s.resupplySourceId=truck.id;s.resupplyProgress=L.clamp(s.resupplyProgress+dt*.45,0,1);unit.supply160=L.unitReadiness(unit).supply;}"
 new_resupply = "if(moved>EPS){s.resupplySourceId=truck.id;s.resupplyProgress=L.clamp(s.resupplyProgress+dt*.45,0,1);unit.supply160=L.unitReadiness(unit).supply;unit._fdLogisticsDetailUntil208=(Number(game.time)||0)+2.5;}"
 if supply.count(old_resupply) != 1:
@@ -77,4 +101,4 @@ if bridge.count(old_bridge_ack) != 1:
 bridge = bridge.replace(old_bridge_ack, new_bridge_ack, 1)
 BRIDGE.write_text(bridge, 'utf-8')
 
-print('Build 208 logistics replication fixed; legacy truck fuel bootstrap, protected replacement reserve and authoritative mission ACK diagnostics installed')
+print('Build 208 logistics replication fixed; legacy truck fuel bootstrap, protected replacement reserve, cargo rebalance and authoritative mission ACK diagnostics installed')
