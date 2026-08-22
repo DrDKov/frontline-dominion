@@ -88,6 +88,9 @@ jobs:
           grep -q 'runtime-ui-v207.js?build=207' dist/frontline-dominion.html
           grep -q 'runtime-shell-v207.js?build=207' dist/frontline-dominion.html
           grep -q 'save-slots-v207.js?build=207' dist/frontline-dominion.html
+          grep -q 'fd-boot-bridge207' dist/frontline-dominion.html
+          grep -q 'data-selection-tab="logistics"' dist/logistics-ui-v207.js
+          grep -q 'selection-logistics-pane' dist/logistics-ui-v207.js
           grep -q "importScripts('/frontline-dominion/singleplayer-gameplay-v207.js?build=207')" dist/authoritative-simulation-worker-v174.js
           grep -q 'Нефтеперерабатывающий комплекс' dist/singleplayer-gameplay-v207.js
           grep -q 'Железорудный рудник' dist/singleplayer-gameplay-v207.js
@@ -98,6 +101,7 @@ jobs:
           grep -q 'priority-up' dist/logistics-ui-v207.js
           python -m py_compile scripts/assemble207.py scripts/generate207_tests.py scripts/prepare207_singleplayer_release.py
           for file in dist/*.js; do node --check "$file"; done
+          node --check tests/worker207-bootstrap.mjs
           node --check tests/singleplayer207-regression.mjs
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
@@ -127,6 +131,7 @@ jobs:
           test "$ready" -eq 1
           GAME_URL="$BASE_URL/frontline-dominion.html?build=207"
           FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd207-invariants.log
+          FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs 2>&1 | tee /tmp/fd207-bootstrap.log
           FD_GAME_URL="$GAME_URL" node tests/singleplayer207-regression.mjs 2>&1 | tee /tmp/fd207-regression.log
           FD_GAME_URL="$GAME_URL" node tests/save-slots207.generated.mjs 2>&1 | tee /tmp/fd207-save.log
 
@@ -138,6 +143,7 @@ jobs:
           path: |
             /tmp/fd207-http.log
             /tmp/fd207-invariants.log
+            /tmp/fd207-bootstrap.log
             /tmp/fd207-regression.log
             /tmp/fd207-save.log
           if-no-files-found: ignore
