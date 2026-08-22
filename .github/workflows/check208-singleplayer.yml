@@ -106,6 +106,7 @@ jobs:
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics208-controls-v2.mjs
           node --check tests/construction208-all-buildings-v2.mjs
+          node --check tests/transport208-authority-diagnostic.mjs
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
 
@@ -117,7 +118,7 @@ jobs:
           python scripts/generate208_tests.py
           node --check tests/save-slots208.generated.mjs
 
-      - name: Physical build 208 gates
+      - name: Focused transport authority probe
         run: |
           set -euo pipefail
           mkdir -p smoke-root
@@ -133,12 +134,8 @@ jobs:
           done
           test "$ready" -eq 1
           GAME_URL="$BASE_URL/frontline-dominion.html?build=208"
-          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd208-invariants.log
-          FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs 2>&1 | tee /tmp/fd208-bootstrap.log
-          FD_GAME_URL="$GAME_URL" node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd208-air.log
-          FD_GAME_URL="$GAME_URL" node tests/logistics208-controls-v2.mjs 2>&1 | tee /tmp/fd208-logistics.log
-          FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings-v2.mjs 2>&1 | tee /tmp/fd208-construction.log
-          FD_GAME_URL="$GAME_URL" node tests/save-slots208.generated.mjs 2>&1 | tee /tmp/fd208-save.log
+          FD_GAME_URL="$GAME_URL" node tests/transport208-authority-diagnostic.mjs 2>&1 | tee /tmp/fd208-transport-probe.log
+          exit 1
 
       - name: Upload build 208 diagnostics
         if: always()
@@ -147,11 +144,6 @@ jobs:
           name: fd208-singleplayer-diagnostics
           path: |
             /tmp/fd208-http.log
-            /tmp/fd208-invariants.log
-            /tmp/fd208-bootstrap.log
-            /tmp/fd208-air.log
-            /tmp/fd208-logistics.log
-            /tmp/fd208-construction.log
-            /tmp/fd208-save.log
+            /tmp/fd208-transport-probe.log
           if-no-files-found: ignore
           retention-days: 3
