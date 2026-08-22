@@ -105,6 +105,15 @@ ready_new = (
 )
 once(ready_anchor, ready_new, 'replacement Worker buffered event flush')
 
+# Keep the Worker stack attached to the recovery reason. This is diagnostic
+# metadata only, but it makes a post-resync fatal point to the exact historical
+# module/line instead of collapsing to a generic TypeError message.
+once(
+    "    if (message.type === 'fatal') this.fail(`${message.stage || 'worker'}: ${message.message || 'фатальная ошибка'}`);\n",
+    "    if (message.type === 'fatal') this.fail(`${message.stage || 'worker'}: ${message.message || 'фатальная ошибка'}${message.stack ? `\\n${message.stack}` : ''}`);\n",
+    'bridge Worker fatal stack preservation',
+)
+
 BRIDGE.write_text(text, 'utf-8')
 
 mp = MP_GAME.read_text('utf-8')
