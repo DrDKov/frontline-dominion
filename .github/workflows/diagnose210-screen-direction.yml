@@ -1,6 +1,8 @@
 name: Diagnose build 210 screen direction
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [build210-screen-direction-fidelity]
     paths:
