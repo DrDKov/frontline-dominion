@@ -11,7 +11,16 @@
   const BUILD = 208;
   const VERSION = '16.9.2';
   const EPS = 1e-6;
-  const EXTRACTOR_MONEY = Object.freeze({ oilPump: 8, gasPump: 7 });
+  // Cover every extractor type known to the physical resource economy, including legacy save-compatible mines.
+  const EXTRACTOR_MONEY = Object.freeze({
+    oilPump: 8,
+    gasPump: 7,
+    mineralQuarry: 6,
+    oreMine: 7,
+    deepMine: 8,
+    coreDrill: 9,
+    ironMine: 7,
+  });
   const isWorkerRealm = typeof document === 'undefined';
   const isEngineer = unit => Boolean(unit?.alive !== false && unit.typeId === 'worker' && !unit.embarkedIn);
   const hashText = value => {
