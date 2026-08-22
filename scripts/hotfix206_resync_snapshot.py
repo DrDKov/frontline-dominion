@@ -1,4 +1,5 @@
 from pathlib import Path
+import runpy
 
 BRIDGE = Path('dist/authoritative-simulation-v174.js')
 if not BRIDGE.exists():
@@ -48,3 +49,8 @@ once(
 
 BRIDGE.write_text(text, 'utf-8')
 print('Build 206 resync snapshots bypass lossy presentation reserialization')
+
+# Keep Unit.update byte-for-byte on the deterministic legacy path. Finite
+# ammunition reconciliation belongs to a world post-phase, not inside each
+# unit's navigation/collision update.
+runpy.run_path('scripts/hotfix206_reload_phase.py', run_name='__main__')
