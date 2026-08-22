@@ -77,6 +77,37 @@ bridge=BRIDGE.read_text('utf-8')
 bridge=sub_once(bridge,r'const BUILD = 207;',f'const BUILD = {BUILD};','bridge BUILD')
 bridge=re.sub(r"const VERSION = '[^']+';",f"const VERSION = '{VERSION}';",bridge,count=1)
 bridge=bridge.replace('?build=207','?build=208').replace('fd:authoritative-save207','fd:authoritative-save208')
+# Inherited context routing relies only on the presentation spatial hit-test. An
+# unfinished friendly scaffold can be absent from/stale in that index even though
+# it is visibly present. For selected engineers, resolve a click inside the actual
+# building footprint directly from the mirrored building list and send targetId.
+# The Worker then reuses the normal context path with an explicit authoritative
+# target, so ordinary terrain/unit context semantics are unchanged.
+old_context="""wrapGameAction('issueContext', 'context', function([x,y,append]) {
+  const target = this.hitTestForContext?.(x,y) || this.hitTest?.(x,y,false);
+  return { x,y,append:Boolean(append),targetId:target?.id||null,formationSettings:clonePlain(this.formationSettings) };
+});"""
+new_context="""wrapGameAction('issueContext', 'context', function([x,y,append]) {
+  let engineerTarget208 = null;
+  const selected208 = this.getSelectedUnits?.() || [];
+  const hasEngineer208 = selected208.some(unit => unit?.alive !== false && (unit.typeId === 'worker' || unit.stats?.worker));
+  if (hasEngineer208) {
+    let bestDistance208 = Infinity;
+    for (const building of this.buildings || []) {
+      if (!building?.alive || building.team !== 'player' || building.completed || Number(building.construction) >= 1) continue;
+      const distance208 = Math.hypot(Number(building.x) - Number(x), Number(building.y) - Number(y));
+      const footprint208 = Math.max(28, Number(building.radius) || 40) + 18;
+      if (distance208 <= footprint208 && distance208 < bestDistance208) {
+        engineerTarget208 = building;
+        bestDistance208 = distance208;
+      }
+    }
+  }
+  const target = engineerTarget208 || this.hitTestForContext?.(x,y) || this.hitTest?.(x,y,false);
+  return { x,y,append:Boolean(append),targetId:target?.id||null,formationSettings:clonePlain(this.formationSettings) };
+});"""
+if bridge.count(old_context)!=1: raise RuntimeError(f'build 208 engineer context bridge anchor count={bridge.count(old_context)}')
+bridge=bridge.replace(old_context,new_context,1)
 BRIDGE.write_text(bridge,'utf-8')
 
 html=HTML.read_text('utf-8')
