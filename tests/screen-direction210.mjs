@@ -164,16 +164,12 @@ async function runLongPress(direction) {
   const { context, page, errors } = await openGame(2);
   const fixture = await prepare(page, direction);
   if (fixture.error) throw new Error(JSON.stringify(fixture));
-  await page.evaluate(({ x, y }) => {
-    const canvas = document.getElementById('game-canvas');
-    canvas.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerId: 77, pointerType: 'touch', button: 0, clientX: x, clientY: y }));
-  }, fixture.client);
+  const cdp = await context.newCDPSession(page);
+  const point = { x: fixture.client.x, y: fixture.client.y, radiusX: 1, radiusY: 1, force: 1, id: 77 };
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
   await page.waitForTimeout(460);
-  await page.evaluate(({ x, y }) => {
-    const canvas = document.getElementById('game-canvas');
-    canvas.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true, pointerId: 77, pointerType: 'touch', button: 0, clientX: x, clientY: y }));
-    globalThis.__FD210_RESTORE_HIT__?.();
-  }, fixture.client);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await page.evaluate(() => globalThis.__FD210_RESTORE_HIT__?.());
   const result = await readResult(page, fixture, direction);
   await page.evaluate(() => globalThis.__FD210_RESTORE_WORKER__?.());
   const row = { mode: 'long-press', dpr: 2, direction: direction.name, fixture, ...result, errors };
