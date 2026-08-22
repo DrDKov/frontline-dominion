@@ -105,6 +105,7 @@ jobs:
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics208-controls-v2.mjs
           node --check tests/construction208-all-buildings-v2.mjs
+          node --check tests/movement198.mjs
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
 
@@ -135,6 +136,7 @@ jobs:
           FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd208-invariants.log
           FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs 2>&1 | tee /tmp/fd208-bootstrap.log
           FD_GAME_URL="$GAME_URL" node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd208-air.log
+          FD_GAME_URL="$GAME_URL" node tests/movement198.mjs 2>&1 | tee /tmp/fd208-movement.log
           FD_GAME_URL="$GAME_URL" node tests/logistics208-controls-v2.mjs 2>&1 | tee /tmp/fd208-logistics.log
           FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings-v2.mjs 2>&1 | tee /tmp/fd208-construction.log
           FD_GAME_URL="$GAME_URL" node tests/save-slots208.generated.mjs 2>&1 | tee /tmp/fd208-save.log
@@ -149,6 +151,7 @@ jobs:
             /tmp/fd208-invariants.log
             /tmp/fd208-bootstrap.log
             /tmp/fd208-air.log
+            /tmp/fd208-movement.log
             /tmp/fd208-logistics.log
             /tmp/fd208-construction.log
             /tmp/fd208-save.log
