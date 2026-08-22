@@ -94,6 +94,13 @@ try {
         worker: Boolean(bridge.worker), workerTick: Number(bridge.workerTick || 0),
         appliedNetworkSeq: Number(bridge.appliedNetworkSeq || 0), seq: Number(bridge.seq || 0),
         lastAck: Number(bridge.lastAck || 0), actionErrors: Number(bridge.actionErrors || 0),
+        recovering201: Boolean(bridge.recovering201), recoveryTimer201: Boolean(bridge.recoveryTimer201),
+        recoveryAttempts201: Number(bridge.recoveryAttempts201 || 0),
+        recoverySuccesses201: Number(bridge.recoverySuccesses201 || 0),
+        recoveryWindowAttempts201: Number(bridge.recoveryWindowAttempts201 || 0),
+        lastError: bridge.lastError || null,
+        lastRecoveryReason201: bridge.lastRecoveryReason201 || null,
+        initialized: Boolean(bridge.initialized), transportMode165: bridge.transportMode165 || null,
       } : null,
       multiplayer: mp ? {
         active: Boolean(mp.active), role: mp.role, mode: mp.mode,
