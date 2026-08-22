@@ -1,0 +1,94 @@
+name: Verify public build 210 logistics recovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify210-recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontline-public-verify-210-recovery
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Publish verification start
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf verify-status
+          mkdir verify-status
+          cat > verify-status/current.json <<EOF
+          {"run_id":${GITHUB_RUN_ID},"head_sha":"${GITHUB_SHA}","status":"in_progress","started_at":"$(date -u +%Y-%m-%dT%H:%M:%SZ)"}
+          EOF
+          cd verify-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b verify210-recovery-status
+          git add current.json
+          git commit -m "Public build 210 recovery verification ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin verify210-recovery-status
+
+      - name: Install Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install chromium
+          python scripts/generate210_tests.py
+
+      - name: Verify public build 210
+        run: |
+          set -euo pipefail
+          PUBLIC_ROOT='https://drdkov.github.io/frontline-dominion'
+          PUBLIC_GAME="$PUBLIC_ROOT/frontline-dominion.html?build=210&verify=${GITHUB_SHA}"
+          ok=0
+          for attempt in $(seq 1 60); do
+            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_GAME" >/tmp/fd210-verify-public.html && \
+               grep -q 'data-fd-canonical-build="210"' /tmp/fd210-verify-public.html && \
+               grep -q 'gameplay-v208.js?build=210' /tmp/fd210-verify-public.html && \
+               grep -q 'logistics-ui-v208.js?build=210' /tmp/fd210-verify-public.html; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" -eq 1
+          FD_GAME_URL="$PUBLIC_GAME" node tests/logistics-ui210.mjs 2>&1 | tee /tmp/fd210-verify-ui.log
+          FD_GAME_URL="$PUBLIC_GAME" node tests/logistics208-controls-v2.mjs 2>&1 | tee /tmp/fd210-verify-logistics.log
+          FD_GAME_URL="$PUBLIC_GAME" node tests/construction208-all-buildings-v2.mjs 2>&1 | tee /tmp/fd210-verify-construction.log
+          FD_GAME_URL="$PUBLIC_GAME" node tests/screen-direction210.mjs 2>&1 | tee /tmp/fd210-verify-screen.log
+
+      - name: Publish verification result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf verify-status
+          mkdir verify-status
+          cat > verify-status/current.json <<EOF
+          {"run_id":${GITHUB_RUN_ID},"head_sha":"${GITHUB_SHA}","status":"${JOB_STATUS}","finished_at":"$(date -u +%Y-%m-%dT%H:%M:%SZ)"}
+          EOF
+          cd verify-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b verify210-recovery-status
+          git add current.json
+          git commit -m "Public build 210 recovery verification ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin verify210-recovery-status
