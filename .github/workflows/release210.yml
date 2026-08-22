@@ -1,0 +1,259 @@
+name: Release Frontline Dominion build 210
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release210.yml'
+      - '.github/workflows/check210.yml'
+      - 'scripts/assemble210.py'
+      - 'scripts/generate210_tests.py'
+      - 'tests/screen-direction210.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontline-release-210
+  cancel-in-progress: true
+
+jobs:
+  release210:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Publish active release identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf release210-status
+          mkdir release210-status
+          cat > release210-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF_NAME}",
+            "status": "in_progress",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "started_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release210-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release210-status
+          git add current.json
+          git commit -m "Build 210 run ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release210-status
+
+      - name: Assemble build 210
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+          python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
+          python scripts/assemble198.py
+          python scripts/assemble199.py
+          python scripts/hotfix199_runtime.py
+          python scripts/assemble200.py
+          python scripts/assemble201.py
+          python scripts/assemble202.py
+          python scripts/assemble203.py
+          python scripts/assemble204.py
+          python scripts/assemble205.py
+          python scripts/assemble206.py
+          python scripts/hotfix206_logistics_state.py
+          python scripts/hotfix206_truck_commands.py
+          python scripts/hotfix206_multiplayer_hash.py
+          python scripts/hotfix206_deterministic_geometry.py
+          python scripts/hotfix206_multiplayer_initial_state.py
+          python scripts/hotfix206_resync_snapshot.py
+          python scripts/hotfix206_resync_continuity.py
+          python scripts/hotfix206_network_components.py
+          python scripts/hotfix206_initial_signature.py
+          python scripts/hotfix206_ai_trace_diagnostics.py
+          python scripts/install206_ui.py
+          python scripts/patch206_invariant_harness.py
+          python scripts/assemble207.py
+          python scripts/assemble208.py
+          python scripts/hotfix208_logistics_replication.py
+          python scripts/assemble209.py
+          python scripts/assemble210.py
+
+      - name: Static build 210 gates
+        run: |
+          set -euo pipefail
+          test -s dist/frontline-dominion.html
+          test -s dist/command-input-v190.js
+          test -s dist/movement-target-fidelity-v209.js
+          test -s dist/runtime-ui-v210.js
+          test -s dist/runtime-shell-v210.js
+          test -s dist/save-slots-v210.js
+          grep -q 'data-fd-canonical-build="210"' dist/frontline-dominion.html
+          grep -q 'runtime-ui-v210.js?build=210' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v210.js?build=210' dist/frontline-dominion.html
+          grep -q 'save-slots-v210.js?build=210' dist/frontline-dominion.html
+          grep -q 'fd-boot-bridge210' dist/frontline-dominion.html
+          grep -q '__FD_SCREEN_INPUT_FIDELITY_210__' dist/command-input-v190.js
+          grep -q 'viewportWidth' dist/command-input-v190.js
+          ! grep -q 'target.width || rect.width' dist/command-input-v190.js
+          grep -q 'movement-target-fidelity-v209.js?build=210' dist/frontline-dominion.html
+          grep -q "importScripts('/frontline-dominion/movement-target-fidelity-v209.js?build=210')" dist/authoritative-simulation-worker-v174.js
+          python -m py_compile scripts/assemble210.py scripts/generate210_tests.py
+          node --check tests/screen-direction210.mjs
+          for file in dist/*.js; do node --check "$file"; done
+          count=$(find dist/models -type f | wc -l)
+          test "$count" -gt 700
+
+      - name: Install Chromium and generate inherited gates
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install chromium
+          python scripts/generate210_tests.py
+          node --check tests/save-slots210.generated.mjs
+          node --check tests/free-group-direction210.generated.mjs
+
+      - name: Physical build 210 gates
+        run: |
+          set -euo pipefail
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd210-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          BASE_URL='http://127.0.0.1:8765/frontline-dominion'
+          GAME_URL="$BASE_URL/frontline-dominion.html?build=210"
+          ready=0
+          for attempt in $(seq 1 50); do
+            if curl -fsSL "$GAME_URL" >/tmp/fd210-local.html; then ready=1; break; fi
+            sleep 0.1
+          done
+          test "$ready" -eq 1
+          grep -q 'data-fd-canonical-build="210"' /tmp/fd210-local.html
+          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd210-invariants.log
+          FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs 2>&1 | tee /tmp/fd210-bootstrap.log
+          FD_GAME_URL="$GAME_URL" node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd210-air.log
+          FD_GAME_URL="$GAME_URL" node tests/free-group-direction210.generated.mjs 2>&1 | tee /tmp/fd210-group-direction.log
+          FD_GAME_URL="$GAME_URL" node tests/screen-direction210.mjs 2>&1 | tee /tmp/fd210-screen-direction.log
+          FD_GAME_URL="$GAME_URL" node tests/logistics208-controls-v2.mjs 2>&1 | tee /tmp/fd210-logistics.log
+          FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings-v2.mjs 2>&1 | tee /tmp/fd210-construction.log
+          FD_GAME_URL="$GAME_URL" node tests/save-slots210.generated.mjs 2>&1 | tee /tmp/fd210-save.log
+
+      - name: Publish build 210 to GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd dist
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Frontline Dominion v16.9.4 build 210"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin gh-pages
+
+      - name: Verify published build 210
+        run: |
+          set -euo pipefail
+          PUBLIC_ROOT='https://drdkov.github.io/frontline-dominion'
+          PUBLIC_GAME="$PUBLIC_ROOT/frontline-dominion.html?build=210&verify=${GITHUB_SHA}"
+          ok=0
+          for attempt in $(seq 1 60); do
+            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_GAME" >/tmp/fd210-public.html && \
+               grep -q 'data-fd-canonical-build="210"' /tmp/fd210-public.html && \
+               grep -q 'fd-boot-bridge210' /tmp/fd210-public.html && \
+               curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/command-input-v190.js?build=210&verify=${GITHUB_SHA}" >/tmp/fd210-public-input.js && \
+               grep -q '__FD_SCREEN_INPUT_FIDELITY_210__' /tmp/fd210-public-input.js && \
+               ! grep -q 'target.width || rect.width' /tmp/fd210-public-input.js; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" -eq 1
+          FD_GAME_URL="$PUBLIC_GAME" node tests/screen-direction210.mjs 2>&1 | tee /tmp/fd210-public-screen-direction.log
+          FD_GAME_URL="$PUBLIC_GAME" node tests/free-group-direction210.generated.mjs 2>&1 | tee /tmp/fd210-public-group-direction.log
+
+      - name: Upload build 210 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fd210-release-diagnostics
+          path: |
+            /tmp/fd210-http.log
+            /tmp/fd210-local.html
+            /tmp/fd210-invariants.log
+            /tmp/fd210-bootstrap.log
+            /tmp/fd210-air.log
+            /tmp/fd210-group-direction.log
+            /tmp/fd210-screen-direction.log
+            /tmp/fd210-logistics.log
+            /tmp/fd210-construction.log
+            /tmp/fd210-save.log
+            /tmp/fd210-public.html
+            /tmp/fd210-public-input.js
+            /tmp/fd210-public-screen-direction.log
+            /tmp/fd210-public-group-direction.log
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Publish final release result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf release210-status
+          mkdir release210-status
+          cat > release210-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF_NAME}",
+            "status": "${JOB_STATUS}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "finished_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release210-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release210-status
+          git add current.json
+          git commit -m "Build 210 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release210-status
