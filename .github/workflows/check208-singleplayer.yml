@@ -106,6 +106,30 @@ jobs:
           count=$(find dist/models -type f | wc -l)
           test "$count" -gt 700
 
+      - name: Inspect production runtime
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          paths=[Path('dist/authoritative-simulation-bundle-v172.js'),Path('dist/production-logistics-v206.js')]
+          needles=['queueProduction(', 'updateQueue(', 'spawnUnit(', "resourceTruck"]
+          for path in paths:
+              text=path.read_text('utf-8',errors='replace')
+              print(f'=== {path} ===')
+              for needle in needles:
+                  start=0
+                  found=0
+                  while True:
+                      i=text.find(needle,start)
+                      if i<0: break
+                      found+=1
+                      a=max(0,i-900); b=min(len(text),i+2600)
+                      print(f'--- {needle} occurrence {found} @ {i} ---')
+                      print(text[a:b])
+                      start=i+len(needle)
+                      if found>=4: break
+          raise SystemExit('production runtime diagnostic stop')
+          PY
+
       - name: Install Chromium and generate inherited save gate
         run: |
           set -euo pipefail
