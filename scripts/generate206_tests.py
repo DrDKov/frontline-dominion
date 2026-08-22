@@ -63,5 +63,56 @@ sync_diag = (
     "    const win = document.getElementById('mp-game-frame205')?.contentWindow;\n"
 )
 mp = mp.replace(sync_anchor, sync_diag, 1)
+
+# A post-resync timeout needs lifecycle evidence from both clients. The normal
+# gate remains unchanged; this only enriches the thrown error if seq delivery
+# or Worker execution stalls after the explicit recovery snapshot.
+post_anchor = "const coopAppliedAfterResync = await waitApplied(coop, postResyncEvent.seq);\n"
+if mp.count(post_anchor) != 1:
+    raise RuntimeError(f'build 206 post-resync diagnostic anchor count={mp.count(post_anchor)}')
+post_diag = r"""let coopAppliedAfterResync;
+try {
+  coopAppliedAfterResync = await waitApplied(coop, postResyncEvent.seq);
+} catch (error) {
+  const inspect = page => page.evaluate(() => {
+    const lobby = globalThis.__FD_MULTIPLAYER_LOBBY_206__?.diagnostics?.() || null;
+    const win = document.getElementById('mp-game-frame205')?.contentWindow;
+    const bridge = win?.__FD_STABLE_STATE165__?.bridge || null;
+    const mp = win?.__FD_MULTIPLAYER__ || null;
+    const handoff = win?.__FD_MP_RESYNC_HANDOFF_206__ || null;
+    return {
+      lobby: lobby ? {
+        role: lobby.role, hostTick: lobby.hostTick, remoteTick: lobby.remoteTick,
+        hashChecks: lobby.hashChecks, hashMismatches: lobby.hashMismatches,
+        mismatchStreak: lobby.mismatchStreak, eventsSent: lobby.eventsSent,
+        eventsReceived: lobby.eventsReceived, packetsSent: lobby.packetsSent,
+        packetsReceived: lobby.packetsReceived, snapshotsSent: lobby.snapshotsSent,
+        snapshotsReceived: lobby.snapshotsReceived, lastEvent: lobby.lastEvent || null,
+      } : null,
+      bridge: bridge ? {
+        id: bridge.id, ready: Boolean(bridge.ready), failed: Boolean(bridge.failed),
+        worker: Boolean(bridge.worker), workerTick: Number(bridge.workerTick || 0),
+        appliedNetworkSeq: Number(bridge.appliedNetworkSeq || 0), seq: Number(bridge.seq || 0),
+        lastAck: Number(bridge.lastAck || 0), actionErrors: Number(bridge.actionErrors || 0),
+      } : null,
+      multiplayer: mp ? {
+        active: Boolean(mp.active), role: mp.role, mode: mp.mode,
+        lastAppliedSeq: Number(mp.lastAppliedSeq || 0), hostTick: Number(mp.hostTick || 0),
+        hostTickAgeMs: Number.isFinite(mp.hostTickReceivedAt) ? performance.now() - Number(mp.hostTickReceivedAt) : null,
+      } : null,
+      handoff: handoff ? JSON.parse(JSON.stringify(handoff)) : null,
+      gameTick: Number(win?.__FD_DEBUG__?.game?.simTick || 0),
+    };
+  });
+  const [hostState, guestState, hostWorker, guestWorker] = await Promise.all([
+    inspect(coop.host), inspect(coop.guest), workerDiagnostics(coop.host), workerDiagnostics(coop.guest),
+  ]);
+  throw new Error(`Build 206 post-resync command ${postResyncEvent.seq} did not apply: ${JSON.stringify({
+    original: String(error?.message || error), postResyncEvent, hostState, guestState, hostWorker, guestWorker,
+  })}`);
+}
+"""
+mp = mp.replace(post_anchor, post_diag, 1)
+
 mp_path.write_text(mp, 'utf-8')
-print('instrumented multiplayer206.generated.mjs first matched-tick divergence diagnostics')
+print('instrumented multiplayer206.generated.mjs first matched-tick and post-resync diagnostics')
