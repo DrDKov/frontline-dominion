@@ -17,17 +17,22 @@ module = r'''(() => {
 
   const VERSION = '16.9.0';
   const BUILD = 206;
-  const MAX_ARRAY = 512;
-  const MAX_KEYS = 160;
-  const MOTION_FIELD = /(?:nav|path|stuck|recovery|blocked|progress|yield|traffic|move|motion|velocity|steer|avoid|pivot|position|render|formation|approach|interaction|target|attempt)/i;
-  const EXCLUDED = new Set(['game','stats','weapons','weapon','selected','logistics206']);
+  const MAX_ARRAY = 768;
+  const MAX_KEYS = 256;
+  const UNIT_EXCLUDED = new Set(['game','stats','weapons','weapon','selected','logistics206']);
+  const GAME_EXCLUDED = new Set([
+    'units','buildings','resources','projectiles','formations','teams','ai','rng','stats','camera','canvas','ctx',
+    'selectedUnits','selectedBuilding','effects','particles','spatialGrid','operationalCore160','logistics206'
+  ]);
+  const AI_TRANSIENT_FIELD = /(?:^_|timer|cooldown|epoch|cycle|phase|next|last|expires|budget|clock|cursor|cadence|interval|metric|picture|plan|operation)/i;
+  const GAME_TRANSIENT_FIELD = /(?:^_|timer|cooldown|epoch|cycle|phase|next|last|expires|budget|clock|cursor|cadence|interval|accumulator|counter)/i;
 
   const cloneValue = (value, depth = 0, seen = new WeakSet()) => {
     if (value == null || typeof value === 'string' || typeof value === 'boolean') return value;
     if (typeof value === 'number') return Number.isFinite(value) ? value : null;
     if (typeof value === 'bigint') return Number(value);
     if (typeof value === 'function' || typeof value === 'symbol') return undefined;
-    if (depth > 5 || typeof value !== 'object') return undefined;
+    if (depth > 6 || typeof value !== 'object') return undefined;
     if (seen.has(value)) return undefined;
     seen.add(value);
     if (Array.isArray(value)) {
@@ -92,21 +97,19 @@ module = r'''(() => {
     return out;
   };
 
+  // A replacement Worker must resume from the exact deterministic object state,
+  // not merely from fields whose names happen to look like navigation fields.
+  // Persistent combat/logistics fields are already in the normal save; copying
+  // them again from the same authoritative tick is harmless and catches legacy
+  // prevX/lastX/steering caches that Unit.serialize historically omitted.
   const captureUnit = unit => {
     const fields = {};
     for (const key of Object.getOwnPropertyNames(unit || {})) {
-      if (EXCLUDED.has(key) || !MOTION_FIELD.test(key)) continue;
+      if (UNIT_EXCLUDED.has(key)) continue;
       const copy = cloneValue(unit[key]);
       if (copy !== undefined) fields[key] = copy;
     }
-    const currentCommand = cloneValue(unit?.currentCommand);
-    const commandQueue = cloneValue(unit?.commandQueue);
-    return {
-      id: String(unit?.id ?? ''),
-      fields,
-      currentCommand: currentCommand === undefined ? null : currentCommand,
-      commandQueue: Array.isArray(commandQueue) ? commandQueue : [],
-    };
+    return { id: String(unit?.id ?? ''), fields };
   };
 
   const formationEntries = game => {
@@ -119,6 +122,7 @@ module = r'''(() => {
 
   const captureFormation = ([key, group]) => ({
     id: String(group?.id ?? key),
+    state: cloneValue(group),
     path: cloneValue(group?.path),
     pathIndex: Number(group?.pathIndex) || 0,
     anchorX: Number(group?.anchorX),
@@ -130,11 +134,46 @@ module = r'''(() => {
     obstacleRecovery196: cloneValue(group?._fdObstacleRecovery196),
   });
 
+  const capturePrivateLogistics = game => {
+    const source = game?.logistics206;
+    const out = {};
+    if (!source || typeof source !== 'object') return out;
+    for (const key of Object.keys(source)) {
+      if (!key.startsWith('_')) continue;
+      const copy = cloneValue(source[key]);
+      if (copy !== undefined) out[key] = copy;
+    }
+    return out;
+  };
+
+  const captureGameTransient = game => {
+    const out = {};
+    for (const key of Object.getOwnPropertyNames(game || {})) {
+      if (GAME_EXCLUDED.has(key) || !GAME_TRANSIENT_FIELD.test(key)) continue;
+      const copy = cloneValue(game[key]);
+      if (copy !== undefined) out[key] = copy;
+    }
+    return out;
+  };
+
+  const captureAITransient = ai => {
+    const out = {};
+    for (const key of Object.getOwnPropertyNames(ai || {})) {
+      if (key === 'game' || !AI_TRANSIENT_FIELD.test(key)) continue;
+      const copy = cloneValue(ai[key]);
+      if (copy !== undefined) out[key] = copy;
+    }
+    return out;
+  };
+
   Game.prototype.exportWorkerTransient206 = function() {
     return {
       version: VERSION,
       build: BUILD,
       tick: Number(this.simTick) || 0,
+      logisticsPrivate: capturePrivateLogistics(this),
+      gameTransient: captureGameTransient(this),
+      aiTransient: captureAITransient(this.ai),
       units: (this.units || []).filter(unit => unit?.alive).map(captureUnit),
       formations: formationEntries(this).map(captureFormation),
     };
@@ -147,22 +186,37 @@ module = r'''(() => {
     return source?.[id] || source?.[String(id)] || null;
   };
 
+  const restoreFields = (game, target, fields, excluded = null) => {
+    if (!target || !fields || typeof fields !== 'object') return;
+    for (const [key,value] of Object.entries(fields)) {
+      if (excluded?.has(key)) continue;
+      try { target[key] = materialize(game, value); } catch (_) {}
+    }
+  };
+
   Game.prototype.importWorkerTransient206 = function(snapshot) {
     if (!snapshot || Number(snapshot.build) !== BUILD) return false;
+
+    // Restore sub-tick phases before the next simulation step. In particular,
+    // resource-economy-v206 uses _incomeAccumulator206 and
+    // _importAccumulator206; resetting either to zero changes Money/import
+    // timing within a few ticks after multiplayer resync.
+    if (this.logistics206 && snapshot.logisticsPrivate) {
+      restoreFields(this, this.logistics206, snapshot.logisticsPrivate);
+    }
+    restoreFields(this, this, snapshot.gameTransient, GAME_EXCLUDED);
+    if (this.ai) restoreFields(this, this.ai, snapshot.aiTransient, new Set(['game']));
+
     for (const record of snapshot.units || []) {
       const unit = this.getEntity?.(record.id);
       if (!unit?.alive || unit.kind !== 'unit') continue;
-      for (const [key,value] of Object.entries(record.fields || {})) {
-        if (EXCLUDED.has(key) || !MOTION_FIELD.test(key)) continue;
-        try { unit[key] = materialize(this, value); } catch (_) {}
-      }
-      try { unit.currentCommand = materialize(this, record.currentCommand); } catch (_) {}
-      try { unit.commandQueue = materialize(this, record.commandQueue) || []; } catch (_) {}
+      restoreFields(this, unit, record.fields, UNIT_EXCLUDED);
       unit.game = this;
     }
     for (const record of snapshot.formations || []) {
       const group = findFormation(this, record.id);
       if (!group) continue;
+      if (record.state && typeof record.state === 'object') restoreFields(this, group, record.state, new Set(['game']));
       if (record.path !== undefined) group.path = materialize(this, record.path);
       if (Number.isFinite(record.pathIndex)) group.pathIndex = record.pathIndex;
       if (Number.isFinite(record.anchorX)) group.anchorX = record.anchorX;
@@ -211,4 +265,4 @@ if save_line not in worker:
     worker = worker.replace(save_anchor, save_anchor + save_line, 1)
 
 worker_path.write_text(worker, 'utf-8')
-print('Build 206 authoritative resync now preserves unit navigation and formation transient state')
+print('Build 206 authoritative resync preserves complete unit, formation, AI and economy transient state')
