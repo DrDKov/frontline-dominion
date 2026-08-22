@@ -17,15 +17,24 @@ await waitFor(()=>{const b=document.getElementById('start-game'),s=globalThis.__
 const fixturePlan=await page.evaluate(()=>{
   const D=globalThis.__FD_DEBUG__,L=globalThis.__FD_LOGISTICS206__,S=globalThis.__FD_SINGLEPLAYER_207__;
   if(!D?.Game||!D?.Unit||!D?.Building||!D?.ResourceNode||!L||!S) return {ok:false,reason:'constructors-or-logistics-missing'};
-  const airEntry=Object.entries(D.UNIT_TYPES||{}).find(([,stats])=>stats?.air&&stats.mobilityClass==='fixedWing'&&!/helicopter|gunship/i.test(`${stats?.visualRole||''}`));
-  if(!airEntry)return{ok:false,reason:'fixed-wing-type-missing'};
-  const [airType]=airEntry;
   const baseInit=D.Game.prototype.initializeBattle;
   if(typeof baseInit!=='function')return{ok:false,reason:'initializeBattle-missing'};
-  if(D.Game.prototype.__fdAviationFixture207Installed)return{ok:true,airType,reused:true};
+  if(D.Game.prototype.__fdAviationFixture207Installed)return{ok:true,reused:true};
   Object.defineProperty(D.Game.prototype,'__fdAviationFixture207Installed',{value:true,configurable:true});
   D.Game.prototype.initializeBattle=function(...args){
     const result=baseInit.apply(this,args);
+    let airType=null;
+    let resolvedStats=null;
+    for(const typeId of Object.keys(D.UNIT_TYPES||{})){
+      let stats=null;
+      try{stats=typeof D.getUnitStats==='function'?D.getUnitStats(typeId,this.teams?.player):D.UNIT_TYPES[typeId];}catch{stats=D.UNIT_TYPES[typeId];}
+      const label=`${typeId} ${stats?.visualRole||''} ${stats?.name||''}`;
+      if(stats?.air&&stats?.mobilityClass==='fixedWing'&&!/helicopter|lightGunship|gunship|rotary|drone|uav|вертол|бпла/i.test(label)){
+        airType=typeId;resolvedStats=stats;break;
+      }
+    }
+    globalThis.__FD_AVIATION_FIXTURE207__={airType,stats:resolvedStats?{air:Boolean(resolvedStats.air),mobilityClass:resolvedStats.mobilityClass,visualRole:resolvedStats.visualRole||null,name:resolvedStats.name||null}:null};
+    if(!airType)return result;
     const base=this.playerBase||{x:1400,y:10500};
     const fx=base.x+760,fy=base.y-620;
     const field=new D.Building(this,{id:'fd207-airfield-fixture',typeId:'airfield',team:'player',x:fx,y:fy,construction:1,autoConstruct:true,rotation:0});
@@ -49,12 +58,14 @@ const fixturePlan=await page.evaluate(()=>{
     this.invalidateTeamAirFleetState93?.('player');
     return result;
   };
-  return{ok:true,airType,reused:false};
+  return{ok:true,reused:false};
 });
 if(!fixturePlan.ok)throw new Error(`Could not install authoritative fixture: ${JSON.stringify(fixturePlan)}`);
 
 await page.locator('#start-game').click();
-const ready=await waitFor(()=>{const game=globalThis.__FD_DEBUG__?.game,b=globalThis.__FD_STABLE_STATE165__?.bridge,plane=game?.getEntity?.('fd207-aircraft-fixture'),field=game?.getEntity?.('fd207-airfield-fixture'),extractor=game?.getEntity?.('fd207-oil-extractor-fixture');return game&&b?.ready&&!b.failed&&Number(b.workerTick||0)>15&&plane?.alive&&field?.alive&&extractor?.alive?{tick:Number(b.workerTick),recoveries:Number(b.recoveryAttempts201||0),units:game.units.filter(u=>u?.alive).length,buildings:game.buildings.filter(x=>x?.alive).length,plane:{id:plane.id,typeId:plane.typeId,x:plane.x,y:plane.y,fuel:plane.logistics206?.fuel,fuelMax:plane.logistics206?.fuelMax},field:{id:field.id,nodeType:field.logistics206?.nodeType,fuel:field.logistics206?.stock?.fuel},extractor:{id:extractor.id,buffer:extractor.resourceBuffer83,max:extractor.resourceBufferMax206}}:null;},undefined,45000);
+const ready=await waitFor(()=>{const game=globalThis.__FD_DEBUG__?.game,b=globalThis.__FD_STABLE_STATE165__?.bridge,plane=game?.getEntity?.('fd207-aircraft-fixture'),field=game?.getEntity?.('fd207-airfield-fixture'),extractor=game?.getEntity?.('fd207-oil-extractor-fixture'),fixture=globalThis.__FD_AVIATION_FIXTURE207__;if(fixture&&!fixture.airType)return{fixtureError:'fixed-wing-type-missing',fixture};return game&&b?.ready&&!b.failed&&Number(b.workerTick||0)>15&&plane?.alive&&field?.alive&&extractor?.alive?{tick:Number(b.workerTick),recoveries:Number(b.recoveryAttempts201||0),units:game.units.filter(u=>u?.alive).length,buildings:game.buildings.filter(x=>x?.alive).length,fixture,plane:{id:plane.id,typeId:plane.typeId,x:plane.x,y:plane.y,fuel:plane.logistics206?.fuel,fuelMax:plane.logistics206?.fuelMax,mobilityClass:plane.stats?.mobilityClass},field:{id:field.id,nodeType:field.logistics206?.nodeType,fuel:field.logistics206?.stock?.fuel},extractor:{id:extractor.id,buffer:extractor.resourceBuffer83,max:extractor.resourceBufferMax206}}:null;},undefined,45000);
+if(ready.fixtureError)throw new Error(`Could not resolve fixed-wing runtime type: ${JSON.stringify(ready)}`);
+if(ready.plane?.mobilityClass!=='fixedWing')throw new Error(`Fixture aircraft is not fixed-wing: ${JSON.stringify(ready.plane)}`);
 
 // The extractor must expose real finite-deposit information in the third Logistics tab.
 const extractorTab=await page.evaluate(()=>{const game=globalThis.__FD_DEBUG__.game,e=game.getEntity('fd207-oil-extractor-fixture');game.setSelection([e],false);game.renderSelectionUI();globalThis.__FD_LOGISTICS_UI207__?.open?.();const r=game.getEntity(e.resourceNodeId);return{name:e.stats?.name,buffer:e.resourceBuffer83,bufferMax:e.resourceBufferMax206,deposit:r?.amount,depositMax:r?.maxAmount,variant:r?.variant,kind:r?.resourceKind207,regen:r?.regenRate};});
