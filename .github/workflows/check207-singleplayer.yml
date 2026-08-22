@@ -3,13 +3,15 @@ name: Validate Frontline Dominion build 207 single-player
 on:
   push:
     branches: [build207-singleplayer-logistics-fixes]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: frontline-check-207-singleplayer
+  group: frontline-check-207-singleplayer-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
