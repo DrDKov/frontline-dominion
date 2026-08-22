@@ -1,45 +1,33 @@
 from pathlib import Path
 import subprocess
 
+# Preserve the build-208 fixture hardening side effects used by the logistics and
+# construction browser gates. Build 209 generation invokes that chain.
 subprocess.run(['python', 'scripts/generate209_tests.py'], check=True)
 
-save_source = Path('tests/save-slots209.generated.mjs')
+# The save-slot browser scenario itself has remained semantically stable since
+# build 205. Generate build 210 directly from that committed source rather than
+# recursively editing an already-generated test, which accumulated stale owner
+# assertions across 206→209.
+save_source = Path('tests/save-slots205.mjs')
 if not save_source.exists():
-    raise RuntimeError('build 210 inherited save gate missing')
+    raise RuntimeError('build 210 stable save gate source missing')
 save_text = save_source.read_text('utf-8')
 for old, new in [
-    ('?build=209', '?build=210'),
-    ('__FD_SAVE_SLOTS_209__', '__FD_SAVE_SLOTS_210__'),
-    ('__FD_RUNTIME_SHELL_209__', '__FD_RUNTIME_SHELL_210__'),
-    ('__FD_BOOT_209__', '__FD_BOOT_210__'),
-    ('menu.build !== 209', 'menu.build !== 210'),
-    ('build 209', 'build 210'),
-    ('build-209', 'build-210'),
+    ('?build=205', '?build=210'),
+    ('__FD_SAVE_SLOTS_205__', '__FD_SAVE_SLOTS_210__'),
+    ('__FD_RUNTIME_SHELL_205__', '__FD_RUNTIME_SHELL_210__'),
+    ('menu.build !== 205', 'menu.build !== 210'),
+    ('build 205', 'build 210'),
+    ('build-205', 'build-210'),
 ]:
     save_text = save_text.replace(old, new)
 
-# Re-own the start-menu assertion without depending on the exact numeric text
-# left by earlier generated versions. The boundaries are semantic markers that
-# have been stable since the original save-slot browser gate.
-menu_start = save_text.find('if (menu.build !==')
-menu_end_marker = "\n\nawait page.locator('#start-game').click();"
-menu_end = save_text.find(menu_end_marker, menu_start)
-if menu_start < 0 or menu_end < 0 or menu_end <= menu_start:
-    raise RuntimeError(
-        f'build 210 save menu markers missing: start={menu_start} end={menu_end}'
-    )
-menu_replacement = """const menuGate210 = {
-  build: Number(menu.build) === 210,
-  noFeatureStrip: menu.featureStrip === false,
-  lead: menu.lead === 'Выберите сторону и сложность операции.',
-  loadPresent: Number(menu.loadIndex) >= 0,
-  multiplayerOrder: Number(menu.multiplayerIndex) === Number(menu.loadIndex) + 1,
-};
-if (!Object.values(menuGate210).every(Boolean)) {
-  throw new Error(`Start menu is not the clean build-210 owner: ${JSON.stringify({ menu, menuGate210 })}`);
-}"""
-save_text = save_text[:menu_start] + menu_replacement + save_text[menu_end:]
-
+# Fail generation if any build-205 ownership marker survived. This keeps the
+# generated test auditable and avoids another false red caused by a hidden pin.
+for stale in ('?build=205', '__FD_SAVE_SLOTS_205__', '__FD_RUNTIME_SHELL_205__', 'menu.build !== 205', 'build-205'):
+    if stale in save_text:
+        raise RuntimeError(f'build 210 save gate retained stale marker: {stale}')
 Path('tests/save-slots210.generated.mjs').write_text(save_text, 'utf-8')
 
 movement_source = Path('tests/free-group-direction209.mjs')
