@@ -44,7 +44,10 @@ for old,new in [
     ('__FD_SAVE_SLOTS_207__','__FD_SAVE_SLOTS_208__'),
     ('__FD_RUNTIME_SHELL_207__','__FD_RUNTIME_SHELL_208__'),
     ('__FD_BOOT_207__','__FD_BOOT_208__'),
-    ('menu.build !== 207','menu.build !== 208'),
+    # Build 209 intentionally retains the build-208 save/storage namespace for
+    # backwards compatibility. Accept either top-level runtime while testing the
+    # same save protocol; older builds remain rejected.
+    ('menu.build !== 207','![208,209].includes(menu.build)'),
     ('build 207','build 208'),
     ('build-207','build-208'),
 ]: text=text.replace(old,new)
