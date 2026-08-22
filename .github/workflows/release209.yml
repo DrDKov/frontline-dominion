@@ -2,7 +2,7 @@ name: Release Frontline Dominion build 209
 
 on:
   push:
-    branches: [build209-movement-target-fidelity]
+    branches: [main, build209-movement-target-fidelity]
     paths:
       - '.github/workflows/release209.yml'
       - 'scripts/assemble209.py'
@@ -24,6 +24,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Publish active release identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf release209-status
+          mkdir release209-status
+          cat > release209-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF_NAME}",
+            "status": "in_progress",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "started_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release209-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release209-status
+          git add current.json
+          git commit -m "Build 209 run ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release209-status
 
       - name: Assemble build 209
         run: |
@@ -186,3 +214,33 @@ jobs:
             /tmp/fd209-public-direction.log
           if-no-files-found: ignore
           retention-days: 3
+
+      - name: Publish final release result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf release209-status
+          mkdir release209-status
+          cat > release209-status/current.json <<EOF
+          {
+            "run_id": ${GITHUB_RUN_ID},
+            "run_attempt": ${GITHUB_RUN_ATTEMPT},
+            "head_sha": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF_NAME}",
+            "status": "${JOB_STATUS}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "finished_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cd release209-status
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release209-status
+          git add current.json
+          git commit -m "Build 209 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release209-status
