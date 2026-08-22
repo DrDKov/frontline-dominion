@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const url = process.env.FD_GAME_URL || 'http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=208';
+const url = process.env.FD_GAME_URL || 'http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=209';
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 const page = await context.newPage();
@@ -17,7 +17,8 @@ const waitFor = async (fn, timeout = 20000, interval = 80) => {
 
 await page.goto(url, { waitUntil: 'load', timeout: 60000 });
 await waitFor(() => page.evaluate(() => Boolean(
-  globalThis.__FD_RUNTIME_SHELL_208__?.build === 208 &&
+  globalThis.__FD_RUNTIME_SHELL_209__?.build === 209 &&
+  globalThis.__FD_MOVEMENT_TARGET_FIDELITY_209__?.installed &&
   typeof globalThis.__FD_COMMAND_INPUT_190__?.route === 'function' &&
   !document.getElementById('start-game')?.disabled
 )));
@@ -82,18 +83,22 @@ const result = await waitFor(() => page.evaluate(({ ids, before, center, target,
     const start = before[u.id];
     const vector = end ? { x: end.x - start.x, y: end.y - start.y } : null;
     const projection = vector ? (vector.x * desired.x + vector.y * desired.y) / desiredLength : null;
-    return { id: u.id, start, end, vector, projection, command: cmd ? { type: cmd.type, free201: Boolean(cmd._fdFreeGroup201), requested: cmd._fdRequestedGroupTarget201 || null } : null };
+    return { id: u.id, start, end, vector, projection, command: cmd ? { type: cmd.type, free201: Boolean(cmd._fdFreeGroup201), translated209: Boolean(cmd._fdTranslatedFree209), requested: cmd._fdRequestedGroupTarget201 || null } : null };
   });
   if (intents.some(item => !item.end)) return null;
   return { tick: bridge.workerTick, desired, intents };
 }, fixture), 10000);
 
 const opposite = result.intents.filter(item => Number(item.projection) <= 0);
-console.log(JSON.stringify({ fixture, result, opposite }));
+const unowned = result.intents.filter(item => !item.command?.translated209);
+console.log(JSON.stringify({ fixture, result, opposite, unowned }));
 if (opposite.length) {
   throw new Error(`FREE_GROUP_OPPOSITE_DIRECTION ${JSON.stringify({ desired: result.desired, opposite, intents: result.intents })}`);
 }
+if (unowned.length) {
+  throw new Error(`BUILD209_MOVEMENT_OWNER_MISSING ${JSON.stringify({ unowned, intents: result.intents })}`);
+}
 
-console.log(JSON.stringify({ ok: true, build: 208, intents: result.intents }));
+console.log(JSON.stringify({ ok: true, build: 209, intents: result.intents }));
 await context.close();
 await browser.close();
