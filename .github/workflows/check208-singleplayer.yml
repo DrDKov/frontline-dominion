@@ -92,6 +92,7 @@ jobs:
           grep -q 'save-slots-v208.js?build=208' dist/frontline-dominion.html
           grep -q 'fd-boot-bridge208' dist/frontline-dominion.html
           grep -q "importScripts('/frontline-dominion/gameplay-v208.js?build=208')" dist/authoritative-simulation-worker-v174.js
+          grep -q 'engineerTarget208' dist/authoritative-simulation-v174.js
           grep -q 'logisticsCritical208' dist/authoritative-simulation-worker-v174.js
           grep -q '_fdLogisticsDetailUntil208' dist/supply-transport-v206.js
           grep -q "productionMaterialPackage206?.(source,'resourceTruck')" dist/supply-transport-v206.js
