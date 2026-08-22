@@ -27,7 +27,7 @@ jobs:
             echo "===== $f =====" | tee -a audit206-static.txt
             node --check "$f" >> audit206-static.txt 2>&1 || status=1
           done
-          python -m py_compile scripts/assemble206.py scripts/install206_ui.py scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py >> audit206-static.txt 2>&1 || status=1
+          python -m py_compile scripts/assemble206.py scripts/hotfix206_logistics_state.py scripts/hotfix206_truck_commands.py scripts/hotfix206_multiplayer_hash.py scripts/hotfix206_multiplayer_initial_state.py scripts/hotfix206_network_components.py scripts/hotfix206_ai_trace_diagnostics.py scripts/install206_ui.py scripts/patch206_invariant_harness.py scripts/audit206_runtime.py scripts/audit206_deep.py scripts/audit206_schema.py scripts/audit206_aiapi.py scripts/audit206_determinism.py >> audit206-static.txt 2>&1 || status=1
           exit "$status"
       - name: Assemble build 206 runtime
         run: |
@@ -65,7 +65,14 @@ jobs:
           python scripts/assemble204.py
           python scripts/assemble205.py
           python scripts/assemble206.py
+          python scripts/hotfix206_logistics_state.py
+          python scripts/hotfix206_truck_commands.py
+          python scripts/hotfix206_multiplayer_hash.py
+          python scripts/hotfix206_multiplayer_initial_state.py
+          python scripts/hotfix206_network_components.py
+          python scripts/hotfix206_ai_trace_diagnostics.py
           python scripts/install206_ui.py
+          python scripts/patch206_invariant_harness.py
           for f in dist/*.js; do node --check "$f"; done
           grep -q 'data-fd-canonical-build="206"' dist/frontline-dominion.html
           grep -q 'logistics-core-v206.js?build=206' dist/frontline-dominion.html
@@ -74,13 +81,14 @@ jobs:
           grep -q "case 'logisticsMission'" dist/authoritative-simulation-worker-v174.js
           grep -q 'networkLogisticsHash206' dist/authoritative-simulation-worker-v174.js
           grep -q 'fd:authoritative-save206' dist/authoritative-simulation-v174.js
-      - name: Audit logistics/economy/runtime anchors
+      - name: Audit logistics economy runtime and determinism anchors
         run: |
           set -euo pipefail
           python scripts/audit206_runtime.py
           python scripts/audit206_deep.py
           python scripts/audit206_schema.py
           python scripts/audit206_aiapi.py
+          python scripts/audit206_determinism.py
       - name: Upload full audit
         if: always()
         uses: actions/upload-artifact@v4
