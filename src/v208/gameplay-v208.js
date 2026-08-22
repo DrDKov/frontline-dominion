@@ -78,6 +78,22 @@
     L.ensureNode = ensureNode208;
   }
 
+  // Large-scale simulation phases idle buildings to keep 20k-unit scenarios cheap.
+  // Production/research queues are authoritative timers, however, and must not be
+  // frozen by a coarse building interval. A queued building therefore becomes a
+  // full-rate simulation participant until its queue drains; idle buildings retain
+  // the inherited mass-scale scheduling policy unchanged.
+  const baseBuildingInterval208 = Game.prototype.buildingIntervalTicksV9;
+  if (typeof baseBuildingInterval208 === 'function' && !baseBuildingInterval208.__fdProductionHot208) {
+    const buildingIntervalTicks208 = function(building) {
+      if (building?.alive && Array.isArray(building.queue) && building.queue.length > 0) return 1;
+      return baseBuildingInterval208.call(this, building);
+    };
+    Object.defineProperty(buildingIntervalTicks208, '__fdProductionHot208', { value: true });
+    Object.defineProperty(buildingIntervalTicks208, '__fdProductionHot208Original', { value: baseBuildingInterval208 });
+    Game.prototype.buildingIntervalTicksV9 = buildingIntervalTicks208;
+  }
+
   for (const [typeId, rate] of Object.entries(EXTRACTOR_MONEY)) {
     const stats = D.BUILDING_TYPES[typeId];
     if (stats) stats.moneyIncomePerSecond208 = rate;
