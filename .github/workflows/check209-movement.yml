@@ -3,6 +3,8 @@ name: Validate Frontline Dominion movement hotfix
 on:
   push:
     branches: [hotfix209-movement-target-fidelity]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
