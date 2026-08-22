@@ -10,6 +10,22 @@ count = text.count(needle)
 if count != 1:
     raise RuntimeError(f'build 206 presentation logistics hash anchor count={count}')
 text = text.replace(needle, '', 1)
+
+# multiplayer-game-v96 historically publishes a presentation-mirror checksum
+# every five ticks. The authoritative bridge now publishes the Worker's
+# matched-tick network hash through the same fd:mp-status channel. Keeping both
+# producers makes the lobby compare Worker hashes with presentation hashes and
+# can manufacture false desyncs even when both Workers are identical. Build 206
+# gives network-hash ownership exclusively to the authoritative Worker.
+status_anchor = "  function postStatus(game) {\n"
+status_guard = (
+    "  function postStatus(game) {\n"
+    "    if (window.__FD_MULTIPLAYER_ACTIVE__) { void '__fdAuthoritativeStatusOnly206'; return; }\n"
+)
+if '__fdAuthoritativeStatusOnly206' not in text:
+    if text.count(status_anchor) != 1:
+        raise RuntimeError(f'build 206 legacy multiplayer status anchor count={text.count(status_anchor)}')
+    text = text.replace(status_anchor, status_guard, 1)
 path.write_text(text, 'utf-8')
 
 worker_path = Path('dist/authoritative-simulation-worker-v174.js')
@@ -62,4 +78,4 @@ else:
     )
 
 worker_path.write_text(worker, 'utf-8')
-print('Build 206 multiplayer presentation checksum restored; deterministic Worker LOD installed with full-rate active commands and logistics-aware network hash')
+print('Build 206 multiplayer hash ownership is Worker-only; deterministic Worker LOD uses full-rate active commands')
