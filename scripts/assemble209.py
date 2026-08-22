@@ -11,6 +11,7 @@ WORKER = OUT / 'authoritative-simulation-worker-v174.js'
 BRIDGE = OUT / 'authoritative-simulation-v174.js'
 MODULE = 'movement-target-fidelity-v209.js'
 
+# Build 209 keeps build-208 save storage identity so existing saves survive upgrade.
 required = [
     HTML, WORKER, BRIDGE,
     OUT / 'runtime-ui-v208.js',
