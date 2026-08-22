@@ -1,5 +1,4 @@
 from pathlib import Path
-import re
 import subprocess
 
 subprocess.run(['python', 'scripts/generate209_tests.py'], check=True)
@@ -19,15 +18,16 @@ for old, new in [
 ]:
     save_text = save_text.replace(old, new)
 
-# Do not rely on another generation of chained textual version substitutions for
-# the start-menu assertion. Re-own this one gate explicitly for build 210 so a
-# stale numeric comparison cannot masquerade as a save/load regression.
-menu_pattern = re.compile(
-    r"if \(menu\.build !== \d+ \|\| menu\.featureStrip \|\| menu\.lead !== 'Выберите сторону и сложность операции\.' \|\|\s*"
-    r"menu\.loadIndex < 0 \|\| menu\.multiplayerIndex !== menu\.loadIndex \+ 1\) \{\s*"
-    r"throw new Error\(`Start menu is not the clean build-\d+ owner: \$\{JSON\.stringify\(menu\)\}`\);\s*\}",
-    re.S,
-)
+# Re-own the start-menu assertion without depending on the exact numeric text
+# left by earlier generated versions. The boundaries are semantic markers that
+# have been stable since the original save-slot browser gate.
+menu_start = save_text.find('if (menu.build !==')
+menu_end_marker = "\n\nawait page.locator('#start-game').click();"
+menu_end = save_text.find(menu_end_marker, menu_start)
+if menu_start < 0 or menu_end < 0 or menu_end <= menu_start:
+    raise RuntimeError(
+        f'build 210 save menu markers missing: start={menu_start} end={menu_end}'
+    )
 menu_replacement = """const menuGate210 = {
   build: Number(menu.build) === 210,
   noFeatureStrip: menu.featureStrip === false,
@@ -38,9 +38,7 @@ menu_replacement = """const menuGate210 = {
 if (!Object.values(menuGate210).every(Boolean)) {
   throw new Error(`Start menu is not the clean build-210 owner: ${JSON.stringify({ menu, menuGate210 })}`);
 }"""
-save_text, menu_count = menu_pattern.subn(menu_replacement, save_text, count=1)
-if menu_count != 1:
-    raise RuntimeError(f'build 210 save menu gate anchor count={menu_count}')
+save_text = save_text[:menu_start] + menu_replacement + save_text[menu_end:]
 
 Path('tests/save-slots210.generated.mjs').write_text(save_text, 'utf-8')
 
