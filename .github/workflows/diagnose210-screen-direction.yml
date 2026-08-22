@@ -7,8 +7,7 @@ on:
     branches: [build210-screen-direction-fidelity]
     paths:
       - '.github/workflows/diagnose210-screen-direction.yml'
-      - 'tests/screen-direction210-diagnostic.mjs'
-      - 'src/v210/**'
+      - 'tests/screen-direction210.mjs'
       - 'scripts/assemble210.py'
   workflow_dispatch:
 
@@ -27,59 +26,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Assemble current build 209 baseline
+      - name: Assemble build 210
         run: |
           set -euo pipefail
           rm -rf dist
-          python scripts/assemble184.py
-          python scripts/assemble185.py
-          python scripts/assemble186.py
-          python scripts/assemble187.py
-          python scripts/assemble189.py
-          python scripts/finalize189.py
-          python scripts/patch189_engineer_parity.py
-          python scripts/assemble190.py
-          python scripts/install190_runtime.py
-          python scripts/assemble191.py
-          python scripts/finalize191.py
-          python scripts/assemble192.py
-          python scripts/finalize192.py
-          python scripts/assemble193.py
-          python scripts/assemble194.py
-          python scripts/assemble195.py
-          python scripts/assemble196.py
-          python scripts/hotfix196_worker_descriptors.py
-          python scripts/hotfix196_worker_scope.py
-          python scripts/assemble197.py
-          python scripts/hotfix197_worker_action_target.py
-          python scripts/hotfix197_input_authority.py
-          python scripts/assemble198.py
-          python scripts/assemble199.py
-          python scripts/hotfix199_runtime.py
-          python scripts/assemble200.py
-          python scripts/assemble201.py
-          python scripts/assemble202.py
-          python scripts/assemble203.py
-          python scripts/assemble204.py
-          python scripts/assemble205.py
-          python scripts/assemble206.py
-          python scripts/hotfix206_logistics_state.py
-          python scripts/hotfix206_truck_commands.py
-          python scripts/hotfix206_multiplayer_hash.py
-          python scripts/hotfix206_deterministic_geometry.py
-          python scripts/hotfix206_multiplayer_initial_state.py
-          python scripts/hotfix206_resync_snapshot.py
-          python scripts/hotfix206_resync_continuity.py
-          python scripts/hotfix206_network_components.py
-          python scripts/hotfix206_initial_signature.py
-          python scripts/hotfix206_ai_trace_diagnostics.py
-          python scripts/install206_ui.py
-          python scripts/patch206_invariant_harness.py
-          python scripts/assemble207.py
-          python scripts/assemble208.py
-          python scripts/hotfix208_logistics_replication.py
-          python scripts/assemble209.py
-          node --check tests/screen-direction210-diagnostic.mjs
+          python scripts/assemble210.py
+          test -s dist/frontline-dominion.html
+          test -s dist/command-input-v190.js
+          test -s dist/runtime-shell-v210.js
+          test -s dist/runtime-ui-v210.js
+          test -s dist/save-slots-v210.js
+          grep -q 'data-fd-canonical-build="210"' dist/frontline-dominion.html
+          grep -q 'fd-boot-bridge210' dist/frontline-dominion.html
+          grep -q '__FD_SCREEN_INPUT_FIDELITY_210__' dist/command-input-v190.js
+          grep -q 'viewportWidth' dist/command-input-v190.js
+          ! grep -q 'target.width || rect.width' dist/command-input-v190.js
+          node --check tests/screen-direction210.mjs
+          for file in dist/*.js; do node --check "$file"; done
 
       - name: Install Chromium
         run: |
@@ -87,7 +50,7 @@ jobs:
           npm install --no-save playwright
           npx playwright install chromium
 
-      - name: Reproduce screen-direction bug
+      - name: Validate screen directions at DPR 1 and 2
         run: |
           set -euo pipefail
           mkdir -p smoke-root
@@ -96,14 +59,14 @@ jobs:
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
           BASE_URL='http://127.0.0.1:8765/frontline-dominion'
-          GAME_URL="$BASE_URL/frontline-dominion.html?build=209"
+          GAME_URL="$BASE_URL/frontline-dominion.html?build=210"
           ready=0
           for attempt in $(seq 1 50); do
-            if curl -fsSL "$GAME_URL" >/tmp/fd210-baseline.html; then ready=1; break; fi
+            if curl -fsSL "$GAME_URL" >/tmp/fd210-local.html; then ready=1; break; fi
             sleep 0.1
           done
           test "$ready" -eq 1
-          FD_GAME_URL="$GAME_URL" node tests/screen-direction210-diagnostic.mjs 2>&1 | tee /tmp/fd210-screen-direction.log
+          FD_GAME_URL="$GAME_URL" node tests/screen-direction210.mjs 2>&1 | tee /tmp/fd210-screen-direction.log
 
       - name: Upload diagnostics
         if: always()
@@ -112,7 +75,7 @@ jobs:
           name: fd210-screen-direction-diagnostics
           path: |
             /tmp/fd210-http.log
-            /tmp/fd210-baseline.html
+            /tmp/fd210-local.html
             /tmp/fd210-screen-direction.log
           if-no-files-found: ignore
           retention-days: 3
