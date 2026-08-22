@@ -1,5 +1,6 @@
 from pathlib import Path
 
+# Public build 206 is intentionally single-player only until multiplayer determinism is finished.
 BUILD = 206
 VERSION = '16.9.0'
 OUT = Path('dist')
