@@ -1,0 +1,8 @@
+{
+  "run_id": 32600337481,
+  "run_attempt": 1,
+  "head_sha": "7fdc5df67b7b00956f0bf3c6ca8e2cf199e1e5df",
+  "status": "failure",
+  "workflow": "Release Frontline Dominion build 205",
+  "finished_at": "2026-08-22T21:44:13Z"
+}
