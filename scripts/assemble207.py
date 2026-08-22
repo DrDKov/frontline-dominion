@@ -24,7 +24,7 @@ def sub_once(text,pattern,repl,label,flags=0):
     if count!=1: raise RuntimeError(f'build 207 {label}: expected one anchor, got {count}')
     return updated
 
-def owner(source_name,target_name,replacements):
+def owner(source_name,target_name,replacements,aliases=''):
     source=OUT/source_name
     if not source.exists(): raise RuntimeError(f'build 207 owner source missing: {source_name}')
     text=source.read_text('utf-8')
@@ -32,19 +32,21 @@ def owner(source_name,target_name,replacements):
     text=re.sub(r"const VERSION = '[^']+';",f"const VERSION = '{VERSION}';",text,count=1)
     for old,new in replacements: text=text.replace(old,new)
     text=text.replace('?build=206','?build=207')
+    if aliases:
+        text += '\n' + aliases + '\n'
     (OUT/target_name).write_text(text,'utf-8')
 
 owner('runtime-ui-v206.js','runtime-ui-v207.js',[
     ('__FD_RUNTIME_UI_206__','__FD_RUNTIME_UI_207__'),('[FD206]','[FD207]')
-])
+], "globalThis.__FD_RUNTIME_UI_206__ ||= globalThis.__FD_RUNTIME_UI_207__;" )
 owner('runtime-shell-v206.js','runtime-shell-v207.js',[
     ('__FD_RUNTIME_SHELL_206__','__FD_RUNTIME_SHELL_207__'),('__FD_BOOT_206__','__FD_BOOT_207__'),
     ('fd-loading206','fd-loading207'),('fd-ready206','fd-ready207'),('fd-running206','fd-running207'),('[FD206]','[FD207]')
-])
+], "globalThis.__FD_RUNTIME_SHELL_206__ ||= globalThis.__FD_RUNTIME_SHELL_207__; globalThis.__FD_BOOT_206__ ||= globalThis.__FD_BOOT_207__;" )
 owner('save-slots-v206.js','save-slots-v207.js',[
     ('__FD_SAVE_SLOTS_206__','__FD_SAVE_SLOTS_207__'),('__FD_RUNTIME_SHELL_206__','__FD_RUNTIME_SHELL_207__'),
     ('__FD_BOOT_206__','__FD_BOOT_207__'),('fd:authoritative-save206','fd:authoritative-save207')
-])
+], "globalThis.__FD_SAVE_SLOTS_206__ ||= globalThis.__FD_SAVE_SLOTS_207__;" )
 
 worker=WORKER.read_text('utf-8')
 worker=sub_once(worker,r'const BUILD = 206;',f'const BUILD = {BUILD};','Worker BUILD')
@@ -85,4 +87,4 @@ if index.exists():
     text=re.sub(r'data-fd-canonical-build="206"','data-fd-canonical-build="207"',text)
     index.write_text(text,'utf-8')
 
-print('Frontline Dominion v16.9.1 build 207 single-player logistics/UI fixes assembled')
+print('Frontline Dominion v16.9.1 build 207 single-player logistics/UI fixes assembled with 206 compatibility aliases')
