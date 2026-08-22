@@ -72,6 +72,7 @@ jobs:
           python scripts/patch206_invariant_harness.py
           python scripts/assemble207.py
           python scripts/assemble208.py
+          python scripts/hotfix208_logistics_replication.py
 
       - name: Static build 208 gates
         run: |
@@ -91,12 +92,14 @@ jobs:
           grep -q 'save-slots-v208.js?build=208' dist/frontline-dominion.html
           grep -q 'fd-boot-bridge208' dist/frontline-dominion.html
           grep -q "importScripts('/frontline-dominion/gameplay-v208.js?build=208')" dist/authoritative-simulation-worker-v174.js
+          grep -q 'logisticsCritical208' dist/authoritative-simulation-worker-v174.js
+          grep -q '_fdLogisticsDetailUntil208' dist/supply-transport-v206.js
           grep -q 'workerAutomation207' dist/singleplayer-gameplay-v207.js
           grep -q 'pruneIdleEngineerHauling208' dist/gameplay-v208.js
           grep -q 'moneyIncomePerSecond208' dist/gameplay-v208.js
           grep -q 'targetUnitIds208' dist/logistics-ui-v208.js
           grep -q 'СОЗДАТЬ ТРАНСПОРТ' dist/logistics-ui-v208.js
-          python -m py_compile scripts/assemble208.py scripts/generate208_tests.py
+          python -m py_compile scripts/assemble208.py scripts/hotfix208_logistics_replication.py scripts/generate208_tests.py
           for file in dist/*.js; do node --check "$file"; done
           node --check tests/logistics208-controls-v2.mjs
           node --check tests/construction208-all-buildings-v2.mjs
