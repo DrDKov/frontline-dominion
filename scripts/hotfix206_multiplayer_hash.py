@@ -17,33 +17,49 @@ if not worker_path.exists():
     raise RuntimeError('build 206 authoritative Worker missing')
 worker = worker_path.read_text('utf-8')
 
-# Build 205 introduced deterministic multiplayer simulation LOD, but its
-# implementation returned tier 1 for ordinary active commands. The base v9
-# scheduler can phase-skip tier-1 unit work, so a moving/building authoritative
-# unit must be tier 0. Patch only inside deterministicNetworkLod205 to avoid
-# touching unrelated command branches.
-pattern = re.compile(
-    r"(D\.Game\.prototype\.unitSimLodV9\s*=\s*function\s+deterministicNetworkLod205\(unit\)\s*\{.*?"
-    r"if\s*\(recentDamage\s*\|\|\s*recentShot\s*\|\|\s*hasCombatTarget\)\s*return\s*0\s*;\s*)"
-    r"if\s*\(command\)\s*return\s*1\s*;",
-    re.S,
-)
-worker, count = pattern.subn(
-    r"\1// Active authoritative commands advance on every fixed network tick.\n"
-    r"    if (command) return 0;",
-    worker,
-    count=1,
-)
-if count != 1:
-    # If an earlier build stage already carries the correct full-rate branch,
-    # accept it rather than failing assembly.
-    already = re.search(
-        r"deterministicNetworkLod205\(unit\).*?if\s*\(command\)\s*return\s*0\s*;",
-        worker,
-        re.S,
-    )
-    if not already:
-        raise RuntimeError('build 206 deterministicNetworkLod205 active-command branch not found')
-worker_path.write_text(worker, 'utf-8')
+# A deterministic network LOD exists in the currently deployed build 205, but
+# it is not part of every historical source-assembly path. Build 206 therefore
+# owns this rule explicitly instead of depending on a deploy-only ancestor.
+# Presentation visibility/camera must never select simulation cadence.
+if '__fdDeterministicNetworkLod206' not in worker:
+    service_match = re.search(r"const SERVICE_CODES = Object\.freeze\(\{.*?\}\);\n", worker, re.S)
+    if not service_match:
+        raise RuntimeError('build 206 Worker SERVICE_CODES insertion anchor missing')
+    lod_block = r'''
 
-print('Build 206 multiplayer presentation checksum restored; active-command Worker simulation is full-rate and authoritative logistics hash remains enabled')
+// Build 206 deterministic authoritative unit simulation cadence.
+// Network physics may not depend on local camera/render visibility. Any unit
+// executing a command advances at full fixed-tick rate; inactive cohorts keep
+// deterministic simulation LOD for large-army scalability.
+const baseUnitSimLod206 = D.Game.prototype.unitSimLodV9;
+if (typeof baseUnitSimLod206 === 'function') {
+  D.Game.prototype.unitSimLodV9 = function deterministicNetworkLod206(unit) {
+    if (!multiplayer.active) return baseUnitSimLod206.call(this, unit);
+    if (!unit?.alive || unit.embarkedIn) return 3;
+    const command = unit.currentCommand;
+    const recentDamage = this.time - (unit.lastDamagedAt || -999) < 2.2;
+    const recentShot = this.time - (unit.lastShotAt || -999) < 1.0;
+    const hasCombatTarget = Boolean(
+      unit.weaponTargetId || command?.combatTargetId || command?.engagedTargetId ||
+      (command?.type === 'attack' && command?.targetId)
+    );
+    if (recentDamage || recentShot || hasCombatTarget || command) return 0;
+    if (unit.aiSquadId || unit.air) return 2;
+    return 3;
+  };
+  Object.defineProperty(D.Game.prototype.unitSimLodV9, '__fdDeterministicNetworkLod206', { value: true });
+}
+'''
+    worker = worker[:service_match.end()] + lod_block + worker[service_match.end():]
+else:
+    # Normalize an existing 206 rule if this script is applied twice.
+    worker = re.sub(
+        r"(function deterministicNetworkLod206\(unit\).*?)if\s*\(command\)\s*return\s*1\s*;",
+        r"\1if (command) return 0;",
+        worker,
+        count=1,
+        flags=re.S,
+    )
+
+worker_path.write_text(worker, 'utf-8')
+print('Build 206 multiplayer presentation checksum restored; deterministic Worker LOD installed with full-rate active commands and logistics-aware network hash')
