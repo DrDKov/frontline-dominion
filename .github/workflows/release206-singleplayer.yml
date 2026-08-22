@@ -161,7 +161,16 @@ jobs:
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
           BASE_URL='http://127.0.0.1:8765/frontline-dominion'
           GAME_URL="$BASE_URL/frontline-dominion.html?build=206"
-          curl -fsSL "$BASE_URL/index.html" | grep -q 'data-fd-release-mode="singleplayer"'
+          ready=0
+          for attempt in $(seq 1 50); do
+            if curl -fsSL "$BASE_URL/index.html" > /tmp/fd206-local-index.html; then
+              ready=1
+              break
+            fi
+            sleep 0.1
+          done
+          test "$ready" -eq 1
+          grep -q 'data-fd-release-mode="singleplayer"' /tmp/fd206-local-index.html
           curl -fsSL "$BASE_URL/multiplayer.html?build=206" | grep -q 'data-fd-multiplayer-status="deferred"'
           FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd206-singleplayer-invariants.log
           FD_GAME_URL="$GAME_URL" node tests/logistics206-browser.mjs 2>&1 | tee /tmp/fd206-singleplayer-browser.log
