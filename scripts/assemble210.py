@@ -1,8 +1,5 @@
 from pathlib import Path
 import re
-import runpy
-
-runpy.run_path('scripts/assemble209.py', run_name='__main__')
 
 ROOT = Path('.')
 OUT = ROOT / 'dist'
