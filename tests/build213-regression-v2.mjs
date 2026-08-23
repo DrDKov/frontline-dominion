@@ -19,5 +19,22 @@ source = source.replace(assertPattern,
   "if(loading.overlap) throw new Error(`truck physically overlapped extractor footprint while loading ${JSON.stringify(loading)}`);"
 );
 
+// Context commands are authoritative Worker actions.  The main-thread mirror
+// is intentionally not mutated synchronously, so validate the command only
+// after the exact routed sequence has been acknowledged and replicated back.
+const assignmentPattern = /const assigned = await page\.evaluate\(I => \{[\s\S]*?\}, I\);\nif\(!assigned\.issued\|\|assigned\.mission!==\'EXTRACT_RESOURCE\'\|\|assigned\.source!==assigned\.extractorId\|\|assigned\.sentSeq<=assigned\.beforeSeq\) throw new Error\(`context extraction assignment failed \$\{JSON\.stringify\(assigned\)\}`\);/;
+if (!assignmentPattern.test(source)) throw new Error('build 213 context assignment assertion missing');
+source = source.replace(assignmentPattern, `const assignmentIssued = await page.evaluate(I => {
+  const g=globalThis.__FD_DEBUG__.game,f=globalThis.__FD213_FIXTURE__,truck=g.getEntity(I.truck),extractor=g.getEntity(f.ids[0]),bridge=globalThis.__FD_STABLE_STATE165__.bridge;
+  g.setSelection([truck],false); const beforeSeq=Number(bridge.seq||0); const issued=g.issueContext(extractor.x,extractor.y,false);
+  return {issued,beforeSeq,sentSeq:Number(bridge.seq||0),extractorId:extractor.id};
+}, I);
+if(!assignmentIssued.issued||assignmentIssued.sentSeq<=assignmentIssued.beforeSeq) throw new Error(\`context extraction command was not routed \${JSON.stringify(assignmentIssued)}\`);
+const assigned = await waitFor(({I,sentSeq,extractorId}) => {
+  const g=globalThis.__FD_DEBUG__.game,L=globalThis.__FD_LOGISTICS206__,bridge=globalThis.__FD_STABLE_STATE165__.bridge,truck=g.getEntity(I.truck),s=L.ensureUnit(truck,false);
+  const out={issued:true,beforeSeq:sentSeq-1,sentSeq,lastAck:Number(bridge?.lastAck||0),mission:s?.missionType,source:s?.sourceNodeId,destination:s?.destinationNodeId||null,extractorId};
+  return out.lastAck>=sentSeq&&out.mission==='EXTRACT_RESOURCE'&&out.source===extractorId?out:{__pending:true,...out};
+}, {I,sentSeq:assignmentIssued.sentSeq,extractorId:assignmentIssued.extractorId}, 15000);`);
+
 await writeFile(generatedUrl, source, 'utf8');
 await import(generatedUrl.href);
