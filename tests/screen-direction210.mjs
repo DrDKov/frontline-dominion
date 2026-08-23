@@ -27,7 +27,7 @@ async function openGame(dpr) {
   page.on('pageerror', error => errors.push(String(error?.stack || error)));
   await page.goto(url, { waitUntil: 'load', timeout: 60000 });
   await waitFor(page, () => ({
-    __pending: !(globalThis.__FD_RUNTIME_SHELL_210__?.build === 210 && globalThis.__FD_SCREEN_INPUT_FIDELITY_210__?.build === 210 && globalThis.__FD_DEBUG__?.startGame && !document.getElementById('start-game')?.disabled),
+    __pending: !([210, 211].includes(Number(globalThis.__FD_RUNTIME_SHELL_210__?.build)) && globalThis.__FD_SCREEN_INPUT_FIDELITY_210__?.build === 210 && globalThis.__FD_DEBUG__?.startGame && !document.getElementById('start-game')?.disabled),
   }));
   await page.locator('#start-game').click();
   await waitFor(page, () => {
@@ -184,5 +184,5 @@ for (const direction of directions) await runMouse(2, direction);
 await runMouse(1, directions[0]);
 await runLongPress(directions[0]);
 
-console.log(JSON.stringify({ ok: true, build: 210, dpr2Directions: directions.map(d => d.name), dpr1: true, touchLongPress: true }));
+console.log(JSON.stringify({ ok: true, build: 210, compatibleShellBuilds: [210, 211], dpr2Directions: directions.map(d => d.name), dpr1: true, touchLongPress: true }));
 await browser.close();
