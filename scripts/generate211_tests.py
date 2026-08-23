@@ -78,3 +78,5 @@ for stale in ('?build=210', '__FD_SAVE_SLOTS_210__', '__FD_RUNTIME_SHELL_210__',
         raise RuntimeError(f'build211 save gate retained stale identity: {stale}')
 Path('tests/save-slots211.generated.mjs').write_text(save, 'utf-8')
 print('generated save-slots211.generated.mjs with build-211 runtime owner')
+
+# Touchpoint intentionally retained so a source change re-runs the full build-211 gate matrix.
