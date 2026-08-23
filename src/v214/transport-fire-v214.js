@@ -10,7 +10,6 @@
   const BUILD = 214;
   const VERSION = '16.9.8';
   const EPS = 1e-6;
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, Number(v) || 0));
   const distance = (a, b) => Math.hypot((Number(a?.x)||0)-(Number(b?.x)||0),(Number(a?.y)||0)-(Number(b?.y)||0));
   const hash = value => { let h=2166136261; for(const c of String(value||'')){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0;} return h>>>0; };
 
@@ -30,13 +29,61 @@
     return true;
   }
 
-  function targetValid214(unit, transport, target, range) {
-    if (!target?.alive || target.team === unit.team || target.team === 'neutral') return false;
+  // Existing combat/awareness layers intentionally reject embarked units.
+  // The transport layer also sets air=true and vision=0 only to remove a
+  // passenger from ground collision/visibility.  For one synchronous combat
+  // query we expose the passenger's real combat identity, then restore every
+  // transport sentinel in finally.  The unit never leaves transportCargoIds,
+  // never re-enters navigation and never becomes independently targetable.
+  function withCombatState214(unit, transport, callback) {
+    const saved = {
+      embarkedIn: unit.embarkedIn,
+      air: unit.air,
+      vision: unit.vision,
+      x: unit.x, y: unit.y,
+      renderX: unit.renderX, renderY: unit.renderY,
+    };
+    unit.embarkedIn = null;
+    unit.air = Boolean(unit._v78OriginalAir ?? unit.stats?.air);
+    unit.vision = Math.max(0, Number(unit.stats?.vision) || 0);
+    unit.x = transport.x;
+    unit.y = transport.y;
+    unit.renderX = transport.renderX ?? transport.x;
+    unit.renderY = transport.renderY ?? transport.y;
+    try { return callback(); }
+    finally {
+      unit.embarkedIn = saved.embarkedIn;
+      unit.air = saved.air;
+      unit.vision = saved.vision;
+      unit.x = transport.x;
+      unit.y = transport.y;
+      unit.renderX = transport.renderX ?? transport.x;
+      unit.renderY = transport.renderY ?? transport.y;
+    }
+  }
+
+  function targetValidCombatState214(unit, transport, target, range) {
+    if (!target?.alive || target.team === unit.team || target.team === 'neutral' || target.embarkedIn) return false;
     if (!unit.canAttack?.(target)) return false;
-    if (target.embarkedIn) return false;
     if (distance(transport, target) - (Number(transport.radius)||0) - (Number(target.radius)||0) > range + EPS) return false;
     if (typeof unit.game?.isTargetableBy === 'function' && !unit.game.isTargetableBy(target, unit.team, unit)) return false;
     return true;
+  }
+
+  function targetValid214(unit, transport, target, range) {
+    return withCombatState214(unit, transport, () => targetValidCombatState214(unit, transport, target, range));
+  }
+
+  function deterministicFallbackTarget214(unit, transport, range) {
+    const game=unit.game,candidates=[];
+    const push=target=>{
+      if(!targetValidCombatState214(unit,transport,target,range))return;
+      candidates.push({target,distance:distance(transport,target)});
+    };
+    for(const target of game.units||[])push(target);
+    for(const target of game.buildings||[])push(target);
+    candidates.sort((a,b)=>a.distance-b.distance||String(a.target.id).localeCompare(String(b.target.id),'en'));
+    return candidates[0]?.target||null;
   }
 
   function acquireTarget214(unit, transport, range) {
@@ -48,9 +95,14 @@
     if (now + EPS < (Number(unit._embarkedFireScanAt214)||0)) return null;
     const stagger = (hash(unit.id) % 7) * .011;
     unit._embarkedFireScanAt214 = now + .16 + stagger;
-    if (typeof game.findNearestEnemy === 'function') {
-      target = game.findNearestEnemy(transport.x, transport.y, unit.team, range + (Number(transport.radius)||0), unit.stats.weapon.targets, unit);
-    }
+    target = withCombatState214(unit, transport, () => {
+      let candidate=null;
+      if (typeof game.findNearestEnemy === 'function') {
+        candidate = game.findNearestEnemy(transport.x, transport.y, unit.team, range + (Number(transport.radius)||0), unit.stats.weapon.targets, unit);
+      }
+      if (!targetValidCombatState214(unit, transport, candidate, range)) candidate=deterministicFallbackTarget214(unit,transport,range);
+      return candidate;
+    });
     if (!targetValid214(unit, transport, target, range)) target = null;
     unit._embarkedFireTarget214 = target?.id || null;
     return target;
@@ -79,15 +131,12 @@
 
     const beforeShot = Number(unit.lastShotAt)||-1;
     const beforeProjectiles = unit.game?.projectiles?.length || 0;
-    // transport-v78/v95 uses air=true only as a collision-layer sentinel.
-    // Temporarily restore the passenger's real layer so all existing finite
-    // ammunition and weapon wrappers execute as a ground weapon, then restore
-    // the collision sentinel without ever disembarking the unit.
-    const collisionAir = unit.air;
-    unit.air = Boolean(unit._v78OriginalAir ?? unit.stats?.air);
-    try { unit.fire?.(target); }
-    finally { unit.air = collisionAir; }
-    const committed = (unit.game?.projectiles?.length || 0) > beforeProjectiles || (Number(unit.lastShotAt)||-1) !== beforeShot;
+    const beforeAmmo = Number(unit.magazineAmmo139 ?? unit.ammo ?? unit.weaponAmmo ?? NaN);
+    withCombatState214(unit, transport, () => unit.fire?.(target));
+    const afterAmmo = Number(unit.magazineAmmo139 ?? unit.ammo ?? unit.weaponAmmo ?? NaN);
+    const committed = (unit.game?.projectiles?.length || 0) > beforeProjectiles ||
+      (Number(unit.lastShotAt)||-1) !== beforeShot ||
+      (Number.isFinite(beforeAmmo) && Number.isFinite(afterAmmo) && afterAmmo < beforeAmmo);
     if (committed) {
       unit._embarkedShots214 = (Number(unit._embarkedShots214)||0) + 1;
       unit._embarkedLastShotAt214 = Number(unit.game?.time)||0;
@@ -136,6 +185,7 @@
     aviationExcluded: true,
     finiteAmmoPreserved: true,
     saveLoadPreserved: true,
+    combatStateBridge: true,
     isGroundTransport214,
   });
 })();
