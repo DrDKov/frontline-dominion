@@ -38,3 +38,43 @@ if mission.count(old_return) != 1:
 mission = mission.replace(old_before, new_before, 1).replace(old_return, new_return, 1)
 mission_out.write_text(mission, 'utf-8')
 print('generated logistics211-missions.generated.mjs with footprint-aware return predicate')
+
+# Build 211 inherits the build-209 free-group movement owner but owns the current
+# runtime shell. Keep the exact movement assertions while updating only the shell
+# identity and URL used by the inherited build-210 generated gate.
+group210 = Path('tests/free-group-direction210.generated.mjs')
+if not group210.exists():
+    raise RuntimeError('build211 inherited group movement gate was not generated')
+group = group210.read_text('utf-8')
+old_group_shell = '__FD_RUNTIME_SHELL_210__?.build === 210'
+new_group_shell = '__FD_RUNTIME_SHELL_210__?.build === 211'
+if group.count(old_group_shell) != 1:
+    raise RuntimeError(f'build211 group shell gate count={group.count(old_group_shell)}')
+group = group.replace(old_group_shell, new_group_shell, 1)
+group = group.replace('?build=210', '?build=211')
+group = group.replace('"build":210', '"build":211').replace('build: 210', 'build: 211')
+Path('tests/free-group-direction211.generated.mjs').write_text(group, 'utf-8')
+print('generated free-group-direction211.generated.mjs with build-211 shell identity')
+
+# Save format/storage remains intentionally compatible with the established
+# build-208 namespace, but the active UI/shell owner is build 211. Preserve the
+# full authoritative save/load scenario and change only top-level owner identity.
+save210 = Path('tests/save-slots210.generated.mjs')
+if not save210.exists():
+    raise RuntimeError('build211 inherited save gate was not generated')
+save = save210.read_text('utf-8')
+replacements = [
+    ('?build=210', '?build=211'),
+    ('__FD_SAVE_SLOTS_210__', '__FD_SAVE_SLOTS_211__'),
+    ('__FD_RUNTIME_SHELL_210__', '__FD_RUNTIME_SHELL_211__'),
+    ('menu.build !== 210', 'menu.build !== 211'),
+    ('build 210', 'build 211'),
+    ('build-210', 'build-211'),
+]
+for old, new in replacements:
+    save = save.replace(old, new)
+for stale in ('?build=210', '__FD_SAVE_SLOTS_210__', '__FD_RUNTIME_SHELL_210__', 'menu.build !== 210', 'build-210'):
+    if stale in save:
+        raise RuntimeError(f'build211 save gate retained stale identity: {stale}')
+Path('tests/save-slots211.generated.mjs').write_text(save, 'utf-8')
+print('generated save-slots211.generated.mjs with build-211 runtime owner')
