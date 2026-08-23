@@ -119,7 +119,7 @@ jobs:
           grep -q 'friendly-extractor-visibility-v213.js?build=213' dist/authoritative-simulation-worker-v174.js
           grep -q 'externalBuildingDock:true' dist/supply-transport-v206.js
           grep -q 'extractorManualAssignment:true' dist/supply-transport-v206.js
-          grep -q 'data-fd-action207="extract"' dist/logistics-ui-v208.js
+          grep -Fq "['extract','ВЫВОЗИТЬ ДОБЫЧУ']" dist/logistics-ui-v208.js
           grep -q 'friendlyExtractorFogPinning: true' dist/friendly-extractor-visibility-v213.js
           grep -q 'hydrateVisibilityRepair: true' dist/friendly-extractor-visibility-v213.js
           grep -q 'contextExtractorHaul: true' dist/friendly-extractor-visibility-v213.js
