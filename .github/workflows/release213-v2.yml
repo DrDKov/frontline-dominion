@@ -1,0 +1,239 @@
+name: Release Frontline Dominion build 213 v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release213-v2.yml'
+      - 'scripts/assemble213.py'
+      - 'scripts/hotfix213_boot_bridge.py'
+      - 'src/v213/**'
+      - 'tests/build213-regression.mjs'
+      - 'tests/worker213-bootstrap.mjs'
+      - 'tests/screen-direction213.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontline-current-publication
+  cancel-in-progress: true
+
+jobs:
+  release213:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Publish running status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf release213-status && mkdir release213-status
+          printf '{"run_id":%s,"run_attempt":%s,"head_sha":"%s","status":"in_progress","workflow":"%s","started_at":"%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_SHA" "$GITHUB_WORKFLOW" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > release213-status/current.json
+          cd release213-status
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b release213-status
+          git add current.json
+          git commit -m "Build 213 v2 run ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release213-status
+
+      - name: Assemble canonical build 213
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python scripts/assemble184.py
+          python scripts/assemble185.py
+          python scripts/assemble186.py
+          python scripts/assemble187.py
+          python scripts/assemble189.py
+          python scripts/finalize189.py
+          python scripts/patch189_engineer_parity.py
+          python scripts/assemble190.py
+          python scripts/install190_runtime.py
+          python scripts/assemble191.py
+          python scripts/finalize191.py
+          python scripts/assemble192.py
+          python scripts/finalize192.py
+          python scripts/assemble193.py
+          python scripts/assemble194.py
+          python scripts/assemble195.py
+          python scripts/assemble196.py
+          python scripts/hotfix196_worker_descriptors.py
+          python scripts/hotfix196_worker_scope.py
+          python scripts/assemble197.py
+          python scripts/hotfix197_worker_action_target.py
+          python scripts/hotfix197_input_authority.py
+          python scripts/assemble198.py
+          python scripts/assemble199.py
+          python scripts/hotfix199_runtime.py
+          python scripts/assemble200.py
+          python scripts/assemble201.py
+          python scripts/assemble202.py
+          python scripts/assemble203.py
+          python scripts/assemble204.py
+          python scripts/assemble205.py
+          python scripts/assemble206.py
+          python scripts/hotfix206_logistics_state.py
+          python scripts/hotfix206_truck_commands.py
+          python scripts/hotfix206_multiplayer_hash.py
+          python scripts/hotfix206_deterministic_geometry.py
+          python scripts/hotfix206_multiplayer_initial_state.py
+          python scripts/hotfix206_resync_snapshot.py
+          python scripts/hotfix206_resync_continuity.py
+          python scripts/hotfix206_network_components.py
+          python scripts/hotfix206_initial_signature.py
+          python scripts/hotfix206_ai_trace_diagnostics.py
+          python scripts/install206_ui.py
+          python scripts/patch206_invariant_harness.py
+          python scripts/assemble207.py
+          python scripts/assemble208.py
+          python scripts/hotfix208_logistics_replication.py
+          python scripts/assemble209.py
+          python scripts/assemble210.py
+          python scripts/run_assemble211.py
+          python scripts/hotfix211_manual_source_v2.py
+          python scripts/assemble212.py
+          python scripts/assemble213.py
+          python scripts/hotfix213_boot_bridge.py
+
+      - name: Static build 213 gates
+        run: |
+          set -euo pipefail
+          test -s dist/frontline-dominion.html
+          test -s dist/friendly-extractor-visibility-v213.js
+          test -s dist/supply-transport-v206.js
+          test -s dist/logistics-ui-v208.js
+          test -s dist/runtime-ui-v213.js
+          test -s dist/runtime-shell-v213.js
+          test -s dist/save-slots-v213.js
+          grep -q 'data-fd-canonical-build="213"' dist/frontline-dominion.html
+          grep -q 'id="fd-boot-bridge213"' dist/frontline-dominion.html
+          grep -q '__FD_BOOT_213__' dist/frontline-dominion.html
+          grep -q 'friendly-extractor-visibility-v213.js?build=213' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v213.js?build=213' dist/frontline-dominion.html
+          grep -q 'save-slots-v213.js?build=213' dist/frontline-dominion.html
+          grep -q 'friendly-extractor-visibility-v213.js?build=213' dist/authoritative-simulation-worker-v174.js
+          grep -q 'externalBuildingDock:true' dist/supply-transport-v206.js
+          grep -Fq "['extract','ВЫВОЗИТЬ ДОБЫЧУ']" dist/logistics-ui-v208.js
+          grep -q 'friendlyExtractorFogPinning: true' dist/friendly-extractor-visibility-v213.js
+          grep -q 'hydrateVisibilityRepair: true' dist/friendly-extractor-visibility-v213.js
+          grep -q 'contextExtractorHaul: true' dist/friendly-extractor-visibility-v213.js
+          grep -q 'launchSavedPayload213' dist/runtime-shell-v213.js
+          python -m py_compile scripts/assemble213.py scripts/hotfix213_boot_bridge.py
+          node --check tests/build213-regression.mjs
+          node --check tests/worker213-bootstrap.mjs
+          node --check tests/screen-direction213.mjs
+          for file in dist/*.js; do node --check "$file"; done
+
+      - name: Install Chromium and generate inherited gates
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install chromium
+          python scripts/generate210_tests.py
+          python scripts/generate211_tests.py
+
+      - name: Local build 213 regression gates
+        run: |
+          set -euo pipefail
+          rm -rf smoke-root && mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd213-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
+          BASE_URL='http://127.0.0.1:8765/frontline-dominion'
+          GAME_URL="$BASE_URL/frontline-dominion.html?build=213"
+          ready=0
+          for attempt in $(seq 1 80); do
+            if curl -fsSL "$GAME_URL" >/tmp/fd213-local.html; then ready=1; break; fi
+            sleep .1
+          done
+          test "$ready" -eq 1
+          grep -q 'data-fd-canonical-build="213"' /tmp/fd213-local.html
+          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd213-invariants.log
+          FD_GAME_URL="$GAME_URL" node tests/worker213-bootstrap.mjs 2>&1 | tee /tmp/fd213-bootstrap.log
+          FD_GAME_URL="$GAME_URL" node tests/logistics211-service.generated.mjs 2>&1 | tee /tmp/fd213-inherited-service.log
+          FD_GAME_URL="$GAME_URL" node tests/logistics211-missions.generated.mjs 2>&1 | tee /tmp/fd213-inherited-missions.log
+          FD_GAME_URL="$GAME_URL" node tests/build212-regression.mjs 2>&1 | tee /tmp/fd213-inherited-212.log
+          FD_GAME_URL="$GAME_URL" node tests/screen-direction213.mjs 2>&1 | tee /tmp/fd213-screen.log
+          FD_GAME_URL="$GAME_URL" node tests/build213-regression.mjs 2>&1 | tee /tmp/fd213-regression.log
+
+      - name: Publish build 213 to GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd dist
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b gh-pages
+          git add -A
+          git commit -m 'Frontline Dominion v16.9.7 build 213 fog and extractor haul fixes'
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin gh-pages
+
+      - name: Verify public build 213
+        run: |
+          set -euo pipefail
+          PUBLIC_ROOT='https://drdkov.github.io/frontline-dominion'
+          PUBLIC_GAME="$PUBLIC_ROOT/frontline-dominion.html?build=213&verify=${GITHUB_SHA}"
+          ok=0
+          for attempt in $(seq 1 80); do
+            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_GAME" >/tmp/fd213-public.html && \
+               grep -q 'data-fd-canonical-build="213"' /tmp/fd213-public.html && \
+               grep -q 'id="fd-boot-bridge213"' /tmp/fd213-public.html && \
+               grep -q 'runtime-shell-v213.js?build=213' /tmp/fd213-public.html && \
+               grep -q 'friendly-extractor-visibility-v213.js?build=213' /tmp/fd213-public.html; then
+              ok=1
+              break
+            fi
+            sleep 4
+          done
+          test "$ok" -eq 1
+          curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/supply-transport-v206.js?build=213&verify=${GITHUB_SHA}" >/tmp/fd213-public-supply.js
+          curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/friendly-extractor-visibility-v213.js?build=213&verify=${GITHUB_SHA}" >/tmp/fd213-public-feature.js
+          grep -q '__FD_LOGISTICS_INTEGRITY_213__' /tmp/fd213-public-supply.js
+          grep -q '__FD_EXTRACTOR_VISIBILITY_HAUL_213__' /tmp/fd213-public-feature.js
+          FD_GAME_URL="$PUBLIC_GAME" node tests/worker213-bootstrap.mjs 2>&1 | tee /tmp/fd213-public-bootstrap.log
+          FD_GAME_URL="$PUBLIC_GAME" node tests/build212-regression.mjs 2>&1 | tee /tmp/fd213-public-inherited-212.log
+          FD_GAME_URL="$PUBLIC_GAME" node tests/build213-regression.mjs 2>&1 | tee /tmp/fd213-public-regression.log
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fd213-v2-release-diagnostics
+          path: |
+            /tmp/fd213-*.log
+            /tmp/fd213-*.html
+            /tmp/fd213-*.js
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Publish final status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf release213-status && mkdir release213-status
+          printf '{"run_id":%s,"run_attempt":%s,"head_sha":"%s","status":"%s","workflow":"%s","finished_at":"%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_SHA" "$JOB_STATUS" "$GITHUB_WORKFLOW" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > release213-status/current.json
+          cd release213-status
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b release213-status
+          git add current.json
+          git commit -m "Build 213 v2 run ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release213-status
