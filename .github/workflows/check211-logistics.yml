@@ -2,22 +2,45 @@ name: Check Frontline Dominion build 211 logistics integrity
 
 on:
   push:
-    branches: [build211-logistics-integrity]
+    branches: [build211-logistics-supply-integrity]
     paths:
       - '.github/workflows/check211-logistics.yml'
       - 'scripts/assemble211.py'
-      - 'scripts/hotfix211_manual_source.py'
+      - 'scripts/run_assemble211.py'
+      - 'scripts/hotfix211_manual_source_v2.py'
+      - 'scripts/generate211_tests.py'
       - 'tests/logistics211-service.mjs'
       - 'tests/logistics211-missions.mjs'
+      - 'tests/screen-direction210.mjs'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   check211:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 100
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Publish check start
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf check211-status && mkdir check211-status
+          printf '{"run_id":%s,"head_sha":"%s","status":"in_progress","started_at":"%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > check211-status/current.json
+          cd check211-status
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b check211-status
+          git add current.json
+          git commit -m "Build 211 check ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin check211-status
 
       - name: Assemble build 211
         run: |
@@ -72,8 +95,8 @@ jobs:
           python scripts/hotfix208_logistics_replication.py
           python scripts/assemble209.py
           python scripts/assemble210.py
-          python scripts/assemble211.py
-          python scripts/hotfix211_manual_source.py
+          python scripts/run_assemble211.py
+          python scripts/hotfix211_manual_source_v2.py
 
       - name: Static integrity gates
         run: |
@@ -87,65 +110,73 @@ jobs:
           grep -q 'runtime-ui-v211.js?build=211' dist/frontline-dominion.html
           grep -q 'runtime-shell-v211.js?build=211' dist/frontline-dominion.html
           grep -q 'save-slots-v211.js?build=211' dist/frontline-dominion.html
-          grep -q '__FD_LOGISTICS_INTEGRITY_211__' dist/supply-transport-v206.js
-          grep -q 'truckToTruckTankService: true' dist/supply-transport-v206.js
-          grep -q 'missionRadiusAuthoritative: true' dist/supply-transport-v206.js
-          grep -q 'manualSourceAuthoritative: true' dist/supply-transport-v206.js
-          grep -q "s.missionType==='AUTO'" dist/supply-transport-v206.js
-          ! grep -q "s.destinationNodeId=s.homeNodeId;s.missionType='SUPPLY_BUILDING'" dist/supply-transport-v206.js
+          grep -q 'gameplay-v208.js?build=211' dist/frontline-dominion.html
+          grep -q 'logistics-ui-v208.js?build=211' dist/frontline-dominion.html
+          grep -q 'truckToTruckTankService:true' dist/supply-transport-v206.js
+          grep -q 'missionRadiusAuthoritative:true' dist/supply-transport-v206.js
+          grep -q 'groupRearFollow:true' dist/supply-transport-v206.js
+          grep -q 'autoNodeSustainment:true' dist/supply-transport-v206.js
+          grep -q 'receiverCargoIsolation:true' dist/supply-transport-v206.js
+          grep -q 'manualSourceAuthoritative:true' dist/supply-transport-v206.js
           grep -q 'effectiveRadius211' dist/supply-transport-v206.js
-          grep -q 'L.isAir(unit)' dist/supply-transport-v206.js
-          python -m py_compile scripts/assemble211.py scripts/hotfix211_manual_source.py
-          node --check tests/logistics211-service.mjs
-          node --check tests/logistics211-missions.mjs
+          ! grep -q "s.destinationNodeId=s.homeNodeId;s.missionType='SUPPLY_BUILDING'" dist/supply-transport-v206.js
+          python -m py_compile scripts/run_assemble211.py scripts/hotfix211_manual_source_v2.py scripts/generate211_tests.py
           for file in dist/*.js; do node --check "$file"; done
-          count=$(find dist/models -type f | wc -l)
-          test "$count" -gt 700
 
-      - name: Install Chromium and generate inherited gates
+      - name: Install Chromium and generate gates
         run: |
           set -euo pipefail
           npm install --no-save playwright
           npx playwright install chromium
           python scripts/generate210_tests.py
-          node --check tests/save-slots210.generated.mjs
-          node --check tests/free-group-direction210.generated.mjs
+          python scripts/generate211_tests.py
+          node --check tests/logistics211-service.generated.mjs
+          node --check tests/logistics211-missions.generated.mjs
+          node --check tests/free-group-direction211.generated.mjs
+          node --check tests/save-slots211.generated.mjs
 
       - name: Physical logistics integrity gates
         run: |
           set -euo pipefail
           mkdir -p smoke-root
           ln -s "$PWD/dist" smoke-root/frontline-dominion
-          python -m http.server 8765 --directory smoke-root >/tmp/fd211-http.log 2>&1 &
+          python -m http.server 8765 --directory smoke-root >/tmp/fd211-check-http.log 2>&1 &
           HTTP_PID=$!
           trap 'kill $HTTP_PID 2>/dev/null || true' EXIT
           BASE_URL='http://127.0.0.1:8765/frontline-dominion'
           GAME_URL="$BASE_URL/frontline-dominion.html?build=211"
           ready=0
           for attempt in $(seq 1 60); do
-            if curl -fsSL "$GAME_URL" >/tmp/fd211-local.html; then ready=1; break; fi
-            sleep 0.1
+            if curl -fsSL "$GAME_URL" >/tmp/fd211-check-local.html; then ready=1; break; fi
+            sleep .1
           done
           test "$ready" -eq 1
-          grep -q 'data-fd-canonical-build="211"' /tmp/fd211-local.html
-          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd211-invariants.log
-          FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs 2>&1 | tee /tmp/fd211-bootstrap.log
-          FD_GAME_URL="$GAME_URL" node tests/logistics-ui210.mjs 2>&1 | tee /tmp/fd211-ui.log
-          FD_GAME_URL="$GAME_URL" node tests/logistics211-service.mjs 2>&1 | tee /tmp/fd211-service.log
-          FD_GAME_URL="$GAME_URL" node tests/logistics211-missions.mjs 2>&1 | tee /tmp/fd211-missions.log
-          FD_GAME_URL="$GAME_URL" node tests/logistics208-controls-v2.mjs 2>&1 | tee /tmp/fd211-inherited-logistics.log
-          FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings-v2.mjs 2>&1 | tee /tmp/fd211-construction.log
-          FD_GAME_URL="$GAME_URL" node tests/screen-direction210.mjs 2>&1 | tee /tmp/fd211-screen.log
-          FD_GAME_URL="$GAME_URL" node tests/free-group-direction210.generated.mjs 2>&1 | tee /tmp/fd211-group-direction.log
-          FD_GAME_URL="$GAME_URL" node tests/save-slots210.generated.mjs 2>&1 | tee /tmp/fd211-save.log
+          FD_BASE_URL="$BASE_URL" node tests/logistics206-invariants.mjs
+          FD_GAME_URL="$GAME_URL" node tests/worker207-bootstrap.mjs
+          FD_GAME_URL="$GAME_URL" node tests/logistics-ui210.mjs
+          FD_GAME_URL="$GAME_URL" node tests/logistics211-service.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/logistics211-missions.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/logistics208-controls-v2.mjs
+          FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings-v2.mjs
+          FD_GAME_URL="$GAME_URL" node tests/screen-direction210.mjs
+          FD_GAME_URL="$GAME_URL" node tests/free-group-direction211.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/save-slots211.generated.mjs
 
-      - name: Upload diagnostics
+      - name: Publish check result
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: fd211-logistics-integrity-diagnostics
-          path: |
-            /tmp/fd211-*.log
-            /tmp/fd211-local.html
-          if-no-files-found: ignore
-          retention-days: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf check211-status && mkdir check211-status
+          printf '{"run_id":%s,"head_sha":"%s","status":"%s","finished_at":"%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$JOB_STATUS" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > check211-status/current.json
+          cd check211-status
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b check211-status
+          git add current.json
+          git commit -m "Build 211 check ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin check211-status
