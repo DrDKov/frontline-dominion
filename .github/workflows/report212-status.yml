@@ -1,0 +1,47 @@
+name: Report build 212 release status
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/report212-status.yml'
+  workflow_run:
+    workflows: ['Release Frontline Dominion build 212 logistics and save-load fixes']
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read latest build 212 run
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          JSON=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow release212.yml --limit 1 --json databaseId,status,conclusion,headSha,displayTitle,createdAt,updatedAt)
+          echo "$JSON" > /tmp/latest212.json
+          test "$(jq length /tmp/latest212.json)" -ge 1
+          jq '.[0]' /tmp/latest212.json > /tmp/current212.json
+          cat /tmp/current212.json
+
+      - name: Publish status branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf release212-status && mkdir release212-status
+          cp /tmp/current212.json release212-status/current.json
+          cd release212-status
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b release212-status
+          git add current.json
+          git commit -m 'Update build 212 release status'
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release212-status
