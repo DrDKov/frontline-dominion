@@ -1,21 +1,24 @@
 from pathlib import Path
 
-# Direct-service stress gate: wait for the actual target replenishment level rather
-# than the first transfer event so the test observes the whole physical cycle.
+# Direct-service stress gate: require the whole physical replenishment policy,
+# not merely the first transfer event. A field supply cycle is successful only
+# when every applicable recipient reaches the configured mission targets:
+# trucks Fuel 92%; ground vehicles Fuel/Ammo 92% and Support 88%; infantry
+# Ammo 92% and Support 88%. Truck cargo remains a separate store.
 service_src = Path('tests/logistics211-service.mjs')
 service_out = Path('tests/logistics211-service.generated.mjs')
 service = service_src.read_text('utf-8')
 old_wait = "if(receiver.fuel>100 && tank.fuel>100 && (infantry.ammo>10||infantry.support>10)) return {receiver,tank,infantry,outside,air,provider,tick:b.workerTick};"
-new_wait = "if(receiver.fuel>=receiver.fuelMax*.90 && tank.fuel>=tank.fuelMax*.80 && (infantry.ammo>10||infantry.support>10)) return {receiver,tank,infantry,outside,air,provider,tick:b.workerTick};"
+new_wait = "if(receiver.fuel>=receiver.fuelMax*.92-1 && tank.fuel>=tank.fuelMax*.92-1 && tank.ammo>=60*.92-1 && tank.support>=180*.88-1 && infantry.ammo>=150*.92-1 && infantry.support>=95*.88-1) return {receiver,tank,infantry,outside,air,provider,tick:b.workerTick};"
 old_assert = "if(area.receiver.fuel < area.receiver.fuelMax*.80) throw new Error(`receiver truck tank insufficiently refuelled ${JSON.stringify(area.receiver)}`);"
-new_assert = "if(area.receiver.fuel < area.receiver.fuelMax*.90) throw new Error(`receiver truck tank insufficiently refuelled ${JSON.stringify(area.receiver)}`);"
+new_assert = "if(area.receiver.fuel < area.receiver.fuelMax*.92-1) throw new Error(`receiver truck tank insufficiently refuelled ${JSON.stringify(area.receiver)}`);\nif(area.tank.fuel < area.tank.fuelMax*.92-1 || area.tank.ammo < 60*.92-1 || area.tank.support < 180*.88-1) throw new Error(`ground vehicle did not reach Fuel/Ammo/Support targets ${JSON.stringify(area.tank)}`);\nif(area.infantry.ammo < 150*.92-1 || area.infantry.support < 95*.88-1) throw new Error(`infantry did not reach Ammo/Support targets ${JSON.stringify(area.infantry)}`);"
 if service.count(old_wait) != 1:
     raise RuntimeError(f'build211 service wait anchor count={service.count(old_wait)}')
 if service.count(old_assert) != 1:
     raise RuntimeError(f'build211 service assert anchor count={service.count(old_assert)}')
 service = service.replace(old_wait, new_wait, 1).replace(old_assert, new_assert, 1)
 service_out.write_text(service, 'utf-8')
-print('generated logistics211-service.generated.mjs with full target-level wait')
+print('generated logistics211-service.generated.mjs with complete 92/92/88 direct-service targets')
 
 # Mission-lifecycle gate: RETURN_TO_SOURCE must use the same footprint-aware
 # building interaction predicate as authoritative navigation. Building centre
