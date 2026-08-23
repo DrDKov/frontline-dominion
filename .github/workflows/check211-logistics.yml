@@ -11,6 +11,7 @@ on:
       - 'scripts/generate211_tests.py'
       - 'tests/logistics211-service.mjs'
       - 'tests/logistics211-missions.mjs'
+      - 'tests/screen-direction210.mjs'
   workflow_dispatch:
 
 permissions:
@@ -131,8 +132,8 @@ jobs:
           python scripts/generate211_tests.py
           node --check tests/logistics211-service.generated.mjs
           node --check tests/logistics211-missions.generated.mjs
-          node --check tests/save-slots210.generated.mjs
-          node --check tests/free-group-direction210.generated.mjs
+          node --check tests/free-group-direction211.generated.mjs
+          node --check tests/save-slots211.generated.mjs
 
       - name: Physical logistics integrity gates
         run: |
@@ -158,8 +159,8 @@ jobs:
           FD_GAME_URL="$GAME_URL" node tests/logistics208-controls-v2.mjs
           FD_GAME_URL="$GAME_URL" node tests/construction208-all-buildings-v2.mjs
           FD_GAME_URL="$GAME_URL" node tests/screen-direction210.mjs
-          FD_GAME_URL="$GAME_URL" node tests/free-group-direction210.generated.mjs
-          FD_GAME_URL="$GAME_URL" node tests/save-slots210.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/free-group-direction211.generated.mjs
+          FD_GAME_URL="$GAME_URL" node tests/save-slots211.generated.mjs
 
       - name: Publish check result
         if: always()
