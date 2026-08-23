@@ -12,9 +12,10 @@ if logistics.exists():
     text=logistics.read_text('utf-8')
     old="this.recalculatePower?.();if(Number(this.teams.player.powerFactor||0)>=.95)break;if(!powerType)break;B(id,powerType,7600+(i%3)*180,5750+Math.floor(i/3)*180);"
     new="this.recalculatePower?.();if(!powerType)break;B(id,powerType,7600+(i%3)*180,5750+Math.floor(i/3)*180);"
-    if old not in text:
+    if old in text:
+        logistics.write_text(text.replace(old,new,1),'utf-8')
+    elif new not in text:
         raise RuntimeError('build 208 logistics power-reserve fixture anchor missing')
-    logistics.write_text(text.replace(old,new,1),'utf-8')
 
 # Keep construction failures actionable. The committed gate intentionally covers
 # every build-menu structure, but its original wait returned only null on timeout.
@@ -25,14 +26,16 @@ if construction.exists():
     text=construction.read_text('utf-8')
     old="last=await page.evaluate(fn,arg);if(last)return last;await page.waitForTimeout(interval);"
     new="last=await page.evaluate(fn,arg);if(last&&!last.__pending)return last;await page.waitForTimeout(interval);"
-    if old not in text:
+    if old in text:
+        text=text.replace(old,new,1)
+    elif new not in text:
         raise RuntimeError('build 208 construction wait diagnostic anchor missing')
-    text=text.replace(old,new,1)
     old="return r.every(x=>x.completed||x.construction>x.initial+.002)?r:null;"
     new="return r.every(x=>x.completed||x.construction>x.initial+.002)?r:{__pending:true,rows:r,stalled:r.filter(x=>!x.completed&&!(x.construction>x.initial+.002))};"
-    if old not in text:
+    if old in text:
+        text=text.replace(old,new,1)
+    elif new not in text:
         raise RuntimeError('build 208 construction stalled-row diagnostic anchor missing')
-    text=text.replace(old,new,1)
     construction.write_text(text,'utf-8')
 
 subprocess.run(['python','scripts/generate207_tests.py'],check=True)
