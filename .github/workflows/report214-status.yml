@@ -1,0 +1,41 @@
+name: Report Frontline Dominion build 214 status
+
+on:
+  workflow_run:
+    workflows: ['Release Frontline Dominion build 214']
+    types: [requested, completed]
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release status branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          EVENT_ACTION: ${{ github.event.action }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_ACTION" = 'completed' ]; then
+            STATUS="${CONCLUSION:-failure}"
+          else
+            STATUS='in_progress'
+          fi
+          rm -rf status && mkdir status && cd status
+          printf '{"run_id":%s,"run_attempt":%s,"head_sha":"%s","status":"%s","workflow":"%s","event":"%s","updated_at":"%s"}\n' \
+            "$RUN_ID" "$RUN_ATTEMPT" "$HEAD_SHA" "$STATUS" "$WORKFLOW_NAME" "$EVENT_ACTION" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > current.json
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b release214-status
+          git add current.json
+          git commit -m "Build 214 run ${RUN_ID} ${STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin release214-status
