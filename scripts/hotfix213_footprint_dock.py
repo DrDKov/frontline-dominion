@@ -12,16 +12,18 @@ pattern = re.compile(
 )
 replacement = """  function moveTruck206(truck,target,dt,interaction='logistics') {
     if(!target)return false;
-    // Buildings must use the canonical footprint-aware interaction planner.
-    // The previous center-distance short circuit could declare a truck ready
-    // while its rendered/navigation footprint was still inside the structure.
-    if(target.kind==='building'){
+    // The collision defect is specific to extractor footprints: their rendered
+    // footprint can be wider/asymmetric relative to target.radius. Use the
+    // canonical footprint-aware interaction planner for extractors only.
+    // Ordinary warehouses/logistics hubs keep the proven build-212 approach so
+    // SUPPLY_AREA / SUPPLY_GROUP source loading semantics remain unchanged.
+    if(target.kind==='building'&&L.ensureExtractor(target)){
       if(typeof truck.moveTowardInteraction==='function'&&target.id){
         return Boolean(truck.moveTowardInteraction(target,truck.currentCommand,dt,interaction));
       }
       if(truck.game?.isBuildingInteractionReady117?.(truck,target,interaction))return true;
-      const fallbackRange=Math.max(48,Number(truck.radius||20)+(Number(target.radius)||0)+30);
-      if(dist(truck,target)<=fallbackRange)return true;
+      const extractorRange=Math.max(58,Number(truck.radius||20)+(Number(target.radius)||0)+18);
+      if(dist(truck,target)<=extractorRange)return true;
       if(typeof truck.moveToward==='function')return Boolean(truck.moveToward(target.x,target.y,dt,.92));
       return false;
     }
@@ -37,6 +39,6 @@ text, count = pattern.subn(replacement, text, count=1)
 if count != 1:
     raise RuntimeError(f'build 213 footprint dock anchor count={count}')
 
-text += "\n;(() => { const root=typeof window!=='undefined'?window:self; root.__FD_TRUCK_DOCK_HOTFIX_213__=Object.freeze({build:213,footprintAware:true,noCenterDistanceShortcut:true}); })();\n"
+text += "\n;(() => { const root=typeof window!=='undefined'?window:self; root.__FD_TRUCK_DOCK_HOTFIX_213__=Object.freeze({build:213,footprintAware:true,extractorScoped:true,noCenterDistanceShortcut:true}); })();\n"
 SUPPLY.write_text(text, 'utf-8')
-print('Build 213 truck loading/unloading now uses canonical footprint-aware interaction approach')
+print('Build 213 extractor loading uses footprint-aware interaction; ordinary supply nodes preserve build-212 service geometry')
