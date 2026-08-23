@@ -35,3 +35,19 @@ if mission.count(old_return) != 1:
 mission = mission.replace(old_before, new_before, 1).replace(old_return, new_return, 1)
 mission_out.write_text(mission, 'utf-8')
 print('generated logistics211-missions.generated.mjs with footprint-aware return predicate')
+
+# The screen-direction behavior is still owned by build 210, but build 211 clones
+# the runtime shell and aliases __FD_RUNTIME_SHELL_210__ to the current shell.
+# Therefore the inherited behavioral test must accept shell.build=211 while still
+# requiring the build-210 HiDPI input owner itself to be present and unchanged.
+screen_src = Path('tests/screen-direction210.mjs')
+screen_out = Path('tests/screen-direction211.generated.mjs')
+screen = screen_src.read_text('utf-8')
+old_gate = "globalThis.__FD_RUNTIME_SHELL_210__?.build === 210 && globalThis.__FD_SCREEN_INPUT_FIDELITY_210__?.build === 210"
+new_gate = "globalThis.__FD_RUNTIME_SHELL_210__?.build === 211 && globalThis.__FD_SCREEN_INPUT_FIDELITY_210__?.build === 210"
+if screen.count(old_gate) != 1:
+    raise RuntimeError(f'build211 screen owner gate count={screen.count(old_gate)}')
+screen = screen.replace(old_gate, new_gate, 1)
+screen = screen.replace("console.log(JSON.stringify({ ok: true, build: 210,", "console.log(JSON.stringify({ ok: true, build: 211, inheritedInputBuild: 210,", 1)
+screen_out.write_text(screen, 'utf-8')
+print('generated screen-direction211.generated.mjs with inherited build-210 input owner')
