@@ -13,6 +13,9 @@ on:
       - 'tests/logistics211-missions.mjs'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   check211:
     runs-on: ubuntu-latest
@@ -20,6 +23,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Publish check start
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf check211-status && mkdir check211-status
+          printf '{"run_id":%s,"head_sha":"%s","status":"in_progress","started_at":"%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > check211-status/current.json
+          cd check211-status
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b check211-status
+          git add current.json
+          git commit -m "Build 211 check ${GITHUB_RUN_ID} started"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin check211-status
 
       - name: Assemble build 211
         run: |
@@ -140,3 +160,22 @@ jobs:
           FD_GAME_URL="$GAME_URL" node tests/screen-direction210.mjs
           FD_GAME_URL="$GAME_URL" node tests/free-group-direction210.generated.mjs
           FD_GAME_URL="$GAME_URL" node tests/save-slots210.generated.mjs
+
+      - name: Publish check result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          rm -rf check211-status && mkdir check211-status
+          printf '{"run_id":%s,"head_sha":"%s","status":"%s","finished_at":"%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$JOB_STATUS" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > check211-status/current.json
+          cd check211-status
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b check211-status
+          git add current.json
+          git commit -m "Build 211 check ${GITHUB_RUN_ID} ${JOB_STATUS}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin check211-status
