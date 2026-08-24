@@ -66,6 +66,7 @@ jobs:
           node --check tests/logistics-service.mjs
           node --check tests/logistics-missions.mjs
           node --check tests/multiplayer-probe.mjs
+          node --check tests/aviation207-worker.mjs
 
       - name: Patchless build, dependency graph, byte-equivalence
         run: npm run check:stage1
@@ -98,7 +99,7 @@ jobs:
           node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd-stage1-02-logistics-invariants.log
           node tests/logistics-service.mjs 2>&1 | tee /tmp/fd-stage1-03-logistics-service.log
           node tests/logistics-missions.mjs 2>&1 | tee /tmp/fd-stage1-04-logistics-missions.log
-          node tests/input-authority204.mjs 2>&1 | tee /tmp/fd-stage1-05-input-authority.log
+          node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd-stage1-05-aviation-worker.log
           node tests/save-load200.mjs 2>&1 | tee /tmp/fd-stage1-06-save-load.log
           node tests/build212-regression.mjs 2>&1 | tee /tmp/fd-stage1-07-build212-regression.log
           node tests/build213-regression-v2.mjs 2>&1 | tee /tmp/fd-stage1-08-build213-regression-v2.log
