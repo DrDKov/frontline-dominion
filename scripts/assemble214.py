@@ -8,16 +8,35 @@ VERSION='16.9.8'
 HTML=OUT/'frontline-dominion.html'
 WORKER=OUT/'authoritative-simulation-worker-v174.js'
 BRIDGE=OUT/'authoritative-simulation-v174.js'
-TRANSPORT_SRC=ROOT/'src/v214/transport-fire-v214.js'
-AI_SRC=ROOT/'src/v214/ai-economy-logistics-v214.js'
-TRANSPORT=OUT/TRANSPORT_SRC.name
-AI=OUT/AI_SRC.name
+# Build 214 release identity is still produced here, but gameplay ownership now
+# comes from the current patchless source modules rather than stale src/v214 copies.
+TRANSPORT_SRC=ROOT/'src/legacy/transport-fire.js'
+AI_SRC=ROOT/'src/legacy/ai-economy-logistics.js'
+TRANSPORT=OUT/'transport-fire-v214.js'
+AI=OUT/'ai-economy-logistics-v214.js'
 
 for path in [HTML,WORKER,BRIDGE,TRANSPORT_SRC,AI_SRC,OUT/'runtime-ui-v213.js',OUT/'runtime-shell-v213.js',OUT/'save-slots-v213.js',OUT/'friendly-extractor-visibility-v213.js']:
     if not path.exists(): raise RuntimeError(f'build 214 inherited output missing: {path}')
 
-TRANSPORT.write_text(TRANSPORT_SRC.read_text('utf-8'),'utf-8')
-AI.write_text(AI_SRC.read_text('utf-8'),'utf-8')
+transport_text=TRANSPORT_SRC.read_text('utf-8')
+transport_text+="""
+;(() => {
+  const root=typeof window!=='undefined'?window:self;
+  const api=root.__FD_TRANSPORT_FIRE__;
+  if(api) root.__FD_TRANSPORT_FIRE_214__=Object.freeze({...api,build:214,version:'16.9.8'});
+})();
+"""
+TRANSPORT.write_text(transport_text,'utf-8')
+
+ai_text=AI_SRC.read_text('utf-8')
+ai_text+="""
+;(() => {
+  const root=typeof window!=='undefined'?window:self;
+  const api=root.__FD_AI_ECONOMY_LOGISTICS__;
+  if(api) root.__FD_AI_ECONOMY_LOGISTICS_214__=Object.freeze({...api,build:214,version:'16.9.8',usableReserve214:api.usableReserve,storageCapacity214:api.storageCapacity,backlog214:api.backlog});
+})();
+"""
+AI.write_text(ai_text,'utf-8')
 
 def clone_runtime(source,target,replacements,alias):
     text=(OUT/source).read_text('utf-8')
@@ -41,8 +60,8 @@ clone_runtime('save-slots-v213.js','save-slots-v214.js',[
     ('__FD_SAVE_SLOTS_213__','__FD_SAVE_SLOTS_214__'),('__FD_RUNTIME_SHELL_213__','__FD_RUNTIME_SHELL_214__'),('__FD_BOOT_213__','__FD_BOOT_214__'),('launchSavedPayload213','launchSavedPayload214')
 ],"globalThis.__FD_SAVE_SLOTS_213__ ||= globalThis.__FD_SAVE_SLOTS_214__; globalThis.__FD_SAVE_SLOTS_212__ ||= globalThis.__FD_SAVE_SLOTS_214__; globalThis.__FD_SAVE_SLOTS_211__ ||= globalThis.__FD_SAVE_SLOTS_214__; globalThis.__FD_SAVE_SLOTS_210__ ||= globalThis.__FD_SAVE_SLOTS_214__;")
 
-# Worker: the two build-214 owners must execute in the authoritative realm as
-# well as on the main thread so combat and AI decisions remain deterministic.
+# The current feature owners execute in the authoritative Worker as well as on
+# the main thread so combat and AI decisions remain deterministic.
 worker=WORKER.read_text('utf-8')
 worker=re.sub(r"\nimportScripts\('/frontline-dominion/transport-fire-v214\.js\?build=\d+'\);",'',worker)
 worker=re.sub(r"\nimportScripts\('/frontline-dominion/ai-economy-logistics-v214\.js\?build=\d+'\);",'',worker)
@@ -81,8 +100,6 @@ for tag in [
 ]:
     if tag not in html: html=html.replace(runtime_tag,tag+'\n'+runtime_tag,1)
 
-# build 213 boot bridge points at the previous owner. Add a build-214 alias
-# immediately before the shell so its captured boot reference is valid.
 shell_tag='<script src="./runtime-shell-v214.js?build=214"></script>'
 boot214="<script id=\"fd-boot-bridge214\">globalThis.__FD_BOOT_214__ ||= globalThis.__FD_BOOT_213__ || globalThis.__FD_BOOT_212__ || globalThis.__FD_BOOT_211__ || globalThis.__FD_BOOT_210__;</script>"
 if shell_tag not in html: raise RuntimeError('build 214 runtime-shell anchor missing')
@@ -94,6 +111,5 @@ if index.exists():
     text=index.read_text('utf-8').replace('?build=213','?build=214').replace('build=213','build=214').replace('Build 213','Build 214').replace('build 213','build 214')
     index.write_text(text,'utf-8')
 
-# Current compatibility diagnostics.
 (OUT/'build214-manifest.json').write_text('''{\n  "build": 214,\n  "version": "16.9.8",\n  "features": ["ground-transport-passenger-fire", "ai-extraction-hauling", "ai-stored-reserve-planning", "ai-logistics-recovery", "build213-fog-and-haul-fixes"]\n}\n''','utf-8')
-print('Frontline Dominion v16.9.8 build 214 assembled: passenger fire + adaptive AI economy/logistics')
+print('Frontline Dominion v16.9.8 build 214 assembled from current passenger-fire and adaptive AI logistics owners')
