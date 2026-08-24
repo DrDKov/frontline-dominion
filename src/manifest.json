@@ -4,7 +4,11 @@
   "sourceRoot": "legacy",
   "entry": "frontline-dominion.html",
   "worker": "authoritative-simulation-worker-v174.js",
-  "extraFiles": [],
+  "extraFiles": [
+    "index.html",
+    "multiplayer.html",
+    "multiplayer-lobby-v206.js"
+  ],
   "cacheBust": {
     "mode": "replace-existing",
     "html": true,
