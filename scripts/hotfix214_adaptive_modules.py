@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Publication trigger: canonical build 214 with adaptive AI and engineer control.
 from pathlib import Path
 
 ROOT = Path('.')
