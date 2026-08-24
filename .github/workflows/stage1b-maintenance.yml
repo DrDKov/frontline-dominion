@@ -4,8 +4,6 @@ name: Stage 1b maintenance
 on:
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/stage1b-maintenance.yml'
   workflow_dispatch:
 
 permissions:
