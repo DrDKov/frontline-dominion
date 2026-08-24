@@ -37,7 +37,7 @@ function withBuild(url) {
 
 function rewriteHtml(text) {
   if (!config.cacheBust?.html) return text;
-  return text.replace(/\b(src|href)=(['"])([^'"]+\.(?:js|mjs|css|json)(?:\?[^'"]*)?(?:#[^'"]*)?)\2/g,
+  return text.replace(/\b(src|href)=(['"])([^'"]+\.(?:html|js|mjs|css|json)(?:\?[^'"]*)?(?:#[^'"]*)?)\2/g,
     (_m, attr, quote, url) => `${attr}=${quote}${withBuild(url)}${quote}`);
 }
 
@@ -60,7 +60,7 @@ async function copySource(relPath) {
     return;
   }
   let text = await readFile(from, 'utf8');
-  if (relPath === config.entry) text = rewriteHtml(text);
+  if (ext === '.html') text = rewriteHtml(text);
   if (ext === '.js' || ext === '.mjs') text = rewriteImportScripts(text);
   await writeFile(to, text, 'utf8');
 }
@@ -80,7 +80,9 @@ const metadata = {
   source: 'src/legacy',
   sourceManifestSchema: config.schemaVersion,
   cacheBustMode: cacheMode,
+  pinnedFiles: legacyFiles.length,
+  extraFiles: extraFiles.length,
   files: allFiles.length,
 };
 await writeFile(join(DIST, 'build-meta.json'), `${JSON.stringify(metadata, null, 2)}\n`, 'utf8');
-console.log(`stage1 build: ${allFiles.length} source files -> dist; build=${version.BUILD} version=${version.VERSION} cache=${cacheMode}`);
+console.log(`stage1 build: ${allFiles.length} source files -> dist; pinned=${legacyFiles.length} extra=${extraFiles.length} build=${version.BUILD} version=${version.VERSION} cache=${cacheMode}`);
