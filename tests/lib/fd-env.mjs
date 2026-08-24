@@ -9,6 +9,11 @@ export function baseUrl({ port = 8765, base = 'frontline-dominion' } = {}) {
   return process.env.FD_BASE_URL || `http://127.0.0.1:${port}/${base}`;
 }
 
+export function multiplayerUrl({ port = 8765, base = 'frontline-dominion' } = {}) {
+  if (process.env.FD_MULTIPLAYER_URL) return process.env.FD_MULTIPLAYER_URL;
+  return `http://127.0.0.1:${port}/${base}/multiplayer.html?build=${expectedBuild}`;
+}
+
 export async function waitFor(page, fn, arg = undefined, timeout = 45000, interval = 100, browserErrors = []) {
   const started = Date.now();
   let last = null;
