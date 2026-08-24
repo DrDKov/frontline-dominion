@@ -68,6 +68,8 @@ jobs:
           node --check tests/multiplayer-probe.mjs
           node --check tests/aviation207-worker.mjs
           node --check tests/command-bridge.mjs
+          node --check tests/extractor-haul.mjs
+          node --check tests/save-load-current.mjs
 
       - name: Patchless build, dependency graph, byte-equivalence
         run: npm run check:stage1
@@ -103,8 +105,8 @@ jobs:
           node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd-stage1-05-aviation-worker.log
           node tests/command-bridge.mjs 2>&1 | tee /tmp/fd-stage1-06-command-bridge.log
           node tests/build212-regression.mjs 2>&1 | tee /tmp/fd-stage1-07-build212-regression.log
-          node tests/build213-regression-v2.mjs 2>&1 | tee /tmp/fd-stage1-08-build213-regression-v2.log
-          node tests/build213-regression.mjs 2>&1 | tee /tmp/fd-stage1-09-build213-regression.log
+          node tests/extractor-haul.mjs 2>&1 | tee /tmp/fd-stage1-08-extractor-haul.log
+          node tests/save-load-current.mjs 2>&1 | tee /tmp/fd-stage1-09-save-load-current.log
           node tests/worker213-bootstrap.mjs 2>&1 | tee /tmp/fd-stage1-10-worker-bootstrap.log
 
       - name: Multiplayer deterministic hash probe
