@@ -26,3 +26,5 @@ for old,new in replacements:
     mp=mp.replace(old,new,1)
 MP.write_text(mp,'utf-8')
 print('Build 214 multiplayer entry routes to canonical runtime 214 while retaining lobby protocol v206')
+
+# Native GitHub merge trigger for release214 workflow.
