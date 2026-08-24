@@ -1,0 +1,180 @@
+name: Publish current Frontline Dominion build 214
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish214-current.yml'
+      - 'scripts/hotfix214_adaptive_modules.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontline-current-publication
+  cancel-in-progress: true
+
+env:
+  FD_EXPECTED_BUILD: '214'
+  FD_BASE_URL: http://127.0.0.1:8765/frontline-dominion
+  FD_GAME_URL: http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=214
+  FD_MULTIPLAYER_URL: http://127.0.0.1:8765/frontline-dominion/multiplayer.html?build=214
+
+jobs:
+  publish214:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Assemble canonical build 214
+        run: |
+          set -euo pipefail
+          python scripts/build.py --from-src
+          python scripts/assemble214.py
+          python scripts/hotfix214_ai_extraction_priority.py
+          python scripts/hotfix214_adaptive_modules.py
+
+      - name: Verify release ownership
+        run: |
+          set -euo pipefail
+          test -s dist/frontline-dominion.html
+          test -s dist/transport-fire-v214.js
+          test -s dist/ai-economy-logistics-v214.js
+          test -s dist/ai-logistics-strategy.js
+          test -s dist/engineer-command-control.js
+          test -s dist/authoritative-simulation-worker-v174.js
+          grep -q 'data-fd-canonical-build="214"' dist/frontline-dominion.html
+          grep -q 'transport-fire-v214.js?build=214' dist/frontline-dominion.html
+          grep -q 'ai-economy-logistics-v214.js?build=214' dist/frontline-dominion.html
+          grep -q 'ai-logistics-strategy.js?build=214' dist/frontline-dominion.html
+          grep -q 'engineer-command-control.js?build=214' dist/frontline-dominion.html
+          grep -q 'ai-logistics-strategy.js?build=214' dist/authoritative-simulation-worker-v174.js
+          grep -q 'engineer-command-control.js?build=214' dist/authoritative-simulation-worker-v174.js
+          grep -q 'minimumAlternatives: MIN_ALTERNATIVES' dist/ai-logistics-strategy.js
+          grep -q 'manualConstructionOnly: true' dist/engineer-command-control.js
+          grep -q 'automaticConstructionDisabled: true' dist/engineer-command-control.js
+          grep -q 'automaticRepairPreserved: true' dist/engineer-command-control.js
+          python -m py_compile scripts/build.py scripts/assemble214.py scripts/hotfix214_ai_extraction_priority.py scripts/hotfix214_adaptive_modules.py
+          node --check dist/ai-logistics-strategy.js
+          node --check dist/engineer-command-control.js
+          node --check tests/engineer-command-control.mjs
+          node --check tests/ai-logistics-strategy.mjs
+          node --check tests/transport-fire.mjs
+          node --check tests/multiplayer-probe.mjs
+
+      - name: Install Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve candidate build 214
+        run: |
+          set -euo pipefail
+          rm -rf smoke-root
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd214-current-http.log 2>&1 &
+          echo $! >/tmp/fd214-current-http.pid
+          for attempt in $(seq 1 100); do
+            if curl -fsSL "$FD_GAME_URL" >/tmp/fd214-current-local.html && curl -fsSL "$FD_MULTIPLAYER_URL" >/tmp/fd214-current-mp.html; then exit 0; fi
+            sleep .1
+          done
+          exit 1
+
+      - name: Required inherited runtime gates
+        run: |
+          set -euo pipefail
+          node tests/runtime-capabilities.mjs 2>&1 | tee /tmp/fd214-current-01-capabilities.log
+          node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd214-current-02-logistics.log
+          node tests/worker214-bootstrap.mjs 2>&1 | tee /tmp/fd214-current-03-worker.log
+          node tests/command-bridge.mjs 2>&1 | tee /tmp/fd214-current-04-command.log
+          node tests/extractor-haul.mjs 2>&1 | tee /tmp/fd214-current-05-extractor.log
+          node tests/save-load-current.mjs 2>&1 | tee /tmp/fd214-current-06-save-load.log
+          node tests/logistics-service-replan.mjs 2>&1 | tee /tmp/fd214-current-07-service-replan.log
+
+      - name: Required engineer and adaptive AI gates
+        run: |
+          set -euo pipefail
+          node tests/ai-economy-logistics.mjs 2>&1 | tee /tmp/fd214-current-08-ai-economy.log
+          node tests/engineer-command-control.mjs 2>&1 | tee /tmp/fd214-current-09-engineer.log
+          node tests/ai-logistics-strategy.mjs 2>&1 | tee /tmp/fd214-current-10-ai-strategy.log
+          node tests/build214-regression.mjs 2>&1 | tee /tmp/fd214-current-11-regression.log
+
+      - name: Known transport-fire diagnostic
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          node tests/transport-fire.mjs 2>&1 | tee /tmp/fd214-current-12-transport-fire.log
+
+      - name: Required multiplayer deterministic gate
+        run: |
+          set -euo pipefail
+          node tests/multiplayer-probe.mjs 2>&1 | tee /tmp/fd214-current-13-multiplayer.log
+          ! grep -Eq '"hashMismatches":[[:space:]]*[1-9]' /tmp/fd214-current-13-multiplayer.log
+          ! grep -Eq '"resyncsRequested":[[:space:]]*[1-9]' /tmp/fd214-current-13-multiplayer.log
+
+      - name: Publish build 214 to GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd dist
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b gh-pages
+          git add -A
+          git commit -m 'Frontline Dominion v16.9.8 build 214 adaptive AI and engineer control'
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin gh-pages
+
+      - name: Verify public build 214 and new owners
+        run: |
+          set -euo pipefail
+          PUBLIC_ROOT='https://drdkov.github.io/frontline-dominion'
+          PUBLIC_GAME="$PUBLIC_ROOT/frontline-dominion.html?build=214&verify=${GITHUB_SHA}"
+          ok=0
+          for attempt in $(seq 1 90); do
+            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_GAME" >/tmp/fd214-current-public.html && \
+               grep -q 'data-fd-canonical-build="214"' /tmp/fd214-current-public.html && \
+               grep -q 'ai-logistics-strategy.js?build=214' /tmp/fd214-current-public.html && \
+               grep -q 'engineer-command-control.js?build=214' /tmp/fd214-current-public.html; then
+              ok=1
+              break
+            fi
+            sleep 4
+          done
+          test "$ok" -eq 1
+          curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/ai-logistics-strategy.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-ai-strategy.js
+          curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/engineer-command-control.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-engineer.js
+          grep -q 'multiOptionPlanning: true' /tmp/fd214-current-public-ai-strategy.js
+          grep -q 'minimumAlternatives: MIN_ALTERNATIVES' /tmp/fd214-current-public-ai-strategy.js
+          grep -q 'manualConstructionOnly: true' /tmp/fd214-current-public-engineer.js
+          grep -q 'automaticRepairPreserved: true' /tmp/fd214-current-public-engineer.js
+          FD_GAME_URL="$PUBLIC_GAME" node tests/worker214-bootstrap.mjs 2>&1 | tee /tmp/fd214-current-public-worker.log
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fd214-current-publication
+          path: |
+            /tmp/fd214-current-*.log
+            /tmp/fd214-current-*.html
+            /tmp/fd214-current-*.js
+          if-no-files-found: ignore
+          retention-days: 7
