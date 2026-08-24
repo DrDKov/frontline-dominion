@@ -22,7 +22,8 @@ const I = { builder: 'ecc-builder', idle1: 'ecc-idle-1', idle2: 'ecc-idle-2', un
 await page.goto(gameUrl(), { waitUntil: 'load', timeout: 60000 });
 await waitFor(() => {
   const b = document.getElementById('start-game');
-  return b && !b.disabled && globalThis.__FD_ENGINEER_COMMAND_CONTROL__?.automaticRepairPreserved && globalThis.__FD_DEBUG__?.Game ? true : null;
+  const c = globalThis.__FD_ENGINEER_COMMAND_CONTROL__;
+  return b && !b.disabled && c?.automaticRepairPreserved && c?.explicitConstructionAssignmentOnly && globalThis.__FD_DEBUG__?.Game ? true : null;
 });
 
 const fixture = await page.evaluate(I => {
@@ -48,13 +49,26 @@ const fixture = await page.evaluate(I => {
     const builder = U(I.builder, x, y);
     const idle1 = U(I.idle1, x - 40, y + 20);
     const idle2 = U(I.idle2, x + 20, y + 55);
+
+    // Direct command to a concrete engineer is the construction assignment.
     const manualResult = builder.setCommand({ type: 'build', buildingId: unfinished.id }, false);
+    // Known legacy auto-initiative must be rejected.
     const legacyAutoResult = idle1.setCommand({ type: 'build', buildingId: unfinished.id, autoEngineer130: true }, false);
+    // Also reject a hydrated/legacy automatic command even if autoEngineer130 was lost.
+    const metadataAutoResult = idle2.setCommand({
+      type: 'build', buildingId: unfinished.id,
+      assignedAt130: Number(this.time) || 0,
+      progressAt130: Number(this.time) || 0,
+      bestSurfaceDistance130: 0,
+    }, false);
+
     globalThis.__ECC_FIXTURE__ = {
       buildingType, repairType,
       manualAccepted: builder.currentCommand?.type === 'build' && builder.currentCommand?.buildingId === unfinished.id,
       legacyAutoRejected: legacyAutoResult === false && idle1.currentCommand?.type !== 'build',
+      metadataAutoRejected: metadataAutoResult === false && idle2.currentCommand?.type !== 'build',
       manualResult,
+      initiallyAssigned: this.engineersAssignedToConstruction?.(unfinished.id) || [],
     };
     return r;
   };
@@ -71,26 +85,38 @@ const ready = await waitFor(I => {
 }, I);
 if (!ready.fixture?.manualAccepted) throw new Error(`manual construction was not accepted ${JSON.stringify(ready)}`);
 if (!ready.fixture?.legacyAutoRejected) throw new Error(`legacy automatic construction was not rejected ${JSON.stringify(ready)}`);
+if (!ready.fixture?.metadataAutoRejected) throw new Error(`metadata-only automatic construction was not rejected ${JSON.stringify(ready)}`);
+if (ready.fixture.initiallyAssigned.length !== 1 || ready.fixture.initiallyAssigned[0] !== I.builder) throw new Error(`construction assignment registry incorrect ${JSON.stringify(ready.fixture)}`);
 
 const behavior = await waitFor(I => {
   const g = globalThis.__FD_DEBUG__.game;
   const rows = [I.builder, I.idle1, I.idle2].map(id => {
     const u = g.getEntity(id), c = u?.currentCommand;
-    return { id, command: c?.type || null, targetId: c?.targetId || c?.buildingId || null, auto: Boolean(c?.autoEngineer130), repairOnly: Boolean(c?.repairOnlyInitiative) };
+    return {
+      id,
+      command: c?.type || null,
+      targetId: c?.targetId || c?.buildingId || null,
+      auto: Boolean(c?.autoEngineer130),
+      explicitBuild: Boolean(c?.explicitEngineerConstructionAssignment),
+      repairOnly: Boolean(c?.repairOnlyInitiative),
+    };
   });
-  const autoBuilds = rows.filter(r => r.auto && r.command === 'build');
-  const idleAutoConstruction = rows.filter(r => r.id !== I.builder && r.command === 'build' && r.targetId === I.unfinished);
-  const repairs = rows.filter(r => r.auto && r.command === 'repair' && r.targetId === I.damaged);
-  if (repairs.length < 1) return { __pending: true, rows, autoBuilds, idleAutoConstruction, repairs };
-  return { rows, autoBuilds, idleAutoConstruction, repairs };
+  const idleConstruction = rows.filter(r => r.id !== I.builder && r.command === 'build' && r.targetId === I.unfinished);
+  const repairs = rows.filter(r => r.id !== I.builder && r.auto && r.repairOnly && r.command === 'repair' && r.targetId === I.damaged);
+  const unfinished = g.getEntity(I.unfinished);
+  const assigned = globalThis.__FD_ENGINEER_COMMAND_CONTROL__?.assignedTo?.(g, I.unfinished) || [];
+  if (repairs.length < 1) return { __pending: true, rows, idleConstruction, repairs, assigned, construction: unfinished?.construction };
+  return { rows, idleConstruction, repairs, assigned, construction: unfinished?.construction };
 }, I, 30000);
-if (behavior.autoBuilds.length) throw new Error(`automatic construction still active ${JSON.stringify(behavior)}`);
-if (behavior.idleAutoConstruction.length) throw new Error(`idle engineers joined construction without assignment ${JSON.stringify(behavior)}`);
+if (behavior.idleConstruction.length) throw new Error(`unassigned engineers joined construction ${JSON.stringify(behavior)}`);
+if (behavior.assigned.some(id => id !== I.builder)) throw new Error(`construction registry contains an unassigned engineer ${JSON.stringify(behavior)}`);
 if (!behavior.repairs.length) throw new Error(`automatic repair initiative did not survive ${JSON.stringify(behavior)}`);
 
 const marker = await page.evaluate(() => globalThis.__FD_ENGINEER_COMMAND_CONTROL__);
-if (!marker?.manualConstructionOnly || !marker?.automaticConstructionDisabled || !marker?.automaticRepairPreserved || !marker?.legacyAutoBuildCancelledOnLoad) throw new Error(`engineer control marker incomplete ${JSON.stringify(marker)}`);
+for (const key of ['manualConstructionOnly', 'explicitConstructionAssignmentOnly', 'unassignedEngineersIgnoreConstruction', 'automaticConstructionDisabled', 'automaticRepairPreserved', 'legacyAutoBuildCancelledOnLoad']) {
+  if (!marker?.[key]) throw new Error(`engineer control marker missing ${key}: ${JSON.stringify(marker)}`);
+}
 const bridge = await page.evaluate(() => { const b = globalThis.__FD_STABLE_STATE165__?.bridge; return { ready: Boolean(b?.ready), failed: Boolean(b?.failed), errors: Number(b?.actionErrors || 0), recoveries: Number(b?.recoveryAttempts201 || 0), tick: Number(b?.workerTick || 0) }; });
 if (!bridge.ready || bridge.failed || bridge.errors || bridge.recoveries) throw new Error(`bridge unhealthy ${JSON.stringify(bridge)}`);
-console.log(JSON.stringify({ ok: true, ready, behavior, marker, bridge }));
+console.log(JSON.stringify({ ok: true, ready, behavior, marker: { explicitConstructionAssignmentOnly: marker.explicitConstructionAssignmentOnly, unassignedEngineersIgnoreConstruction: marker.unassignedEngineersIgnoreConstruction, automaticRepairPreserved: marker.automaticRepairPreserved }, bridge }));
 await context.close(); await browser.close();
