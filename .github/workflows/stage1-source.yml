@@ -63,6 +63,8 @@ jobs:
           node --check tools/write-version.mjs
           node --check tests/lib/fd-env.mjs
           node --check tests/runtime-capabilities.mjs
+          node --check tests/logistics-service.mjs
+          node --check tests/logistics-missions.mjs
           node --check tests/logistics-service-replan.mjs
           node --check tests/multiplayer-probe.mjs
 
@@ -95,8 +97,8 @@ jobs:
           set -euo pipefail
           node tests/runtime-capabilities.mjs 2>&1 | tee /tmp/fd-stage1-01-runtime-capabilities.log
           node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd-stage1-02-logistics-invariants.log
-          node tests/logistics211-service.mjs 2>&1 | tee /tmp/fd-stage1-03-logistics-service.log
-          node tests/logistics211-missions.mjs 2>&1 | tee /tmp/fd-stage1-04-logistics-missions.log
+          node tests/logistics-service.mjs 2>&1 | tee /tmp/fd-stage1-03-logistics-service.log
+          node tests/logistics-missions.mjs 2>&1 | tee /tmp/fd-stage1-04-logistics-missions.log
           node tests/logistics-service-replan.mjs 2>&1 | tee /tmp/fd-stage1-05-service-replan.log
           node tests/input-authority204.mjs 2>&1 | tee /tmp/fd-stage1-06-input-authority.log
           node tests/save-load200.mjs 2>&1 | tee /tmp/fd-stage1-07-save-load.log
