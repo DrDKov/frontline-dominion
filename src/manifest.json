@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "legacySnapshotManifest": "../scripts/legacy-manifest.json",
   "sourceRoot": "legacy",
   "entry": "frontline-dominion.html",
@@ -9,8 +9,18 @@
     "multiplayer.html",
     "multiplayer-lobby-v206.js"
   ],
+  "pageModules": [
+    "logistics-service-replan.js",
+    "ai-economy-logistics.js",
+    "transport-fire.js"
+  ],
+  "workerModules": [
+    "logistics-service-replan.js",
+    "ai-economy-logistics.js",
+    "transport-fire.js"
+  ],
   "cacheBust": {
-    "mode": "replace-existing",
+    "mode": "inject",
     "html": true,
     "workerImportScripts": true
   }
