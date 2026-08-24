@@ -75,14 +75,17 @@ jobs:
           test -s dist/runtime-shell-v214.js
           test -s dist/runtime-ui-v214.js
           test -s dist/save-slots-v214.js
+          test -s dist/logistics-service-replan.js
           grep -q 'data-fd-canonical-build="214"' dist/frontline-dominion.html
           grep -q 'transport-fire-v214.js?build=214' dist/frontline-dominion.html
           grep -q 'ai-economy-logistics-v214.js?build=214' dist/frontline-dominion.html
           grep -q 'runtime-shell-v214.js?build=214' dist/frontline-dominion.html
           grep -q 'save-slots-v214.js?build=214' dist/frontline-dominion.html
+          grep -q 'logistics-service-replan.js?build=214' dist/frontline-dominion.html
           grep -q '__FD_BOOT_214__' dist/frontline-dominion.html
           grep -q 'transport-fire-v214.js?build=214' dist/authoritative-simulation-worker-v174.js
           grep -q 'ai-economy-logistics-v214.js?build=214' dist/authoritative-simulation-worker-v174.js
+          grep -q 'logistics-service-replan.js?build=214' dist/authoritative-simulation-worker-v174.js
           grep -q 'groundPassengersFire: true' dist/transport-fire-v214.js
           grep -q 'aviationExcluded: true' dist/transport-fire-v214.js
           grep -q 'noDoubleFire: true' dist/transport-fire-v214.js
@@ -92,7 +95,7 @@ jobs:
           grep -q '__FD_AI_ECONOMY_LOGISTICS_214__' dist/ai-economy-logistics-v214.js
           grep -q '__FD_AI_EXTRACTION_PRIORITY_214__' dist/ai-economy-logistics-v214.js
           grep -q '__FD_TRUCK_DOCK_HOTFIX_213__' dist/supply-transport-v206.js
-          grep -q 'serviceReplanOnUndeliverable:true' dist/supply-transport-v206.js
+          grep -q 'serviceReplanOnUndeliverable:true' dist/logistics-service-replan.js
           grep -q 'friendlyExtractorFogPinning: true' dist/friendly-extractor-visibility-v213.js
           python -m py_compile scripts/build.py scripts/assemble214.py scripts/hotfix214_ai_extraction_priority.py
           node --check tests/runtime-capabilities.mjs
