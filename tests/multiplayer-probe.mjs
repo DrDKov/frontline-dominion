@@ -1,8 +1,9 @@
-import { baseUrl, expectedBuild } from './lib/fd-env.mjs';
+import { expectedBuild, multiplayerUrl } from './lib/fd-env.mjs';
 
 process.env.FD_EXPECTED_BUILD ||= String(expectedBuild);
-process.env.FD_MULTIPLAYER_URL ||= `${baseUrl()}/multiplayer.html?build=${expectedBuild}`;
-// Existing physical WebRTC soak is stronger than the Stage-1 acceptance target:
-// it requires >=30 fresh checksum pairs, zero mismatches and zero automatic
-// recovery/resync while alternating real commands between two browser peers.
-await import('./multiplayer205-soak.mjs');
+process.env.FD_MULTIPLAYER_URL ||= multiplayerUrl();
+// Build-agnostic physical WebRTC acceptance probe. It discovers the active
+// multiplayer lobby capability instead of depending on a historical build
+// global, then requires >=30 fresh checksum pairs, zero mismatches, zero
+// recovery/resync and real alternating commands applied by both Workers.
+await import('./multiplayer-current-soak.mjs');
