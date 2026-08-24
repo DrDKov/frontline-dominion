@@ -6,6 +6,12 @@ on:
     paths:
       - '.github/workflows/publish214-current.yml'
       - 'scripts/hotfix214_adaptive_modules.py'
+      - 'src/legacy/ai-logistics-mobile-reserve.js'
+      - 'src/legacy/ai-logistics-strategy.js'
+      - 'src/legacy/ai-logistics-adaptive-controller.js'
+      - 'src/legacy/engineer-command-control.js'
+      - 'tests/ai-logistics-strategy.mjs'
+      - 'tests/engineer-command-control.mjs'
   workflow_dispatch:
 
 permissions:
@@ -53,6 +59,7 @@ jobs:
           test -s dist/frontline-dominion.html
           test -s dist/transport-fire-v214.js
           test -s dist/ai-economy-logistics-v214.js
+          test -s dist/ai-logistics-mobile-reserve.js
           test -s dist/ai-logistics-strategy.js
           test -s dist/ai-logistics-adaptive-controller.js
           test -s dist/engineer-command-control.js
@@ -60,12 +67,16 @@ jobs:
           grep -q 'data-fd-canonical-build="214"' dist/frontline-dominion.html
           grep -q 'transport-fire-v214.js?build=214' dist/frontline-dominion.html
           grep -q 'ai-economy-logistics-v214.js?build=214' dist/frontline-dominion.html
+          grep -q 'ai-logistics-mobile-reserve.js?build=214' dist/frontline-dominion.html
           grep -q 'ai-logistics-strategy.js?build=214' dist/frontline-dominion.html
           grep -q 'ai-logistics-adaptive-controller.js?build=214' dist/frontline-dominion.html
           grep -q 'engineer-command-control.js?build=214' dist/frontline-dominion.html
+          grep -q 'ai-logistics-mobile-reserve.js?build=214' dist/authoritative-simulation-worker-v174.js
           grep -q 'ai-logistics-strategy.js?build=214' dist/authoritative-simulation-worker-v174.js
           grep -q 'ai-logistics-adaptive-controller.js?build=214' dist/authoritative-simulation-worker-v174.js
           grep -q 'engineer-command-control.js?build=214' dist/authoritative-simulation-worker-v174.js
+          grep -q 'physicalReassignmentOnly: true' dist/ai-logistics-mobile-reserve.js
+          grep -q 'protectedFieldMissions: true' dist/ai-logistics-mobile-reserve.js
           grep -q 'minimumAlternatives: MIN_ALTERNATIVES' dist/ai-logistics-strategy.js
           grep -q 'minimumAlternativesPerProblem: MIN_ALTERNATIVES' dist/ai-logistics-adaptive-controller.js
           grep -q 'automaticReplanning: true' dist/ai-logistics-adaptive-controller.js
@@ -73,6 +84,7 @@ jobs:
           grep -q 'unassignedEngineersIgnoreConstruction: true' dist/engineer-command-control.js
           grep -q 'automaticRepairPreserved: true' dist/engineer-command-control.js
           python -m py_compile scripts/build.py scripts/assemble214.py scripts/hotfix214_ai_extraction_priority.py scripts/hotfix214_adaptive_modules.py
+          node --check dist/ai-logistics-mobile-reserve.js
           node --check dist/ai-logistics-strategy.js
           node --check dist/ai-logistics-adaptive-controller.js
           node --check dist/engineer-command-control.js
@@ -147,6 +159,7 @@ jobs:
           for attempt in $(seq 1 90); do
             if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_GAME" >/tmp/fd214-current-public.html && \
                grep -q 'data-fd-canonical-build="214"' /tmp/fd214-current-public.html && \
+               grep -q 'ai-logistics-mobile-reserve.js?build=214' /tmp/fd214-current-public.html && \
                grep -q 'ai-logistics-strategy.js?build=214' /tmp/fd214-current-public.html && \
                grep -q 'ai-logistics-adaptive-controller.js?build=214' /tmp/fd214-current-public.html && \
                grep -q 'engineer-command-control.js?build=214' /tmp/fd214-current-public.html; then
@@ -156,9 +169,12 @@ jobs:
             sleep 4
           done
           test "$ok" -eq 1
+          curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/ai-logistics-mobile-reserve.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-ai-reserve.js
           curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/ai-logistics-strategy.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-ai-strategy.js
           curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/ai-logistics-adaptive-controller.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-ai-adaptive.js
           curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/engineer-command-control.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-engineer.js
+          grep -q 'physicalReassignmentOnly: true' /tmp/fd214-current-public-ai-reserve.js
+          grep -q 'protectedFieldMissions: true' /tmp/fd214-current-public-ai-reserve.js
           grep -q 'multiOptionPlanning: true' /tmp/fd214-current-public-ai-strategy.js
           grep -q 'minimumAlternatives: MIN_ALTERNATIVES' /tmp/fd214-current-public-ai-strategy.js
           grep -q 'minimumAlternativesPerProblem: MIN_ALTERNATIVES' /tmp/fd214-current-public-ai-adaptive.js
