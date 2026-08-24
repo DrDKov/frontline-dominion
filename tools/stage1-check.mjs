@@ -72,9 +72,20 @@ const allSrc = await walk(SRC);
 let legacyVersionedNames = 0;
 let legacyBuildQueries = 0;
 let illegalOutsideLegacy = 0;
+let historicalPatchFiles = 0;
 for (const path of allSrc) {
   const rel = relative(SRC, path).replaceAll('\\', '/');
-  if (rel === 'version.js' || !['.js', '.mjs', '.html', '.css', '.json'].includes(extname(path).toLowerCase())) continue;
+  if (!['.js', '.mjs', '.html', '.css', '.json'].includes(extname(path).toLowerCase())) continue;
+
+  // src/vNNN is the pre-Stage-1 patch archive. It is deliberately excluded
+  // from the active source policy because npm build no longer reads it.
+  // Stage 1e will delete/archive it after the patchless release path is green.
+  if (/^v\d+\//.test(rel)) {
+    historicalPatchFiles += 1;
+    continue;
+  }
+  if (rel === 'version.js') continue;
+
   const text = await readFile(path, 'utf8').catch(() => '');
   const inLegacy = rel.startsWith('legacy/');
   const buildRefs = (text.match(/\?build=\d+/g) || []).length;
@@ -83,18 +94,23 @@ for (const path of allSrc) {
     if (/-v\d+\.(?:js|mjs|css|json)$/i.test(rel)) legacyVersionedNames += 1;
   } else if (rel !== 'manifest.json' && (buildRefs || /\bBUILD\s*[=:]\s*\d+/.test(text) || /-v\d+\.(?:js|mjs)/i.test(text))) {
     illegalOutsideLegacy += 1;
-    errors.push(`${rel}: build coupling outside grandfathered legacy source`);
+    errors.push(`${rel}: build coupling outside active legacy source`);
   }
 }
+
 const manifestVersionRefs = (JSON.stringify(config).match(/-v\d+\.(?:js|mjs|css|json)/gi) || []).length;
+if (historicalPatchFiles) warnings.push(`migration debt: ${historicalPatchFiles} files remain in inactive src/vNNN patch archive`);
 if (manifestVersionRefs) warnings.push(`migration debt: source manifest still names ${manifestVersionRefs} versioned legacy file(s)`);
-if (strictSource && (legacyVersionedNames || legacyBuildQueries || manifestVersionRefs)) errors.push(`strict source policy: legacy still has ${legacyVersionedNames} versioned filenames, ${legacyBuildQueries} ?build references and ${manifestVersionRefs} manifest version refs`);
-else if (legacyVersionedNames || legacyBuildQueries) warnings.push(`migration debt: legacy has ${legacyVersionedNames} versioned filenames and ${legacyBuildQueries} ?build references`);
+if (strictSource && (legacyVersionedNames || legacyBuildQueries || manifestVersionRefs || historicalPatchFiles)) {
+  errors.push(`strict source policy: legacy still has ${legacyVersionedNames} versioned filenames, ${legacyBuildQueries} ?build references, ${manifestVersionRefs} manifest version refs and ${historicalPatchFiles} historical patch files`);
+} else if (legacyVersionedNames || legacyBuildQueries) {
+  warnings.push(`migration debt: legacy has ${legacyVersionedNames} versioned filenames and ${legacyBuildQueries} ?build references`);
+}
 
 const provenance = await readFile(join(LEGACY, 'PROVENANCE.md'), 'utf8').catch(() => '');
 if (!/files:\s*836/.test(provenance) || !/build:\s*213/.test(provenance)) errors.push('src/legacy/PROVENANCE.md does not describe the pinned snapshot');
 
-console.log(`stage1 check: build=${version.BUILD} pinned=${manifest.files.length} extra=${extraFiles.length} hashDrift=${hashDrift} versionedNames=${legacyVersionedNames} buildQueries=${legacyBuildQueries} errors=${errors.length} warnings=${warnings.length}`);
+console.log(`stage1 check: build=${version.BUILD} pinned=${manifest.files.length} extra=${extraFiles.length} hashDrift=${hashDrift} versionedNames=${legacyVersionedNames} buildQueries=${legacyBuildQueries} historicalPatchFiles=${historicalPatchFiles} errors=${errors.length} warnings=${warnings.length}`);
 for (const w of warnings) console.log(`stage1 warning: ${w}`);
 for (const e of errors) console.error(`stage1 error: ${e}`);
 process.exitCode = errors.length ? 1 : 0;
