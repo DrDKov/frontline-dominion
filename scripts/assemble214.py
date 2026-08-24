@@ -19,11 +19,52 @@ for path in [HTML,WORKER,BRIDGE,TRANSPORT_SRC,AI_SRC,OUT/'runtime-ui-v213.js',OU
     if not path.exists(): raise RuntimeError(f'build 214 inherited output missing: {path}')
 
 transport_text=TRANSPORT_SRC.read_text('utf-8')
+# Embarked passengers are excluded from the ordinary active-unit update path by
+# the transport system. Drive their combat from the active ground carrier tick
+# instead, in stable cargo-id order, so the authoritative Worker advances each
+# passenger cooldown exactly once and can actually release fire while embarked.
+old_transport_update="""  const baseUpdate = Unit.prototype.update;
+  Unit.prototype.update = function(dt) {
+    const transportId = this.embarkedIn;
+    const transport = transportId ? this.game?.getEntity?.(transportId) : null;
+    const beforeShot = Number(this.lastShotAt) || -1;
+    const beforeProjectiles = this.game?.projectiles?.length || 0;
+    const beforeCooldown = Number(this.weaponCooldown) || 0;
+    const result = baseUpdate.call(this, dt);
+    if (!transportId || !isGroundTransport(transport) || !isEmbarkedPassenger(this, transport)) return result;
+
+    const baseAlreadyFired = (this.game?.projectiles?.length || 0) > beforeProjectiles || (Number(this.lastShotAt) || -1) !== beforeShot;
+    if (baseAlreadyFired) return result;
+    const cooldownAlreadyAdvanced = (Number(this.weaponCooldown) || 0) < beforeCooldown - EPS;
+    fireFromGroundTransport(this, transport, dt, cooldownAlreadyAdvanced);
+    return result;
+  };
+"""
+new_transport_update="""  const baseUpdate = Unit.prototype.update;
+  Unit.prototype.update = function(dt) {
+    const result = baseUpdate.call(this, dt);
+    if (!isGroundTransport(this) || !Array.isArray(this.transportCargoIds) || !this.transportCargoIds.length) return result;
+
+    const tick = Number(this.game?.simTick);
+    const passengerIds = [...new Set(this.transportCargoIds.map(id => String(id)))].sort((a, b) => a.localeCompare(b, 'en'));
+    for (const id of passengerIds) {
+      const passenger = this.game?.getEntity?.(id);
+      if (!isEmbarkedPassenger(passenger, this)) continue;
+      if (Number.isFinite(tick) && passenger._embarkedFireTick === tick) continue;
+      if (Number.isFinite(tick)) passenger._embarkedFireTick = tick;
+      fireFromGroundTransport(passenger, this, dt, false);
+    }
+    return result;
+  };
+"""
+if transport_text.count(old_transport_update)!=1:
+    raise RuntimeError(f'build 214 embarked fire scheduler anchor count={transport_text.count(old_transport_update)}')
+transport_text=transport_text.replace(old_transport_update,new_transport_update,1)
 transport_text+="""
 ;(() => {
   const root=typeof window!=='undefined'?window:self;
   const api=root.__FD_TRANSPORT_FIRE__;
-  if(api) root.__FD_TRANSPORT_FIRE_214__=Object.freeze({...api,build:214,version:'16.9.8'});
+  if(api) root.__FD_TRANSPORT_FIRE_214__=Object.freeze({...api,build:214,version:'16.9.8',carrierDrivenScheduler:true});
 })();
 """
 TRANSPORT.write_text(transport_text,'utf-8')
