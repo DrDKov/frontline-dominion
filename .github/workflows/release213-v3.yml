@@ -11,6 +11,7 @@ on:
       - 'src/v213/**'
       - 'tests/build213-regression.mjs'
       - 'tests/build213-regression-v2.mjs'
+      - 'tests/logistics211-service-replan.mjs'
       - 'tests/worker213-bootstrap.mjs'
       - 'tests/screen-direction213.mjs'
   workflow_dispatch:
@@ -125,6 +126,7 @@ jobs:
           grep -q 'save-slots-v213.js?build=213' dist/frontline-dominion.html
           grep -q 'friendly-extractor-visibility-v213.js?build=213' dist/authoritative-simulation-worker-v174.js
           grep -q '__FD_TRUCK_DOCK_HOTFIX_213__' dist/supply-transport-v206.js
+          grep -q 'serviceReplanOnUndeliverable:true' dist/supply-transport-v206.js
           grep -q 'noCenterDistanceShortcut:true' dist/supply-transport-v206.js
           grep -Fq "['extract','ВЫВОЗИТЬ ДОБЫЧУ']" dist/logistics-ui-v208.js
           grep -q 'friendlyExtractorFogPinning: true' dist/friendly-extractor-visibility-v213.js
@@ -136,6 +138,7 @@ jobs:
           node --check tests/build213-regression-v2.mjs
           node --check tests/worker213-bootstrap.mjs
           node --check tests/screen-direction213.mjs
+          node --check tests/logistics211-service-replan.mjs
           for file in dist/*.js; do node --check "$file"; done
 
       - name: Install Chromium and generate inherited gates
@@ -167,6 +170,7 @@ jobs:
           FD_GAME_URL="$GAME_URL" node tests/worker213-bootstrap.mjs 2>&1 | tee /tmp/fd213-bootstrap.log
           FD_GAME_URL="$GAME_URL" node tests/logistics211-service.generated.mjs 2>&1 | tee /tmp/fd213-inherited-service.log
           FD_GAME_URL="$GAME_URL" node tests/logistics211-missions.generated.mjs 2>&1 | tee /tmp/fd213-inherited-missions.log
+          FD_GAME_URL="$GAME_URL" node tests/logistics211-service-replan.mjs 2>&1 | tee /tmp/fd213-service-replan.log
           FD_GAME_URL="$GAME_URL" node tests/build212-regression.mjs 2>&1 | tee /tmp/fd213-inherited-212.log
           FD_GAME_URL="$GAME_URL" node tests/screen-direction213.mjs 2>&1 | tee /tmp/fd213-screen.log
           FD_GAME_URL="$GAME_URL" node tests/build213-regression-v2.mjs 2>&1 | tee /tmp/fd213-regression.log
