@@ -1,0 +1,31 @@
+name: Observe current build 214 publication
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'publish214-trigger.txt'
+      - '.github/workflows/publish214-observer.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch-and-watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - name: Dispatch current build 214 publisher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run publish214-current.yml --repo "$GITHUB_REPOSITORY" --ref main
+          sleep 4
+          RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow publish214-current.yml --branch main --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId')"
+          test -n "$RUN_ID"
+          echo "publisher_run_id=$RUN_ID"
+          echo "publisher_url=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}"
+          gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status --interval 10
