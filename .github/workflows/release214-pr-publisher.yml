@@ -1,0 +1,154 @@
+name: Release 214 observable PR publisher
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'release214-pr-trigger.txt'
+
+permissions:
+  contents: write
+
+env:
+  FD_EXPECTED_BUILD: '214'
+  FD_BASE_URL: http://127.0.0.1:8765/frontline-dominion
+  FD_GAME_URL: http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=214
+  FD_MULTIPLAYER_URL: http://127.0.0.1:8765/frontline-dominion/multiplayer.html?build=214
+  FD205_SOAK_MS: '90000'
+
+jobs:
+  publish214:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout PR state
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build canonical 214
+        run: |
+          set -euo pipefail
+          python scripts/build.py --from-src
+          python scripts/assemble214.py
+          python scripts/hotfix214_ai_extraction_priority.py
+
+      - name: Static canonical gates
+        run: |
+          set -euo pipefail
+          test -s dist/frontline-dominion.html
+          test -s dist/multiplayer.html
+          test -s dist/runtime-shell-v214.js
+          test -s dist/runtime-ui-v214.js
+          test -s dist/save-slots-v214.js
+          test -s dist/transport-fire-v214.js
+          test -s dist/ai-economy-logistics-v214.js
+          grep -q 'data-fd-canonical-build="214"' dist/frontline-dominion.html
+          grep -q 'runtime-shell-v214.js?build=214' dist/frontline-dominion.html
+          grep -q 'save-slots-v214.js?build=214' dist/frontline-dominion.html
+          grep -q 'transport-fire-v214.js?build=214' dist/frontline-dominion.html
+          grep -q 'ai-economy-logistics-v214.js?build=214' dist/frontline-dominion.html
+          grep -q '__FD_TRANSPORT_FIRE_214__' dist/transport-fire-v214.js
+          grep -q 'groundPassengersFire: true' dist/transport-fire-v214.js
+          grep -q 'aviationExcluded: true' dist/transport-fire-v214.js
+          grep -q 'noDoubleFire: true' dist/transport-fire-v214.js
+          grep -q '__FD_AI_ECONOMY_LOGISTICS_214__' dist/ai-economy-logistics-v214.js
+          grep -q '__FD_AI_EXTRACTION_PRIORITY_214__' dist/ai-economy-logistics-v214.js
+          grep -q 'data-fd-canonical-build="214"' dist/multiplayer.html
+          grep -q 'frontline-dominion.html?build=214&amp;multiplayer=1' dist/multiplayer.html
+          grep -q 'multiplayer-lobby-v206.js?build=214' dist/multiplayer.html
+          for file in dist/*.js; do node --check "$file"; done
+
+      - name: Install Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve canonical build 214
+        run: |
+          set -euo pipefail
+          rm -rf smoke-root && mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd214-pr-http.log 2>&1 &
+          echo $! >/tmp/fd214-pr-http.pid
+          for attempt in $(seq 1 100); do
+            if curl -fsSL "$FD_GAME_URL" >/tmp/fd214-pr-local.html && curl -fsSL "$FD_MULTIPLAYER_URL" >/tmp/fd214-pr-mp.html; then exit 0; fi
+            sleep .1
+          done
+          exit 1
+
+      - name: Runtime regression gates
+        run: |
+          set -euo pipefail
+          node tests/runtime-capabilities.mjs
+          node tests/logistics206-invariants.mjs
+          node tests/worker214-bootstrap.mjs
+          node tests/command-bridge.mjs
+          node tests/extractor-haul.mjs
+          node tests/save-load-current.mjs
+          node tests/logistics-service-replan.mjs
+          node tests/transport-fire.mjs
+          node tests/ai-economy-logistics.mjs
+          node tests/build214-regression.mjs
+
+      - name: Multiplayer deterministic gate
+        run: |
+          set -euo pipefail
+          node tests/multiplayer-probe.mjs
+
+      - name: Publish build 214 to gh-pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd dist
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b gh-pages
+          git add -A
+          git commit -m 'Frontline Dominion v16.9.8 build 214 passenger fire and AI logistics'
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin gh-pages
+
+      - name: Verify public build 214
+        run: |
+          set -euo pipefail
+          PUBLIC_ROOT='https://drdkov.github.io/frontline-dominion'
+          PUBLIC_GAME="$PUBLIC_ROOT/frontline-dominion.html?build=214&verify=${GITHUB_SHA}"
+          ok=0
+          for attempt in $(seq 1 120); do
+            if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_GAME" >/tmp/fd214-pr-public.html && \
+               grep -q 'data-fd-canonical-build="214"' /tmp/fd214-pr-public.html && \
+               grep -q 'transport-fire-v214.js?build=214' /tmp/fd214-pr-public.html && \
+               grep -q 'ai-economy-logistics-v214.js?build=214' /tmp/fd214-pr-public.html; then
+              ok=1; break
+            fi
+            sleep 3
+          done
+          test "$ok" -eq 1
+          curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/multiplayer.html?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-pr-public-mp.html
+          grep -q 'data-fd-canonical-build="214"' /tmp/fd214-pr-public-mp.html
+          grep -q 'frontline-dominion.html?build=214&amp;multiplayer=1' /tmp/fd214-pr-public-mp.html
+          FD_GAME_URL="$PUBLIC_GAME" node tests/worker214-bootstrap.mjs
+          FD_GAME_URL="$PUBLIC_GAME" node tests/build214-regression.mjs
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release214-pr-publisher-diagnostics
+          path: |
+            /tmp/fd214-pr-*.log
+            /tmp/fd214-pr-*.html
+          if-no-files-found: ignore
+          retention-days: 3
