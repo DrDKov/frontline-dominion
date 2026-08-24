@@ -11,6 +11,11 @@ const config = JSON.parse(await readFile(join(SRC, 'manifest.json'), 'utf8'));
 const legacyManifest = JSON.parse(await readFile(resolve(SRC, config.legacySnapshotManifest), 'utf8'));
 const sourceRoot = resolve(SRC, config.sourceRoot);
 const TEXT_EXT = new Set(['.js', '.html', '.css', '.json', '.mjs']);
+const cacheMode = config.cacheBust?.mode || 'inject';
+
+function hasBuildParam(url) {
+  return /(?:[?&])build=\d+(?:&|#|$)/.test(String(url));
+}
 
 function stripBuildParam(url) {
   const [beforeHash, hash = ''] = String(url).split('#', 2);
@@ -23,6 +28,7 @@ function stripBuildParam(url) {
 
 function withBuild(url) {
   if (!url || /^(?:https?:|data:|blob:|#|javascript:)/i.test(url)) return url;
+  if (cacheMode === 'replace-existing' && !hasBuildParam(url)) return url;
   const clean = stripBuildParam(url);
   const [beforeHash, hash = ''] = clean.split('#', 2);
   const sep = beforeHash.includes('?') ? '&' : '?';
@@ -37,7 +43,7 @@ function rewriteHtml(text) {
 
 function rewriteImportScripts(text) {
   if (!config.cacheBust?.workerImportScripts || !text.includes('importScripts')) return text;
-  return text.replace(/importScripts\s*\(([^;]*?)\)/gs, (whole, args) => {
+  return text.replace(/importScripts\s*\(([^;]*?)\)/gs, (_whole, args) => {
     const next = args.replace(/(['"])([^'"]+\.js(?:\?[^'"]*)?(?:#[^'"]*)?)\1/g,
       (_m, quote, url) => `${quote}${withBuild(url)}${quote}`);
     return `importScripts(${next})`;
@@ -73,7 +79,8 @@ const metadata = {
   protocolVersion: version.PROTOCOL_VERSION,
   source: 'src/legacy',
   sourceManifestSchema: config.schemaVersion,
+  cacheBustMode: cacheMode,
   files: allFiles.length,
 };
 await writeFile(join(DIST, 'build-meta.json'), `${JSON.stringify(metadata, null, 2)}\n`, 'utf8');
-console.log(`stage1 build: ${allFiles.length} source files -> dist; build=${version.BUILD} version=${version.VERSION}`);
+console.log(`stage1 build: ${allFiles.length} source files -> dist; build=${version.BUILD} version=${version.VERSION} cache=${cacheMode}`);
