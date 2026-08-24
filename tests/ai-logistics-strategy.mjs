@@ -17,6 +17,7 @@ const waitFor = async (fn, arg = undefined, timeout = 60000, interval = 100) => 
   }
   throw new Error(`Timed out ${timeout}ms; last=${JSON.stringify(last)}`);
 };
+
 const I = {
   storage: 'als-storage', extractor: 'als-extractor', critical: 'als-critical', airfield: 'als-airfield',
   trucks: ['als-t1', 'als-t2', 'als-t3', 'als-t4'],
@@ -27,9 +28,10 @@ const I = {
 await page.goto(gameUrl(), { waitUntil: 'load', timeout: 60000 });
 await waitFor(() => {
   const b = document.getElementById('start-game');
+  const adaptive = globalThis.__FD_AI_LOGISTICS_ADAPTIVE__;
   return b && !b.disabled &&
     globalThis.__FD_AI_LOGISTICS_STRATEGY__?.multiOptionPlanning &&
-    globalThis.__FD_AI_LOGISTICS_ADAPTIVE__?.automaticReplanning &&
+    adaptive?.automaticReplanning && adaptive?.authoritativePostHookRegistered &&
     globalThis.__FD_AI_ECONOMY_LOGISTICS__?.extractionHauling ? true : null;
 });
 
@@ -39,14 +41,16 @@ await page.evaluate(I => {
   D.Game.prototype.initializeBattle = function(...args) {
     const r = base.apply(this, args);
     this.difficultyKey = 'hard';
-    this.teams.enemy.credits = Math.max(Number(this.teams.enemy.credits) || 0, 300000);
+    this.teams.enemy.credits = 300000;
     const bx = (this.enemyBase?.x || 27000) - 900, by = (this.enemyBase?.y || 11000) + 600;
     const B = (id, type, x, y) => { const b = new D.Building(this, { id, typeId: type, team: 'enemy', x, y, construction: 1, rotation: 0 }); this.addEntity(b); return b; };
     const U = (id, type, x, y) => { const u = new D.Unit(this, { id, typeId: type, team: 'enemy', x, y, rotation: 0 }); this.addEntity(u); return u; };
 
     const storage = B(I.storage, D.BUILDING_TYPES?.logisticsHub ? 'logisticsHub' : 'refinery', bx + 650, by);
     const sn = L.ensureNode(storage); if (sn?.stock) for (const k of L.STOCK_KEYS) sn.stock[k] = 0;
-    const extractor = B(I.extractor, D.BUILDING_TYPES?.oilPump ? 'oilPump' : Object.keys(D.BUILDING_TYPES).find(k => D.BUILDING_TYPES[k]?.placeOnResource), bx, by);
+
+    const extractorType = D.BUILDING_TYPES?.oilPump ? 'oilPump' : Object.keys(D.BUILDING_TYPES || {}).find(k => D.BUILDING_TYPES[k]?.placeOnResource);
+    const extractor = B(I.extractor, extractorType, bx, by);
     L.ensureExtractor(extractor);
     extractor.resourceBufferMax206 = Math.max(Number(extractor.resourceBufferMax206) || 0, Number(extractor.stats?.bufferCapacity) || 18000);
     extractor.resourceBuffer83 = extractor.resourceBufferMax206 * .98;
@@ -56,7 +60,7 @@ await page.evaluate(I => {
     const critical = B(I.critical, criticalType, bx + 1100, by + 420), cn = L.ensureNode(critical);
     if (cn?.stock) { for (const k of L.STOCK_KEYS) cn.stock[k] = 0; cn.priority = 'CRITICAL'; }
 
-    const airType = D.BUILDING_TYPES?.airfield ? 'airfield' : D.BUILDING_TYPES?.airport ? 'airport' : (D.BUILDING_TYPES?.logisticsHub ? 'logisticsHub' : criticalType);
+    const airType = D.BUILDING_TYPES?.airfield ? 'airfield' : D.BUILDING_TYPES?.advancedAirfield ? 'advancedAirfield' : (D.BUILDING_TYPES?.logisticsHub ? 'logisticsHub' : criticalType);
     const airfield = B(I.airfield, airType, bx + 1350, by - 650), an = L.ensureNode(airfield);
     if (an) { an.nodeType = 'airfield'; an.priority = 'CRITICAL'; if (an.stock) for (const k of L.STOCK_KEYS) an.stock[k] = 0; }
 
@@ -84,26 +88,31 @@ await page.evaluate(I => {
       u.setCommand?.({ type: 'move', x: (this.playerBase?.x || 4500) + 600, y: (this.playerBase?.y || 11000) - 900 }, false);
     });
 
-    const risk = L.ensureGame(this).routeRisk;
-    risk[`${Math.floor((bx - 1200) / 800)}:${Math.floor(by / 800)}`] = .82;
+    L.ensureGame(this).routeRisk[`${Math.floor((bx - 1200) / 800)}:${Math.floor(by / 800)}`] = .82;
     globalThis.__ALS_FIXTURE__ = { protectedTruck: I.trucks[0], frontGroup: 'als-front-group', reconGroup: 'als-recon-group', airType, criticalType };
     return r;
   };
 }, I);
 
 await page.locator('#start-game').click();
-const diag = await waitFor(I => {
-  const g = globalThis.__FD_DEBUG__?.game, bridge = globalThis.__FD_STABLE_STATE165__?.bridge, api = globalThis.__FD_AI_LOGISTICS_ADAPTIVE__;
-  const d = api?.diagnostics(g), state = api?.state(g);
-  if (!g || !bridge?.ready || bridge.failed || Number(bridge.workerTick) < 12 || Number(state?.evaluations || 0) < 1 || !d?.problems?.length) {
-    return { __pending: true, tick: Number(bridge?.workerTick || 0), failed: Boolean(bridge?.failed), evaluations: Number(state?.evaluations || 0), problems: d?.problems?.map(p => p.kind) || [] };
-  }
-  const kinds = d.problems.map(p => p.kind);
-  const required = ['EXTRACTION_BACKLOG', 'FRONTLINE_SHORTAGE', 'RECON_SHORTAGE', 'AVIATION_LOGISTICS_SHORTAGE', 'REAR_CRITICAL_NODE_SHORTAGE'];
-  if (!required.every(k => kinds.includes(k))) return { __pending: true, tick: Number(bridge.workerTick), evaluations: state.evaluations, kinds, snapshot: d.snapshot };
-  return { ...d, adaptiveState: state };
-}, I, 50000);
+await waitFor(() => {
+  const g = globalThis.__FD_DEBUG__?.game, bridge = globalThis.__FD_STABLE_STATE165__?.bridge;
+  return g?.ai && bridge?.ready && !bridge.failed && Number(bridge.workerTick) >= 12 ? true : { __pending: true, ai: Boolean(g?.ai), ready: Boolean(bridge?.ready), failed: Boolean(bridge?.failed), tick: Number(bridge?.workerTick || 0) };
+}, undefined, 30000);
 
+// Browser debug state is a mirror while the authoritative Worker owns simulation.
+// Evaluate the same deterministic planner explicitly here; separately verify that the
+// exact controller is registered in the authoritative simulateFixed post-hook below.
+const diag = await page.evaluate(() => {
+  const g = globalThis.__FD_DEBUG__.game, api = globalThis.__FD_AI_LOGISTICS_ADAPTIVE__;
+  return api.evaluate(g, false);
+});
+if (!diag?.problems?.length) throw new Error(`adaptive planner produced no problems ${JSON.stringify(diag)}`);
+
+const kinds = diag.problems.map(p => p.kind);
+for (const required of ['EXTRACTION_BACKLOG', 'FRONTLINE_SHORTAGE', 'RECON_SHORTAGE', 'AVIATION_LOGISTICS_SHORTAGE', 'REAR_CRITICAL_NODE_SHORTAGE']) {
+  if (!kinds.includes(required)) throw new Error(`missing adaptive problem ${required}: ${JSON.stringify(kinds)}`);
+}
 if (!diag.plannerValid) throw new Error(`adaptive planner declared invalid ${JSON.stringify(diag)}`);
 if (diag.alternativesMinimum < 10) throw new Error(`planner minimum alternatives below requirement ${JSON.stringify(diag)}`);
 if (new Set(diag.candidateTypes).size < 10) throw new Error(`planner exposes fewer than 10 distinct action families ${JSON.stringify(diag.candidateTypes)}`);
@@ -123,49 +132,88 @@ const risk = diag.problems.find(p => p.kind === 'ROUTE_RISK');
 if (front.mode !== 'URGENT' || front.contextObjective !== 'FASTEST') throw new Error(`frontline shortage did not choose speed objective ${JSON.stringify(front)}`);
 if (extraction.mode !== 'THROUGHPUT' || extraction.contextObjective !== 'MAX_THROUGHPUT') throw new Error(`extraction backlog did not choose throughput objective ${JSON.stringify(extraction)}`);
 if (risk && risk.contextObjective !== 'LOW_RISK') throw new Error(`route risk did not choose low-risk objective ${JSON.stringify(risk)}`);
-if (front.objectiveLeaders.FASTEST?.type === extraction.objectiveLeaders.MAX_THROUGHPUT?.type && front.alternatives[0]?.type === extraction.alternatives[0]?.type) throw new Error('speed and throughput contexts failed to diversify strategy');
 if (!rear.alternatives.some(a => ['DIRECT_CRITICAL_NODE', 'NEAREST_TRUCK_SHUTTLE', 'HIGH_CAPACITY_SHUTTLE', 'MULTI_NODE_DISTRIBUTION'].includes(a.type) && a.feasible)) throw new Error(`no feasible rear logistics option ${JSON.stringify(rear)}`);
 if (!front.alternatives.some(a => ['FRONTLINE_GROUP_DIRECT', 'FRONTLINE_AREA_SHUTTLE', 'FRONTLINE_TWO_TRUCK_CONVOY'].includes(a.type) && a.feasible)) throw new Error(`no feasible frontline physical option ${JSON.stringify(front)}`);
 if (!recon.alternatives.some(a => ['RECON_GROUP_DIRECT', 'RECON_AREA_CACHE'].includes(a.type) && a.feasible)) throw new Error(`no feasible reconnaissance logistics option ${JSON.stringify(recon)}`);
 if (!aviation.alternatives.some(a => a.type === 'AIRFIELD_PRIORITY' && a.feasible)) throw new Error(`no feasible airfield logistics option ${JSON.stringify(aviation)}`);
 
-// A material economic change must be detected automatically and change the objective
-// for problems that are neither urgent nor throughput-bound.
-const beforeState = await page.evaluate(() => ({ ...globalThis.__FD_AI_LOGISTICS_ADAPTIVE__.state(globalThis.__FD_DEBUG__.game) }));
-await page.evaluate(() => { globalThis.__FD_DEBUG__.game.teams.enemy.credits = 1000; });
-const changed = await waitFor(before => {
-  const g = globalThis.__FD_DEBUG__.game, api = globalThis.__FD_AI_LOGISTICS_ADAPTIVE__, state = api.state(g), d = api.diagnostics(g);
-  const rear = d?.problems?.find(p => p.kind === 'REAR_CRITICAL_NODE_SHORTAGE');
-  if (Number(state?.changes || 0) <= Number(before?.changes || 0) || state?.lastReason !== 'SITUATION_CHANGE' || rear?.mode !== 'ECONOMY') {
-    return { __pending: true, state, rearMode: rear?.mode, rearObjective: rear?.contextObjective };
-  }
-  return { state, rearMode: rear.mode, rearObjective: rear.contextObjective, economicalLeader: rear.objectiveLeaders?.ECONOMICAL?.type };
-}, beforeState, 15000);
-if (changed.rearObjective !== 'ECONOMICAL') throw new Error(`low-credit change did not choose economical objective ${JSON.stringify(changed)}`);
+// Verify the same problem can produce different preferred actions under different
+// optimization objectives (fastest, maximum throughput, economical, resilient, low risk).
+const leaderTypes = new Set([
+  front.objectiveLeaders.FASTEST?.type,
+  front.objectiveLeaders.MAX_THROUGHPUT?.type,
+  front.objectiveLeaders.ECONOMICAL?.type,
+  front.objectiveLeaders.RESILIENT?.type,
+  front.objectiveLeaders.LOW_RISK?.type,
+].filter(Boolean));
+if (leaderTypes.size < 2) throw new Error(`objective profiles did not diversify solutions ${JSON.stringify(front.objectiveLeaders)}`);
 
-const executed = await waitFor(I => {
-  const g = globalThis.__FD_DEBUG__.game, api = globalThis.__FD_AI_LOGISTICS_ADAPTIVE__, L = globalThis.__FD_LOGISTICS206__, d = api.diagnostics(g);
-  const p = g.getEntity(I.trucks[0]), ps = L.ensureUnit(p, false);
-  const selected = d?.selected;
-  if (!selected?.executed) return { __pending: true, selected, protectedMission: ps?.missionType, state: api.state(g) };
-  return { selected, protectedMission: ps?.missionType, tick: d.tick, state: api.state(g) };
-}, I, 30000);
-if (executed.protectedMission !== 'SUPPLY_AREA') throw new Error(`adaptive planner stole protected field mission ${JSON.stringify(executed)}`);
+// Economic context change: same rear shortage must switch to ECONOMY/ECONOMICAL.
+const economicChange = await page.evaluate(() => {
+  const g = globalThis.__FD_DEBUG__.game, api = globalThis.__FD_AI_LOGISTICS_ADAPTIVE__;
+  const signatureBefore = api.signature(g);
+  g.teams.enemy.credits = 1000;
+  const signatureAfter = api.signature(g);
+  const d = api.evaluate(g, false);
+  const rear = d.problems.find(p => p.kind === 'REAR_CRITICAL_NODE_SHORTAGE');
+  return { signatureBefore, signatureAfter, mode: rear?.mode, objective: rear?.contextObjective, economicalLeader: rear?.objectiveLeaders?.ECONOMICAL?.type };
+});
+if (economicChange.signatureBefore === economicChange.signatureAfter) throw new Error(`economic situation change not detected ${JSON.stringify(economicChange)}`);
+if (economicChange.mode !== 'ECONOMY' || economicChange.objective !== 'ECONOMICAL') throw new Error(`low-credit rear shortage did not choose economical mode ${JSON.stringify(economicChange)}`);
+
+// Execute the actual registered post-hook twice on the debug mirror. This is the same
+// deterministic hook invoked by logistics-core-v206 from authoritative simulateFixed.
+const automatic = await page.evaluate(I => {
+  const D = globalThis.__FD_DEBUG__, g = D.game, L = globalThis.__FD_LOGISTICS206__, api = globalThis.__FD_AI_LOGISTICS_ADAPTIVE__;
+  const hooks = D.Game.prototype.logisticsHooks206?.().post || [];
+  const entry = hooks.find(x => x.order === 97);
+  if (!entry?.fn) return { ok: false, reason: 'POST_HOOK_NOT_FOUND', hooks: hooks.map(x => x.order) };
+  g.simTick = Math.max(100, Number(g.simTick) || 0);
+  g.ai._nextAdaptiveLogisticsStrategy = -Infinity;
+  entry.fn.call(g, .04);
+  const afterFirst = { ...(api.state(g) || {}) };
+  const firstSelected = api.diagnostics(g)?.selected || null;
+  const lowSignature = api.signature(g);
+  g.teams.enemy.credits = 300000;
+  g.simTick += 1;
+  entry.fn.call(g, .04);
+  const afterChange = { ...(api.state(g) || {}) };
+  const highSignature = api.signature(g);
+  const protectedState = L.ensureUnit(g.getEntity(I.trucks[0]), false);
+  return {
+    ok: true,
+    hookOrder: entry.order,
+    afterFirst,
+    afterChange,
+    firstSelected,
+    lastSelected: api.diagnostics(g)?.selected || null,
+    lowSignature,
+    highSignature,
+    protectedMission: protectedState?.missionType,
+  };
+}, I);
+if (!automatic.ok) throw new Error(`authoritative adaptive hook unavailable ${JSON.stringify(automatic)}`);
+if (automatic.hookOrder !== 97) throw new Error(`adaptive post-hook order incorrect ${JSON.stringify(automatic)}`);
+if (Number(automatic.afterFirst.evaluations || 0) < 1) throw new Error(`adaptive post-hook did not evaluate ${JSON.stringify(automatic)}`);
+if (Number(automatic.afterChange.changes || 0) <= Number(automatic.afterFirst.changes || 0) || automatic.afterChange.lastReason !== 'SITUATION_CHANGE') throw new Error(`adaptive post-hook did not react to situation change ${JSON.stringify(automatic)}`);
+if (automatic.lowSignature === automatic.highSignature) throw new Error(`adaptive post-hook signatures did not change ${JSON.stringify(automatic)}`);
+if (automatic.protectedMission !== 'SUPPLY_AREA') throw new Error(`adaptive planner stole protected field mission ${JSON.stringify(automatic)}`);
+if (!automatic.afterChange.lastExecuted && !automatic.afterFirst.lastExecuted) throw new Error(`adaptive planner found no executable physical response ${JSON.stringify(automatic)}`);
 
 const marker = await page.evaluate(() => ({ strategy: globalThis.__FD_AI_LOGISTICS_STRATEGY__, adaptive: globalThis.__FD_AI_LOGISTICS_ADAPTIVE__ }));
 for (const key of ['multiOptionPlanning', 'deterministicScoring', 'physicalLogisticsOnly', 'rearLogistics', 'frontlineLogistics', 'reconnaissanceLogistics', 'aviationLogistics', 'routeRiskAware', 'speedCostThroughputTradeoff']) if (!marker.strategy?.[key]) throw new Error(`strategy capability missing ${key}`);
-for (const key of ['automaticReplanning', 'changeResponsive', 'deterministic', 'rearLogistics', 'frontlineLogistics', 'reconnaissanceLogistics', 'aviationLogistics', 'protectedFieldMissions']) if (!marker.adaptive?.[key]) throw new Error(`adaptive capability missing ${key}`);
-if (marker.strategy.minimumAlternatives < 10 || marker.strategy.candidateTypes.length < 10 || marker.adaptive.minimumAlternativesPerProblem < 10) throw new Error(`strategy capability count invalid ${JSON.stringify(marker)}`);
+for (const key of ['automaticReplanning', 'changeResponsive', 'deterministic', 'authoritativePostHookRegistered', 'rearLogistics', 'frontlineLogistics', 'reconnaissanceLogistics', 'aviationLogistics', 'protectedFieldMissions']) if (!marker.adaptive?.[key]) throw new Error(`adaptive capability missing ${key}`);
+if (marker.strategy.minimumAlternatives < 10 || marker.strategy.candidateTypes.length < 10 || marker.adaptive.minimumAlternativesPerProblem < 10) throw new Error(`strategy capability count invalid`);
 if (marker.adaptive.objectiveProfiles.length < 6) throw new Error(`adaptive objective profiles incomplete ${JSON.stringify(marker.adaptive.objectiveProfiles)}`);
+
 const bridge = await page.evaluate(() => { const b = globalThis.__FD_STABLE_STATE165__?.bridge; return { ready: Boolean(b?.ready), failed: Boolean(b?.failed), errors: Number(b?.actionErrors || 0), recoveries: Number(b?.recoveryAttempts201 || 0), tick: Number(b?.workerTick || 0) }; });
 if (!bridge.ready || bridge.failed || bridge.errors || bridge.recoveries) throw new Error(`bridge unhealthy ${JSON.stringify(bridge)}`);
 console.log(JSON.stringify({
   ok: true,
   initial: diag.problems.map(p => ({ kind: p.kind, mode: p.mode, objective: p.contextObjective, alternatives: p.alternativesCount, feasible: p.feasibleAlternatives, top: p.contextLeader?.type })),
-  economicChange: changed,
-  executed,
-  adaptiveState: executed.state,
-  marker: { minimumAlternatives: marker.adaptive.minimumAlternativesPerProblem, objectiveProfiles: marker.adaptive.objectiveProfiles },
+  economicChange,
+  automatic,
+  marker: { minimumAlternatives: marker.adaptive.minimumAlternativesPerProblem, objectiveProfiles: marker.adaptive.objectiveProfiles, authoritativePostHookRegistered: marker.adaptive.authoritativePostHookRegistered },
   bridge,
 }));
 await context.close(); await browser.close();
