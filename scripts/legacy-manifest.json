@@ -1,0 +1,4188 @@
+{
+ "baseUrl": "https://drdkov.github.io/frontline-dominion",
+ "build": 213,
+ "fileCount": 836,
+ "files": [
+  {
+   "path": "action-group-core-v184.js",
+   "sha256": "f0e94818a40e638b6305b37c7e55c752204d331f1d9eaed91c14fada560ec10c",
+   "size": 22119
+  },
+  {
+   "path": "adaptive-doctrine-ai-v131.js",
+   "sha256": "0bd209ce81f047ee2ee0594c0560f570e8a5e0b6aaec935c5c20483bfc8858d2",
+   "size": 36208
+  },
+  {
+   "path": "adaptive-visual-lod-v195.js",
+   "sha256": "d11d4c47a8126e9c5d5d23d86b1a70c4a23a5a31be99e7a536739e8699e444b8",
+   "size": 12112
+  },
+  {
+   "path": "ai-logistics-v206.js",
+   "sha256": "7b575fb15799c5f38b30952f55f902f3b95a8f019f31b15fc888902377edcb6f",
+   "size": 10457
+  },
+  {
+   "path": "air-command-doctrine-v134.js",
+   "sha256": "76e54f898bbc8270629eff74a203422fd5b3367ab247d65f10a8df0d2455cea7",
+   "size": 19511
+  },
+  {
+   "path": "air-logistics-v206.js",
+   "sha256": "7d6ae82bc74990995e5ceae18070af822fc1043e0b1ed8f8d0295cf444ac1f99",
+   "size": 9483
+  },
+  {
+   "path": "air-war-navigation-v133.js",
+   "sha256": "7209efaade5b741a1c4eac3ce71605c1763e8aa3c75a3d9e34fe8d8eea4ebb74",
+   "size": 65791
+  },
+  {
+   "path": "airbase-v93.js",
+   "sha256": "c703b4d67ae78c13b4fe586a559a6b4729901cadef3d1f5a970af98cb73bbff0",
+   "size": 44847
+  },
+  {
+   "path": "authoritative-logistics-v206.js",
+   "sha256": "511b9cf8fbcaf80a3a721818b44c3ceed264df5f76019ffe4645fcda414f9b05",
+   "size": 8540
+  },
+  {
+   "path": "authoritative-simulation-bundle-v172.js",
+   "sha256": "6f04dd3481893a860d669d4e7dd79f805ed637d71ca57d3a876b055fdc62dbe5",
+   "size": 1932234
+  },
+  {
+   "path": "authoritative-simulation-shim-v172.js",
+   "sha256": "c29a9edc1bbf770ecc038808b1bfbe11ccdad916d185d06ac493701176cab72f",
+   "size": 7464
+  },
+  {
+   "path": "authoritative-simulation-v174.js",
+   "sha256": "2bde2490b768f002362e75db3764b0ab2ed65c4ebbc62c0acf130dc081155596",
+   "size": 61373
+  },
+  {
+   "path": "authoritative-simulation-worker-v174.js",
+   "sha256": "600d9c4699f3bb09e710642d1b981fd95b46b85298d741de3b71b564985aaf17",
+   "size": 189135
+  },
+  {
+   "path": "battlefield-network-v132.js",
+   "sha256": "54b245c0458adb385c87f494b46f2e3074fda7d1d186dde3d9c4f4b27e1c9ac7",
+   "size": 36413
+  },
+  {
+   "path": "building-model-hit-v201.js",
+   "sha256": "d8653bfaa177cf8dd40ed024977edc53cbc902212e4fb2ccbb18d5a801c2588e",
+   "size": 2477
+  },
+  {
+   "path": "building-render-authority-v199.js",
+   "sha256": "0f342fa915cb35ab0d55d9dc5f88b33178d3f0a3d0a9c3d56c0a4567fc10ce8d",
+   "size": 3957
+  },
+  {
+   "path": "building-selection-contour-v200.js",
+   "sha256": "7958b80d15575550dfe7e9ca49774b253d8bd0e9fed36ee21e8b734cd114d7e6",
+   "size": 12567
+  },
+  {
+   "path": "building-selection-invariance-v197.js",
+   "sha256": "aa676565609dd79907436dd2ad5b959207794892c70ecf8476f043227169f301",
+   "size": 9950
+  },
+  {
+   "path": "building-selection-owner-v196.js",
+   "sha256": "9c98e3a338925c4e47d308e58d7811a5330de779797812a7a3bc0f91fe4b29f4",
+   "size": 5218
+  },
+  {
+   "path": "building-selection-v193.js",
+   "sha256": "187311b85dc148191f9ea772f047557dab5594a036b99947cc4418f4d1faaaef",
+   "size": 15348
+  },
+  {
+   "path": "building-visible-hit-v204.js",
+   "sha256": "813ab5b970ae40128acea83d3cfd480b11c7f1ce706aac499404fc3927629040",
+   "size": 11609
+  },
+  {
+   "path": "campaign-offensive-ai-v129.js",
+   "sha256": "ef2153734b33b4c8593ad6cc8ba184207204896787ce94d71ee2f035edd4af0f",
+   "size": 24460
+  },
+  {
+   "path": "classic-render-v124.js",
+   "sha256": "c543658e297e160d1ce6d4b114169639a10cc9ad0550b029dde160a5ea87e84a",
+   "size": 8166
+  },
+  {
+   "path": "combat-awareness-v98.js",
+   "sha256": "e30646c819fda619959e19a1d2fed04307d5fc44d6e6b303545a9f5a8fa9d1ac",
+   "size": 5954
+  },
+  {
+   "path": "combat-initiative-v127.js",
+   "sha256": "049e2ceacb6a1c415dd92a4b5233af9f1a07ea4c936c878a3b9b0313a11b4865",
+   "size": 13202
+  },
+  {
+   "path": "combat-scale-core-v166.js",
+   "sha256": "f55bacc03d21aeed53e95759b4e551df5ce98415a779716968d3b92e1b7d0c20",
+   "size": 34609
+  },
+  {
+   "path": "combat-scale-v120.js",
+   "sha256": "89a1dfa244fec2d0f5dfcdc305ed8312337b162322297a938d71666a2f607685",
+   "size": 62322
+  },
+  {
+   "path": "combined-arms-doctrine-v141.js",
+   "sha256": "bf622915ab93cd2f7417b01fd35f5b04dd9caa3efc7d6b85a8f338fe440c80a3",
+   "size": 91685
+  },
+  {
+   "path": "command-input-v190.js",
+   "sha256": "948cb516862b7c2a6b093ace3d1883f72cbe989777445278b4f8ce597e174f44",
+   "size": 8944
+  },
+  {
+   "path": "command-power-authority-v202.js",
+   "sha256": "933514d081b6e2dd0d95ee29cdcb90b70b7a3b045effdc046fac11824e28c6a1",
+   "size": 9377
+  },
+  {
+   "path": "command-watchdog-v191.js",
+   "sha256": "5b846e5fc40222d54b572c0d3692a43539a32104a0159f83434f027c6984c597",
+   "size": 3480
+  },
+  {
+   "path": "construction-footprint-v114.js",
+   "sha256": "d0796e2ef2fb2d037f7dc22033e7639061a710de69512ddd9dda06d0a2eb3755",
+   "size": 12975
+  },
+  {
+   "path": "construction-victory-v184.js",
+   "sha256": "c39d3fbde2e44df844ab2c6fd534623027bed7ebdd399becd844cd404888a579",
+   "size": 16894
+  },
+  {
+   "path": "deep-operations-ai-v182.js",
+   "sha256": "f3935b6d44e0e51f11190bfdde4104d41b8eb6fa11187ee86b192518b952c39e",
+   "size": 76694
+  },
+  {
+   "path": "economic-buildings-v206.js",
+   "sha256": "087a37e9b3970338ffb936922a5ab22509b53111e1a4d0f14345934e95cf94a8",
+   "size": 4026
+  },
+  {
+   "path": "engineer-initiative-v130.js",
+   "sha256": "b714e75dad27746f2e19e43189898e521cd504675732db6083bc19365227ee2e",
+   "size": 12334
+  },
+  {
+   "path": "engineer-rocket-parity-v191.js",
+   "sha256": "920d6473a79a8fea2391c217745ff5859fe425daec7deed77e452c7e6e6137dd",
+   "size": 11796
+  },
+  {
+   "path": "engineer-rocket-visual-v190.js",
+   "sha256": "c11c3e0f31b70f85a1282cb930da1a954c87dc43dc30a0f6e6183e7cbdba2814",
+   "size": 6460
+  },
+  {
+   "path": "extractor-placement-v190.js",
+   "sha256": "7f6fa9d9071b2447cc77afeb91f71ee05f0376dc67d270c3dc0df214c0a99894",
+   "size": 12829
+  },
+  {
+   "path": "finite-ammunition-network-v139.js",
+   "sha256": "17739f3cf38743824eb6e7f4a71e0176d6ca1b5bcb7ba05b654d3690524af90e",
+   "size": 21238
+  },
+  {
+   "path": "fire-discipline-v177.js",
+   "sha256": "db9f95a5da52cb693f2098ed5d2748792cad39c8f17e197d3ac2be5779d0b5bc",
+   "size": 8356
+  },
+  {
+   "path": "formation-march-core-v183.js",
+   "sha256": "716405b79d1923ad620cbbc9ddd9bfc3e9c19b74aaf04fc4040aa87118df7095",
+   "size": 25323
+  },
+  {
+   "path": "formation-obstacle-recovery-v196.js",
+   "sha256": "2a295846cc6f039ec108f8e69f0bbccfd9142c03db82092347282bf16fb3e086",
+   "size": 15856
+  },
+  {
+   "path": "formation-target-fidelity-v197.js",
+   "sha256": "16d58fd53d3deb9d454e6818ef7ed6ddcf733ae95542c4e27d8545b1bc7bc801",
+   "size": 11867
+  },
+  {
+   "path": "fortress-defense-ai-v183.js",
+   "sha256": "98a48549765fead29b2c22ddbcb996112d476c332a072c333d9f37a31627bbae",
+   "size": 36802
+  },
+  {
+   "path": "friendly-extractor-visibility-v213.js",
+   "sha256": "c63344763fa7b431966f1072cbf06d6a2c69f8068504ae49f4ff2964930905a4",
+   "size": 9028
+  },
+  {
+   "path": "frontline-dominion.html",
+   "sha256": "b7cd4febe2c5b08771676f62f4b662b3728511049a0ed52d546000def371062d",
+   "size": 1204025
+  },
+  {
+   "path": "gameplay-reliability-v199.js",
+   "sha256": "2e2ac482b27897c1aca9072664001e413fe043be80f95e8b72b337c7560e6e0b",
+   "size": 22106
+  },
+  {
+   "path": "gameplay-v208.js",
+   "sha256": "486b9a134072e37d29c8793da5920d7098308cca38d8ec90c96ad63e01f129c0",
+   "size": 11116
+  },
+  {
+   "path": "group-movement-v201.js",
+   "sha256": "8480e1ee3bbadc6094b5ce649004c0ed26459c6cd58ec5f8bca6f392f96fce3e",
+   "size": 20133
+  },
+  {
+   "path": "hierarchical-army-v164.js",
+   "sha256": "74961a28e2775714bf719c53bdd19a0b0f40f07524532fe4a4a8a31dccdc5331",
+   "size": 13417
+  },
+  {
+   "path": "hook-context-v207.js",
+   "sha256": "3c23ed2e9a0c68f06e76f4b03a16deed2978f17b84c99f336596a056a77128a2",
+   "size": 1207
+  },
+  {
+   "path": "integrated-air-operations-v119.js",
+   "sha256": "b6a9caffa3fa5d7c075e52ef46bbd796618801fb7a1125a50d2b9e2b48c60e84",
+   "size": 11582
+  },
+  {
+   "path": "interaction-reset-v199.js",
+   "sha256": "63000d23e2788dbbbf4946153c701df35e8cf2d1a63d30e65ef7e03fbdac1557",
+   "size": 8533
+  },
+  {
+   "path": "legion-render-v125.js",
+   "sha256": "b5a40ca1955d106730f76db20706b16f56932ac2e0a6d280feec106a58370566",
+   "size": 36004
+  },
+  {
+   "path": "legion-render-worker-v125.js",
+   "sha256": "d1f93f9f9ea00d94f25a5cac32c91f2e6656f71571f14a2192d09f8addbe091c",
+   "size": 8204
+  },
+  {
+   "path": "logistics-core-v206.js",
+   "sha256": "f6f73a0b51cbc75c53511fdc4915898cf6c4256c3e87a7457d5c7d64fbb94bee",
+   "size": 31558
+  },
+  {
+   "path": "logistics-ui-v208.js",
+   "sha256": "53eb5257bd55204eb4fa0759f97eab1e2bf10b5226eec61d7f3aed0b1e278e24",
+   "size": 23486
+  },
+  {
+   "path": "mass-scale-v94.js",
+   "sha256": "a406fbf42f60d3380fbdf890f62e89ed33b3cade8d3d53008ce3436c77ad89be",
+   "size": 92694
+  },
+  {
+   "path": "mass-simulation-core-v163.js",
+   "sha256": "d7f9191ea1817009c3fcac6235f09aa956f5d5c0bf9d7f385bec8d1929c2389e",
+   "size": 19498
+  },
+  {
+   "path": "minefield-defense-catalog-v181.js",
+   "sha256": "0731ca5d3ccd59f55ef3eb5d7120b4bc807bda1498d7e3b3ffc7ee00db012bef",
+   "size": 5093
+  },
+  {
+   "path": "minimap-atomic-v181.js",
+   "sha256": "5518e60541fe63d94c7c720545173ed16335dca0b19a3262929dc2cf1160605a",
+   "size": 7195
+  },
+  {
+   "path": "missile-salvo-v136.js",
+   "sha256": "3c299c1f39c96455904bc3c7c807e5cca5a7c8a9ea0a019f89df53ee1f03f4a7",
+   "size": 11072
+  },
+  {
+   "path": "model-pilot-v101.js",
+   "sha256": "98491268456ce9c37065055bfd6de6bdd3ded238d8277af12d5e7f795f57f2a0",
+   "size": 47874
+  },
+  {
+   "path": "models/canvas/b-01-views.webp",
+   "sha256": "1ec8511299397130b4db9707441a782a2f385b1d98b02bbe9a60b2c41fff18fd",
+   "size": 30922
+  },
+  {
+   "path": "models/canvas/b-02-views.webp",
+   "sha256": "3e5f51506c3f4e8a8653bc919660e2786b4299eddc897b2dcca90aba53691eb5",
+   "size": 52310
+  },
+  {
+   "path": "models/canvas/b-03-views.webp",
+   "sha256": "5a30c97d41e58e654eec8009dc54c09c0f44ad762d84097981d54d8d1206ddbe",
+   "size": 36060
+  },
+  {
+   "path": "models/canvas/b-04-views.webp",
+   "sha256": "fbeebf0fe9dff32bf76aec8c664091cf58fe491099cced73bc19d52f97490ad8",
+   "size": 41124
+  },
+  {
+   "path": "models/canvas/b-05-views.webp",
+   "sha256": "6f486c8f979bfe7177480a77571452f54d9fc3706431ad1842843517a3160e7e",
+   "size": 40128
+  },
+  {
+   "path": "models/canvas/b-06-views.webp",
+   "sha256": "a40d9e46c365e6d60d0f856ad2832cb4e298e408b93c3c6b0b2fd0b1eb449329",
+   "size": 48006
+  },
+  {
+   "path": "models/canvas/b-07-views.webp",
+   "sha256": "ced0195a1f1c91777714ce7fd597d85ab3e2e54a597b1c50d66b2e3859f4691a",
+   "size": 38986
+  },
+  {
+   "path": "models/canvas/b-08-views.webp",
+   "sha256": "6e1189b434923c521aa2498e53c19e566689834bfe56f838404fdc564c55cc03",
+   "size": 43886
+  },
+  {
+   "path": "models/canvas/b-09-views.webp",
+   "sha256": "3c4f50dedf44be372418a619be48a8f62f427910838d0ef2e37ffce0450bd752",
+   "size": 27856
+  },
+  {
+   "path": "models/canvas/b-10-views.webp",
+   "sha256": "77943408595c19e81d6bae8d079f954d6dfbbf3f9777be52b3db91956613cd6d",
+   "size": 36364
+  },
+  {
+   "path": "models/canvas/b-11-views.webp",
+   "sha256": "f297b83b78585f5cd4c90774e25d4b38c8960d318eef807febef6fcfb0f83473",
+   "size": 42704
+  },
+  {
+   "path": "models/canvas/b-12-views.webp",
+   "sha256": "db784d09abf1318a9cfea32a9b50311c36d8aca8b960402a45bb91b7cd1bd7c5",
+   "size": 33388
+  },
+  {
+   "path": "models/canvas/b-13-views.webp",
+   "sha256": "178cf6e18d5157615bff7670503b3bab1c0a057544f2d0a7af24a462dd9ba9c3",
+   "size": 31772
+  },
+  {
+   "path": "models/canvas/b-14-views.webp",
+   "sha256": "04a755ebf626b2961e8084462cdd24d13a17112714f9b62628864cfa85c7e055",
+   "size": 35846
+  },
+  {
+   "path": "models/canvas/b-15-views.webp",
+   "sha256": "c05cb4e9424874da978e3e810160f76e5ba5d879c51fd1e16d4cab840cc577ff",
+   "size": 36878
+  },
+  {
+   "path": "models/canvas/b-16-views.webp",
+   "sha256": "3bc2feb1fc72e4d8ff386d102af51c722e9e16737be9d37e97f4989236cf0199",
+   "size": 57034
+  },
+  {
+   "path": "models/canvas/b-17-views.webp",
+   "sha256": "8ecd0a2458a37345f6e042caf386172fd6f94ddc607954660323ea6c11ba2ae0",
+   "size": 38870
+  },
+  {
+   "path": "models/canvas/b-18-views.webp",
+   "sha256": "8937498845168ce2554612fea8417ee68d2c271b829f1c8f1e42ad2c23e027c6",
+   "size": 39266
+  },
+  {
+   "path": "models/canvas/b-19-views.webp",
+   "sha256": "1db2aa85e871b7f1236db0280d8b1423b0f598856f29c8e64a1d59e441899c55",
+   "size": 35624
+  },
+  {
+   "path": "models/canvas/b-20-views.webp",
+   "sha256": "5685c28d952d5cf4811d439f78d6b9dc2f6378a640c544445687031f2ac93393",
+   "size": 34740
+  },
+  {
+   "path": "models/canvas/b-21-views.webp",
+   "sha256": "f0931089e71fa87aff81c53bc14bbb74f1473daa6f05c0cfac31dc463833588e",
+   "size": 28224
+  },
+  {
+   "path": "models/canvas/b-22-views.webp",
+   "sha256": "1e932cc996d38ebcc77eda0bf1e3753f21f4f848a551d35f855fcbcb70bbf5f8",
+   "size": 26172
+  },
+  {
+   "path": "models/canvas/b-23-views.webp",
+   "sha256": "bd5e23f1bf66d3528de39d2320a4ee84e6f09668f4d9f42a7439500f729c2ace",
+   "size": 32140
+  },
+  {
+   "path": "models/canvas/b-24-views.webp",
+   "sha256": "b64b51161b7d6bada2c2f4bd6600be79c79167466b41e826772da0c76ce35ac5",
+   "size": 27924
+  },
+  {
+   "path": "models/canvas/b-25-views.webp",
+   "sha256": "b879e4a6a4b8e56326faa6a51df047f7a72a3ffef6b9e6769af5b9406480a385",
+   "size": 31632
+  },
+  {
+   "path": "models/canvas/b-26-views.webp",
+   "sha256": "f6219c1f6b6f29e2dff3b01c051797e236de3e05e681319595a55d97b76bf2db",
+   "size": 23028
+  },
+  {
+   "path": "models/canvas/b-27-views.webp",
+   "sha256": "32b3ee236ce372edc96c9b88d1ea449f6b7e8b9efb49d96aef9f6723854cb188",
+   "size": 27196
+  },
+  {
+   "path": "models/canvas/b-28-views.webp",
+   "sha256": "8b64ceae376ae058768bf72166fa2d0f528d8b8cb9c7305cee6da150c48cb500",
+   "size": 50824
+  },
+  {
+   "path": "models/canvas/b-29-views.webp",
+   "sha256": "292a6d826e58c31a32fa678e1c8d511f2c529dbda877641656262a71ee892c0f",
+   "size": 36986
+  },
+  {
+   "path": "models/canvas/b-30-views.webp",
+   "sha256": "eecd0c535c3bfcb9f1d5d8f06a7b63761b339c05d5bbd92878f0f6bc4c1c86f8",
+   "size": 33538
+  },
+  {
+   "path": "models/canvas/b-31-views.webp",
+   "sha256": "e51e38cecae9fa5b35c4cf0329a197970c4f92dd66d1fe709a9f950ea6600181",
+   "size": 39814
+  },
+  {
+   "path": "models/canvas/b-32-views.webp",
+   "sha256": "af0144090a33c500f233f570ab495f2ff40157383917cb22dc0d7e6522e3ecd4",
+   "size": 41474
+  },
+  {
+   "path": "models/canvas/b-33-views.webp",
+   "sha256": "76a0ef5c9d9b67e279487ed09287a6a3f82a24fb646d891637bfedeac84a15b2",
+   "size": 37080
+  },
+  {
+   "path": "models/canvas/b-34-views.webp",
+   "sha256": "269bf287333b678f1f95db809534a94ce4bd3a78bda6ab13cbba6b04fb16310d",
+   "size": 38274
+  },
+  {
+   "path": "models/canvas/b-35-views.webp",
+   "sha256": "0f26b8de6768fa360f4b4ac32f8e74e1ebf5d76d3d1cbe4945ac5bd42596a233",
+   "size": 27864
+  },
+  {
+   "path": "models/canvas/b-36-views.webp",
+   "sha256": "dd772beeeb5d8abe637d632c5a38ddcae01b1ec39089c30c97dd8ca5863b5f3e",
+   "size": 39488
+  },
+  {
+   "path": "models/canvas/b-37-views.webp",
+   "sha256": "c942c5cde9cb07df6da586e98605c42cf6121da94fbd76fd49e066d2cff40129",
+   "size": 25104
+  },
+  {
+   "path": "models/canvas/b-38-views.webp",
+   "sha256": "f896e59fd27b7bd8521d65ed0077df5447c5762bbe89513c3819fb015e5fb9cf",
+   "size": 38410
+  },
+  {
+   "path": "models/canvas/b-39-views.webp",
+   "sha256": "0684ab8ce34b06902c77d050166d47d7539d26e893f913794f09f0e7df5d65e8",
+   "size": 57162
+  },
+  {
+   "path": "models/canvas/b-40-views.webp",
+   "sha256": "b2c988e48da5c21c7eaac87529873910d11f7516d933ccda3116fd1074416fc9",
+   "size": 28602
+  },
+  {
+   "path": "models/canvas/b-41-views.webp",
+   "sha256": "a66d5fe0778ad72b9f2de4bf49012eab961e533d5c7fafcff2c30db9154a3d39",
+   "size": 29486
+  },
+  {
+   "path": "models/canvas/b-42-views.webp",
+   "sha256": "c2bfce82f48c4a746801b24cdb0560a6f9d03300a84b625c1681a97902023df3",
+   "size": 32746
+  },
+  {
+   "path": "models/canvas/b-43-views.webp",
+   "sha256": "0cf6446dff090184576337b92a262563ec66e760d5f036e576c5464254380228",
+   "size": 34756
+  },
+  {
+   "path": "models/canvas/b-44-views.webp",
+   "sha256": "ba2d30565295e6f88fdd8bda708fb45bc5ca7ac82089e06ecdc56fa850f6c6db",
+   "size": 37496
+  },
+  {
+   "path": "models/canvas/b-45-views.webp",
+   "sha256": "dc972e5dcef8bf72ccd15cf0e26a63a42c71a1a25f68e07da074a647a4b13406",
+   "size": 30872
+  },
+  {
+   "path": "models/canvas/b-46-views.webp",
+   "sha256": "d3941fa394623925623f2f55bcc58b98737531102ea0936428b6bd8c0a250b83",
+   "size": 38100
+  },
+  {
+   "path": "models/canvas/b-47-views.webp",
+   "sha256": "af6182cbaace288547606c72c79c57c40eaa1e270c498fd1dc47fc12dbcfc792",
+   "size": 42622
+  },
+  {
+   "path": "models/canvas/b-48-views.webp",
+   "sha256": "26f9901701c5e40d8e8905e1c133b06ccdd256c63cb80563647e9360cb74ed0a",
+   "size": 38336
+  },
+  {
+   "path": "models/canvas/b-49-views.webp",
+   "sha256": "f5b70175ff398ac323137707b9d06f3cdf823abe5058a36c26d96eb18f197f68",
+   "size": 27008
+  },
+  {
+   "path": "models/canvas/b-50-views.webp",
+   "sha256": "b8e936c44cfa452488c2b44839df77164981ff892a812e99d1503bdf6b46f9be",
+   "size": 35574
+  },
+  {
+   "path": "models/canvas/b-51-views.webp",
+   "sha256": "47932bd2e47f2749f69a098162a452bec616bd985592237162d63b1111d00221",
+   "size": 48620
+  },
+  {
+   "path": "models/canvas/b-52-views.webp",
+   "sha256": "02d67d8526502d0d98f31af503210f9c7f01871af470bbf691b58899d0aeed44",
+   "size": 33088
+  },
+  {
+   "path": "models/canvas/b-53-views.webp",
+   "sha256": "80c7588cbe428db45f007ce96cc99897a0ef17ec91bcaf7ebf5029ccd34d2a8d",
+   "size": 45732
+  },
+  {
+   "path": "models/canvas/c-u01-views.webp",
+   "sha256": "d1ed5d271221bafcc4d93fafadda4e8551fa7c127459c47d5ed4ea4b38d1ad89",
+   "size": 35116
+  },
+  {
+   "path": "models/canvas/c-u02-views.webp",
+   "sha256": "4b9b0244031a970d7e63c475b56c6c3a0476e34815221e35b1a21abe304bda58",
+   "size": 76990
+  },
+  {
+   "path": "models/canvas/c-u03-views.webp",
+   "sha256": "3cf4a3df58880c9c230cab8daf371b77f81b37728315c5d8ace9f8aac76b701a",
+   "size": 63932
+  },
+  {
+   "path": "models/canvas/c-u04-views.webp",
+   "sha256": "231ee5ff75903355e1058c3d3f360ce707d749f381c3b11b8b52664cfca9135d",
+   "size": 38802
+  },
+  {
+   "path": "models/canvas/c-u05-views.webp",
+   "sha256": "f8bf12db734baf8306c57b99660b4ab8cc71314941a10fbf9ba6da51efa1aa71",
+   "size": 31876
+  },
+  {
+   "path": "models/canvas/c-u06-views.webp",
+   "sha256": "1adc26cffc8b77f61f41770c63589201e847be3600ac8cc1474298b7d18b10b1",
+   "size": 45576
+  },
+  {
+   "path": "models/canvas/c-u07-views.webp",
+   "sha256": "f359ee6f3d11b42b9c6a4159038fe3a6120f39c1262a93f5362af59c0ab1ed76",
+   "size": 45568
+  },
+  {
+   "path": "models/canvas/c-u08-views.webp",
+   "sha256": "363cdb8e4caa25b880e05ac7746876c019465e54c5ac9fef2cbe334a2cb62904",
+   "size": 52760
+  },
+  {
+   "path": "models/canvas/c-u09-views.webp",
+   "sha256": "20c81a43f76c46d34aeb84fd05af578046318d62e15f006d9892121705133f70",
+   "size": 51072
+  },
+  {
+   "path": "models/canvas/c-u10-views.webp",
+   "sha256": "76ec37a1ab8887b233f4766e51ca00ac2d9be87151b2be85518ff219f3ff35b6",
+   "size": 62836
+  },
+  {
+   "path": "models/canvas/c-u11-views.webp",
+   "sha256": "bde3f7c46a18cd592267e88c428215f8d8ea70ad1eafeef54186964ff772b56c",
+   "size": 56264
+  },
+  {
+   "path": "models/canvas/c-u12-views.webp",
+   "sha256": "9f6f4d2dfa8e3714fe43cbd28a6c6a57d48889439e7129c960167b0fee5d90fd",
+   "size": 79872
+  },
+  {
+   "path": "models/canvas/c-u13-views.webp",
+   "sha256": "9a2def08051d2af45b266a48f52e270c120da15609b8d7f2a5f16cbf57311e55",
+   "size": 49468
+  },
+  {
+   "path": "models/canvas/c-u14-views.webp",
+   "sha256": "7d5c6c85c284906536d8df45dead7f2b2964f342d3d2aad4c641f3ec85949cd4",
+   "size": 37234
+  },
+  {
+   "path": "models/canvas/c-u15-views.webp",
+   "sha256": "38a33123e92d0c9aaddb1a76f3498f807cb0f804a115a64eade7bac10fcea0b4",
+   "size": 43002
+  },
+  {
+   "path": "models/canvas/c-u16-views.webp",
+   "sha256": "6be9c82d440e4e4a731d5e83f5294440cd0549f6790ec71a74c1dce6a50bb301",
+   "size": 58728
+  },
+  {
+   "path": "models/canvas/c-u17-views.webp",
+   "sha256": "f1f73435e02584a426fd0610c9e12be19191effb2ace356a6e73869a6d2ae6e6",
+   "size": 55216
+  },
+  {
+   "path": "models/canvas/c-u18-views.webp",
+   "sha256": "558971ad79df0d776cdcd6ce37cc4b0b88e738d2a359ea7b8a585d0d18675e33",
+   "size": 54656
+  },
+  {
+   "path": "models/canvas/c-u19-views.webp",
+   "sha256": "e648cb69afcfd08e779738d702ee91758135ced4b160e522011f9024c2f91edf",
+   "size": 42250
+  },
+  {
+   "path": "models/canvas/c-u20-views.webp",
+   "sha256": "d312c8930ed6545c97820d0b1d500ace8a0b4c95c946b8a37a6245dc4080c3ed",
+   "size": 40948
+  },
+  {
+   "path": "models/canvas/c-u21-views.webp",
+   "sha256": "c6e99421b925be0077b52f9c44eeb57959de6c6b87a2c933ab9a355224dc32c1",
+   "size": 60090
+  },
+  {
+   "path": "models/canvas/c-u22-views.webp",
+   "sha256": "f8e5ae89cb5b6074d16df50a8535deb139e63a09f9b39d4af54f93f3f5c6eb0f",
+   "size": 57410
+  },
+  {
+   "path": "models/canvas/c-u23-views.webp",
+   "sha256": "2437d917aeec1b913a195b2ff00943a4737972d0506c67c816adbe5a7cb97cd2",
+   "size": 41462
+  },
+  {
+   "path": "models/canvas/d-u01-views.webp",
+   "sha256": "9250ddd6ea1ce4eda54bd762bd6877362fff2aa11eb0c65fac95bb3b3387c4ca",
+   "size": 70294
+  },
+  {
+   "path": "models/canvas/d-u02-views.webp",
+   "sha256": "489bba0f873794c2129b9b16c4c29b98a5df303e1b3951f2be857091bf73ccfa",
+   "size": 56820
+  },
+  {
+   "path": "models/canvas/d-u03-views.webp",
+   "sha256": "5ba3961ab191bbf7a83258923d6dcfb6b97503e90ecf16413d040075d19a20c2",
+   "size": 40130
+  },
+  {
+   "path": "models/canvas/d-u04-views.webp",
+   "sha256": "8a150ab71119cfac8a3ee130f53d5805fcf55ee673199474b27ff7356f24f861",
+   "size": 64416
+  },
+  {
+   "path": "models/canvas/d-u05-views.webp",
+   "sha256": "223fd9bc7d7699b7aeb7d410a6ddba02bde5d5e98d180de923a7406e73679f6a",
+   "size": 62648
+  },
+  {
+   "path": "models/canvas/d-u06-views.webp",
+   "sha256": "c18118302e5d26da798ea042a8ed2e9ab1a55c8994f5aa618fd6a1abf21d2626",
+   "size": 38610
+  },
+  {
+   "path": "models/canvas/d-u07-views.webp",
+   "sha256": "3417db2423c6ec5861ced5335c9c7617d065b74f66a880417ded48f9a8d6b7f0",
+   "size": 34028
+  },
+  {
+   "path": "models/canvas/d-u08-views.webp",
+   "sha256": "7dc4c639207a030f47e75423a81860bf1611e2f369eb23f0020a6816bc052ebe",
+   "size": 29084
+  },
+  {
+   "path": "models/canvas/d-u09-views.webp",
+   "sha256": "ab8e24d5c2ce9522999e4770e6a2222a8544e46fe27342ecb4e611c4f076e6de",
+   "size": 32754
+  },
+  {
+   "path": "models/canvas/d-u10-views.webp",
+   "sha256": "a75190ad0fc4f8bd9c1e01438923290395425dda1d7f82039b979d137f072df4",
+   "size": 27296
+  },
+  {
+   "path": "models/canvas/d-u11-views.webp",
+   "sha256": "9d1eb634b52ad398e4dac3a5be9d957daf132bb9438579a4d11c8b162d14dd5e",
+   "size": 47860
+  },
+  {
+   "path": "models/canvas/d-u12-views.webp",
+   "sha256": "99bfdac93386392dbe7e27ad1dd79399b11c3af255c8984fd2c441d321cdb7ed",
+   "size": 49326
+  },
+  {
+   "path": "models/canvas/d-u13-views.webp",
+   "sha256": "16eb3feb225858a3969ba9059ef633f0f5e86faa1d81dd067dbcd50ff16b0289",
+   "size": 44268
+  },
+  {
+   "path": "models/canvas/d-u14-views.webp",
+   "sha256": "fb3147e6bf32244c0d2170a7f01444c235a0f8daa4e0202bb5746ffe155fc5c7",
+   "size": 44210
+  },
+  {
+   "path": "models/canvas/d-u15-views.webp",
+   "sha256": "c265bc70f183e56fea480ba54ee38330a60470e51f0b1617cf9b0bff3ef72c9e",
+   "size": 56440
+  },
+  {
+   "path": "models/canvas/d-u16-views.webp",
+   "sha256": "83924eb443c01455a6659cf3efdf6c6bd0121a48396afabb4dad60a52bf256cc",
+   "size": 52520
+  },
+  {
+   "path": "models/canvas/d-u17-views.webp",
+   "sha256": "aaa2c5620b2758a344b01ff4d88949a5918697b54a212e047dc3020981296c5e",
+   "size": 55100
+  },
+  {
+   "path": "models/canvas/d-u18-views.webp",
+   "sha256": "01882c595108e034a1a900150d4f571dc7a674cbe71941864bc0a5f3c464d233",
+   "size": 54696
+  },
+  {
+   "path": "models/canvas/d-u19-views.webp",
+   "sha256": "92378cb1fd039028ff30cef44216725cb02c3d9fc918c733277157b1ccb34cf9",
+   "size": 53024
+  },
+  {
+   "path": "models/canvas/d-u20-views.webp",
+   "sha256": "bf7fc59a5c11b866ffdfe60b5c7d3397467f76ce747f28e98ac3b5eb130ef4a6",
+   "size": 51558
+  },
+  {
+   "path": "models/canvas/d-u21-views.webp",
+   "sha256": "e3c9750dc09e2a7fc368e52c68c0be17c603a8f57000fa1e918d20837aa616cf",
+   "size": 57346
+  },
+  {
+   "path": "models/canvas/d-u22-views.webp",
+   "sha256": "70905b1ad9d21504a526bb271f8b9e543c63e3c839292fcfb8332c4cb2d5c434",
+   "size": 36832
+  },
+  {
+   "path": "models/canvas/d-u23-views.webp",
+   "sha256": "a6527438805ab0572991c14868425df5beab456efde28730fc6513cae2f3eda6",
+   "size": 45712
+  },
+  {
+   "path": "models/canvas/d-u24-views.webp",
+   "sha256": "dc2f0d3ef2f2eccd8410a76461bddb6d03c5bc5d3932587e3cc3d8318a9a952c",
+   "size": 51916
+  },
+  {
+   "path": "models/canvas/d-u25-views.webp",
+   "sha256": "3cc186362d27ff3ea7717575e78ffa8cf98787a3b5c02da9c5354fab945d955b",
+   "size": 48928
+  },
+  {
+   "path": "models/canvas/d-u26-views.webp",
+   "sha256": "c426a86dccc865625a527227ad61b02351a3a13e105be13b8fa0e8457cc03f2f",
+   "size": 41394
+  },
+  {
+   "path": "models/canvas/d-u27-views.webp",
+   "sha256": "831bd886ab612a9ea43c06fc89784dd7a90d688510aa5d373bf5ffdc833b8fd8",
+   "size": 42090
+  },
+  {
+   "path": "models/canvas/d-u28-views.webp",
+   "sha256": "ca24df70a6bcd1d475b4f543d8bd5a0fe68449ce0c0e4d30f2d7cfb56470ced4",
+   "size": 93786
+  },
+  {
+   "path": "models/canvas/d-u29-views.webp",
+   "sha256": "9698f80407f7f4acf4475c058d3f540837eedc94b5cfdd56523116f8e93b492e",
+   "size": 40708
+  },
+  {
+   "path": "models/canvas/d-u30-views.webp",
+   "sha256": "d3651850914002b087d86f5ba7b375b323ec51479edecd5938fd934d95ec43ee",
+   "size": 60332
+  },
+  {
+   "path": "models/canvas/d-x01-views.webp",
+   "sha256": "17a7916fbe4a7d679250bfb4ffcd91f172c8bafd7b1c30ecf31ad30aa050de3a",
+   "size": 48194
+  },
+  {
+   "path": "models/canvas/d-x02-views.webp",
+   "sha256": "a0a3ef82135d0983783272b3cdd5be52c68e2f0066b69cb55d78532672bcb8e9",
+   "size": 45912
+  },
+  {
+   "path": "models/canvas/d-x03-views.webp",
+   "sha256": "42d68dbda668ae02da19705aaf5bea858e941414c01e35dbd1a2fb1ccdd3d3ec",
+   "size": 55374
+  },
+  {
+   "path": "models/canvas/d-x04-views.webp",
+   "sha256": "91fb12441f8daa3c3d615ce27e4ff7ebadea7bd86e4bc25df7763ea7b3087aa5",
+   "size": 48116
+  },
+  {
+   "path": "models/canvas/d-x05-views.webp",
+   "sha256": "14a93dfcc2c067a2a909c6f18f497b549c48f99ba0a8ca488398e28809d230ca",
+   "size": 49458
+  },
+  {
+   "path": "models/canvas/d-x06-views.webp",
+   "sha256": "04073b7f12985a6d1a88ddc646069436a71cb6ca3ac016bd783e7251f1f6960a",
+   "size": 39964
+  },
+  {
+   "path": "models/canvas/s-u01-views.webp",
+   "sha256": "11b811952d2462e7f089c47deee0342a4183730663f30eb95436e4e667c9fa71",
+   "size": 79070
+  },
+  {
+   "path": "models/canvas/s-u02-views.webp",
+   "sha256": "1ddada3179dd49908850448eccfc0fb09349ac3fd172d7c3051a61884910da5f",
+   "size": 59248
+  },
+  {
+   "path": "models/canvas/s-u03-views.webp",
+   "sha256": "8a2c21375365d988312a1bf1f94a465c8a9a109e08c38ec428170d7e17816681",
+   "size": 42256
+  },
+  {
+   "path": "models/canvas/s-u04-views.webp",
+   "sha256": "4eacc7100c285d9d979441cad8ec2fd5770e30714af942a379f4c2d4d7a8d3e6",
+   "size": 69532
+  },
+  {
+   "path": "models/canvas/s-u05-views.webp",
+   "sha256": "5e5efcd688baddf0764669cfda667dc8557bf00830f80ff2ddfff8d16576330d",
+   "size": 71112
+  },
+  {
+   "path": "models/canvas/s-u06-views.webp",
+   "sha256": "dd18737418d0b80fdf1305eb43165fd52ecd960df5950cf2329881492c42f5d2",
+   "size": 50760
+  },
+  {
+   "path": "models/canvas/s-u07-views.webp",
+   "sha256": "0e85b65c9c6c2c40eb41251ef4cb7281c5b65fb9cf624da5b9fb68b80cda1a5c",
+   "size": 42286
+  },
+  {
+   "path": "models/canvas/s-u08-views.webp",
+   "sha256": "a2a16dcb7c50bc0ca53b33338f25db68fcec7c410cdc11a45d3ed842863b3505",
+   "size": 37348
+  },
+  {
+   "path": "models/canvas/s-u09-views.webp",
+   "sha256": "8d211e479e967a28e4040991cfd25723eb38e4f87ad00e42bd4cbfce9e43c826",
+   "size": 42432
+  },
+  {
+   "path": "models/canvas/s-u10-views.webp",
+   "sha256": "26537038844456b6463efc3f67fe047e5fd7021205fa778a1a2822fd92249b20",
+   "size": 33408
+  },
+  {
+   "path": "models/canvas/s-u11-views.webp",
+   "sha256": "f169c2ddd09146243169388fe5e25255aa65934a29940d3cf600fe84e4a6f865",
+   "size": 45366
+  },
+  {
+   "path": "models/canvas/s-u12-views.webp",
+   "sha256": "b3b6402575163c80cd5c5ec59babdca2d953de7df1424471a913e45ee64a516a",
+   "size": 47110
+  },
+  {
+   "path": "models/canvas/s-u13-views.webp",
+   "sha256": "547ebde7852ac8a8e65e33e17d0a6ae3614f759933ecfbaa4f9b7aef4a90e76e",
+   "size": 44484
+  },
+  {
+   "path": "models/canvas/s-u14-views.webp",
+   "sha256": "745958af9b5c3c2a4d92fb63ddd33198c482aa674d11da033861dab8ddad6ee0",
+   "size": 44736
+  },
+  {
+   "path": "models/canvas/s-u15-views.webp",
+   "sha256": "a74d76015d42ef154bada5eb64a4e222d671590bf4e50b9e022329fda557276a",
+   "size": 55230
+  },
+  {
+   "path": "models/canvas/s-u16-views.webp",
+   "sha256": "74e51cfb34c384a8c2fda8ad30fcb0e7b92ffc36fd39adc4128cd6dd857fcb94",
+   "size": 50916
+  },
+  {
+   "path": "models/canvas/s-u17-views.webp",
+   "sha256": "6f6211d2431f0a88520b27e0b9b3a85595adced9cf40bd48179206d66fcdfa33",
+   "size": 54572
+  },
+  {
+   "path": "models/canvas/s-u18-views.webp",
+   "sha256": "e047da973cae8946a6c93f35a8d0cca0f23e46dc76ee5411aa5fe3fdf535a516",
+   "size": 50534
+  },
+  {
+   "path": "models/canvas/s-u19-views.webp",
+   "sha256": "84719614a9909041ea812bdfafe90a88b096b33fe2aaa2169216322f3a4d74cc",
+   "size": 51188
+  },
+  {
+   "path": "models/canvas/s-u20-views.webp",
+   "sha256": "c002c4090f74b9cde355e93f2de6beb091c7f0e1d3c168dba7ccbc47026dea03",
+   "size": 48144
+  },
+  {
+   "path": "models/canvas/s-u21-views.webp",
+   "sha256": "e29f3f3af7880f0aed603ea563480bd3fda6c98f1569ed883d6ccd2581c77300",
+   "size": 53934
+  },
+  {
+   "path": "models/canvas/s-u22-views.webp",
+   "sha256": "25ef468a49db0ec90633f50a4ededc7bfff2dfa21e4233285d62a5fc2620f1ba",
+   "size": 34662
+  },
+  {
+   "path": "models/canvas/s-u23-views.webp",
+   "sha256": "1b57a9fd846a127b50622a9cf6da42fcb0c645d4bcf26e34d468fa59a4135589",
+   "size": 45350
+  },
+  {
+   "path": "models/canvas/s-u24-views.webp",
+   "sha256": "86095d313321c632e4306e1e5f1ed94882f2fc2df9cf14cbdbe141e6b5f752ef",
+   "size": 50712
+  },
+  {
+   "path": "models/canvas/s-u25-views.webp",
+   "sha256": "bdb53004adb5838e4060b8d6db6132fcb398a108abad1ab3f701d08016672be9",
+   "size": 45876
+  },
+  {
+   "path": "models/canvas/s-u26-views.webp",
+   "sha256": "7ffa83cd5d240017388992bb75279b55394ef922b2460a85e01c225c03f61158",
+   "size": 39706
+  },
+  {
+   "path": "models/canvas/s-u27-views.webp",
+   "sha256": "ada8f241328e7565764efd08100970f763541822752269af4640af09c9f44b26",
+   "size": 39044
+  },
+  {
+   "path": "models/canvas/s-u28-views.webp",
+   "sha256": "5db6b54a49ac5dc8000595f4afcf276a4f4a99b2c5103192206135a25ff41f18",
+   "size": 91722
+  },
+  {
+   "path": "models/canvas/s-u29-views.webp",
+   "sha256": "a83a309d7d70f55acee62b4b12d7c0a1c6e811b8a0c616aabc5272dc23287ae6",
+   "size": 38182
+  },
+  {
+   "path": "models/canvas/s-u30-views.webp",
+   "sha256": "11c85e92d7a5c56eed1e5bac78afa77614e2f9793464dfc8b79d7677bb10ebd0",
+   "size": 58350
+  },
+  {
+   "path": "models/canvas/s-x01-views.webp",
+   "sha256": "46b5c9c6784acbb658c625ae5132787d313b1a94e32b4568d199fb74908e4769",
+   "size": 45920
+  },
+  {
+   "path": "models/canvas/s-x02-views.webp",
+   "sha256": "a18b17d9bd6ef6baf13fd3a3428ff1ff393a5814544b98ddc67a2d7a533924b7",
+   "size": 43530
+  },
+  {
+   "path": "models/canvas/s-x03-views.webp",
+   "sha256": "2b3a15fa82fe4bd8a89e3ac254fb23f98c97a28a44c0f9b0c2da8d6e0cac5695",
+   "size": 53970
+  },
+  {
+   "path": "models/canvas/s-x04-views.webp",
+   "sha256": "b29c93946314d7639cd7442ae7d80af51665f9fa2d5b924f38f959a7e5fb9917",
+   "size": 45980
+  },
+  {
+   "path": "models/canvas/s-x05-views.webp",
+   "sha256": "e140bbca1f24fd41dc52270d550c615942b3097a1938aabfb008e820134f5db6",
+   "size": 46744
+  },
+  {
+   "path": "models/canvas/s-x06-views.webp",
+   "sha256": "e1f61ee7fa1201d184913dd4ce85dd430acb85e1190900e39bc51c95ed64faac",
+   "size": 37422
+  },
+  {
+   "path": "models/canvas/v-u01-views.webp",
+   "sha256": "12e7346de4a27e727049dccba736e3e46cbf53ce2eddd49ae5da708faca5ca9d",
+   "size": 75958
+  },
+  {
+   "path": "models/canvas/v-u02-views.webp",
+   "sha256": "27d5083b079ecefa1804b18a2013c878f7141f0d91dd079447ffca8e85913fab",
+   "size": 60396
+  },
+  {
+   "path": "models/canvas/v-u03-views.webp",
+   "sha256": "dc7fbb21b7619f281fb5857c59b06807c1c7930dd19f2ce08a98f0a72dbed68b",
+   "size": 42166
+  },
+  {
+   "path": "models/canvas/v-u04-views.webp",
+   "sha256": "455341dbfde9c44d9409ed51318947bd315aeb7abfcb6b91efd6c6e587b9ecb7",
+   "size": 68790
+  },
+  {
+   "path": "models/canvas/v-u05-views.webp",
+   "sha256": "7949b80877c7b8abc878c4356e3ec7b437fd3579530b3d003c2b89ebcd6d9af3",
+   "size": 68972
+  },
+  {
+   "path": "models/canvas/v-u06-views.webp",
+   "sha256": "017f858557931b2c982e909eb86897f839b6700873bd3c555cebf597ac0e2b11",
+   "size": 42212
+  },
+  {
+   "path": "models/canvas/v-u07-views.webp",
+   "sha256": "ec55e6aefc49df29c234fda862b151a9d8cb05fdbece775dc5e748f233aa24b4",
+   "size": 36638
+  },
+  {
+   "path": "models/canvas/v-u08-views.webp",
+   "sha256": "2eb555d1d55ade074f410b0ab2f59d57af48b5a65b937aa71b27da8e79161d99",
+   "size": 32464
+  },
+  {
+   "path": "models/canvas/v-u09-views.webp",
+   "sha256": "f6b120b0d099c00b7ae86e3d9bcc2e5c4dcdd0ca03157ff6fd9be9a60fd1c5ca",
+   "size": 35814
+  },
+  {
+   "path": "models/canvas/v-u10-views.webp",
+   "sha256": "0645717002a6672cf2ef093781e27633463ea35cdbae7cc67f106016a7a69e32",
+   "size": 29472
+  },
+  {
+   "path": "models/canvas/v-u11-views.webp",
+   "sha256": "aaeaaad8c2d94c2ba56540d280a5119587108499945b6581fccae987cfb10791",
+   "size": 47324
+  },
+  {
+   "path": "models/canvas/v-u12-views.webp",
+   "sha256": "971f2e53bc3d4f7fea8ac9acf7d7af512eb240ae94aa2943088164b65d0bfbd7",
+   "size": 48288
+  },
+  {
+   "path": "models/canvas/v-u13-views.webp",
+   "sha256": "e0742a576d4e3d5b6d3e4072a6bbaaf56b9fc3b05da31eb831791c2a1f15236b",
+   "size": 45912
+  },
+  {
+   "path": "models/canvas/v-u14-views.webp",
+   "sha256": "b22bb421f947c29bcf5807c1dc607fd60325bc871088771c72ac84823ce4d665",
+   "size": 43732
+  },
+  {
+   "path": "models/canvas/v-u15-views.webp",
+   "sha256": "92deed81fa037b5aff21a5ed4429a593a5cb2e3c989769d9ea07c86b3de7b234",
+   "size": 56772
+  },
+  {
+   "path": "models/canvas/v-u16-views.webp",
+   "sha256": "547b8517224ad2c410f2094811f084ad8785c2da7dd37f44e19972e0ed0678ae",
+   "size": 52376
+  },
+  {
+   "path": "models/canvas/v-u17-views.webp",
+   "sha256": "870fe818cc77aa0cddf099fd5b8ccb00f890639141eb22bed0f37cd6eed3cb72",
+   "size": 54668
+  },
+  {
+   "path": "models/canvas/v-u18-views.webp",
+   "sha256": "6b2a7a1248f81471ef36a48ee031c07d0db0dd4349fdec6503549b9c28095eae",
+   "size": 52648
+  },
+  {
+   "path": "models/canvas/v-u19-views.webp",
+   "sha256": "fa71d6d48794dd1346729936dc9ae0cde55621b2b4c7cec0df17708ac1317004",
+   "size": 51936
+  },
+  {
+   "path": "models/canvas/v-u20-views.webp",
+   "sha256": "22e32a55b661892081f39f85ec0f7970d3de057cab5e5727eae1159aa5c127bd",
+   "size": 49906
+  },
+  {
+   "path": "models/canvas/v-u21-views.webp",
+   "sha256": "c6c1dbba4340fc728f3a46eb4dab498535208c39e070f9252fc9559e026d186b",
+   "size": 56244
+  },
+  {
+   "path": "models/canvas/v-u22-views.webp",
+   "sha256": "0763a080359bd55990f60265025795c8bf76add27333f27a5dcad2b8c301104c",
+   "size": 37286
+  },
+  {
+   "path": "models/canvas/v-u23-views.webp",
+   "sha256": "b6ad34d26eed266bcffe3cf21a7bc950350f2454beaa699eebfc12b7dd558c41",
+   "size": 45804
+  },
+  {
+   "path": "models/canvas/v-u24-views.webp",
+   "sha256": "87408e6575543a88c1bc7b8f375878045251423c5ce2bd6d05b164c1ed4ce862",
+   "size": 49888
+  },
+  {
+   "path": "models/canvas/v-u25-views.webp",
+   "sha256": "188b38255b5d8906f6504c0ba4ba4a23d42f9753e4c16025dc0858af1555f53e",
+   "size": 47132
+  },
+  {
+   "path": "models/canvas/v-u26-views.webp",
+   "sha256": "c109eaa1fde5a68c0bd4f5107c500bd15bba284c1136f48b88c807385baa6c72",
+   "size": 40878
+  },
+  {
+   "path": "models/canvas/v-u27-views.webp",
+   "sha256": "868aaa08fb8423a6885193c0e4387ba32fb92f29822872e36dfd176b2a72d058",
+   "size": 41060
+  },
+  {
+   "path": "models/canvas/v-u28-views.webp",
+   "sha256": "4e15447d543ca276a78e6280a56cc3bcec482e8fa33a09a2e1832b432e705ceb",
+   "size": 95630
+  },
+  {
+   "path": "models/canvas/v-u29-views.webp",
+   "sha256": "a55f0b014f72d3ac66f8e51e2805913b99a7c2187d9b653a52926398ab2006cb",
+   "size": 39504
+  },
+  {
+   "path": "models/canvas/v-u30-views.webp",
+   "sha256": "6d36d05418a36472fba7f7b9f85b36bdae339f34385450949a3dc19a5e7d7e93",
+   "size": 57558
+  },
+  {
+   "path": "models/canvas/v-x01-views.webp",
+   "sha256": "5a6d6787717c4b08fb0889e1cbe12d205b7694ed887e7677ee7e0c0dc68a69e8",
+   "size": 46394
+  },
+  {
+   "path": "models/canvas/v-x02-views.webp",
+   "sha256": "17676f5958556469685e1af1875122f876605cff6909608e5d35011a2f58529f",
+   "size": 45408
+  },
+  {
+   "path": "models/canvas/v-x03-views.webp",
+   "sha256": "10010903b1b1b4d5c9c5c531921dc0f1b83fb92ffc0574d312ed02379d83c9e4",
+   "size": 54518
+  },
+  {
+   "path": "models/canvas/v-x04-views.webp",
+   "sha256": "cf2d4551da9c2d76ed9b1d0d50dab3db82dbdf88bee9922d60f6dd5a523eed66",
+   "size": 46428
+  },
+  {
+   "path": "models/canvas/v-x05-views.webp",
+   "sha256": "e8b39110d278e8551a68a74e5a322479e804fa0a3e973dc4f67e784f44747262",
+   "size": 48118
+  },
+  {
+   "path": "models/canvas/v-x06-views.webp",
+   "sha256": "36278cf3802264a7f269d044a14d5bd1c42df9d575fd1039a3d8ca0c56ebd2c8",
+   "size": 38894
+  },
+  {
+   "path": "models/pilot/b-01-command-center-lod0.glb",
+   "sha256": "7076f1bd2983d3da069c67d17068eb152ba9f5f4fc3d806a072fa4db0fb689d2",
+   "size": 776604
+  },
+  {
+   "path": "models/pilot/b-01-command-center-lod1.glb",
+   "sha256": "ff807dba7e7ac9d5f7d8a82a2f55ce3bd615a181cf7c53ac5a105aeb470b47cc",
+   "size": 121176
+  },
+  {
+   "path": "models/pilot/b-01-command-center-lod2.glb",
+   "sha256": "e0f46ad8ff1b290356dcc33c1dc66952f09b6297f452058c7441293715d3a8cb",
+   "size": 118884
+  },
+  {
+   "path": "models/pilot/b-02-power-station-lod0.glb",
+   "sha256": "d13446469fdaddc5c172e3cd90317fe1877836eaf7f384c69e719ce20d09abec",
+   "size": 1720536
+  },
+  {
+   "path": "models/pilot/b-02-power-station-lod1.glb",
+   "sha256": "c230a2c6fe1a0e8facfc63a2f5b4ab9e5c4f24c71799d11e0ed02fd6696fba49",
+   "size": 667156
+  },
+  {
+   "path": "models/pilot/b-02-power-station-lod2.glb",
+   "sha256": "f6391125d58d411ed78c8e1a88586298ed8965619fa9de5c6e1c02ef6cefc8a4",
+   "size": 405828
+  },
+  {
+   "path": "models/pilot/b-03-solar-array-lod0.glb",
+   "sha256": "22cfbccb41545590bc94121b01be199060e81fcc0ed0549f5c4cf327f12bc1ac",
+   "size": 675104
+  },
+  {
+   "path": "models/pilot/b-03-solar-array-lod1.glb",
+   "sha256": "458aa89e64963fbe79a9fbdc37448c1ff15057bdf26735eb3fca7133955fcb75",
+   "size": 61196
+  },
+  {
+   "path": "models/pilot/b-03-solar-array-lod2.glb",
+   "sha256": "fe64ed1fb7d41e05aec55a5bef891aeaace08821427ffa860f16435871e1a906",
+   "size": 48168
+  },
+  {
+   "path": "models/pilot/b-04-fusion-plant-lod0.glb",
+   "sha256": "cdd40dfd849a19cd6baf69bf65acd0715a5d7ab90525e4051637d5f21bd2dc97",
+   "size": 833836
+  },
+  {
+   "path": "models/pilot/b-04-fusion-plant-lod1.glb",
+   "sha256": "2096e502984798c82dcc9ab0e1073b7997470d4fe461f636976bfac703b83319",
+   "size": 194908
+  },
+  {
+   "path": "models/pilot/b-04-fusion-plant-lod2.glb",
+   "sha256": "efe5cb72e0b8d3fcfd119f3e3a2f2341974689a5ca1f574cc062b0feb64a625e",
+   "size": 138964
+  },
+  {
+   "path": "models/pilot/b-05-geothermal-plant-lod0.glb",
+   "sha256": "7a674872628d889ace1d29602b582302dbb8127a9945dcf63705469175a10745",
+   "size": 872728
+  },
+  {
+   "path": "models/pilot/b-05-geothermal-plant-lod1.glb",
+   "sha256": "13cb916306e7b243a2087482e77c70f5592fddcd702511dc7abf99c58b942464",
+   "size": 184540
+  },
+  {
+   "path": "models/pilot/b-05-geothermal-plant-lod2.glb",
+   "sha256": "f5217abec41b27561502381f86d31031b49344be3e67a7cb8b6de134f751582a",
+   "size": 177532
+  },
+  {
+   "path": "models/pilot/b-06-supply-beacon-lod0.glb",
+   "sha256": "9663f91cb738bf0414c8b081a38e0deaf1819eb53ba4d9d5f6973f55a6d934cc",
+   "size": 1013708
+  },
+  {
+   "path": "models/pilot/b-06-supply-beacon-lod1.glb",
+   "sha256": "848d7c99f99cd4c8ec11e192f5f317980c7006bc676a84b32f7d10769976ce79",
+   "size": 167564
+  },
+  {
+   "path": "models/pilot/b-06-supply-beacon-lod2.glb",
+   "sha256": "f181317b96c565395e263476e0caebe5261738c00f8edb16b1fae56d043a6455",
+   "size": 146540
+  },
+  {
+   "path": "models/pilot/b-07-refinery-lod0.glb",
+   "sha256": "bbebd66e4b1a7eedfc307783b6a83f4796ad2befd32042a13b1f500eff8239f8",
+   "size": 894060
+  },
+  {
+   "path": "models/pilot/b-07-refinery-lod1.glb",
+   "sha256": "ba23d79ba25fdb3bff111d8d854513bd30915d9d8a30b2815b9d05c0f4d86c72",
+   "size": 137508
+  },
+  {
+   "path": "models/pilot/b-07-refinery-lod2.glb",
+   "sha256": "eef6e708da7897157b0e78415322f6681ed6ad020f02aef56a02505e4e73604b",
+   "size": 132512
+  },
+  {
+   "path": "models/pilot/b-08-logistics-hub-lod0.glb",
+   "sha256": "abc1b77e54373b4129cbcbeda8ffe773857138e6e5b7e0666cf23eac60f4e021",
+   "size": 950044
+  },
+  {
+   "path": "models/pilot/b-08-logistics-hub-lod1.glb",
+   "sha256": "87f47a1ba6b376f4bc54042cbed292d891409d9e64ea16a986df98eb1c3c36af",
+   "size": 61636
+  },
+  {
+   "path": "models/pilot/b-08-logistics-hub-lod2.glb",
+   "sha256": "0c918b2ba21772fce2a34bec68740bb60c5f83d9f15ae7621a5b020314e11208",
+   "size": 53168
+  },
+  {
+   "path": "models/pilot/b-09-credit-exchange-lod0.glb",
+   "sha256": "f26f6b9be985fb06b598c959ce5183200119049e6dfee37dee3c6be6313369da",
+   "size": 732284
+  },
+  {
+   "path": "models/pilot/b-09-credit-exchange-lod1.glb",
+   "sha256": "7d68880fd7bf121d895c5a6a9310485a7fc0f828f815d08bcf404caff2eb23dc",
+   "size": 123740
+  },
+  {
+   "path": "models/pilot/b-09-credit-exchange-lod2.glb",
+   "sha256": "cab6445ab358ff8391505f913b62029567014e1baa3301c4d1d2bbc47c5fea20",
+   "size": 68240
+  },
+  {
+   "path": "models/pilot/b-10-resource-silo-lod0.glb",
+   "sha256": "a1017b4c40469c012d2c6a3c6f432a95f5d6bd06ed34592bcb9b99cc5232bf1e",
+   "size": 810864
+  },
+  {
+   "path": "models/pilot/b-10-resource-silo-lod1.glb",
+   "sha256": "f5a50db7494a114dac57253a4d745b2b9d5f99d226efa11313dfcf2c21692911",
+   "size": 162688
+  },
+  {
+   "path": "models/pilot/b-10-resource-silo-lod2.glb",
+   "sha256": "604d6fd218b5f4d8ab585d0f4f3f2179293e74dcaef470b957d9bc68e0bba14e",
+   "size": 108136
+  },
+  {
+   "path": "models/pilot/b-11-oil-pump-lod0.glb",
+   "sha256": "e810e2ea617349efe02992f9598bd1cbd9ac88edd7b5ea2df719b8b91c7ec963",
+   "size": 837676
+  },
+  {
+   "path": "models/pilot/b-11-oil-pump-lod1.glb",
+   "sha256": "4f9b8ed40cd45e0a444390cd7ce68fe5ebbf97b0e6535574b0d42b7f5b7e88ee",
+   "size": 177984
+  },
+  {
+   "path": "models/pilot/b-11-oil-pump-lod2.glb",
+   "sha256": "ab1c02bb6740b46eb37e519cadc44b43da0312c033ee4f8b7df7e94a044d80e4",
+   "size": 124248
+  },
+  {
+   "path": "models/pilot/b-12-gas-pump-lod0.glb",
+   "sha256": "249cd6abbf5db3fa3c7de708cd68e2f966cdcfe374a2273afa7d784554f07156",
+   "size": 808512
+  },
+  {
+   "path": "models/pilot/b-12-gas-pump-lod1.glb",
+   "sha256": "0b62eb292ffacfa2cc6f0091a173cce39d1945ab1305f2d499dff367fcaf5a17",
+   "size": 175028
+  },
+  {
+   "path": "models/pilot/b-12-gas-pump-lod2.glb",
+   "sha256": "43662ffc73c3a651c7650445a2de8c66a257262ce6bd92e86872b2ab2fe8f844",
+   "size": 120724
+  },
+  {
+   "path": "models/pilot/b-13-barracks-lod0.glb",
+   "sha256": "666d537e9f52da49f98508e9a43b556bf0c6e4405afeac06c36b4e3a892abd1b",
+   "size": 661388
+  },
+  {
+   "path": "models/pilot/b-13-barracks-lod1.glb",
+   "sha256": "07902e4a2313441c943d40a034ee37351b4647cb1b9b5a4c723807a41dd5ad89",
+   "size": 41252
+  },
+  {
+   "path": "models/pilot/b-13-barracks-lod2.glb",
+   "sha256": "8ef822f10d2be95d971b4b51c08a07c5c099c85f4cb2bfb675b2012b0cdd302e",
+   "size": 38468
+  },
+  {
+   "path": "models/pilot/b-14-special-ops-center-lod0.glb",
+   "sha256": "7ff3394884ed0d5636f4fd48b249a8629a7c6d130ade31a859837c33a64004d2",
+   "size": 773916
+  },
+  {
+   "path": "models/pilot/b-14-special-ops-center-lod1.glb",
+   "sha256": "19081ae84f8ece3abee42be331c81c2d56b668d1fbdea0eb5a3eb1c38418f861",
+   "size": 72284
+  },
+  {
+   "path": "models/pilot/b-14-special-ops-center-lod2.glb",
+   "sha256": "d19916a8b954ced3727d59c026494e3b06cbf1947843110e5f643cb5eefee92b",
+   "size": 51620
+  },
+  {
+   "path": "models/pilot/b-15-vehicle-factory-lod0.glb",
+   "sha256": "b2606c49a2378317b81ba7e62f6cd1f4d3088f808a972ceee3dade622fd2b2b4",
+   "size": 879892
+  },
+  {
+   "path": "models/pilot/b-15-vehicle-factory-lod1.glb",
+   "sha256": "20a8d997e5cf3b8ec3c6e082b703abb63c1e4b743812fb8a7b92802c1a5506de",
+   "size": 128852
+  },
+  {
+   "path": "models/pilot/b-15-vehicle-factory-lod2.glb",
+   "sha256": "a3548475ac6d429a9aaacbff97cb7b3290fef377cc31c67b0a6c97a184ef33c7",
+   "size": 123212
+  },
+  {
+   "path": "models/pilot/b-16-vehicle-depot-lod0.glb",
+   "sha256": "ad5175ffd5b02a1a033073beede647ba367a564217db05c60be1dcdc26f2fd66",
+   "size": 887284
+  },
+  {
+   "path": "models/pilot/b-16-vehicle-depot-lod1.glb",
+   "sha256": "d0a3f29bf588e666493be1f23ae84b2792353fe8f6e86fba83f16992df8f542f",
+   "size": 134092
+  },
+  {
+   "path": "models/pilot/b-16-vehicle-depot-lod2.glb",
+   "sha256": "33e7bfdde73db2f88d8f9a7afaa2dd9466141c95f99494421b8c6d24dad61c29",
+   "size": 97956
+  },
+  {
+   "path": "models/pilot/b-17-heavy-factory-lod0.glb",
+   "sha256": "98e0dd31a1debe03ebce1f2bb7dfb41e9efcb4efc07010b5d3827b4492338c8f",
+   "size": 880672
+  },
+  {
+   "path": "models/pilot/b-17-heavy-factory-lod1.glb",
+   "sha256": "b39304c2f7bea5ec05172a125dd05903ab5c117bd292ed7cf7257aabf19e8cef",
+   "size": 129452
+  },
+  {
+   "path": "models/pilot/b-17-heavy-factory-lod2.glb",
+   "sha256": "6e2ee5275bb67d069909a45bc3b5cd36296b6431ab18df48e0b7e336e69b680a",
+   "size": 102104
+  },
+  {
+   "path": "models/pilot/b-18-artillery-foundry-lod0.glb",
+   "sha256": "00a0210ab71909255ab5b768aab73e4869d5bf82745f3694f2d77b45270013ed",
+   "size": 882852
+  },
+  {
+   "path": "models/pilot/b-18-artillery-foundry-lod1.glb",
+   "sha256": "cc15abd65c1e53132421fb861848e49e06a1a970ec5c714ea9e46bc53aeb4a21",
+   "size": 116916
+  },
+  {
+   "path": "models/pilot/b-18-artillery-foundry-lod2.glb",
+   "sha256": "8204e595c05f260c48da99d2a8e4e6c0da6bfce197c2ead1b74b5b9785bf9c53",
+   "size": 99700
+  },
+  {
+   "path": "models/pilot/b-19-frontline-airfield-lod0.glb",
+   "sha256": "2c9101d8fb0c8b7ac2ddde08f4269554a066b44e87f165410fc17254dd75bc86",
+   "size": 393244
+  },
+  {
+   "path": "models/pilot/b-19-frontline-airfield-lod1.glb",
+   "sha256": "0a1730a10be139a59f1aab8a1f9331b979a2949f3d5a6a56e2280cb8050c7897",
+   "size": 66436
+  },
+  {
+   "path": "models/pilot/b-19-frontline-airfield-lod2.glb",
+   "sha256": "99760c9241318be92e16ccf0a9bc14995a10d18ae90d3d80c263e692ab8dc30b",
+   "size": 43312
+  },
+  {
+   "path": "models/pilot/b-20-drone-bay-lod0.glb",
+   "sha256": "959f162d84d48f4d2a7733eec0b68f7c8323b2421b1b6289628548a542a2379d",
+   "size": 653516
+  },
+  {
+   "path": "models/pilot/b-20-drone-bay-lod1.glb",
+   "sha256": "b4f3dfc90bf38a8b61ce24fa0ac2df1c6955436c2a02ecb63dd8f420173b9148",
+   "size": 134044
+  },
+  {
+   "path": "models/pilot/b-20-drone-bay-lod2.glb",
+   "sha256": "40854f12ee9eaf9a194a6a39bbc7eaa504a64aaef863caeee663ef3143be905b",
+   "size": 73668
+  },
+  {
+   "path": "models/pilot/b-21-advanced-airfield-lod0.glb",
+   "sha256": "f76583719d3ca435a338258d5bc8ef2d65bcf0b5bb21f32b804c32bc403eab1d",
+   "size": 922292
+  },
+  {
+   "path": "models/pilot/b-21-advanced-airfield-lod1.glb",
+   "sha256": "b8101e02bad8d88e4c4498f92f58587e1aa388ba6c5ba5765c2d82a5251d098d",
+   "size": 123700
+  },
+  {
+   "path": "models/pilot/b-21-advanced-airfield-lod2.glb",
+   "sha256": "56c32bcb07a1bd70b0696b23f077d637552792a010af2670e9cac11c3b8042cc",
+   "size": 120896
+  },
+  {
+   "path": "models/pilot/b-22-phased-array-radar-lod0.glb",
+   "sha256": "082f020f090a8797fe19960dd446f8a6815f388f7f49d1e490cfb833437741d6",
+   "size": 733912
+  },
+  {
+   "path": "models/pilot/b-22-phased-array-radar-lod1.glb",
+   "sha256": "ea4c395910612d7aef50f86a2dacbb7377529e08e152a041cd6074101913b214",
+   "size": 66188
+  },
+  {
+   "path": "models/pilot/b-22-phased-array-radar-lod2.glb",
+   "sha256": "1e7533c35ff4b1f2e93270f773417503a4357c8a29362cbae5d5b080d093c822",
+   "size": 59700
+  },
+  {
+   "path": "models/pilot/b-23-sensor-tower-lod0.glb",
+   "sha256": "fd31070bd7de2a7007d255e124c665ef9eb98bc21998c45e18cb6c755901e911",
+   "size": 556296
+  },
+  {
+   "path": "models/pilot/b-23-sensor-tower-lod1.glb",
+   "sha256": "2816c09e910c779cbe2f4c023f9c35760d37d4640c7ae860f12699266ffa62c8",
+   "size": 55008
+  },
+  {
+   "path": "models/pilot/b-23-sensor-tower-lod2.glb",
+   "sha256": "593147659f955eaf4307df2bc032f740d29a8101cbd9a526fef0dfe06e6b19d4",
+   "size": 52452
+  },
+  {
+   "path": "models/pilot/b-24-jammer-lod0.glb",
+   "sha256": "8031c7d7962910376165975cf7a357d3cd8f848bfbcc4622be2da754ce1ab203",
+   "size": 618496
+  },
+  {
+   "path": "models/pilot/b-24-jammer-lod1.glb",
+   "sha256": "c0907080028cc287ef8d5e33c7be3624f9d05c22d6481b1141da57b0f41e69f9",
+   "size": 63040
+  },
+  {
+   "path": "models/pilot/b-24-jammer-lod2.glb",
+   "sha256": "d1dcbda5d907ad2e4ec9fb0595e60aa2f4af43bc557097fc6faf5b897e6cd343",
+   "size": 59576
+  },
+  {
+   "path": "models/pilot/b-25-tech-lab-lod0.glb",
+   "sha256": "1014993a2f37041643b5dfeaffbaaabdbe0201b70b13c963acaa1a39fef9d0a9",
+   "size": 839640
+  },
+  {
+   "path": "models/pilot/b-25-tech-lab-lod1.glb",
+   "sha256": "862a7df902b03be6ef12929caab46257d8ab930c168af8d8fb60d9f3d3b79545",
+   "size": 182124
+  },
+  {
+   "path": "models/pilot/b-25-tech-lab-lod2.glb",
+   "sha256": "39e6a708c86874107438552d7dbbe75e6d4442efd5ee88794f09a65705c3b88b",
+   "size": 161716
+  },
+  {
+   "path": "models/pilot/b-26-cyber-lab-lod0.glb",
+   "sha256": "1dceca2be4295e932de52404b917bcf603e5343ac56d0ccb7f0443bb274cc768",
+   "size": 691868
+  },
+  {
+   "path": "models/pilot/b-26-cyber-lab-lod1.glb",
+   "sha256": "eb4fb272814ca1531a975f19384957cbc3d6da3e7243e1c54fb8afb05f23ac08",
+   "size": 115848
+  },
+  {
+   "path": "models/pilot/b-26-cyber-lab-lod2.glb",
+   "sha256": "e2a2e6fa1928a18a5ec424f785dacbe80f5529edf5699f1ad9ec73cee1228603",
+   "size": 113000
+  },
+  {
+   "path": "models/pilot/b-27-academy-lod0.glb",
+   "sha256": "1053d760ec01464f9b295cfca280028535f08d6ac5598f533d184a11c49a7252",
+   "size": 732060
+  },
+  {
+   "path": "models/pilot/b-27-academy-lod1.glb",
+   "sha256": "bf6d089147251daaaab0455946da6835503ea74f213314a341c91c583f6e56a1",
+   "size": 78292
+  },
+  {
+   "path": "models/pilot/b-27-academy-lod2.glb",
+   "sha256": "1409f91f1b01b818a5767b6f9797a0da98fe92500cdb3fcd1bdbcd70d7863447",
+   "size": 62900
+  },
+  {
+   "path": "models/pilot/b-28-quantum-lab-lod0.glb",
+   "sha256": "9c656badc964363ac1741e08e14bb1ebe99692306fc1a6bd0a872992ff63e7f5",
+   "size": 704992
+  },
+  {
+   "path": "models/pilot/b-28-quantum-lab-lod1.glb",
+   "sha256": "4d9f2d32c291474dc03185beebbb95062a3c8bfa8ed5099964a48e68770eb97e",
+   "size": 190072
+  },
+  {
+   "path": "models/pilot/b-28-quantum-lab-lod2.glb",
+   "sha256": "d1fad693a63b8f1af2ffd3a2949936430ec2b9fef419438e9ec001e440fe31bb",
+   "size": 176912
+  },
+  {
+   "path": "models/pilot/b-29-autocannon-turret-lod0.glb",
+   "sha256": "e05c1277b60dbf10023164648b1e339df80d74e6b6abc02589a5ec7b51582728",
+   "size": 659596
+  },
+  {
+   "path": "models/pilot/b-29-autocannon-turret-lod1.glb",
+   "sha256": "2a73c6d335a66ae291a4de48f94a1e3c83f4a0145ee812ada34ddf2ba8c32c11",
+   "size": 63552
+  },
+  {
+   "path": "models/pilot/b-29-autocannon-turret-lod2.glb",
+   "sha256": "1d3c6ca7873b9fc69fe650bd9bdd91a42cb1ea197bcf23cc3645846a6308af0b",
+   "size": 62432
+  },
+  {
+   "path": "models/pilot/b-30-cannon-turret-lod0.glb",
+   "sha256": "e294800fcc623ca309f55a006dcaab1f2d2064db913354eb15dc28fcb2f49b0b",
+   "size": 673544
+  },
+  {
+   "path": "models/pilot/b-30-cannon-turret-lod1.glb",
+   "sha256": "473c580ab3b11d497b7167ff06ccabe0d70d814326d3a42cced4f71c56f40313",
+   "size": 77660
+  },
+  {
+   "path": "models/pilot/b-30-cannon-turret-lod2.glb",
+   "sha256": "22900d58627b0288c988413a9694fe21115cee2a6a81fd333dd24cdaae3b617e",
+   "size": 76544
+  },
+  {
+   "path": "models/pilot/b-31-aa-turret-lod0.glb",
+   "sha256": "6cb0598d8825520a1d77e2c95ecef9024454d6ac663dbc8920dc55a72d53bc9a",
+   "size": 714388
+  },
+  {
+   "path": "models/pilot/b-31-aa-turret-lod1.glb",
+   "sha256": "eafd914f6f39dc1adf1f5d394e6e00598267973d767c6a8f6f016f571ddf74dd",
+   "size": 118488
+  },
+  {
+   "path": "models/pilot/b-31-aa-turret-lod2.glb",
+   "sha256": "f05394d4aafe30f23befdfd43a0c3233256d10e4ddd4fbd6e1f2d2992ddf2441",
+   "size": 116152
+  },
+  {
+   "path": "models/pilot/b-32-missile-battery-lod0.glb",
+   "sha256": "af2420b971cea95bd5dfa0eaa6d1310a8a65ce6a204a4338815d760df0dca93b",
+   "size": 690208
+  },
+  {
+   "path": "models/pilot/b-32-missile-battery-lod1.glb",
+   "sha256": "0ccd3e60e1e54ead37c883898be1264c8e01592e8fc16f0c26c9ca61a2c16d94",
+   "size": 64048
+  },
+  {
+   "path": "models/pilot/b-32-missile-battery-lod2.glb",
+   "sha256": "3b55141df1ceee09876b36c0c22b34e669e39b25cd11a5fda950b86f932dbe41",
+   "size": 53208
+  },
+  {
+   "path": "models/pilot/b-33-counter-uas-lod0.glb",
+   "sha256": "4b875ed1f08850da2a53494bfe329b9351c0cac00e3c7225fd07318fc12ffe6d",
+   "size": 674784
+  },
+  {
+   "path": "models/pilot/b-33-counter-uas-lod1.glb",
+   "sha256": "e2f7ffc9bac122b9097068bbc0cd13a419fbd6d3faf236adc8e2b31650a450fb",
+   "size": 80336
+  },
+  {
+   "path": "models/pilot/b-33-counter-uas-lod2.glb",
+   "sha256": "348181bbdb4d5151c5787436f234aeca267f9b67fb5c8422cfc524e6ebbc1eb0",
+   "size": 77808
+  },
+  {
+   "path": "models/pilot/b-34-abm-battery-lod0.glb",
+   "sha256": "f8d27bb8a4f2339660e708ffd4a2b6d43dd1db92577edfab24fc87f3b63dc639",
+   "size": 690188
+  },
+  {
+   "path": "models/pilot/b-34-abm-battery-lod1.glb",
+   "sha256": "044a70385d4a6ff38efc7c2c330ae17ae446dd7d3f2a7eaac8e7f4d9f471e058",
+   "size": 64032
+  },
+  {
+   "path": "models/pilot/b-34-abm-battery-lod2.glb",
+   "sha256": "2b91dd062095f5c97e84cc152fbbfe4907017a354e1fdda26585277650596da6",
+   "size": 53192
+  },
+  {
+   "path": "models/pilot/b-35-bunker-lod0.glb",
+   "sha256": "4f8eff1859b1c6afb9755cba4966c9fc34b018e44d025972050b0635844ab04c",
+   "size": 720316
+  },
+  {
+   "path": "models/pilot/b-35-bunker-lod1.glb",
+   "sha256": "220fad80d39b8b66a90483fbe919773fd4f3a186525454924f650b2b0a5916a7",
+   "size": 60756
+  },
+  {
+   "path": "models/pilot/b-35-bunker-lod2.glb",
+   "sha256": "2224a201c5b7cd573a631cf8f3e33d706f06228bd5ecb42c98c3950a99be431f",
+   "size": 59244
+  },
+  {
+   "path": "models/pilot/b-36-flame-tower-lod0.glb",
+   "sha256": "b2d68d56564f2e78582bb0b89fdc4191398f251d38b5282d6a36a0fd5c92fa39",
+   "size": 915048
+  },
+  {
+   "path": "models/pilot/b-36-flame-tower-lod1.glb",
+   "sha256": "e07fb7b0ef43c619f0b32851a7501a8a00ed8e2c85d48082bd63475a43b58378",
+   "size": 182748
+  },
+  {
+   "path": "models/pilot/b-36-flame-tower-lod2.glb",
+   "sha256": "0d9122979ca940828d5031f997e4578f54c64af53ee403b033459f8a2f0dd9a0",
+   "size": 167984
+  },
+  {
+   "path": "models/pilot/b-37-mine-control-lod0.glb",
+   "sha256": "83ae2189557bfbcdd646f65f216a6fa75a377d11e50c5dc9b66c0a4f970e46f9",
+   "size": 714220
+  },
+  {
+   "path": "models/pilot/b-37-mine-control-lod1.glb",
+   "sha256": "2b99e11d8a4953695255b3a32c75c9c06f8b2e2b03c3c8ef96631ae9ee89babf",
+   "size": 101508
+  },
+  {
+   "path": "models/pilot/b-37-mine-control-lod2.glb",
+   "sha256": "119b4977e9f52ffeb34da4d0556b3f8b67cbe3c6ee6773fd6265f5a56864b2f0",
+   "size": 99464
+  },
+  {
+   "path": "models/pilot/b-38-orbital-defense-lod0.glb",
+   "sha256": "dc27f91cb0012db4286d0210f2848263d55b7ff4c96be6e5b7b35cec8b49b2cc",
+   "size": 750384
+  },
+  {
+   "path": "models/pilot/b-38-orbital-defense-lod1.glb",
+   "sha256": "8df008a9a6f02f7aee5b4416bec98492454d008d1059464806100c4d6a4d9a35",
+   "size": 124236
+  },
+  {
+   "path": "models/pilot/b-38-orbital-defense-lod2.glb",
+   "sha256": "ad32582d7b9906f13aa9e20f8d585a99510f1aa3b9f02aaf534181b88f521854",
+   "size": 104268
+  },
+  {
+   "path": "models/pilot/b-39-repair-depot-lod0.glb",
+   "sha256": "204668961d066a5f0770956616fa7ffbfe3d8ed18df277c6931a78a49fcae6a0",
+   "size": 949956
+  },
+  {
+   "path": "models/pilot/b-39-repair-depot-lod1.glb",
+   "sha256": "68566f467b5e5e56f490579a3d309a7eeafaac3bf8219b85ba4045c906efdc99",
+   "size": 145356
+  },
+  {
+   "path": "models/pilot/b-39-repair-depot-lod2.glb",
+   "sha256": "c1e8ed9e3e4b382e2e5540a2b6d9df8dd6f0688af070a54bcba5dac6c5c27d9f",
+   "size": 108400
+  },
+  {
+   "path": "models/pilot/b-40-medical-center-lod0.glb",
+   "sha256": "b9117e76a401674043a092596bb8c0883b2074847d7743ac3e9b21dfd061a0f2",
+   "size": 707072
+  },
+  {
+   "path": "models/pilot/b-40-medical-center-lod1.glb",
+   "sha256": "17c28ccd456ff4d1e99bee1fe0dddbb97e553ab2779dae06f8c689076532a575",
+   "size": 110892
+  },
+  {
+   "path": "models/pilot/b-40-medical-center-lod2.glb",
+   "sha256": "38f0f1f0cdfeb51772196836100eed31a7d57ee6d7acc99e5efa432636edd4e3",
+   "size": 55340
+  },
+  {
+   "path": "models/pilot/b-41-shield-generator-lod0.glb",
+   "sha256": "03da17dac4799765a91ec1c4d99f85b7cf38c318b784760c691054df78cc85f7",
+   "size": 597252
+  },
+  {
+   "path": "models/pilot/b-41-shield-generator-lod1.glb",
+   "sha256": "2ffbacf3d6ba3eb836c0d7e2403e13722cb31d52d768f605dcbe0c37d64d38a5",
+   "size": 44312
+  },
+  {
+   "path": "models/pilot/b-41-shield-generator-lod2.glb",
+   "sha256": "02d05727cc8592caf9e1d57b9e0ab02533bc1a43b6b98090c32990996467ea33",
+   "size": 40120
+  },
+  {
+   "path": "models/pilot/b-42-forward-outpost-lod0.glb",
+   "sha256": "2fc1f07a75a38c2ba77f81fc60f6c6e4a8e50592fd260dd1b6b2030093275536",
+   "size": 862100
+  },
+  {
+   "path": "models/pilot/b-42-forward-outpost-lod1.glb",
+   "sha256": "6457f9b21e54a4fff11da37346a4c27f09e4aef2d559a6bc14dc64f86bc7250a",
+   "size": 72988
+  },
+  {
+   "path": "models/pilot/b-42-forward-outpost-lod2.glb",
+   "sha256": "f908460191261c5b21dae338532246757f75adccf95b06bec9f90c82f4ccc6c5",
+   "size": 55068
+  },
+  {
+   "path": "models/pilot/b-43-command-relay-lod0.glb",
+   "sha256": "9b7cf9614dca6068926f9c3b1f283cfad0a308f73d9961cfeadee8d4a9982fdf",
+   "size": 702488
+  },
+  {
+   "path": "models/pilot/b-43-command-relay-lod1.glb",
+   "sha256": "bbb6aaf7fb975acc1f60def0b2f682991efdaff75cb007d9bcf6019f99b7762f",
+   "size": 128804
+  },
+  {
+   "path": "models/pilot/b-43-command-relay-lod2.glb",
+   "sha256": "7d24e104baa8611e7255113913a9e70a1bc77a0042b9785ac3f3bbf985ea1b0c",
+   "size": 108912
+  },
+  {
+   "path": "models/pilot/b-44-uplink-lod0.glb",
+   "sha256": "68d1bca9ebe93b1a4e1300ad7e8ca7898257e669a0e40c4bfe59f9606cfb949b",
+   "size": 844968
+  },
+  {
+   "path": "models/pilot/b-44-uplink-lod1.glb",
+   "sha256": "cf26fbd6988f204071ffb1a6b4e1021fce1855eef383f717f12b5f413b936a7d",
+   "size": 154164
+  },
+  {
+   "path": "models/pilot/b-44-uplink-lod2.glb",
+   "sha256": "0c89288d7319a92d4878abcd881d30493da1802fd83f62723e00732bdb949b8b",
+   "size": 148648
+  },
+  {
+   "path": "models/pilot/b-45-superweapon-lab-lod0.glb",
+   "sha256": "94860a694773ea5a67d3675dad56c1143a9e31e7ea30ec3a4b14d4a30f182e99",
+   "size": 746516
+  },
+  {
+   "path": "models/pilot/b-45-superweapon-lab-lod1.glb",
+   "sha256": "da13dc31f49872c367c0cbf6f3fc465608b057aafb16481db48fec617b6b4e4f",
+   "size": 64392
+  },
+  {
+   "path": "models/pilot/b-45-superweapon-lab-lod2.glb",
+   "sha256": "bb92e6f29e298d8936fe2adc9f771e410ed63fc97b17d1a125c85dd47a1e7acb",
+   "size": 39024
+  },
+  {
+   "path": "models/pilot/b-46-neutral-oil-derrick-lod0.glb",
+   "sha256": "f0ea98d3184609559ad7a7e0e09d131d2c093479d2118b98cc26a8681279e38b",
+   "size": 694780
+  },
+  {
+   "path": "models/pilot/b-46-neutral-oil-derrick-lod1.glb",
+   "sha256": "d67f2a9fdf2f23c8bf06ff9fcd518b15f2306aa9738bee837b8809df0fc52e33",
+   "size": 177188
+  },
+  {
+   "path": "models/pilot/b-46-neutral-oil-derrick-lod2.glb",
+   "sha256": "98627c9e5673302505d99e30c1d4e4fd407bcb641e20e1218f4fbbdaa20f9cc0",
+   "size": 124024
+  },
+  {
+   "path": "models/pilot/b-47-salvage-yard-lod0.glb",
+   "sha256": "1372e546e051d713774ca2aa1afba52915664f5dcd6f5dc198952a78206e04c9",
+   "size": 676084
+  },
+  {
+   "path": "models/pilot/b-47-salvage-yard-lod1.glb",
+   "sha256": "06364597cb5990a36375208800f6817233ee60428963958e2aead153bc2edb94",
+   "size": 63204
+  },
+  {
+   "path": "models/pilot/b-47-salvage-yard-lod2.glb",
+   "sha256": "9d49f31a439868b4339ff7a7d1eba7b85eb39339b56081a7ccd83c065493c47a",
+   "size": 54312
+  },
+  {
+   "path": "models/pilot/b-48-neutral-solar-farm-lod0.glb",
+   "sha256": "0868d1ee43b5e01d0ad88d9a263410fb69f7d6457fdb60f784824231fef575c2",
+   "size": 653716
+  },
+  {
+   "path": "models/pilot/b-48-neutral-solar-farm-lod1.glb",
+   "sha256": "67461630e507340b84bef8a2193c2dc044db2b1adcb51fe34637ee63dbe92a9f",
+   "size": 61552
+  },
+  {
+   "path": "models/pilot/b-48-neutral-solar-farm-lod2.glb",
+   "sha256": "096c65c75d9310043d2bec745805cb848971f9a3f1e44258c8da07c82391ad0e",
+   "size": 48632
+  },
+  {
+   "path": "models/pilot/b-49-data-vault-lod0.glb",
+   "sha256": "d38128978b1f7fff0ddf21075c0476b775dc10183c3ae12d60f5e85cca8f4bf8",
+   "size": 771348
+  },
+  {
+   "path": "models/pilot/b-49-data-vault-lod1.glb",
+   "sha256": "50b0f77818369849281853dce547caab310505cad6b41a99e8eac96773ea469c",
+   "size": 195420
+  },
+  {
+   "path": "models/pilot/b-49-data-vault-lod2.glb",
+   "sha256": "84af2d6a34debfbada7909720adc5242790b04e8ace0fe7db6736fa0cd1dceb9",
+   "size": 138684
+  },
+  {
+   "path": "models/pilot/b-50-mineral-quarry-lod0.glb",
+   "sha256": "8797c9b1751736854eaa7c4cb44aeacaa439f0eb229b0cbf5a70714d6ec571fe",
+   "size": 1001884
+  },
+  {
+   "path": "models/pilot/b-50-mineral-quarry-lod1.glb",
+   "sha256": "ecee34e2f606b918dd557ba6e65a10779fc6a1deffc3c6539144fc438234ef2d",
+   "size": 207588
+  },
+  {
+   "path": "models/pilot/b-50-mineral-quarry-lod2.glb",
+   "sha256": "987600df416fb0d93d2056400d94774c82ed5917084a663f234ee56200d2e44d",
+   "size": 172660
+  },
+  {
+   "path": "models/pilot/b-51-ore-mine-lod0.glb",
+   "sha256": "661789820d1b0e90be55307784595e4340ad2030129ea113d19bb41cafcca76b",
+   "size": 1038032
+  },
+  {
+   "path": "models/pilot/b-51-ore-mine-lod1.glb",
+   "sha256": "c0192a208231e0a251ebf815bd136470e4d4d2de6f3847bbe7af6c6f30b765e5",
+   "size": 171392
+  },
+  {
+   "path": "models/pilot/b-51-ore-mine-lod2.glb",
+   "sha256": "cc38f9b79d40e01ae0f11d17416b198db6f124cb937fe835e47a5220dadaaf11",
+   "size": 164376
+  },
+  {
+   "path": "models/pilot/b-52-deep-mine-lod0.glb",
+   "sha256": "584da3c641c54d2bbd43b7d03bcd863b18fae1280c0446979e2bb384bf5c1402",
+   "size": 1097608
+  },
+  {
+   "path": "models/pilot/b-52-deep-mine-lod1.glb",
+   "sha256": "a4025c16821fa9519c92513591de4cd548a500dcabf3c16b2992424537d49141",
+   "size": 149032
+  },
+  {
+   "path": "models/pilot/b-52-deep-mine-lod2.glb",
+   "sha256": "b5021a7b2fc6d06a1f653f01e8b0fe5685796fc82600aec79dea793b174f663c",
+   "size": 141756
+  },
+  {
+   "path": "models/pilot/b-53-core-drill-lod0.glb",
+   "sha256": "45589c01172bb2bd5edb67ac41f56d6d107428d789ba2f50de948fdcfd7931f4",
+   "size": 1241848
+  },
+  {
+   "path": "models/pilot/b-53-core-drill-lod1.glb",
+   "sha256": "885f85ec3b11d74082934192dfae796e3825c41639a097cbbb395f178bf193dd",
+   "size": 228484
+  },
+  {
+   "path": "models/pilot/b-53-core-drill-lod2.glb",
+   "sha256": "da5275b184ecdcf60837cfeb474fe1f8bea9a10eb397eccf440f52eb3b5c7be9",
+   "size": 225548
+  },
+  {
+   "path": "models/pilot/c-u01-engineer-lod0.glb",
+   "sha256": "32c0de9b640c135caa3ebc2b4606e2a1fe84b5c562b94d0a7511e2992f3be151",
+   "size": 536864
+  },
+  {
+   "path": "models/pilot/c-u01-engineer-lod1.glb",
+   "sha256": "e9b9c9825f94cd63fca46ebe5e21a65fbeff4826868c029e81f61762bb349984",
+   "size": 109388
+  },
+  {
+   "path": "models/pilot/c-u01-engineer-lod2.glb",
+   "sha256": "84ece771682ae79470f0327f25d61345cd12f3db72b3004ada1d0bebb26889dd",
+   "size": 108116
+  },
+  {
+   "path": "models/pilot/c-u02-rifle-squad-lod0.glb",
+   "sha256": "c9cb210f88f22ecaa33d548f93d6c6957886394b5885cf2e954387d489d23de9",
+   "size": 447424
+  },
+  {
+   "path": "models/pilot/c-u02-rifle-squad-lod1.glb",
+   "sha256": "a70b42ad98597a5a29e6735d657bf1a65c88a95b36e21dda59354fa8a5255b8e",
+   "size": 103348
+  },
+  {
+   "path": "models/pilot/c-u02-rifle-squad-lod2.glb",
+   "sha256": "eafc241659f598c3455d45b739b065b692cbb2d0ecdc03ad9eda88b4580976b0",
+   "size": 46716
+  },
+  {
+   "path": "models/pilot/c-u03-rocket-soldier-lod0.glb",
+   "sha256": "a9e84a5d6db8fa87f35bff3a90abfa3af59b440198237c799528ae2849f3bbc4",
+   "size": 449176
+  },
+  {
+   "path": "models/pilot/c-u03-rocket-soldier-lod1.glb",
+   "sha256": "311760a16f69eb67bb7c7c6de9b68517ae389346b21bca5531ac54843ae12313",
+   "size": 107840
+  },
+  {
+   "path": "models/pilot/c-u03-rocket-soldier-lod2.glb",
+   "sha256": "1ded5faeb6460442a9a5df0368151db7381b3be4d106e22e4a875fb9326a558a",
+   "size": 53128
+  },
+  {
+   "path": "models/pilot/c-u04-field-medic-lod0.glb",
+   "sha256": "4f0319caeae73842db0b54a33593eb03e27e5925d63d4b566941a9f85884cfec",
+   "size": 474444
+  },
+  {
+   "path": "models/pilot/c-u04-field-medic-lod1.glb",
+   "sha256": "df39b06ec848a4d9dff5b96bd9517ab9ffae8b7bb276417a635d2b1cea8b94a8",
+   "size": 94524
+  },
+  {
+   "path": "models/pilot/c-u04-field-medic-lod2.glb",
+   "sha256": "a2d725924a8efdcbd4bd6028feced26b6a65fbb323ca8bb808f6f9f1c8e6397e",
+   "size": 93352
+  },
+  {
+   "path": "models/pilot/c-u05-operative-lod0.glb",
+   "sha256": "c8f33e0740df1d679cd39913c2979db107e49ac4af8a4e2b58c74778ccdf1e4c",
+   "size": 433172
+  },
+  {
+   "path": "models/pilot/c-u05-operative-lod1.glb",
+   "sha256": "317b3e56c33adc5d55e11170b58acfcebc8da28325115f38d9effd9c527cc51b",
+   "size": 94248
+  },
+  {
+   "path": "models/pilot/c-u05-operative-lod2.glb",
+   "sha256": "6e57df92a6cba1e8b1818a6fe17e46f76e791c6955814a55de1ba4bc6f361546",
+   "size": 41428
+  },
+  {
+   "path": "models/pilot/c-u06-recon-buggy-lod0.glb",
+   "sha256": "4b8dc61e90e15915a7b4f5518b1b2a9e9d9722a060c97f572bba0fc3e64a6ea4",
+   "size": 452168
+  },
+  {
+   "path": "models/pilot/c-u06-recon-buggy-lod1.glb",
+   "sha256": "55f669df3cafc145479e51c99ad06ef576cc9224ac1add1a3660caaa005e93e6",
+   "size": 45384
+  },
+  {
+   "path": "models/pilot/c-u06-recon-buggy-lod2.glb",
+   "sha256": "123f45ba78d845b5dedaf8ca285463f93e1d84a97b1e038ff03feb2e4bbbf511",
+   "size": 43268
+  },
+  {
+   "path": "models/pilot/c-u07-main-tank-lod0.glb",
+   "sha256": "dd248df404a7b8f0522b00b8e1f06f5c38c2308c988097569504d7111039d969",
+   "size": 453528
+  },
+  {
+   "path": "models/pilot/c-u07-main-tank-lod1.glb",
+   "sha256": "9b3af687fc65d7730051c56565ceafd313d816fe5f9f6aad2a41b63cea8db79d",
+   "size": 47712
+  },
+  {
+   "path": "models/pilot/c-u07-main-tank-lod2.glb",
+   "sha256": "8fb728a93cdc48b4e02c84b8d0d1741733769a89f5984626baac2ef1ffbe8f4d",
+   "size": 45148
+  },
+  {
+   "path": "models/pilot/c-u08-anti-air-system-lod0.glb",
+   "sha256": "369e324f1065c2ffdd8e6f4d311717289b19fc4c2a5c927fed62ae64355683d1",
+   "size": 413788
+  },
+  {
+   "path": "models/pilot/c-u08-anti-air-system-lod1.glb",
+   "sha256": "e0628819afa1e15e87e64dda5c071ec585079924767c9da16f681b1b5c67e8a6",
+   "size": 48608
+  },
+  {
+   "path": "models/pilot/c-u08-anti-air-system-lod2.glb",
+   "sha256": "e31f60e7a28930cff2cb685988622711b4c1ba3c8fa0cf0f906fb4d3cbf847a3",
+   "size": 46380
+  },
+  {
+   "path": "models/pilot/c-u09-self-propelled-artillery-lod0.glb",
+   "sha256": "acb6774b56eebfd3826b901f3ec5f8c6676c56fa7320b28e4778b5d70b66558e",
+   "size": 455132
+  },
+  {
+   "path": "models/pilot/c-u09-self-propelled-artillery-lod1.glb",
+   "sha256": "c1f3109b19f9b42f0684eb245605b4425362c68017090a7a8af14b192338e502",
+   "size": 48968
+  },
+  {
+   "path": "models/pilot/c-u09-self-propelled-artillery-lod2.glb",
+   "sha256": "4221621047411d9e6f346e14b99f40d7bf1c6eef03703e79594a68c36702357a",
+   "size": 45936
+  },
+  {
+   "path": "models/pilot/c-u10-attack-helicopter-lod0.glb",
+   "sha256": "006318d7ded5b68743e8ee8c623c7fbd854bcc2696e714b2579c681a8d0fc61c",
+   "size": 464856
+  },
+  {
+   "path": "models/pilot/c-u10-attack-helicopter-lod1.glb",
+   "sha256": "fed14d336144a572fd1831d74dc8cfc6b201e04d5b88e6b3d6f2b5db71179b5f",
+   "size": 113184
+  },
+  {
+   "path": "models/pilot/c-u10-attack-helicopter-lod2.glb",
+   "sha256": "9653e6cd66f75692e2fb09460c5c5df69189d5dc2389cade93ac54ff164ddf55",
+   "size": 110184
+  },
+  {
+   "path": "models/pilot/c-u11-heavy-gunship-lod0.glb",
+   "sha256": "c14110d40c3f7f094c4f3567888ec2a32e623b80d3641dd0cf6b127995d273e7",
+   "size": 466572
+  },
+  {
+   "path": "models/pilot/c-u11-heavy-gunship-lod1.glb",
+   "sha256": "88f827ecec434df7c506bfd74af7c2f72fe4e81ea4752da51b3da9dcc49a026b",
+   "size": 115412
+  },
+  {
+   "path": "models/pilot/c-u11-heavy-gunship-lod2.glb",
+   "sha256": "eb20acca5d5a9a15feadb43777961bed3e6573c736a9e17523002a8d7212730a",
+   "size": 61512
+  },
+  {
+   "path": "models/pilot/c-u12-repair-drone-lod0.glb",
+   "sha256": "cf680631dfbfe06c1893df58a90e0374e991cad5f15f7e0e65a55a1374d6c1b2",
+   "size": 456508
+  },
+  {
+   "path": "models/pilot/c-u12-repair-drone-lod1.glb",
+   "sha256": "7e86d6d3980838e05d8c23804e218087cf5d58e5bf4b9ee341c71e22d01406b5",
+   "size": 110196
+  },
+  {
+   "path": "models/pilot/c-u12-repair-drone-lod2.glb",
+   "sha256": "3428112fcf8d428c5fefab84ac49dc2f2bd7568471470f0a4eb3816ee376484a",
+   "size": 56392
+  },
+  {
+   "path": "models/pilot/c-u13-juggernaut-lod0.glb",
+   "sha256": "4ac178b3fce716daf29a584b23fd763d452ed6d8fba3bb5dad63bde085bd07aa",
+   "size": 454576
+  },
+  {
+   "path": "models/pilot/c-u13-juggernaut-lod1.glb",
+   "sha256": "ce68831fc17d7d4eac9e06d73283a732a31fcdf30feaf19015989cf4775a0da3",
+   "size": 48624
+  },
+  {
+   "path": "models/pilot/c-u13-juggernaut-lod2.glb",
+   "sha256": "6dce323bd3b2982e90e584e13a24ca21d977000b7ea202ceac0e3f4460322fd0",
+   "size": 45772
+  },
+  {
+   "path": "models/pilot/c-u14-saboteur-lod0.glb",
+   "sha256": "473b8556b6c256fb44842946f055e68627f090a1e5a2aeb0f44a6e2ef4f9bddb",
+   "size": 434440
+  },
+  {
+   "path": "models/pilot/c-u14-saboteur-lod1.glb",
+   "sha256": "c18bc60666d9df19e6f7e4c6b178b54cb146585caf7044f200cbaa354e712631",
+   "size": 95516
+  },
+  {
+   "path": "models/pilot/c-u14-saboteur-lod2.glb",
+   "sha256": "c53860d2553be2eba59352dd964f95e493fe03546749015530ec6acc350dd6a4",
+   "size": 42144
+  },
+  {
+   "path": "models/pilot/c-u15-mobile-fire-group-lod0.glb",
+   "sha256": "8e728fa8248c4ad6d0bad0bf838f37b0d20c7fe278a50b8430ec13a3949be086",
+   "size": 452080
+  },
+  {
+   "path": "models/pilot/c-u15-mobile-fire-group-lod1.glb",
+   "sha256": "4ab6e2ba12ba643b11c6baa393bd3b9a02c61ff1ab7ce466e73f1aff6f0d74d6",
+   "size": 45056
+  },
+  {
+   "path": "models/pilot/c-u15-mobile-fire-group-lod2.glb",
+   "sha256": "962503dbdd67d80fc9ab23fae3ab1dff83c9ac83ac90c76c0c64eccfe1bb5f77",
+   "size": 42952
+  },
+  {
+   "path": "models/pilot/c-u16-counter-uas-lod0.glb",
+   "sha256": "3b9553dbc25c606e5c4e1a85656c68c5f25047879edf3f01747fe3d054eeb9ea",
+   "size": 457288
+  },
+  {
+   "path": "models/pilot/c-u16-counter-uas-lod1.glb",
+   "sha256": "a3742fe0cd3be7e09de509286483196dc705a3d73b580816d16037dd8afd4d0f",
+   "size": 47128
+  },
+  {
+   "path": "models/pilot/c-u16-counter-uas-lod2.glb",
+   "sha256": "e1b6d6fac1de1d3c70961fd98f3eaf02db80038d42a783fc453e62798de6fa5d",
+   "size": 43664
+  },
+  {
+   "path": "models/pilot/c-u17-long-range-sam-lod0.glb",
+   "sha256": "db2cfce09c6d6183622cb5d9ec278f263d49b76404931e06595242333af69114",
+   "size": 415772
+  },
+  {
+   "path": "models/pilot/c-u17-long-range-sam-lod1.glb",
+   "sha256": "8bc4a407bf5a061cc54f0bb4339f75fa07d4f83dabe3a9945b674fb8c2eab5cb",
+   "size": 48072
+  },
+  {
+   "path": "models/pilot/c-u17-long-range-sam-lod2.glb",
+   "sha256": "4aabfba5f1d51d2f3fbe896fdb3731213658524d0b9bda8d15a4d55493b9d652",
+   "size": 42960
+  },
+  {
+   "path": "models/pilot/c-u18-awacs-lod0.glb",
+   "sha256": "6121f300c973e0e0c28ccfa273cd925efa50bbd44020c139061624d0d3952324",
+   "size": 490592
+  },
+  {
+   "path": "models/pilot/c-u18-awacs-lod1.glb",
+   "sha256": "bfa22b9730f258b16ee9d39d9f42011fd0256b2b68506f8816d068dca604df95",
+   "size": 140032
+  },
+  {
+   "path": "models/pilot/c-u18-awacs-lod2.glb",
+   "sha256": "c265da5a0c1fb479e968184d46f6a42032e552e2f7f8966560064752b45c9d0e",
+   "size": 95304
+  },
+  {
+   "path": "models/pilot/c-u19-armored-transport-lod0.glb",
+   "sha256": "182c9976c96728b405b7e5698b7ff07ac852f0b2789afdebdd6f7f027570e67e",
+   "size": 453468
+  },
+  {
+   "path": "models/pilot/c-u19-armored-transport-lod1.glb",
+   "sha256": "a4992cb5b73a413b05968cb99f7df9973b3bf60250c7f15ac516e57f3f35a846",
+   "size": 45748
+  },
+  {
+   "path": "models/pilot/c-u19-armored-transport-lod2.glb",
+   "sha256": "0ac70576275bdafd2f0b54c25d71e0258b6bc4fed5bc008ef75d8252bd4a476a",
+   "size": 42796
+  },
+  {
+   "path": "models/pilot/c-u20-heavy-ground-transport-lod0.glb",
+   "sha256": "164f065413cc8dd4f2f709066789160ed3355d2dcb8e4e5c63bcfb5be56d3067",
+   "size": 453892
+  },
+  {
+   "path": "models/pilot/c-u20-heavy-ground-transport-lod1.glb",
+   "sha256": "c68311f6ddf73f44ead74fc92355f02fa55fa384f41e56f28db63b6e415e729e",
+   "size": 46084
+  },
+  {
+   "path": "models/pilot/c-u20-heavy-ground-transport-lod2.glb",
+   "sha256": "aa89120c5392fa9e330b12fa01409d8bac95a39e23b477384a522481adc12bc8",
+   "size": 42780
+  },
+  {
+   "path": "models/pilot/c-u21-transport-helicopter-lod0.glb",
+   "sha256": "b5877ba7e73159604a977b99a520b664e2f7c1a0d838a5bf6224e6e60c4f55cb",
+   "size": 461648
+  },
+  {
+   "path": "models/pilot/c-u21-transport-helicopter-lod1.glb",
+   "sha256": "c9aae5542cedf8b6affc7616f82f5c886f92f8fe237327dd401549c022121165",
+   "size": 111952
+  },
+  {
+   "path": "models/pilot/c-u21-transport-helicopter-lod2.glb",
+   "sha256": "a5d92e114d9549615392b561e5cc9b4c5f5d548357f4585efcf63eeefb0db94f",
+   "size": 44140
+  },
+  {
+   "path": "models/pilot/c-u22-strategic-airlifter-lod0.glb",
+   "sha256": "fde2fd5d5fb58228a5737d482a2fb1e2454885dd1e78c3087e62a85b660d0c12",
+   "size": 465856
+  },
+  {
+   "path": "models/pilot/c-u22-strategic-airlifter-lod1.glb",
+   "sha256": "e8ce904fa6da2a85eb20afd56302ddf56a45f49f5646dc3dd6696ffad14dfdc1",
+   "size": 115256
+  },
+  {
+   "path": "models/pilot/c-u22-strategic-airlifter-lod2.glb",
+   "sha256": "268b3725324a93568e00c596d0525293fe5cbb5b170e75ef52112caf515eafd0",
+   "size": 61456
+  },
+  {
+   "path": "models/pilot/c-u23-resource-truck-lod0.glb",
+   "sha256": "cccae0ba98ce1107cf93c5299afd919c423fedf19928253e6d7d7b696ea11504",
+   "size": 409208
+  },
+  {
+   "path": "models/pilot/c-u23-resource-truck-lod1.glb",
+   "sha256": "eca44142b1302883c387b734c9120969263a0562992227b14165d7ffea47dc78",
+   "size": 45208
+  },
+  {
+   "path": "models/pilot/c-u23-resource-truck-lod2.glb",
+   "sha256": "868ecddfa74ea10343e7b79ef3f2953af180c9ef9422e755d92d8bbc7e46ad4c",
+   "size": 33716
+  },
+  {
+   "path": "models/pilot/d-u01-dominion-line-infantry-lod0.glb",
+   "sha256": "75df4e674cb2a378284075fa1ebe658f579ab2edb02f95d34b6059be672c4688",
+   "size": 362244
+  },
+  {
+   "path": "models/pilot/d-u01-dominion-line-infantry-lod1.glb",
+   "sha256": "eb8ca27d0f5dccc27d9bc780697eb4d2182f3b6f8f0fc4a42f8622bac1d48acd",
+   "size": 103588
+  },
+  {
+   "path": "models/pilot/d-u01-dominion-line-infantry-lod2.glb",
+   "sha256": "825440ce33f36ebd23fa42a83d14505b7d5f43656fcf17bd1f43c98c7882c12d",
+   "size": 46740
+  },
+  {
+   "path": "models/pilot/d-u02-dominion-assault-infantry-lod0.glb",
+   "sha256": "f88d47b4ac86790a5879b000d6bd846526fcb2bac4da83f93df08651e3ba5625",
+   "size": 297516
+  },
+  {
+   "path": "models/pilot/d-u02-dominion-assault-infantry-lod1.glb",
+   "sha256": "4a44e5118edb34130a2bf66fc92e9474687688e96b23625360f8c017c0b1e9c7",
+   "size": 98388
+  },
+  {
+   "path": "models/pilot/d-u02-dominion-assault-infantry-lod2.glb",
+   "sha256": "cf36f0b434d83cd01fa93b77f5e7ea9803e9588689d22898c0dd955d5110c915",
+   "size": 95280
+  },
+  {
+   "path": "models/pilot/d-u03-dominion-sniper-lod0.glb",
+   "sha256": "1636b12d843e3d243ab1184d21175da6e18c6ddd271f3f030f688e5405ea6b01",
+   "size": 347892
+  },
+  {
+   "path": "models/pilot/d-u03-dominion-sniper-lod1.glb",
+   "sha256": "847e080eab62c0866a2c529072bf8dd79545d7ab907f1d04fa29998d72b1ca47",
+   "size": 94496
+  },
+  {
+   "path": "models/pilot/d-u03-dominion-sniper-lod2.glb",
+   "sha256": "79666c6572c6c39b8c27f59d75006d86694e9a5e33028428904aca961b32e300",
+   "size": 41704
+  },
+  {
+   "path": "models/pilot/d-u04-dominion-anti-tank-team-lod0.glb",
+   "sha256": "ab51352a23e0de95b4a54ebcf85b51b7c693a1c8e80463ecdb48647097812908",
+   "size": 363868
+  },
+  {
+   "path": "models/pilot/d-u04-dominion-anti-tank-team-lod1.glb",
+   "sha256": "00aff2ad9515a4aec49b98f1abaad5aa278a1caebb2932fbb2836b48551e3aec",
+   "size": 108032
+  },
+  {
+   "path": "models/pilot/d-u04-dominion-anti-tank-team-lod2.glb",
+   "sha256": "384da61f17dead1330e4b3fa6c4af24d4d4c6928208cf815f81660b79c493429",
+   "size": 53196
+  },
+  {
+   "path": "models/pilot/d-u05-dominion-anti-air-team-lod0.glb",
+   "sha256": "e8948c5dacf89eee766d8b63017318041593802e17cd2ea47b0c8d0b273721a4",
+   "size": 363892
+  },
+  {
+   "path": "models/pilot/d-u05-dominion-anti-air-team-lod1.glb",
+   "sha256": "1c5d11b407e990692ea8a6789d3dcde712cea6652a5fb04ff975ea29c59cec30",
+   "size": 108056
+  },
+  {
+   "path": "models/pilot/d-u05-dominion-anti-air-team-lod2.glb",
+   "sha256": "afeed7cc989e69e92ca3b0158d8538ad7330447a5106e0980e80d6d38e70d41a",
+   "size": 53216
+  },
+  {
+   "path": "models/pilot/d-u06-dominion-combat-medic-lod0.glb",
+   "sha256": "06dff5acd4ac0428a6f9422e2e2f9b0e7d32ac740e91129dcda465af1da74127",
+   "size": 457472
+  },
+  {
+   "path": "models/pilot/d-u06-dominion-combat-medic-lod1.glb",
+   "sha256": "bbedaee03ff0af29d71f38ebe9e9ed30f61a88d8f1b454d2a2dca10c9768e14f",
+   "size": 94940
+  },
+  {
+   "path": "models/pilot/d-u06-dominion-combat-medic-lod2.glb",
+   "sha256": "d0e8a27bb65d5cdb3609dc8e4d2253f1c6fb386bcc407c11661c22991c3eda90",
+   "size": 93432
+  },
+  {
+   "path": "models/pilot/d-u07-dominion-infiltrator-lod0.glb",
+   "sha256": "539b58cabd67f0d67c3c58a51d2bc022c1d5e65a0c2e326a2395a45251bd5d01",
+   "size": 348868
+  },
+  {
+   "path": "models/pilot/d-u07-dominion-infiltrator-lod1.glb",
+   "sha256": "7188a866f453b4e4584755e426325f1a6ae91c63dfb8d93227ba678551248151",
+   "size": 95664
+  },
+  {
+   "path": "models/pilot/d-u07-dominion-infiltrator-lod2.glb",
+   "sha256": "49bdbc9c2adf0b26f62c00fe424e27a00beb012b308166fc28056925769660ff",
+   "size": 42256
+  },
+  {
+   "path": "models/pilot/d-u08-dominion-flamethrower-lod0.glb",
+   "sha256": "4e190f701555b874ff146603984a3adb031402ca74bd1fa96c138425492c6e9f",
+   "size": 464856
+  },
+  {
+   "path": "models/pilot/d-u08-dominion-flamethrower-lod1.glb",
+   "sha256": "5fd9eb8863b007e9b828e818d33396927681e57e657be9ebd9a43b6218a988c9",
+   "size": 103904
+  },
+  {
+   "path": "models/pilot/d-u08-dominion-flamethrower-lod2.glb",
+   "sha256": "0917e80a07f56300223d0613a927c9f32e4451ef791bcac712fe739940a1bb21",
+   "size": 51048
+  },
+  {
+   "path": "models/pilot/d-u09-dominion-exo-infantry-lod0.glb",
+   "sha256": "0c93998004702ca4e44653681b712b03bf6a6657b3ef365d35df131edb35bd1e",
+   "size": 473900
+  },
+  {
+   "path": "models/pilot/d-u09-dominion-exo-infantry-lod1.glb",
+   "sha256": "1e712c8752018acf384c59cc9cd243a4a9c5035f4b6c2133c8101427bd18e53d",
+   "size": 106668
+  },
+  {
+   "path": "models/pilot/d-u09-dominion-exo-infantry-lod2.glb",
+   "sha256": "347a481c6034ec614f0a8207fe99fb6ad07ac681269a074eaca3520090d0b428",
+   "size": 52340
+  },
+  {
+   "path": "models/pilot/d-u10-dominion-operator-lod0.glb",
+   "sha256": "b1f03898c0f919816f7c169b12b73dac73072ae32177b7fdc23ef9241ff959c8",
+   "size": 347568
+  },
+  {
+   "path": "models/pilot/d-u10-dominion-operator-lod1.glb",
+   "sha256": "f8dfd15fd40d1f843ff13224f050d74c366c80771fe27338f425fb04ade785d9",
+   "size": 94364
+  },
+  {
+   "path": "models/pilot/d-u10-dominion-operator-lod2.glb",
+   "sha256": "a1cb2ad9880594c0a4cb72fa3aecd3e04ac7d221bc9015a1f81e7b394ff9299f",
+   "size": 41508
+  },
+  {
+   "path": "models/pilot/d-u11-dominion-recon-vehicle-lod0.glb",
+   "sha256": "0d82247b2a01145fc069a51db4b439f91dc569947aaf7cad471f5cd916449dcb",
+   "size": 425944
+  },
+  {
+   "path": "models/pilot/d-u11-dominion-recon-vehicle-lod1.glb",
+   "sha256": "9593085b3e842cd7cfa2f3e48d1448764c1f08eab3a566e4d5598a5a587c52b4",
+   "size": 46012
+  },
+  {
+   "path": "models/pilot/d-u11-dominion-recon-vehicle-lod2.glb",
+   "sha256": "8cdbd99e381c57e471d9db426fc643d2d82cc83adf3acd6956d4f62ac710d15b",
+   "size": 43272
+  },
+  {
+   "path": "models/pilot/d-u12-dominion-assault-vehicle-lod0.glb",
+   "sha256": "9711babb6b7de5c7d6ce4ca039ddfdae34e65b5370e1fc5cbc4c6d93e6dde808",
+   "size": 426064
+  },
+  {
+   "path": "models/pilot/d-u12-dominion-assault-vehicle-lod1.glb",
+   "sha256": "c71f73255b8fbc97fa336cb3ba144905991484e2d0cec0c9a3fd135d1e65c208",
+   "size": 46344
+  },
+  {
+   "path": "models/pilot/d-u12-dominion-assault-vehicle-lod2.glb",
+   "sha256": "2caa5cf2a2864fefac12778ddf7606b7d8a5b18f1a386d0aa0aec1eccc599f6b",
+   "size": 43100
+  },
+  {
+   "path": "models/pilot/d-u13-dominion-main-battle-tank-lod0.glb",
+   "sha256": "0e53c02db0e465e49231c0c1a6fd410c59f27e4aad222a339c7273b54bdb7039",
+   "size": 321280
+  },
+  {
+   "path": "models/pilot/d-u13-dominion-main-battle-tank-lod1.glb",
+   "sha256": "7c1c307db83577727a8f3837fd90b805a05488c6018b688ca80032f1dd1c663c",
+   "size": 55864
+  },
+  {
+   "path": "models/pilot/d-u13-dominion-main-battle-tank-lod2.glb",
+   "sha256": "9ce78faca665cc5e435a3f58105ced68c64e8275febddf63f510cb16f1cb9d3c",
+   "size": 43480
+  },
+  {
+   "path": "models/pilot/d-u14-dominion-tank-destroyer-lod0.glb",
+   "sha256": "d1799436a9ee1f14190cd1dd1e0c111bfb37ed968946dc06071188576bfab624",
+   "size": 427020
+  },
+  {
+   "path": "models/pilot/d-u14-dominion-tank-destroyer-lod1.glb",
+   "sha256": "d66dde052e7ee245136a8e0ecf2dd8ba2a73fbf67ed3a1f3f788d30384c1a71b",
+   "size": 49200
+  },
+  {
+   "path": "models/pilot/d-u14-dominion-tank-destroyer-lod2.glb",
+   "sha256": "d92861eb41d77018dbe16c2c2fa26fb074f22521b3305ec318393318e6a0e74b",
+   "size": 46164
+  },
+  {
+   "path": "models/pilot/d-u15-dominion-mobile-sam-lod0.glb",
+   "sha256": "0c9200a01c0258b3b85f07c0f039163be7b176fe740bf441ef6bb70396cf7076",
+   "size": 388620
+  },
+  {
+   "path": "models/pilot/d-u15-dominion-mobile-sam-lod1.glb",
+   "sha256": "f93d09dcad58e2c778503d575fb489a461ec8ab744188d57eb56aa7a0a7c4d27",
+   "size": 50620
+  },
+  {
+   "path": "models/pilot/d-u15-dominion-mobile-sam-lod2.glb",
+   "sha256": "e29db46ffd6669f83c1ff7a591b6314352756fe6708416c0e3d7c88c1cc5ad0c",
+   "size": 48088
+  },
+  {
+   "path": "models/pilot/d-u16-dominion-self-propelled-howitzer-lod0.glb",
+   "sha256": "3bb9c3385d1e50179280b6d31402785d0b8945b81dd7db4673052b17b8a1d967",
+   "size": 427496
+  },
+  {
+   "path": "models/pilot/d-u16-dominion-self-propelled-howitzer-lod1.glb",
+   "sha256": "260fe98284eeeba7b08a7a68bee5183bde52127002739af5b5b12b1ce5a23c83",
+   "size": 49656
+  },
+  {
+   "path": "models/pilot/d-u16-dominion-self-propelled-howitzer-lod2.glb",
+   "sha256": "874161513deab7f4ce718981274bde0326495740772cc0fd73ed256954c59855",
+   "size": 46436
+  },
+  {
+   "path": "models/pilot/d-u17-dominion-rocket-artillery-lod0.glb",
+   "sha256": "ea41980b5c47c4ad8ad186fdf40e5b6e9b396dca9d9897f1cd13828cd95379b7",
+   "size": 391136
+  },
+  {
+   "path": "models/pilot/d-u17-dominion-rocket-artillery-lod1.glb",
+   "sha256": "ed7bf05365a559903bc32b0aae868d5efb218fd9b73d9d72ef82184d5d282b18",
+   "size": 50460
+  },
+  {
+   "path": "models/pilot/d-u17-dominion-rocket-artillery-lod2.glb",
+   "sha256": "49bd4223ab8d526c5b3dc643b152ef56be1266bbc708fdeaee6aaed6fa1aa3d7",
+   "size": 46948
+  },
+  {
+   "path": "models/pilot/d-u18-dominion-recovery-vehicle-lod0.glb",
+   "sha256": "d41c104a9b7d941c9d87d608eda6072effb3c5e11e16bcb91ab38378de8ef47f",
+   "size": 426348
+  },
+  {
+   "path": "models/pilot/d-u18-dominion-recovery-vehicle-lod1.glb",
+   "sha256": "f45514b09d4a16068924f9e73ec75ba1fd99bc5cca5a7b81e09c64ba25a61d97",
+   "size": 46392
+  },
+  {
+   "path": "models/pilot/d-u18-dominion-recovery-vehicle-lod2.glb",
+   "sha256": "6ec9adac0581ad7273b4152c611b298f73abf9be9dc5d080452ca0df622688a2",
+   "size": 42840
+  },
+  {
+   "path": "models/pilot/d-u19-dominion-siege-tank-lod0.glb",
+   "sha256": "1e848412e81b5def61bd675c0cec6b35242901bf16a19d9e95802e059fc891d1",
+   "size": 426764
+  },
+  {
+   "path": "models/pilot/d-u19-dominion-siege-tank-lod1.glb",
+   "sha256": "68d5c7e16ee66a3c0ccab478d0b6d0e4f5d9ca534d539a91070ca9bca789bb28",
+   "size": 49264
+  },
+  {
+   "path": "models/pilot/d-u19-dominion-siege-tank-lod2.glb",
+   "sha256": "1b2746f2651c6b23627f0fbabe465dda85b52eb23bd7d130f938d27e6be35184",
+   "size": 46372
+  },
+  {
+   "path": "models/pilot/d-u20-dominion-super-heavy-lod0.glb",
+   "sha256": "66d12865c2785783cbbcb249a9b1a86d549c9d4b1d2b4bbdf13335f990906d70",
+   "size": 429208
+  },
+  {
+   "path": "models/pilot/d-u20-dominion-super-heavy-lod1.glb",
+   "sha256": "9731a467805f768c9d1b6117e9828520c7aa41a74b3a4601a1188a6ba9a13f41",
+   "size": 51284
+  },
+  {
+   "path": "models/pilot/d-u20-dominion-super-heavy-lod2.glb",
+   "sha256": "2b4ec711709745497e1b85f6642aa81b0cdca6d055de78f2464e92bc75015cc3",
+   "size": 47276
+  },
+  {
+   "path": "models/pilot/d-u21-dominion-command-vehicle-lod0.glb",
+   "sha256": "2b1c4e21fafba3c5122b935b91d7838170f3f19fadbd357ec113f815f02aa60e",
+   "size": 503212
+  },
+  {
+   "path": "models/pilot/d-u21-dominion-command-vehicle-lod1.glb",
+   "sha256": "9dfa1f51a1b9126f93187f5bdc8e6e981b2a61e8d1ba6541ac5d3dc492d5f1f2",
+   "size": 97656
+  },
+  {
+   "path": "models/pilot/d-u21-dominion-command-vehicle-lod2.glb",
+   "sha256": "ecf4bd58b65e8558efe7f4350ff9a9800bb09df17f801cb699a97b7ddadb5670",
+   "size": 85700
+  },
+  {
+   "path": "models/pilot/d-u22-dominion-recon-drone-lod0.glb",
+   "sha256": "cf129cd66a7e5ce49d491ceeabf0edc20d20cfd711d8f7455cc0521d4aecb1a6",
+   "size": 377600
+  },
+  {
+   "path": "models/pilot/d-u22-dominion-recon-drone-lod1.glb",
+   "sha256": "c1bc89e30e185672ca409d0da5ec98b095aa136e8d1a3e657a02057c41663f5f",
+   "size": 103140
+  },
+  {
+   "path": "models/pilot/d-u22-dominion-recon-drone-lod2.glb",
+   "sha256": "7ed45006582af183c5a03ef1adc2d71f437f9544aed2c27205d5446dd725970a",
+   "size": 50424
+  },
+  {
+   "path": "models/pilot/d-u23-dominion-interceptor-lod0.glb",
+   "sha256": "d85052ca18ef92575692ff7b0bbdaddf8fdcd2feef770f58f77bca424b753be8",
+   "size": 439900
+  },
+  {
+   "path": "models/pilot/d-u23-dominion-interceptor-lod1.glb",
+   "sha256": "e57ec3374afa84be547553fe8aaaaecaa4771ab3970e9ca7892ea6e3201de018",
+   "size": 114916
+  },
+  {
+   "path": "models/pilot/d-u23-dominion-interceptor-lod2.glb",
+   "sha256": "63587a6831aa096f61907b84d8c7767322d2015073092be91cddb081f869b585",
+   "size": 110376
+  },
+  {
+   "path": "models/pilot/d-u24-dominion-light-gunship-lod0.glb",
+   "sha256": "2ac6fae020f3916b2e43a08ba0bc053311d65eff05653da553c9f7895cf20f87",
+   "size": 442340
+  },
+  {
+   "path": "models/pilot/d-u24-dominion-light-gunship-lod1.glb",
+   "sha256": "1a72bdaef6c4ea5dda982e153604c05b11efb9e7a47a04b797a20ceecb56f0f2",
+   "size": 116552
+  },
+  {
+   "path": "models/pilot/d-u24-dominion-light-gunship-lod2.glb",
+   "sha256": "c0530b4602061d4c215f83742c1121d0ca32e97e1b835231fb8a12c5792640e4",
+   "size": 111132
+  },
+  {
+   "path": "models/pilot/d-u25-dominion-multirole-aircraft-lod0.glb",
+   "sha256": "df25224c36c4b9c3d53872c536552e7c2c50669a88ddfb77a4d0670ba68782c8",
+   "size": 441776
+  },
+  {
+   "path": "models/pilot/d-u25-dominion-multirole-aircraft-lod1.glb",
+   "sha256": "52b5ae62a49478e3579ad43277f82f77ad340025393fb9ba83a92fa224023933",
+   "size": 116524
+  },
+  {
+   "path": "models/pilot/d-u25-dominion-multirole-aircraft-lod2.glb",
+   "sha256": "418778e8046f49c5366ede16b4e3b7c91cbd04c1640e16ba3fad3838d99fe701",
+   "size": 110848
+  },
+  {
+   "path": "models/pilot/d-u26-dominion-bomber-lod0.glb",
+   "sha256": "4e402076286ca03c61895a4e14bbd22248139abf01866eec2022854f4f1175f6",
+   "size": 440828
+  },
+  {
+   "path": "models/pilot/d-u26-dominion-bomber-lod1.glb",
+   "sha256": "310138df62d6b55e8d96a24292e641ea5fc9b419f238a80c9879e58be764c92d",
+   "size": 115700
+  },
+  {
+   "path": "models/pilot/d-u26-dominion-bomber-lod2.glb",
+   "sha256": "ae578d194d6d1be3cfee25284ae766761f6b67d069fd976f3bd1d32fd1b683f6",
+   "size": 95156
+  },
+  {
+   "path": "models/pilot/d-u27-dominion-heavy-bomber-lod0.glb",
+   "sha256": "a483cd0bbcf54665f87810350557d461f104b3b1ab9b7b6c9d3940b04e361e47",
+   "size": 439812
+  },
+  {
+   "path": "models/pilot/d-u27-dominion-heavy-bomber-lod1.glb",
+   "sha256": "0cdf22a91f88af2122b417c7e2e839633fb6977f5d84cddb5d4de8233f964861",
+   "size": 115256
+  },
+  {
+   "path": "models/pilot/d-u27-dominion-heavy-bomber-lod2.glb",
+   "sha256": "e019c29b03cffea2a0452610c26ec5a6c3af5ec1da34f10697fc4c8b032894a6",
+   "size": 61804
+  },
+  {
+   "path": "models/pilot/d-u28-dominion-repair-drone-lod0.glb",
+   "sha256": "37e1eb03d3099ef005484733ffb329a301a3fced63a8ceb8c2a3d506390dbbba",
+   "size": 428320
+  },
+  {
+   "path": "models/pilot/d-u28-dominion-repair-drone-lod1.glb",
+   "sha256": "922897cf7b863c2642a3325f52765edcaa0cbb3f517009c935c903006dc05853",
+   "size": 110392
+  },
+  {
+   "path": "models/pilot/d-u28-dominion-repair-drone-lod2.glb",
+   "sha256": "859e967bc6160c87baebf44ae0b3c2e91c153a068c8199544b570e5514fd4d12",
+   "size": 56544
+  },
+  {
+   "path": "models/pilot/d-u29-dominion-stealth-striker-lod0.glb",
+   "sha256": "58350bcf1ad41dbbad241e14ebfccfe4bb36c83d8eb98963cf34ce9d1730e402",
+   "size": 437920
+  },
+  {
+   "path": "models/pilot/d-u29-dominion-stealth-striker-lod1.glb",
+   "sha256": "912c3e8fb7ef1f661d05280bff7a126b4d88337b3ae0b01b5e5248d1fa2d035a",
+   "size": 114344
+  },
+  {
+   "path": "models/pilot/d-u29-dominion-stealth-striker-lod2.glb",
+   "sha256": "058b25954a408c325740da75df11be1f6249091f2f1553eeff9ab8669c62f6ca",
+   "size": 60844
+  },
+  {
+   "path": "models/pilot/d-u30-dominion-aerial-artillery-lod0.glb",
+   "sha256": "919e917b2e951064b012b590c3df3dd35fdd15d52086b4c75113538bff27799a",
+   "size": 445132
+  },
+  {
+   "path": "models/pilot/d-u30-dominion-aerial-artillery-lod1.glb",
+   "sha256": "6cf57d2f9d781624384354d3a0869f2c292cae3a2b52eb0d0ed0195b5c636431",
+   "size": 118860
+  },
+  {
+   "path": "models/pilot/d-u30-dominion-aerial-artillery-lod2.glb",
+   "sha256": "4ba8fc527d506efdd482a4895b78a4cec3eff3f6c81a389e39804a817db2e09d",
+   "size": 112652
+  },
+  {
+   "path": "models/pilot/d-x01-dominion-tactical-lod0.glb",
+   "sha256": "00c018ed03dd2f365ee8dffd20fba8a034748237e6ce03ca431763a13fcc6fd2",
+   "size": 438100
+  },
+  {
+   "path": "models/pilot/d-x01-dominion-tactical-lod1.glb",
+   "sha256": "bafae3c34016422dffc93329568a9a77d960181284c786ff298e737e08166a35",
+   "size": 59696
+  },
+  {
+   "path": "models/pilot/d-x01-dominion-tactical-lod2.glb",
+   "sha256": "fdd5c38ecc01018c168b40b55887eb3afa9f4af3e5085b7503f3f834237c0a61",
+   "size": 33856
+  },
+  {
+   "path": "models/pilot/d-x02-dominion-cruise-lod0.glb",
+   "sha256": "17b0fe0e3b6686e160f802b7ba124274e373d34b0a3e65cab18c75101e7d988b",
+   "size": 429144
+  },
+  {
+   "path": "models/pilot/d-x02-dominion-cruise-lod1.glb",
+   "sha256": "f5075cb5bad9c36b1a8e32c281478616e1b4287b2df76be99d3e49d27eafa4da",
+   "size": 48732
+  },
+  {
+   "path": "models/pilot/d-x02-dominion-cruise-lod2.glb",
+   "sha256": "4d5ac621fbe951b3fda7b3cb6ab1a41039ab084c5bde09baad38ac19ce5ac9df",
+   "size": 43832
+  },
+  {
+   "path": "models/pilot/d-x03-dominion-drone-lod0.glb",
+   "sha256": "c91bcc78c5987e3defcfecb6d2ee8d5666db0380c64d62ce56bd252edf8b3550",
+   "size": 435804
+  },
+  {
+   "path": "models/pilot/d-x03-dominion-drone-lod1.glb",
+   "sha256": "f2e081ec945cf0b27cd32c456b8bc72f1aebc6ff009349d0cff6a1c69f913faf",
+   "size": 51432
+  },
+  {
+   "path": "models/pilot/d-x03-dominion-drone-lod2.glb",
+   "sha256": "3c08487e7f3caa0e37ae824c5bda312bd6c729e138a39531277ae5298172e6e7",
+   "size": 47732
+  },
+  {
+   "path": "models/pilot/d-x04-dominion-aero-lod0.glb",
+   "sha256": "b74a1bae0d599bdd0b1ce0a51d8fdcb8bbf8ec63dcf6903ad0ee4277b2b9a0f4",
+   "size": 441672
+  },
+  {
+   "path": "models/pilot/d-x04-dominion-aero-lod1.glb",
+   "sha256": "3a21c27e200a526692af20bef9c86e0aad6834844290318f8c1a5107f70d92f3",
+   "size": 116628
+  },
+  {
+   "path": "models/pilot/d-x04-dominion-aero-lod2.glb",
+   "sha256": "5c5e6d1ba989b7e0cfbc98baca3dd4736d3096180a7a01bbe0a7ae447bb654b0",
+   "size": 110928
+  },
+  {
+   "path": "models/pilot/d-x05-dominion-strategic-lod0.glb",
+   "sha256": "a5a5137b35ae082dbc17a6fa9f6f472b30945f2fcc390404b418d822f91647d7",
+   "size": 443544
+  },
+  {
+   "path": "models/pilot/d-x05-dominion-strategic-lod1.glb",
+   "sha256": "78b510db6110892744a9e450adc93e98560919837dfd9a415db895c080e4deac",
+   "size": 64696
+  },
+  {
+   "path": "models/pilot/d-x05-dominion-strategic-lod2.glb",
+   "sha256": "4af43685c935e7cfef8786b81ca863c692d622e4afb361e2bfe55e5114314010",
+   "size": 33800
+  },
+  {
+   "path": "models/pilot/d-x06-dominion-reserveStrike-lod0.glb",
+   "sha256": "3c69fa820b00f5f6aaf9f975425adddf83c836538d3b054f48069d35f16dcf87",
+   "size": 438076
+  },
+  {
+   "path": "models/pilot/d-x06-dominion-reserveStrike-lod1.glb",
+   "sha256": "36aefb8821efe9e65ac85e2d624bdd552876e5d5cad5765723f048562739932f",
+   "size": 114328
+  },
+  {
+   "path": "models/pilot/d-x06-dominion-reserveStrike-lod2.glb",
+   "sha256": "3d5e7a329cb9bf0ea9a28a0c9f3cb2b0a4cbde341f355c782aedfc0e8f9667c7",
+   "size": 60808
+  },
+  {
+   "path": "models/pilot/manifest.json",
+   "sha256": "8fed0e1d4a7343aae3d134ba12b98f3f56ab1a0d4bf31124b2eba7f9fa7d95e0",
+   "size": 364922
+  },
+  {
+   "path": "models/pilot/s-u01-specter-line-infantry-lod0.glb",
+   "sha256": "2bd1df519393b5ecf763216fdfb0055a23139662ad03fb2dffd77cff30e8c1a7",
+   "size": 358908
+  },
+  {
+   "path": "models/pilot/s-u01-specter-line-infantry-lod1.glb",
+   "sha256": "5620fc8fa370b0e22ce048bddfd79bee369dbad242769bd8de428cef9d960eb9",
+   "size": 103492
+  },
+  {
+   "path": "models/pilot/s-u01-specter-line-infantry-lod2.glb",
+   "sha256": "cdad5559e8535b2fd5857094297f83fbb3a717e5aa5d2924bba9abc17bc0682a",
+   "size": 46764
+  },
+  {
+   "path": "models/pilot/s-u02-specter-assault-infantry-lod0.glb",
+   "sha256": "c197bc9126c180f43eeb5ba68ee7d62222fc343becb5cb272510317a50d77523",
+   "size": 294140
+  },
+  {
+   "path": "models/pilot/s-u02-specter-assault-infantry-lod1.glb",
+   "sha256": "e88cb60d670e2552f14db267b4ad06a21a2f88055e72278b99035e8d1b164df8",
+   "size": 98312
+  },
+  {
+   "path": "models/pilot/s-u02-specter-assault-infantry-lod2.glb",
+   "sha256": "f51479e082bb3f042c344a1714a3c6eb55a7cbd69e7d74c6b288200902a43438",
+   "size": 95248
+  },
+  {
+   "path": "models/pilot/s-u03-specter-sniper-lod0.glb",
+   "sha256": "cf0e5597c364b5826f5b087003880e9eaa1cbb2658fe097bdcdeff9581f53b44",
+   "size": 344484
+  },
+  {
+   "path": "models/pilot/s-u03-specter-sniper-lod1.glb",
+   "sha256": "90d80dc4b9768dfdc7f27bcc09679b20b293673ca5412fc89a14e8552749ee0a",
+   "size": 94492
+  },
+  {
+   "path": "models/pilot/s-u03-specter-sniper-lod2.glb",
+   "sha256": "6d70f3a2fbb7eb8e2d6201e3e44e0e40d3ced89fe83ef92106d5297192d13b1e",
+   "size": 41692
+  },
+  {
+   "path": "models/pilot/s-u04-specter-anti-tank-team-lod0.glb",
+   "sha256": "4ca0c73d1d4f5620eb196f4cb480ddd62619b636c20d0b04a914f41989d87a97",
+   "size": 360516
+  },
+  {
+   "path": "models/pilot/s-u04-specter-anti-tank-team-lod1.glb",
+   "sha256": "a113a501436757c78246f68cc99ffbd718c3d83df1baa44e650349c11b111d4d",
+   "size": 107976
+  },
+  {
+   "path": "models/pilot/s-u04-specter-anti-tank-team-lod2.glb",
+   "sha256": "cc9e63469619ebd80b02fdcbac419afb536cb7c2e4353c520160bf7aa8357f64",
+   "size": 53204
+  },
+  {
+   "path": "models/pilot/s-u05-specter-anti-air-team-lod0.glb",
+   "sha256": "6ffbe81fe9d14f288797154f15d89373f2a540bbeee60a677e700df098c51786",
+   "size": 360540
+  },
+  {
+   "path": "models/pilot/s-u05-specter-anti-air-team-lod1.glb",
+   "sha256": "b86c04be3bf1f60777804c5cb3c1b0702c000b459d5895f2e2599edc24a6e6de",
+   "size": 108000
+  },
+  {
+   "path": "models/pilot/s-u05-specter-anti-air-team-lod2.glb",
+   "sha256": "9e90661e2c71b7faaf779f7c1407860b1c0db2df435206994c89d27450a2c397",
+   "size": 53232
+  },
+  {
+   "path": "models/pilot/s-u06-specter-combat-medic-lod0.glb",
+   "sha256": "597971fa6881925af07daae9f7cb70b06095bc6cf5629007a2d8b862c196be42",
+   "size": 454108
+  },
+  {
+   "path": "models/pilot/s-u06-specter-combat-medic-lod1.glb",
+   "sha256": "0693b657fd6e999d90ab88398986ffde8b16e59c763a51ad4a2efd5b9f9539a4",
+   "size": 94924
+  },
+  {
+   "path": "models/pilot/s-u06-specter-combat-medic-lod2.glb",
+   "sha256": "09b3237f344c1a2cf9ddb28d375feacbc57fabf17d67a800397c9cd4263ce724",
+   "size": 93436
+  },
+  {
+   "path": "models/pilot/s-u07-specter-infiltrator-lod0.glb",
+   "sha256": "aa111609f8309681620b589a63efb3e2766c06367f0c8c8d64774d0d3aba9bc8",
+   "size": 345512
+  },
+  {
+   "path": "models/pilot/s-u07-specter-infiltrator-lod1.glb",
+   "sha256": "263f1150753bc9224a6078234d5d144e6ac523c3529b1a8f55ef4ace15f3cc70",
+   "size": 95660
+  },
+  {
+   "path": "models/pilot/s-u07-specter-infiltrator-lod2.glb",
+   "sha256": "321cd431a905ec22fb75c8a31614c89135f32eca0ba2d9ab8cab1ad1cd82d74b",
+   "size": 42272
+  },
+  {
+   "path": "models/pilot/s-u08-specter-flamethrower-lod0.glb",
+   "sha256": "339733123229074ba8170d2ca20069f32fca357f30c005670746d11f32b7e908",
+   "size": 461456
+  },
+  {
+   "path": "models/pilot/s-u08-specter-flamethrower-lod1.glb",
+   "sha256": "2df329bf20e6d102a32fa54e3329900042bc2a877477486ed26f2eed3fcabb79",
+   "size": 103852
+  },
+  {
+   "path": "models/pilot/s-u08-specter-flamethrower-lod2.glb",
+   "sha256": "ad05477f781faefba7d6b2a2370458b80515b790c2b9874f32a7afc190034ad9",
+   "size": 51020
+  },
+  {
+   "path": "models/pilot/s-u09-specter-exo-infantry-lod0.glb",
+   "sha256": "acaaa00c53adff3bbc427f52982ee224ef838edac1cb6c98a646e1122722c5f9",
+   "size": 470544
+  },
+  {
+   "path": "models/pilot/s-u09-specter-exo-infantry-lod1.glb",
+   "sha256": "c9f551767874188b1d7b7981cfdc040569cc223b6a4ce183152cbbc873e51dae",
+   "size": 106692
+  },
+  {
+   "path": "models/pilot/s-u09-specter-exo-infantry-lod2.glb",
+   "sha256": "b0e8d48876a0c1668cf1e4d8a2bff5dd5f80bff26ebd7116f102e5c3c9f3e4aa",
+   "size": 52376
+  },
+  {
+   "path": "models/pilot/s-u10-specter-operator-lod0.glb",
+   "sha256": "5f4663bba371ffe1f057926110afd63caa9d8171fe90bda25ce60eb5deb01076",
+   "size": 344184
+  },
+  {
+   "path": "models/pilot/s-u10-specter-operator-lod1.glb",
+   "sha256": "81728dec9864c5b706b0737e830d6aa2a56cc4e76de2cecaa956db195faa754f",
+   "size": 94332
+  },
+  {
+   "path": "models/pilot/s-u10-specter-operator-lod2.glb",
+   "sha256": "71dba309d2b4a02c127f902db824fc36b731c33cf9027d5354a233d31df8bb05",
+   "size": 41496
+  },
+  {
+   "path": "models/pilot/s-u11-specter-recon-vehicle-lod0.glb",
+   "sha256": "13e46d31db11d617797b6febd5968349168fcdc545df366e48753efbe866fd26",
+   "size": 423204
+  },
+  {
+   "path": "models/pilot/s-u11-specter-recon-vehicle-lod1.glb",
+   "sha256": "119556fda49693a54d5564a02b4ef3af70ae98990edd7bee583315c29e17f620",
+   "size": 46648
+  },
+  {
+   "path": "models/pilot/s-u11-specter-recon-vehicle-lod2.glb",
+   "sha256": "27a17b86604005286a1992f402030fc902f68d85fda6663cebdc2f792f109e7c",
+   "size": 43532
+  },
+  {
+   "path": "models/pilot/s-u12-specter-assault-vehicle-lod0.glb",
+   "sha256": "ebb3c0f5fa243fccc7a633d828fa68dcd47533467485651bc089f23c8b742e5f",
+   "size": 422404
+  },
+  {
+   "path": "models/pilot/s-u12-specter-assault-vehicle-lod1.glb",
+   "sha256": "2daaddf1978607281c6a1813ad12879494f8ebc6c9b72d9a3831d4e892adea64",
+   "size": 46176
+  },
+  {
+   "path": "models/pilot/s-u12-specter-assault-vehicle-lod2.glb",
+   "sha256": "5e9264214da08763b3ba39abb88fafb5bfccea30b3e355dfb92d9d087dde2dd5",
+   "size": 43080
+  },
+  {
+   "path": "models/pilot/s-u13-specter-main-battle-tank-lod0.glb",
+   "sha256": "0828fca938f7c52c0052a17376e9bed329059bd46e1044e116c99c9a5ca594ac",
+   "size": 312056
+  },
+  {
+   "path": "models/pilot/s-u13-specter-main-battle-tank-lod1.glb",
+   "sha256": "890b8e617c2c5fc84f7d3f08d9cbf57af9cb3931521271f12ca3577ceb037cb8",
+   "size": 50344
+  },
+  {
+   "path": "models/pilot/s-u13-specter-main-battle-tank-lod2.glb",
+   "sha256": "b725a0715123fdcdc213af608f5beb3f8194b98f4c30bb2dc8be4253bfbb3ee8",
+   "size": 47804
+  },
+  {
+   "path": "models/pilot/s-u14-specter-tank-destroyer-lod0.glb",
+   "sha256": "ead3aa5334c7ca496e8ac9c5b6ae42e63f3fae062c26695d13d4b713926e7f96",
+   "size": 423756
+  },
+  {
+   "path": "models/pilot/s-u14-specter-tank-destroyer-lod1.glb",
+   "sha256": "5fb7247914aa106ffb063511867f04803083105830a7c296c648c77e1400d495",
+   "size": 49396
+  },
+  {
+   "path": "models/pilot/s-u14-specter-tank-destroyer-lod2.glb",
+   "sha256": "45c5548dc1fde788f498f9e56366dafebf7adbd1d915f60312b313619dc5c9e1",
+   "size": 46004
+  },
+  {
+   "path": "models/pilot/s-u15-specter-mobile-sam-lod0.glb",
+   "sha256": "445dac27bf195e5c2c2327c7196ee48791229abb9ebccf58ea230f2754fc604b",
+   "size": 383688
+  },
+  {
+   "path": "models/pilot/s-u15-specter-mobile-sam-lod1.glb",
+   "sha256": "58cfd994c21dff88fc6e3a2ac6d640267f311a7cbc6d3ae92deee935b8ad7770",
+   "size": 49836
+  },
+  {
+   "path": "models/pilot/s-u15-specter-mobile-sam-lod2.glb",
+   "sha256": "cf7a066fee81a9afebfcfc398c7d3c9bb2a0401e6772a0523486e4fdf4c78468",
+   "size": 47120
+  },
+  {
+   "path": "models/pilot/s-u16-specter-self-propelled-howitzer-lod0.glb",
+   "sha256": "308d93ae1781d899b1d9a70192ab9a963fbd9f6333354f1acd0002913188517e",
+   "size": 424108
+  },
+  {
+   "path": "models/pilot/s-u16-specter-self-propelled-howitzer-lod1.glb",
+   "sha256": "59646f8c261bd78eb9bb47d8b075e15bdc525f6d8077f7876002771cc73382ff",
+   "size": 49732
+  },
+  {
+   "path": "models/pilot/s-u16-specter-self-propelled-howitzer-lod2.glb",
+   "sha256": "e615a3682624ec555061e48e0447a0dab7b78a3e5044f3093295daf84a9bb9b4",
+   "size": 46276
+  },
+  {
+   "path": "models/pilot/s-u17-specter-rocket-artillery-lod0.glb",
+   "sha256": "0f09016847703a9a40a66114237436b3a2cf042ddc9b4577d69b18d38f7a01ca",
+   "size": 388704
+  },
+  {
+   "path": "models/pilot/s-u17-specter-rocket-artillery-lod1.glb",
+   "sha256": "74152dbb33e87bd7a34e7432b0c814119f61b1fe9169fa47284f88629c5b5bb2",
+   "size": 50792
+  },
+  {
+   "path": "models/pilot/s-u17-specter-rocket-artillery-lod2.glb",
+   "sha256": "a85e4b7283563428d1ab12ea1ac56c4cbd1a1af34aa11c2515ad6cd4e2eb19d7",
+   "size": 47416
+  },
+  {
+   "path": "models/pilot/s-u18-specter-recovery-vehicle-lod0.glb",
+   "sha256": "97bc002fb2b11ef74e301ddee5dad42c48de33b76fd7fa47e704d3da21a4b39d",
+   "size": 423728
+  },
+  {
+   "path": "models/pilot/s-u18-specter-recovery-vehicle-lod1.glb",
+   "sha256": "52ec5bb41bbc5b4bb1a64d24886bb8a34741536bbd669028717477e10b0166bb",
+   "size": 47036
+  },
+  {
+   "path": "models/pilot/s-u18-specter-recovery-vehicle-lod2.glb",
+   "sha256": "8c6df4d6d1941236615efa7595ef921891fd1ff549f75eda5025ab1e5d89e304",
+   "size": 43136
+  },
+  {
+   "path": "models/pilot/s-u19-specter-siege-tank-lod0.glb",
+   "sha256": "2a009f06e8b0e9a3970590aeaf04b735c314a64043509ff729cedeff86baee34",
+   "size": 423492
+  },
+  {
+   "path": "models/pilot/s-u19-specter-siege-tank-lod1.glb",
+   "sha256": "36e36c8de6a18b2b30ce96683e66a7757544f77073641573b75ad914a4cce979",
+   "size": 49132
+  },
+  {
+   "path": "models/pilot/s-u19-specter-siege-tank-lod2.glb",
+   "sha256": "43d34a12a63596cec52d800e5104c0b0954e1f203507a2cad489bf8becf554f4",
+   "size": 46036
+  },
+  {
+   "path": "models/pilot/s-u20-specter-super-heavy-lod0.glb",
+   "sha256": "d62751699c56093a23d5af47fe522b2ae3d2b6742b46420e72c1c3ea2b401448",
+   "size": 425420
+  },
+  {
+   "path": "models/pilot/s-u20-specter-super-heavy-lod1.glb",
+   "sha256": "18780ad43cdfe91d0ac046f80af860c20d3144a568ed2b4efcd2b199694f08f4",
+   "size": 50644
+  },
+  {
+   "path": "models/pilot/s-u20-specter-super-heavy-lod2.glb",
+   "sha256": "00dc78428e11a057c318e4d909241d229c3b21877755027d98b954cfc71c0eab",
+   "size": 46656
+  },
+  {
+   "path": "models/pilot/s-u21-specter-command-vehicle-lod0.glb",
+   "sha256": "824ebf76ce173f60a93b253b13b39aa538d56c9a8f4001d70e235a1dddc2f2c7",
+   "size": 500212
+  },
+  {
+   "path": "models/pilot/s-u21-specter-command-vehicle-lod1.glb",
+   "sha256": "3381be6bb344eb61c4a20a0bdf55b926fca1107dd294254f8930676a1b566487",
+   "size": 98112
+  },
+  {
+   "path": "models/pilot/s-u21-specter-command-vehicle-lod2.glb",
+   "sha256": "3fdd556efa3e747850845e7967117a4db5e68a833040180a3a5c526a00b041e6",
+   "size": 85964
+  },
+  {
+   "path": "models/pilot/s-u22-specter-recon-drone-lod0.glb",
+   "sha256": "35d686ac819e5d7b10ed371d76aac8b6026da77a84fceebecc385224494c3363",
+   "size": 373156
+  },
+  {
+   "path": "models/pilot/s-u22-specter-recon-drone-lod1.glb",
+   "sha256": "257078affc66922874d1e51590fcad52bd4743048a0605b6e4138ba08197dc1e",
+   "size": 102332
+  },
+  {
+   "path": "models/pilot/s-u22-specter-recon-drone-lod2.glb",
+   "sha256": "4f8342724e73e933b13d21ed2eba66c5196f46dae52df02142229f0cd2fcdf05",
+   "size": 49580
+  },
+  {
+   "path": "models/pilot/s-u23-specter-interceptor-lod0.glb",
+   "sha256": "17522e2f417a5c2ca856f2c9170f231efeef2bd7150ceea2cdb1cdb257bd9894",
+   "size": 436492
+  },
+  {
+   "path": "models/pilot/s-u23-specter-interceptor-lod1.glb",
+   "sha256": "6b571743550cabfb0ec2e42470f556d1ce2e1a7bee07f5fa92b1a031732cae4b",
+   "size": 114664
+  },
+  {
+   "path": "models/pilot/s-u23-specter-interceptor-lod2.glb",
+   "sha256": "4c21b6742fda398b816344f7dbbdb255d479262840ac6894c70ebc3033ac00c5",
+   "size": 110304
+  },
+  {
+   "path": "models/pilot/s-u24-specter-light-gunship-lod0.glb",
+   "sha256": "b4b1acdf6a1c4a98108ef63698e4865b9daa4b519e3a1d2e8fb425060d4d68f2",
+   "size": 437764
+  },
+  {
+   "path": "models/pilot/s-u24-specter-light-gunship-lod1.glb",
+   "sha256": "46d7dea64ef7042dce10e455d1e84ccc0f5df6e7427b0a3e029b9235faca2d81",
+   "size": 115700
+  },
+  {
+   "path": "models/pilot/s-u24-specter-light-gunship-lod2.glb",
+   "sha256": "673ffe68c394c33ffbebb0d7ea1d65ccec13c48e1484f82f06580cd89caf39ba",
+   "size": 110560
+  },
+  {
+   "path": "models/pilot/s-u25-specter-multirole-aircraft-lod0.glb",
+   "sha256": "eb503a0320005b2e85539c1018693a98df4c5ff4fb4e10ee215373b3c63d5582",
+   "size": 437084
+  },
+  {
+   "path": "models/pilot/s-u25-specter-multirole-aircraft-lod1.glb",
+   "sha256": "c22dbe2a9f5a571b3b10106e8e242438ca29f41f01fe93ca4e3dd4a176356168",
+   "size": 115652
+  },
+  {
+   "path": "models/pilot/s-u25-specter-multirole-aircraft-lod2.glb",
+   "sha256": "447dca251b668e02a44ee7926f1c2a6671e921e9d3a2fa51f078f41a8bfd82b6",
+   "size": 110264
+  },
+  {
+   "path": "models/pilot/s-u26-specter-bomber-lod0.glb",
+   "sha256": "137dded68c3a829671b82b536ecb74ca8329eec5678ed013e3b7abe7b0bbea7c",
+   "size": 436608
+  },
+  {
+   "path": "models/pilot/s-u26-specter-bomber-lod1.glb",
+   "sha256": "c686891038df0703e860748ed093229270b422b3163e33d895328bcc2a73615e",
+   "size": 115096
+  },
+  {
+   "path": "models/pilot/s-u26-specter-bomber-lod2.glb",
+   "sha256": "e7c0d3288f1cdf6f46cff9d589bc8444678f4fcbe224150c00ef6f712f7afbda",
+   "size": 95020
+  },
+  {
+   "path": "models/pilot/s-u27-specter-heavy-bomber-lod0.glb",
+   "sha256": "e291528f757dabc83ec9669bf7b46f0250590896373dfa2acd5759bbaa4befe1",
+   "size": 436036
+  },
+  {
+   "path": "models/pilot/s-u27-specter-heavy-bomber-lod1.glb",
+   "sha256": "77b72e59e85ed0318bbae16337dee37e9cc98b3fb0a2eaeb9b8aa0ba1eeaf1a2",
+   "size": 114984
+  },
+  {
+   "path": "models/pilot/s-u27-specter-heavy-bomber-lod2.glb",
+   "sha256": "0d8ef0a8e2268bb178835c7b919ea72e2c2e1cad6bb81eec5206def8dc9afeb1",
+   "size": 61772
+  },
+  {
+   "path": "models/pilot/s-u28-specter-repair-drone-lod0.glb",
+   "sha256": "1ca5ba1c9f428a1a4f17d47eb3e34a1e829723e4218f3aeafc23798848f5a908",
+   "size": 424980
+  },
+  {
+   "path": "models/pilot/s-u28-specter-repair-drone-lod1.glb",
+   "sha256": "063496de93a35166e10b4f5e3495f2176322be4845db7ddfdd71ecfc2bde3be5",
+   "size": 110344
+  },
+  {
+   "path": "models/pilot/s-u28-specter-repair-drone-lod2.glb",
+   "sha256": "e3698b5a595d610b5944b3f5042de871e9a0125cfe781bbe93cacdd0a1db5f30",
+   "size": 56500
+  },
+  {
+   "path": "models/pilot/s-u29-specter-stealth-striker-lod0.glb",
+   "sha256": "3215b69fd4527ffb7efb4d7ebfc9648a7c14f36ecff75999482edf4a83adaaad",
+   "size": 434188
+  },
+  {
+   "path": "models/pilot/s-u29-specter-stealth-striker-lod1.glb",
+   "sha256": "261faf8ae91808137d4933ef330ab37bcf6600c88478ff46d6c115ec0a351e49",
+   "size": 113944
+  },
+  {
+   "path": "models/pilot/s-u29-specter-stealth-striker-lod2.glb",
+   "sha256": "f92d7b4f86e66a5e987fd704dbd0e612c263f699f828a3bab136cfc29201bcea",
+   "size": 60644
+  },
+  {
+   "path": "models/pilot/s-u30-specter-aerial-artillery-lod0.glb",
+   "sha256": "a00e38bc503f4f6f210db1d05b3331fa143979d0e27d070432dd720bb8916666",
+   "size": 441100
+  },
+  {
+   "path": "models/pilot/s-u30-specter-aerial-artillery-lod1.glb",
+   "sha256": "b90368264ba826fa100869e20f856cfb112e3ba826f0b47b89fb15861d5b3610",
+   "size": 118316
+  },
+  {
+   "path": "models/pilot/s-u30-specter-aerial-artillery-lod2.glb",
+   "sha256": "980023d886b44e93c35d08b596e21896b7b12e1b08b613e912e5aa17b9575591",
+   "size": 112232
+  },
+  {
+   "path": "models/pilot/s-x01-specter-tactical-lod0.glb",
+   "sha256": "5ee872ce6b4256f8446c239b32a6c8253425a81bceaedb917220504fa60e5ac4",
+   "size": 434812
+  },
+  {
+   "path": "models/pilot/s-x01-specter-tactical-lod1.glb",
+   "sha256": "f90b2f6aa0342917c5d0d61c199185c3f1dfc4343cf33996efd8b7c1378a1c54",
+   "size": 59836
+  },
+  {
+   "path": "models/pilot/s-x01-specter-tactical-lod2.glb",
+   "sha256": "9e105f6e08eea5dd8205c6e297a5ad5693f4d48adee3284b071d9f2a4a487e01",
+   "size": 33844
+  },
+  {
+   "path": "models/pilot/s-x02-specter-cruise-lod0.glb",
+   "sha256": "8aa6988b62645ebf7418ec19254a807c0f42c06dd67493bad553d1e9552e83fe",
+   "size": 423524
+  },
+  {
+   "path": "models/pilot/s-x02-specter-cruise-lod1.glb",
+   "sha256": "1384f5ecfd76a7d3537c26dbc80a69dff6f35d1e46addeaa3cae065439a14479",
+   "size": 49560
+  },
+  {
+   "path": "models/pilot/s-x02-specter-cruise-lod2.glb",
+   "sha256": "cf024b04283f68f7401eca1d07d7cf05c04f0281ddfac19448d075787ff84356",
+   "size": 46376
+  },
+  {
+   "path": "models/pilot/s-x03-specter-drone-lod0.glb",
+   "sha256": "134cc403c71c9f9dc755f1323c0c6e6977dcbc1c336c8f97b1082f0f6bf8d604",
+   "size": 432076
+  },
+  {
+   "path": "models/pilot/s-x03-specter-drone-lod1.glb",
+   "sha256": "3690401c40a893fbce1e1b578ee8f9b5bdbd6aed9b8a4163d4a764b63ddd032b",
+   "size": 51260
+  },
+  {
+   "path": "models/pilot/s-x03-specter-drone-lod2.glb",
+   "sha256": "9cf8e1fe0b78898dc8c439414f632039f0f49adebc924702a042ea7df5c19b7a",
+   "size": 47968
+  },
+  {
+   "path": "models/pilot/s-x04-specter-aero-lod0.glb",
+   "sha256": "9fdb3abccc750f3602f70e5ead4e065e1ad4988ebd67e26fe64900e1fca9a253",
+   "size": 437868
+  },
+  {
+   "path": "models/pilot/s-x04-specter-aero-lod1.glb",
+   "sha256": "47cea288994059decc0953c06ced1414bb0d0d3fcd1fd3deb535ae6f4d295c6d",
+   "size": 115876
+  },
+  {
+   "path": "models/pilot/s-x04-specter-aero-lod2.glb",
+   "sha256": "99ebff622d1697d1efa786974df2834e0171f172f0b61c3e29affdb45b48f78a",
+   "size": 110460
+  },
+  {
+   "path": "models/pilot/s-x05-specter-strategic-lod0.glb",
+   "sha256": "0e41e1a26122355d4bce028192bce8a75b67ebbe660fd5c5f2a523df1fda219c",
+   "size": 440624
+  },
+  {
+   "path": "models/pilot/s-x05-specter-strategic-lod1.glb",
+   "sha256": "6c2b890d1c20cb7ab98a4aadcf9c80b86e485ec4497692ed361c84c217eeb188",
+   "size": 64980
+  },
+  {
+   "path": "models/pilot/s-x05-specter-strategic-lod2.glb",
+   "sha256": "2fab186faa45c7212e3fe1eca76e11f602d62fc3795b6551e5a9765ff7ab3ca7",
+   "size": 33908
+  },
+  {
+   "path": "models/pilot/s-x06-specter-reserveStrike-lod0.glb",
+   "sha256": "820863c83f28024734e23034a2270512c97a1f79f75f178bef995d1f6c64c2f0",
+   "size": 434076
+  },
+  {
+   "path": "models/pilot/s-x06-specter-reserveStrike-lod1.glb",
+   "sha256": "80577e0d9306a36e0e5c2ca995269ea190f090b14fca451080404f2973965e9a",
+   "size": 113768
+  },
+  {
+   "path": "models/pilot/s-x06-specter-reserveStrike-lod2.glb",
+   "sha256": "b180db5a7e900247cf7368d21361af3188566b2334499d0d0ca55e765ec94b40",
+   "size": 60532
+  },
+  {
+   "path": "models/pilot/v-u01-vanguard-line-infantry-lod0.glb",
+   "sha256": "880d42884b80548edf4d817627e08f399f9f65bc65a90bffc2e21b2db87d8bf4",
+   "size": 358568
+  },
+  {
+   "path": "models/pilot/v-u01-vanguard-line-infantry-lod1.glb",
+   "sha256": "42e1cbb4a893a0b46d70a65da472a7159805ed78376f1cf5c94688d9fd48ad66",
+   "size": 103344
+  },
+  {
+   "path": "models/pilot/v-u01-vanguard-line-infantry-lod2.glb",
+   "sha256": "3d6094b8eb2aa05240ce4c4342213abd512e60ef498a1e58c040d4c6502b872c",
+   "size": 46724
+  },
+  {
+   "path": "models/pilot/v-u02-vanguard-assault-infantry-lod0.glb",
+   "sha256": "6aa11f7970765544ddf83dfee2d03afb81b861bf7e58767cea5f43693314072f",
+   "size": 293876
+  },
+  {
+   "path": "models/pilot/v-u02-vanguard-assault-infantry-lod1.glb",
+   "sha256": "b9e7937874c390499afbc6a0a392d83b986864a5cface7f1c1dd72db333c51ba",
+   "size": 98176
+  },
+  {
+   "path": "models/pilot/v-u02-vanguard-assault-infantry-lod2.glb",
+   "sha256": "779b3ee741c896e72549f4d3d94db93a30124c1a4c797fb87d024643abb950f4",
+   "size": 95156
+  },
+  {
+   "path": "models/pilot/v-u03-vanguard-sniper-lod0.glb",
+   "sha256": "6e419bd00db058c957f2ee7e894e9102b3116d9340f62736a383cf043d94fdb3",
+   "size": 344404
+  },
+  {
+   "path": "models/pilot/v-u03-vanguard-sniper-lod1.glb",
+   "sha256": "e2480cd8c28d236ea15c5704fa86c1ce5a64727558b28d6929e047d9ba8cb567",
+   "size": 94452
+  },
+  {
+   "path": "models/pilot/v-u03-vanguard-sniper-lod2.glb",
+   "sha256": "998680a45ff16134188fab172bf8d7dbb17ee044d6adadf3f8f71355a2e90968",
+   "size": 41676
+  },
+  {
+   "path": "models/pilot/v-u04-vanguard-anti-tank-team-lod0.glb",
+   "sha256": "b4d3ac8725582eba78218a237385ce92f05ed258f2ac5221676d3728cdccafc0",
+   "size": 360304
+  },
+  {
+   "path": "models/pilot/v-u04-vanguard-anti-tank-team-lod1.glb",
+   "sha256": "5efa00ac5176c636740d8e0cd4e2852f76359382d8ac6fe1e2c21b9c16a82a0a",
+   "size": 107892
+  },
+  {
+   "path": "models/pilot/v-u04-vanguard-anti-tank-team-lod2.glb",
+   "sha256": "66f895ad3e8567621f3bfc61a5bc379b42a4a93991c3f8f6a10af42ae036ec2d",
+   "size": 53192
+  },
+  {
+   "path": "models/pilot/v-u05-vanguard-anti-air-team-lod0.glb",
+   "sha256": "0b77c31b0130eb4a19b10f10c9fe9e3ca2a6c28b99bf7e3ebea54d54387ca2d5",
+   "size": 360308
+  },
+  {
+   "path": "models/pilot/v-u05-vanguard-anti-air-team-lod1.glb",
+   "sha256": "80dc743966a827fc231434a8f4b4d6418a0c1d5599a94ab28871b987c2084d29",
+   "size": 107896
+  },
+  {
+   "path": "models/pilot/v-u05-vanguard-anti-air-team-lod2.glb",
+   "sha256": "5380617146aefd3a0d64574bd9c066a64fed70f1af398585d353eb849e20247a",
+   "size": 53196
+  },
+  {
+   "path": "models/pilot/v-u06-vanguard-combat-medic-lod0.glb",
+   "sha256": "2550f9236b5b6df33a75f7512e7bd0477031d88bf4a615e857767de41e6edbb0",
+   "size": 454044
+  },
+  {
+   "path": "models/pilot/v-u06-vanguard-combat-medic-lod1.glb",
+   "sha256": "3706418c127569013c2ff4868b2ca26d522a5617cb929a6ce76ee7a6f20d8d82",
+   "size": 94928
+  },
+  {
+   "path": "models/pilot/v-u06-vanguard-combat-medic-lod2.glb",
+   "sha256": "ebb3d6253f10eab05ff1552a3b267ff075ac3867a329a1ef380efe0f6fbde9c9",
+   "size": 93468
+  },
+  {
+   "path": "models/pilot/v-u07-vanguard-infiltrator-lod0.glb",
+   "sha256": "89c0ca9d22a718d79386a2e0dc7dd0464b610cfc5302312dc0b9b57168c584a0",
+   "size": 345372
+  },
+  {
+   "path": "models/pilot/v-u07-vanguard-infiltrator-lod1.glb",
+   "sha256": "d6f59ffad4b30d81ccf482063481f399e827a7991a7cc32b3b3ab8a46e88ac59",
+   "size": 95580
+  },
+  {
+   "path": "models/pilot/v-u07-vanguard-infiltrator-lod2.glb",
+   "sha256": "9fa7a0ef166c524b5ceb064ceac1e515ab5f06616fa7f27295a3908572c1af63",
+   "size": 42224
+  },
+  {
+   "path": "models/pilot/v-u08-vanguard-flamethrower-lod0.glb",
+   "sha256": "e5fc8eee16aac167089d79d42820c03f84755a8b7da8b980d0984d393a1dc43d",
+   "size": 461352
+  },
+  {
+   "path": "models/pilot/v-u08-vanguard-flamethrower-lod1.glb",
+   "sha256": "cef649c1e2231aac1a0d748452e4f5d1a44fbafb598916fe17816cbbeb4230ff",
+   "size": 103820
+  },
+  {
+   "path": "models/pilot/v-u08-vanguard-flamethrower-lod2.glb",
+   "sha256": "1bac3d6f017d86e11b5eda509f9c2685d83a0f001705c25681c31ab70791363c",
+   "size": 51012
+  },
+  {
+   "path": "models/pilot/v-u09-vanguard-exo-infantry-lod0.glb",
+   "sha256": "ed50368bfd10924565de52e2e5fbd24d24bee9508c25a259aec3c09a79e5f095",
+   "size": 470440
+  },
+  {
+   "path": "models/pilot/v-u09-vanguard-exo-infantry-lod1.glb",
+   "sha256": "11445a6adfec6a66d97705ef929fe74c81a077056f127b1030ba246bca0172cc",
+   "size": 106620
+  },
+  {
+   "path": "models/pilot/v-u09-vanguard-exo-infantry-lod2.glb",
+   "sha256": "23ae1c0988a88cee6e73af69679d895e989d90face10678f9d4cfa5d50bea6e1",
+   "size": 52328
+  },
+  {
+   "path": "models/pilot/v-u10-vanguard-operator-lod0.glb",
+   "sha256": "6c75d2973b2a759b0f7a3dcf91287cd1a229bd80d34fb3e974cf7ffa256b97d8",
+   "size": 344096
+  },
+  {
+   "path": "models/pilot/v-u10-vanguard-operator-lod1.glb",
+   "sha256": "5b91562837571231be821ef88c2b8155a288281cc0ab01d9c215a276fe29b518",
+   "size": 94308
+  },
+  {
+   "path": "models/pilot/v-u10-vanguard-operator-lod2.glb",
+   "sha256": "010545c6c2501831315906d763ef8fe15dc298be0a31cf60bae9ec16d3c84930",
+   "size": 41500
+  },
+  {
+   "path": "models/pilot/v-u11-vanguard-recon-vehicle-lod0.glb",
+   "sha256": "342ae4e1e18a3f6d810995e102829ae3aa7f7949a7ce61649dbd64561b75ea58",
+   "size": 421780
+  },
+  {
+   "path": "models/pilot/v-u11-vanguard-recon-vehicle-lod1.glb",
+   "sha256": "3e81cd74cabb924286764e21cca4e09692ac6bd4c44ed190bb6b0aceb046f270",
+   "size": 45820
+  },
+  {
+   "path": "models/pilot/v-u11-vanguard-recon-vehicle-lod2.glb",
+   "sha256": "2f2e76b8eccaef9e5a55d5402270bcacb1cee5c82acd0547f7122ac88362234c",
+   "size": 43200
+  },
+  {
+   "path": "models/pilot/v-u12-vanguard-assault-vehicle-lod0.glb",
+   "sha256": "69914df145a9ae732ac5a3995130433f5e6f15803225682199f3618ff95a9770",
+   "size": 422892
+  },
+  {
+   "path": "models/pilot/v-u12-vanguard-assault-vehicle-lod1.glb",
+   "sha256": "afd252ca0b01eeb14850b5582c72394e984b7c989d2cccf776b75f6e08ecf65c",
+   "size": 46200
+  },
+  {
+   "path": "models/pilot/v-u12-vanguard-assault-vehicle-lod2.glb",
+   "sha256": "8cf936de04cf4cb683aa3f61421e16dc09b8a81526e8e441e0fa781d04c88b18",
+   "size": 42964
+  },
+  {
+   "path": "models/pilot/v-u13-vanguard-main-battle-tank-lod0.glb",
+   "sha256": "a6ed1b0680e23315f867738d5cd71ddf72b3eb24a511050a093c139f36198b0c",
+   "size": 308188
+  },
+  {
+   "path": "models/pilot/v-u13-vanguard-main-battle-tank-lod1.glb",
+   "sha256": "3bdb6027ccaf6717a7fd3b4ab1a267b54a79d818c39dce70350d729bdd2fcb62",
+   "size": 46280
+  },
+  {
+   "path": "models/pilot/v-u13-vanguard-main-battle-tank-lod2.glb",
+   "sha256": "fc5a4be0df2a17046acf2a7a8022a9999b8669d40f64d5dff2e86d9f1686a7ae",
+   "size": 43292
+  },
+  {
+   "path": "models/pilot/v-u14-vanguard-tank-destroyer-lod0.glb",
+   "sha256": "10090ca8240540f47a49d26c96f31a5090f906959232f5de3cdc7ad100f706aa",
+   "size": 422596
+  },
+  {
+   "path": "models/pilot/v-u14-vanguard-tank-destroyer-lod1.glb",
+   "sha256": "4c2ed1b769bc512c28ff3f062c4dcc9342fbded14d215fbb82821cbc0de1914e",
+   "size": 48456
+  },
+  {
+   "path": "models/pilot/v-u14-vanguard-tank-destroyer-lod2.glb",
+   "sha256": "10d74d11fe21c5359611d610db31342f837c3a0e3cfb9dde8245d23d5568c440",
+   "size": 45472
+  },
+  {
+   "path": "models/pilot/v-u15-vanguard-mobile-sam-lod0.glb",
+   "sha256": "ff540003c50bea985de09e35a58ec5c1a9cc45282b20aad2f41e444e3af0a0df",
+   "size": 382916
+  },
+  {
+   "path": "models/pilot/v-u15-vanguard-mobile-sam-lod1.glb",
+   "sha256": "b263d67d911e83228a15488d7c2a16747905c583928203d8e2171104ecb946dd",
+   "size": 49228
+  },
+  {
+   "path": "models/pilot/v-u15-vanguard-mobile-sam-lod2.glb",
+   "sha256": "0879f3cf234d35a6bd188f2ee38257484227f95c62f5bfe5996b9ee3c5d7d9dc",
+   "size": 46792
+  },
+  {
+   "path": "models/pilot/v-u16-vanguard-self-propelled-howitzer-lod0.glb",
+   "sha256": "59eaf6f555b1a1c80b793d6e1712a544f9ee242f3ba1af03c67091487f0a0aa4",
+   "size": 423684
+  },
+  {
+   "path": "models/pilot/v-u16-vanguard-self-propelled-howitzer-lod1.glb",
+   "sha256": "ce9ffa9326452d6dd3cf920a70f05624d750e2c9e869ffa904b7972916a791ea",
+   "size": 49388
+  },
+  {
+   "path": "models/pilot/v-u16-vanguard-self-propelled-howitzer-lod2.glb",
+   "sha256": "ad22824172de1d6a1b40816061609b2fb92d2bd48af11adb606d874297d40d01",
+   "size": 46068
+  },
+  {
+   "path": "models/pilot/v-u17-vanguard-rocket-artillery-lod0.glb",
+   "sha256": "6a90e915e52ef472fe3544f59a358b5a36dba2ecb1638b905970a19dec051229",
+   "size": 388612
+  },
+  {
+   "path": "models/pilot/v-u17-vanguard-rocket-artillery-lod1.glb",
+   "sha256": "2f14cf1e32a58efee10d3ae40b272199882a1683e3bfb32213983ef8c9d1c296",
+   "size": 50820
+  },
+  {
+   "path": "models/pilot/v-u17-vanguard-rocket-artillery-lod2.glb",
+   "sha256": "bad6b29713083552f0c07421f2f1b80feb6ec16517040f444f44864379d0051b",
+   "size": 47564
+  },
+  {
+   "path": "models/pilot/v-u18-vanguard-recovery-vehicle-lod0.glb",
+   "sha256": "d1594329c621c26924e2ee3e9fcfe96badcb68558d3bb528f2bdc8de251c9794",
+   "size": 422112
+  },
+  {
+   "path": "models/pilot/v-u18-vanguard-recovery-vehicle-lod1.glb",
+   "sha256": "5c3621ec58cb7768a559ed363ea9dd08918ef9bf27b71731b0d86211fc148d04",
+   "size": 45972
+  },
+  {
+   "path": "models/pilot/v-u18-vanguard-recovery-vehicle-lod2.glb",
+   "sha256": "fc291ea9140f6332c009ce7165379ebf24977e12f659be450f067defa1d7baba",
+   "size": 42796
+  },
+  {
+   "path": "models/pilot/v-u19-vanguard-siege-tank-lod0.glb",
+   "sha256": "461bea3d6f99901c1f1ddbd7dfdf7ea52d3632fd10d8d96f16b0867117a58d82",
+   "size": 422828
+  },
+  {
+   "path": "models/pilot/v-u19-vanguard-siege-tank-lod1.glb",
+   "sha256": "d660cadf1212c86f4a6ead489751eb19be6d2dc72aba64a0a395d06cdc1d2b01",
+   "size": 48736
+  },
+  {
+   "path": "models/pilot/v-u19-vanguard-siege-tank-lod2.glb",
+   "sha256": "d48abe5e9689b93119e2e8e6530f846e4f4b30b797e6f83d2ae4af9ce02d50bb",
+   "size": 45812
+  },
+  {
+   "path": "models/pilot/v-u20-vanguard-super-heavy-lod0.glb",
+   "sha256": "da0a64007e1168edd365e7eb681c6f3631e6f8e078aa22152461cc26182ece59",
+   "size": 424440
+  },
+  {
+   "path": "models/pilot/v-u20-vanguard-super-heavy-lod1.glb",
+   "sha256": "1a27847e4b8ca054f09c3c333da93646439b1851cc173537df691e4a6a8127d5",
+   "size": 50104
+  },
+  {
+   "path": "models/pilot/v-u20-vanguard-super-heavy-lod2.glb",
+   "sha256": "f3ff6037f3b525f1835570d23234b8ad6f551f4640dcbc2d7f2d689514da4be4",
+   "size": 46448
+  },
+  {
+   "path": "models/pilot/v-u21-vanguard-command-vehicle-lod0.glb",
+   "sha256": "2ffe1e22ee3e88c2ed31758df7c4aafdb830332940375360cd4c37fd12fbbbe4",
+   "size": 499676
+  },
+  {
+   "path": "models/pilot/v-u21-vanguard-command-vehicle-lod1.glb",
+   "sha256": "9f46131ce24fead6589766308bd324653b34740d6e7c092840ec21786f0597a7",
+   "size": 97584
+  },
+  {
+   "path": "models/pilot/v-u21-vanguard-command-vehicle-lod2.glb",
+   "sha256": "66c86962de9e96322e2de491329e57de146d5ac1edaaa0b03df3cf6fdea1bfe6",
+   "size": 85696
+  },
+  {
+   "path": "models/pilot/v-u22-vanguard-recon-drone-lod0.glb",
+   "sha256": "5352393cb7f9cbdc7af963558a117471eee3b5f9423f3ab1e7727a51f33ba918",
+   "size": 373900
+  },
+  {
+   "path": "models/pilot/v-u22-vanguard-recon-drone-lod1.glb",
+   "sha256": "9e1bccab208be0d5f5f0e3ec5b14d7b52be51ea03b1d4011439110f96ba70db4",
+   "size": 103068
+  },
+  {
+   "path": "models/pilot/v-u22-vanguard-recon-drone-lod2.glb",
+   "sha256": "910c74c500c7f68b242b1c3c3e959b6f819906fd56576407d388fa07fa743528",
+   "size": 50356
+  },
+  {
+   "path": "models/pilot/v-u23-vanguard-interceptor-lod0.glb",
+   "sha256": "2444ffe1eb409e0dce09afbc7786776a30920ab1d1bb7a397b9475e28eb31425",
+   "size": 435860
+  },
+  {
+   "path": "models/pilot/v-u23-vanguard-interceptor-lod1.glb",
+   "sha256": "6d404772a833974bb188ec66ff00796b0387646b0760a6b8598f73dd919b3e50",
+   "size": 114344
+  },
+  {
+   "path": "models/pilot/v-u23-vanguard-interceptor-lod2.glb",
+   "sha256": "847d60477b139f543146b059f6dcf278df777773cb65031b1f51a7f407ba4f08",
+   "size": 109984
+  },
+  {
+   "path": "models/pilot/v-u24-vanguard-light-gunship-lod0.glb",
+   "sha256": "e29c5661aadc278a1502aa0b621c2699a7421599846c867ea2a5d0d46e2833b6",
+   "size": 437956
+  },
+  {
+   "path": "models/pilot/v-u24-vanguard-light-gunship-lod1.glb",
+   "sha256": "5304d564d5e7e519d85bc7bd1a385907a59acecfe02e1f2994f3fe33d2311ba9",
+   "size": 115884
+  },
+  {
+   "path": "models/pilot/v-u24-vanguard-light-gunship-lod2.glb",
+   "sha256": "26cf338defc977c6839fd80378bdb70b0e6192577085c3d0567e98f4de520c08",
+   "size": 110716
+  },
+  {
+   "path": "models/pilot/v-u25-vanguard-multirole-aircraft-lod0.glb",
+   "sha256": "8b2278ac8861d5964ba9437d20e72f18c123536cb5ac99ff3c689af00d85c797",
+   "size": 437332
+  },
+  {
+   "path": "models/pilot/v-u25-vanguard-multirole-aircraft-lod1.glb",
+   "sha256": "c0916a660d5457ea1be2c5b2b41d205a452a6aaf759956abd7fe8693633fc525",
+   "size": 115764
+  },
+  {
+   "path": "models/pilot/v-u25-vanguard-multirole-aircraft-lod2.glb",
+   "sha256": "dd62235fbca1e4494bd9a0a8fbe5d6bf1c037bd7906e771a1732761d42f5c3f0",
+   "size": 110472
+  },
+  {
+   "path": "models/pilot/v-u26-vanguard-bomber-lod0.glb",
+   "sha256": "4796c445a9d520fe8914ce19cfbf18d79d2e37d627c455bd70a3cc73eb6e8b50",
+   "size": 436600
+  },
+  {
+   "path": "models/pilot/v-u26-vanguard-bomber-lod1.glb",
+   "sha256": "b8ce00e102f3e7f17a0fdff687f08cc13535991b2de4ad6fcbc976cc76f0ad3f",
+   "size": 115036
+  },
+  {
+   "path": "models/pilot/v-u26-vanguard-bomber-lod2.glb",
+   "sha256": "c25a64c09dbc4fcc73cd9fadb8483a7255ecdeabf4369775c1ac8f00f71ebcba",
+   "size": 94948
+  },
+  {
+   "path": "models/pilot/v-u27-vanguard-heavy-bomber-lod0.glb",
+   "sha256": "b50057ab1b1aa9269dfcd5a79083623052b50a53afa59da82351b2a836435be7",
+   "size": 435976
+  },
+  {
+   "path": "models/pilot/v-u27-vanguard-heavy-bomber-lod1.glb",
+   "sha256": "5c860b12486d540e1ad02a20fa26115f93d9963b686d7e3a8c5ac297a277b9f6",
+   "size": 114832
+  },
+  {
+   "path": "models/pilot/v-u27-vanguard-heavy-bomber-lod2.glb",
+   "sha256": "e8a3ce38e4f8c1ef3fb96252912372ae1acb5ee269c567606aa4cb8c259cba81",
+   "size": 61576
+  },
+  {
+   "path": "models/pilot/v-u28-vanguard-repair-drone-lod0.glb",
+   "sha256": "a55651fa528d0592f919aa031d9b8d1f6f8f2ad8a3e88b3da420c7a19115348a",
+   "size": 424832
+  },
+  {
+   "path": "models/pilot/v-u28-vanguard-repair-drone-lod1.glb",
+   "sha256": "ce09546822aaaf51a4f0b037c1008338a0d762819e7932a1d32d39a9e03ad0a1",
+   "size": 110296
+  },
+  {
+   "path": "models/pilot/v-u28-vanguard-repair-drone-lod2.glb",
+   "sha256": "2e5a1a3dc6f14f37dd35973ad6c1f9d73e59a2f1cefc2f359235639a9d7bcbaf",
+   "size": 56468
+  },
+  {
+   "path": "models/pilot/v-u29-vanguard-stealth-striker-lod0.glb",
+   "sha256": "ce83e74fdd1639e330de210b8d2f1720a1399a8c43f8af0274ba75c5e8c4b324",
+   "size": 433904
+  },
+  {
+   "path": "models/pilot/v-u29-vanguard-stealth-striker-lod1.glb",
+   "sha256": "cd33ba8930faee73edcb57fd7939cbc4a2f7cd3c523c12c74a276f469c286d06",
+   "size": 113808
+  },
+  {
+   "path": "models/pilot/v-u29-vanguard-stealth-striker-lod2.glb",
+   "sha256": "b01cbc68cabb6d5f92b7a281680f3480fab2e1d16f8c0200dabda6ed9f5fdfc5",
+   "size": 60560
+  },
+  {
+   "path": "models/pilot/v-u30-vanguard-aerial-artillery-lod0.glb",
+   "sha256": "3882396eed822cf77d97462d715ae87eee8d9dd0adfcbeab9583c8c95a1c40ca",
+   "size": 440376
+  },
+  {
+   "path": "models/pilot/v-u30-vanguard-aerial-artillery-lod1.glb",
+   "sha256": "482c55c0df6ea36a5077272bbd735daa2e9feeec09fc5d2127176b2fb6665185",
+   "size": 117772
+  },
+  {
+   "path": "models/pilot/v-u30-vanguard-aerial-artillery-lod2.glb",
+   "sha256": "1536f9f2ee79eb2935df10276cb340a0a57d6afa34fcde97dbdec06122e51e01",
+   "size": 111892
+  },
+  {
+   "path": "models/pilot/v-x01-vanguard-tactical-lod0.glb",
+   "sha256": "d68688d41aa6fd8570b477dc3dcf23f7194ca19093d6a99a96a207a7d530c760",
+   "size": 435328
+  },
+  {
+   "path": "models/pilot/v-x01-vanguard-tactical-lod1.glb",
+   "sha256": "a7d75300514cb3253eaee86fb06aa69266bf9aa03e90eb5fb0627c8a4b2faaae",
+   "size": 60136
+  },
+  {
+   "path": "models/pilot/v-x01-vanguard-tactical-lod2.glb",
+   "sha256": "e2a09b85ba6d00e6dc68df4e6f71fdb100ec6132cc307c78039d6b6775dc4a86",
+   "size": 33864
+  },
+  {
+   "path": "models/pilot/v-x02-vanguard-cruise-lod0.glb",
+   "sha256": "83d297531495d1da07ed41c509fa4465cf016f521a175a03871b5be6ff00335b",
+   "size": 423808
+  },
+  {
+   "path": "models/pilot/v-x02-vanguard-cruise-lod1.glb",
+   "sha256": "d270bff9642ada56f5009f604983a69fa26519058de926a68f0650539ed46d1e",
+   "size": 47908
+  },
+  {
+   "path": "models/pilot/v-x02-vanguard-cruise-lod2.glb",
+   "sha256": "81d5cdbcec84e0e9f2c76f14b6261bb24caad90cbd1fc6bd43643b9e9326bc32",
+   "size": 43732
+  },
+  {
+   "path": "models/pilot/v-x03-vanguard-drone-lod0.glb",
+   "sha256": "e4c05d2644db720c307db921a38d09c6e71566061b71964d4b9265e3ce7a8b1d",
+   "size": 430592
+  },
+  {
+   "path": "models/pilot/v-x03-vanguard-drone-lod1.glb",
+   "sha256": "a8731137ff317c8f4793eaee0733acb40c5ebfe138907e59eabcbdcd74158dec",
+   "size": 50524
+  },
+  {
+   "path": "models/pilot/v-x03-vanguard-drone-lod2.glb",
+   "sha256": "85d06f718bcab9757e4481247827ef5e0473b9461e491761e06e285839720884",
+   "size": 47380
+  },
+  {
+   "path": "models/pilot/v-x04-vanguard-aero-lod0.glb",
+   "sha256": "e46ffa00d6464a29f0bc3bef0ccb1d779c35f5bab18b79759cd1a35e0c4d1ff8",
+   "size": 437136
+  },
+  {
+   "path": "models/pilot/v-x04-vanguard-aero-lod1.glb",
+   "sha256": "d00c4910313d218edc45e200d6bebd5e27d89e98035b43a36e1b9eb7e40d96c9",
+   "size": 115568
+  },
+  {
+   "path": "models/pilot/v-x04-vanguard-aero-lod2.glb",
+   "sha256": "24e1d22de5c5cd2ac4810984267628759c531fb8134b7abdebccfe2ba844836f",
+   "size": 110256
+  },
+  {
+   "path": "models/pilot/v-x05-vanguard-strategic-lod0.glb",
+   "sha256": "178b3ebb3abae6dcbdc634bd7189fbd932228d22044a9821b84bccc4aeba1c82",
+   "size": 440656
+  },
+  {
+   "path": "models/pilot/v-x05-vanguard-strategic-lod1.glb",
+   "sha256": "ebe0cb25a315604cae739c14faeab8aa5365838dd2558e66d05a09d825c08df4",
+   "size": 64884
+  },
+  {
+   "path": "models/pilot/v-x05-vanguard-strategic-lod2.glb",
+   "sha256": "e4a15f13163374c187b1b4abdc470dd7b3adfd7612ccb4fb75c99eb6da73bdfa",
+   "size": 33860
+  },
+  {
+   "path": "models/pilot/v-x06-vanguard-reserveStrike-lod0.glb",
+   "sha256": "9dc08cf146010599eafaa9b51f2818b5712cff14b3b992b5ea6105bd36e36da7",
+   "size": 433448
+  },
+  {
+   "path": "models/pilot/v-x06-vanguard-reserveStrike-lod1.glb",
+   "sha256": "62ee5d66cbd56165f97e836944bca0f950bb287e28fe8888d2c58eb451b40270",
+   "size": 113536
+  },
+  {
+   "path": "models/pilot/v-x06-vanguard-reserveStrike-lod2.glb",
+   "sha256": "c45509bb52e6b240aeddd482ffd125abcb09e330e75410e1d877caecc7efd9a7",
+   "size": 60344
+  },
+  {
+   "path": "movement-target-fidelity-v209.js",
+   "sha256": "1375e404d77bee0c49123a6f0e3d733c18e0f5ccd1e970b389f1c5ef81f1eee3",
+   "size": 7590
+  },
+  {
+   "path": "multiplayer-game-v96.js",
+   "sha256": "a41f174594606261a685b259af4ab9052b08511322e9364cd347181a445b6504",
+   "size": 34023
+  },
+  {
+   "path": "navigation-footprint-v117.js",
+   "sha256": "14721a295f249e6d88f353b21ad4c011cfe730ae8e1e49dc72e233b87d6c6702",
+   "size": 32001
+  },
+  {
+   "path": "operational-core-v160.js",
+   "sha256": "c1473229a517119dd544835a9fdda9ed3368e2ef854c9f6a9931904acf052597",
+   "size": 28226
+  },
+  {
+   "path": "operational-core-worker-v160.js",
+   "sha256": "e71bc8228b18a2b6f0a456d8fda2d23f096dcf39e4f9a0917036f209b6c47a9f",
+   "size": 1433
+  },
+  {
+   "path": "performance-observability-v194.js",
+   "sha256": "aa6c10dd969f0546ae72080d13d3b5cda1a89b4c49d6fb983fb37d4c26e079b0",
+   "size": 9449
+  },
+  {
+   "path": "post-load-command-recovery-v196.js",
+   "sha256": "4cdbbb9704fcf1f5e0e828e3373bb93ee44067b70a3a69ebdd103efe50af8ba0",
+   "size": 13344
+  },
+  {
+   "path": "production-logistics-v206.js",
+   "sha256": "045991a73dcbccbc04a68006af5e02aa5f613e1b35b87f5bf23a344392da01af",
+   "size": 5381
+  },
+  {
+   "path": "rally-point-authority-v204.js",
+   "sha256": "9847c954c3c6390f6568cfc635559807a5cafe86c75af96c5ff8ea02173664fc",
+   "size": 6732
+  },
+  {
+   "path": "recon-memory-production-v203.js",
+   "sha256": "4a01ce756392c1840fa9be1a2b7a45acc867d77fe9e2929cea3c99f457184765",
+   "size": 11164
+  },
+  {
+   "path": "recovery-bootstrap-v196.js",
+   "sha256": "51fa283cbf825ceb68a2f98a895162833d9705e4a7ae5ef82192449bfb918ff5",
+   "size": 2478
+  },
+  {
+   "path": "render-state-guard-v192.js",
+   "sha256": "e5f9bb12fd5405afecd59819a10677ee59c193cb1d1504bd45524bae939b786c",
+   "size": 1960
+  },
+  {
+   "path": "resource-economy-v206.js",
+   "sha256": "f57936d56a18b1969156e1c89fff1f4fb322485f2c8d9e0f12df434875a49edb",
+   "size": 15627
+  },
+  {
+   "path": "resource-extraction-authority-v192.js",
+   "sha256": "3be07ea3ccb167ed09d3f33466e39165b92df93de0683f1c956ba75f560f04dc",
+   "size": 4730
+  },
+  {
+   "path": "resource-extraction-v114.js",
+   "sha256": "ba84b05b85b4cf39c6e1f93d3423eba3390ba216ef2a658970d6c9ea85685d2d",
+   "size": 16546
+  },
+  {
+   "path": "resource-ui-stability-v192.js",
+   "sha256": "df870b16f89ae3d3ec2a0bce85512bd856c5a52fc06829cd8b4233ef422f41e2",
+   "size": 4776
+  },
+  {
+   "path": "resync-continuity-v206.js",
+   "sha256": "1f6c40a7830e194e948229beb176823292b0b16b9a645a26a4c71d86a893cf07",
+   "size": 10377
+  },
+  {
+   "path": "right-click-authority-v197.js",
+   "sha256": "3f440b442ef312e9d630a1c1895e99d367b199e00c733c79bf237b7ae279cbbc",
+   "size": 5704
+  },
+  {
+   "path": "runtime-shell-v213.js",
+   "sha256": "0da51546955eb5e25c175b96f9d2d1a8bcb490f9b48b89c70816b1d34bacf1ae",
+   "size": 17651
+  },
+  {
+   "path": "runtime-ui-v213.js",
+   "sha256": "08a1533667d945852b666fe4f4cc80bda2079f8516014aa60cf47df29f7ec625",
+   "size": 3533
+  },
+  {
+   "path": "save-compat-v191.js",
+   "sha256": "250e3f6c80f7fe8cf3376ff373475881d8dda095d39911b9b661c27d18eef5fa",
+   "size": 8917
+  },
+  {
+   "path": "save-slots-v213.js",
+   "sha256": "03d15b9b4bb7de46f85a0ed2d7b6a950f9d5e58b50d177a72e1a96b0422c19ca",
+   "size": 31850
+  },
+  {
+   "path": "screen-selection-formation-v140.js",
+   "sha256": "f9aa4ff80707d37117ef894c75876b9e19ce387e0c9c91002f7a8eb1fcee69a3",
+   "size": 16403
+  },
+  {
+   "path": "simulation-profiler-v166.js",
+   "sha256": "5e8ad5bb13097866b3b7989ad52cca969120f0e91cf51e50143591ce30a8a858",
+   "size": 8741
+  },
+  {
+   "path": "simulation-resilience-v200.js",
+   "sha256": "bd749897dcc43263e163374c3e349526d2aab19f9e2cab70e592a4fbd0f63cba",
+   "size": 18793
+  },
+  {
+   "path": "singleplayer-gameplay-v207.js",
+   "sha256": "494b4c2484de96d6762839fd9a34217740d1ea5fd9150863d39840dd0d6220c2",
+   "size": 16475
+  },
+  {
+   "path": "sprite-scale-v123.js",
+   "sha256": "1177194dc58d0248f982c1e10de200208485597450316a1c978eadd6d475d2cb",
+   "size": 8212
+  },
+  {
+   "path": "strategic-war-ai-v128.js",
+   "sha256": "763e1b659df7b132623ef4f701cf9c1066cf0f3a5c878d56468e99483be10d22",
+   "size": 43286
+  },
+  {
+   "path": "supply-transport-v206.js",
+   "sha256": "03ad0637c668015f53e6e6bc503cb926d2a62f69e91bb37cdbea3c42956afcbf",
+   "size": 38507
+  },
+  {
+   "path": "transport-v95.js",
+   "sha256": "9274eff97f77b305af922f51a0583a4c99655ba67824ddc053d81127dda2c5e3",
+   "size": 19506
+  },
+  {
+   "path": "unit-air-refinement-v137.js",
+   "sha256": "5efca28d4bc9c5a44a8752567c344107ad98fed19c986d165afee1c7968c4e26",
+   "size": 12600
+  },
+  {
+   "path": "unit-footprints-v115.js",
+   "sha256": "e7052754edc83b8a4f2aff6555af8c23f3d38b7d92678083ddf3cfe619bf0986",
+   "size": 24942
+  },
+  {
+   "path": "unit-formation-refinement-v138.js",
+   "sha256": "701b8ce37fa24b0410e5313c319f4e0e6a7518a13112bb22286c9ffcdd691edc",
+   "size": 13825
+  },
+  {
+   "path": "unit-sustainment-v206.js",
+   "sha256": "36ffdfc3bc1aeb75ac06ed21d7fcef655d6bca5ac6c6643cb7c3c98d3f8ef7aa",
+   "size": 14698
+  },
+  {
+   "path": "war-economy-ai-v126.js",
+   "sha256": "ac673cc5890adae16d451d76d77d20c41789baa594663799987721498dcce220",
+   "size": 27460
+  }
+ ],
+ "generatedAt": "2026-08-24T08:19:58Z"
+}
