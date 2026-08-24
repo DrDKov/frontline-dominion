@@ -1,0 +1,29 @@
+import { chromium } from 'playwright';
+import { gameUrl } from './lib/fd-env.mjs';
+
+const browser=await chromium.launch({headless:true});
+const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
+const page=await context.newPage();const errors=[];
+page.on('pageerror',e=>errors.push(String(e?.stack||e)));
+page.on('console',m=>{if(m.type()==='error'&&!/favicon|404|audio|autoplay|Failed to load resource/i.test(m.text()))errors.push(`console:${m.text()}`);});
+const waitFor=async(fn,arg=undefined,timeout=45000,interval=80)=>{const t=Date.now();let last=null;while(Date.now()-t<timeout){if(errors.length)throw new Error(`Browser errors ${JSON.stringify(errors)}`);last=await page.evaluate(fn,arg);if(last&&!last.__pending)return last;await page.waitForTimeout(interval);}throw new Error(`Timed out ${timeout}ms; last=${JSON.stringify(last)}`);};
+const I={ground:'tf-ground',passenger:'tf-passenger',target:'tf-target',air:'tf-air',airPassenger:'tf-air-passenger',airTarget:'tf-air-target'};
+
+await page.goto(gameUrl(),{waitUntil:'load',timeout:60000});
+await waitFor(()=>{const b=document.getElementById('start-game');return b&&!b.disabled&&globalThis.__FD_TRANSPORT_FIRE__?.groundPassengersFire&&globalThis.__FD_DEBUG__?.Game?true:null;});
+const fixture=await page.evaluate(I=>{const D=globalThis.__FD_DEBUG__;const base=D.Game.prototype.initializeBattle;D.Game.prototype.initializeBattle=function(...args){const r=base.apply(this,args);const U=(id,type,team,x,y)=>{const u=new D.Unit(this,{id,typeId:type,team,x,y,rotation:0});this.addEntity(u);return u;};const gx=12600,gy=9300;const ground=U(I.ground,'armoredTransport','player',gx,gy),p=U(I.passenger,'rifle','player',gx+20,gy),target=U(I.target,D.UNIT_TYPES?.tank?'tank':'rifle','enemy',gx+170,gy);const ax=12600,ay=10800;const air=U(I.air,'transportHelicopter','player',ax,ay),ap=U(I.airPassenger,'rifle','player',ax+20,ay),at=U(I.airTarget,D.UNIT_TYPES?.tank?'tank':'rifle','enemy',ax+170,ay);if(this.loadIntoTransport78(ground,[p])!==1||this.loadIntoTransport78(air,[ap])!==1)throw new Error('transport fixture embark failed');p.weaponCooldown=0;ap.weaponCooldown=0;ground._tfStart={x:ground.x,y:ground.y};const cmd={type:'move',x:gx+420,y:gy+80};if(typeof ground.setCommand==='function')ground.setCommand(cmd,false);else ground.commandQueue=[cmd];globalThis.__TF_FIXTURE__={targetHp:target.hp,airTargetHp:at.hp,ammo:Number(p.magazineAmmo139??p.ammo??p.weaponAmmo??NaN),carrierCargo:JSON.stringify(ground.logistics206?.cargo||null)};return r;};return{ok:true};},I);if(!fixture.ok)throw new Error('fixture install failed');
+await page.locator('#start-game').click();
+const ready=await waitFor(I=>{const g=globalThis.__FD_DEBUG__?.game,b=globalThis.__FD_STABLE_STATE165__?.bridge,p=g?.getEntity(I.passenger),ap=g?.getEntity(I.airPassenger);return p?.embarkedIn===I.ground&&ap?.embarkedIn===I.air&&b?.ready&&!b.failed&&Number(b.workerTick)>10?{tick:Number(b.workerTick)}:{__pending:true,tick:Number(b?.workerTick||0),failed:Boolean(b?.failed)};},I);
+const fired=await waitFor(I=>{const g=globalThis.__FD_DEBUG__.game,f=globalThis.__TF_FIXTURE__,p=g.getEntity(I.passenger),ap=g.getEntity(I.airPassenger),ground=g.getEntity(I.ground),air=g.getEntity(I.air),target=g.getEntity(I.target),at=g.getEntity(I.airTarget);const ammo=Number(p.magazineAmmo139??p.ammo??p.weaponAmmo??NaN);const out={shots:Number(p._embarkedShots||0),transportShots:Number(ground._passengerShots||0),embarked:p.embarkedIn,carrierDistance:Math.hypot(ground.x-ground._tfStart.x,ground.y-ground._tfStart.y),targetHp:Number(target.hp),ammo,beforeAmmo:f.ammo,carrierCargo:JSON.stringify(ground.logistics206?.cargo||null),beforeCarrierCargo:f.carrierCargo,air:{shots:Number(ap._embarkedShots||0),transportShots:Number(air._passengerShots||0),embarked:ap.embarkedIn,targetHp:Number(at.hp),startHp:f.airTargetHp}};return out.shots>0&&out.carrierDistance>5?out:{__pending:true,...out};},I,25000);
+if(fired.embarked!==I.ground)throw new Error(`ground passenger disembarked ${JSON.stringify(fired)}`);
+if(fired.air.embarked!==I.air||fired.air.shots||fired.air.transportShots||fired.air.targetHp<fired.air.startHp)throw new Error(`aviation passenger fired ${JSON.stringify(fired.air)}`);
+if(Number.isFinite(fired.beforeAmmo)&&!(fired.ammo<fired.beforeAmmo))throw new Error(`passenger finite ammo was not consumed ${JSON.stringify(fired)}`);
+if(fired.carrierCargo!==fired.beforeCarrierCargo)throw new Error(`passenger fire mutated carrier logistics cargo ${JSON.stringify(fired)}`);
+
+const cadence=await page.evaluate(I=>{const g=globalThis.__FD_DEBUG__.game,p=g.getEntity(I.passenger),ground=g.getEntity(I.ground);return{shots:Number(p._embarkedShots||0),transportShots:Number(ground._passengerShots||0),lastShot:Number(p._embarkedLastShotAt||0),cooldown:Number(p.weaponCooldown||0)};},I);
+if(cadence.shots!==cadence.transportShots)throw new Error(`passenger/carrier shot accounting mismatch, possible double fire ${JSON.stringify(cadence)}`);
+const marker=await page.evaluate(()=>globalThis.__FD_TRANSPORT_FIRE__);
+if(!marker?.groundPassengersFire||!marker.aviationExcluded||!marker.movingCarrierFire||!marker.ownFiniteAmmo||!marker.carrierAmmoIsolation||!marker.noDoubleFire)throw new Error(`transport capability marker incomplete ${JSON.stringify(marker)}`);
+const bridge=await page.evaluate(()=>{const b=globalThis.__FD_STABLE_STATE165__?.bridge;return{ready:Boolean(b?.ready),failed:Boolean(b?.failed),errors:Number(b?.actionErrors||0),recoveries:Number(b?.recoveryAttempts201||0),tick:Number(b?.workerTick||0)};});
+if(!bridge.ready||bridge.failed||bridge.errors||bridge.recoveries)throw new Error(`bridge unhealthy ${JSON.stringify(bridge)}`);
+console.log(JSON.stringify({ok:true,ready,fired,cadence,marker,bridge}));await context.close();await browser.close();
