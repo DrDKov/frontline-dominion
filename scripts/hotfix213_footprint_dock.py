@@ -42,3 +42,11 @@ if count != 1:
 text += "\n;(() => { const root=typeof window!=='undefined'?window:self; root.__FD_TRUCK_DOCK_HOTFIX_213__=Object.freeze({build:213,footprintAware:true,extractorScoped:true,noCenterDistanceShortcut:true}); })();\n"
 SUPPLY.write_text(text, 'utf-8')
 print('Build 213 extractor loading uses footprint-aware interaction; ordinary supply nodes preserve build-212 service geometry')
+
+# --- stage1b: one-time src/legacy materialization (fail-safe; see scripts/materialize_legacy.py) ---
+try:
+    import subprocess as _fd_sp
+    import sys as _fd_sys
+    _fd_sp.call([_fd_sys.executable, str(Path(__file__).resolve().parent / 'materialize_legacy.py')])
+except Exception as _fd_exc:  # never break the release chain
+    print(f'materialize_legacy hook skipped: {_fd_exc!r}')
