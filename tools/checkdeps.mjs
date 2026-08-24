@@ -71,7 +71,7 @@ function inferRequires(text, provides) {
 
 function isIife(text) {
   const stripped = text.replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/, '');
-  return /^(?:\(\(\)\s*=>\s*\{|\(function\s*\(|!function\s*\()/m.test(stripped);
+  return /^(?:['"]use strict['"];?\s*)?(?:\(\(\)\s*=>\s*\{|\(function\s*\(|!function\s*\()/m.test(stripped);
 }
 
 function localUrl(url) {
@@ -136,7 +136,8 @@ for (const path of files.sort()) {
   const finalDeclared = writeDeclarations ? parseHeaders(text) : declared;
   const provides = finalDeclared.provides.length ? finalDeclared.provides : inferredProvides;
   const requires = finalDeclared.requires.length ? finalDeclared.requires : inferredRequires;
-  if (strictDeclarations && extname(file) !== '.html' && !finalDeclared.provides.length && !finalDeclared.requires.length)
+  const isDeclared = Boolean(finalDeclared.requires.length || finalDeclared.provides.length);
+  if (strictDeclarations && extname(file) !== '.html' && !isDeclared)
     errors.push(`${file}: missing // requires and // provides declaration block`);
   if (strictIife && extname(file) !== '.html' && !isIife(text)) errors.push(`${file}: module is not a single top-level IIFE`);
   if (finalDeclared.provides.length && JSON.stringify(finalDeclared.provides) !== JSON.stringify(inferredProvides))
@@ -145,7 +146,7 @@ for (const path of files.sort()) {
     const undeclared = inferredRequires.filter(x => !finalDeclared.requires.includes(x));
     if (undeclared.length) errors.push(`${file}: undeclared hard requires: ${undeclared.join(', ')}`);
   }
-  modules.push({ file, requires, provides, inferredRequires, inferredProvides, loads: parseLoads(text, file), iife: extname(file) === '.html' ? null : isIife(text), declared: Boolean(finalDeclared.requires.length || finalDeclared.provides.length) });
+  modules.push({ file, requires, orderRequires: finalDeclared.requires, provides, inferredRequires, inferredProvides, loads: parseLoads(text, file), iife: extname(file) === '.html' ? null : isIife(text), declared: isDeclared });
 }
 
 const byFile = new Map(modules.map(m => [m.file, m]));
@@ -172,12 +173,16 @@ for (const mod of modules) for (const g of mod.requires) {
 const cycles = cycleList(graph);
 for (const cycle of cycles) errors.push(`dependency cycle: ${cycle.join(' -> ')}`);
 
+// Load-order is authoritative only for explicit declarations. Legacy inferred
+// references can be lazy (inside functions invoked after all scripts loaded),
+// so treating every inferred mention as an eager dependency creates false
+// positives. --strict-declarations makes this exact after Stage 1d migration.
 for (const loader of modules.filter(m => m.loads.length)) {
   const order = new Map(loader.loads.map((f, i) => [f, i]));
   for (const consumerName of loader.loads) {
     const consumer = byFile.get(consumerName);
-    if (!consumer) continue;
-    for (const g of consumer.requires) {
+    if (!consumer?.declared) continue;
+    for (const g of consumer.orderRequires) {
       const owner = (providers.get(g) || []).find(f => order.has(f));
       if (!owner) continue;
       if (order.get(owner) > order.get(consumerName)) errors.push(`${loader.file}: load order invalid; ${consumerName} requires ${g} from later ${owner}`);
@@ -186,7 +191,7 @@ for (const loader of modules.filter(m => m.loads.length)) {
 }
 
 for (const mod of modules) for (const target of mod.loads) {
-  if (!byFile.has(target) && !target.startsWith('cdn-cgi') && /\.(?:js|mjs)$/i.test(target)) errors.push(`${mod.file}: missing load target ${target}`);
+  if (!byFile.has(target) && !/^\/?cdn-cgi\//.test(target) && /\.(?:js|mjs)$/i.test(target)) errors.push(`${mod.file}: missing load target ${target}`);
 }
 
 const report = {
