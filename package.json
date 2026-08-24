@@ -1,0 +1,12 @@
+{
+  "name": "frontline-dominion",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "check:deps": "node tools/checkdeps.mjs --root src/legacy --entry frontline-dominion.html",
+    "check:stage1": "node tools/stage1-check.mjs",
+    "plan:unversioned": "node tools/plan-unversioned.mjs",
+    "version:write": "node tools/write-version.mjs"
+  }
+}

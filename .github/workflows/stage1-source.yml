@@ -1,0 +1,132 @@
+name: Stage 1 patchless source gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/stage1-source.yml'
+      - 'package.json'
+      - 'src/**'
+      - 'tools/**'
+      - 'tests/**'
+      - 'scripts/legacy-manifest.json'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stage1-source.yml'
+      - 'package.json'
+      - 'src/**'
+      - 'tools/**'
+      - 'tests/**'
+      - 'scripts/legacy-manifest.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stage1-source-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  patchless-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      FD_EXPECTED_BUILD: '213'
+      FD_BASE_URL: http://127.0.0.1:8765/frontline-dominion
+      FD_GAME_URL: http://127.0.0.1:8765/frontline-dominion/frontline-dominion.html?build=213
+      FD_MULTIPLAYER_URL: http://127.0.0.1:8765/frontline-dominion/multiplayer.html?build=213
+      FD205_SOAK_MS: '90000'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Static syntax
+        run: |
+          set -euo pipefail
+          node --check tools/build.mjs
+          node --check tools/checkdeps.mjs
+          node --check tools/stage1-check.mjs
+          node --check tools/plan-unversioned.mjs
+          node --check tools/write-version.mjs
+          node --check tests/lib/fd-env.mjs
+          node --check tests/runtime-capabilities.mjs
+          node --check tests/logistics-service.mjs
+          node --check tests/logistics-missions.mjs
+          node --check tests/multiplayer-probe.mjs
+          node --check tests/multiplayer-current-soak.mjs
+          node --check tests/aviation207-worker.mjs
+          node --check tests/command-bridge.mjs
+          node --check tests/extractor-haul.mjs
+          node --check tests/save-load-current.mjs
+
+      - name: Patchless build, dependency graph, byte-equivalence
+        run: npm run check:stage1
+
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve patchless dist
+        run: |
+          set -euo pipefail
+          rm -rf smoke-root
+          mkdir -p smoke-root
+          ln -s "$PWD/dist" smoke-root/frontline-dominion
+          python -m http.server 8765 --directory smoke-root >/tmp/fd-stage1-http.log 2>&1 &
+          echo $! > /tmp/fd-stage1-http.pid
+          for attempt in $(seq 1 80); do
+            if curl -fsSL "$FD_GAME_URL" >/tmp/fd-stage1-game.html && curl -fsSL "$FD_MULTIPLAYER_URL" >/tmp/fd-stage1-multiplayer.html; then
+              exit 0
+            fi
+            sleep .1
+          done
+          exit 1
+
+      - name: Ten functional regression gates
+        run: |
+          set -euo pipefail
+          node tests/runtime-capabilities.mjs 2>&1 | tee /tmp/fd-stage1-01-runtime-capabilities.log
+          node tests/logistics206-invariants.mjs 2>&1 | tee /tmp/fd-stage1-02-logistics-invariants.log
+          node tests/logistics-service.mjs 2>&1 | tee /tmp/fd-stage1-03-logistics-service.log
+          node tests/logistics-missions.mjs 2>&1 | tee /tmp/fd-stage1-04-logistics-missions.log
+          node tests/aviation207-worker.mjs 2>&1 | tee /tmp/fd-stage1-05-aviation-worker.log
+          node tests/command-bridge.mjs 2>&1 | tee /tmp/fd-stage1-06-command-bridge.log
+          node tests/build212-regression.mjs 2>&1 | tee /tmp/fd-stage1-07-build212-regression.log
+          node tests/extractor-haul.mjs 2>&1 | tee /tmp/fd-stage1-08-extractor-haul.log
+          node tests/save-load-current.mjs 2>&1 | tee /tmp/fd-stage1-09-save-load-current.log
+          node tests/worker213-bootstrap.mjs 2>&1 | tee /tmp/fd-stage1-10-worker-bootstrap.log
+
+      - name: Multiplayer deterministic hash probe
+        run: |
+          set -euo pipefail
+          node tests/multiplayer-probe.mjs 2>&1 | tee /tmp/fd-stage1-11-multiplayer.log
+          grep -Eq '"hashAdvance":[[:space:]]*(3[0-9]|[4-9][0-9]|[1-9][0-9]{2,})' /tmp/fd-stage1-11-multiplayer.log
+          ! grep -Eq '"hashMismatches":[[:space:]]*[1-9]' /tmp/fd-stage1-11-multiplayer.log
+          ! grep -Eq '"resyncsRequested":[[:space:]]*[1-9]' /tmp/fd-stage1-11-multiplayer.log
+
+      - name: Upload Stage 1 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage1-patchless-source-diagnostics
+          path: |
+            .stage1-deps.json
+            .stage1-unversioned.json
+            /tmp/fd-stage1-*.log
+            /tmp/fd-stage1-*.html
+          if-no-files-found: ignore
+          retention-days: 7
