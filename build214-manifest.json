@@ -1,0 +1,5 @@
+{
+  "build": 214,
+  "version": "16.9.8",
+  "features": ["ground-transport-passenger-fire", "ai-extraction-hauling", "ai-stored-reserve-planning", "ai-logistics-recovery", "adaptive-ai-mobile-reserve", "adaptive-ai-logistics-strategy", "adaptive-ai-logistics-controller", "explicit-engineer-construction", "build213-fog-and-haul-fixes"]
+}
