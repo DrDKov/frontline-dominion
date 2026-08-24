@@ -46,16 +46,19 @@ if (meta.build !== version.BUILD || meta.version !== version.VERSION) errors.pus
 
 const config = JSON.parse(await readFile(join(SRC, 'manifest.json'), 'utf8'));
 const extraFiles = Array.isArray(config.extraFiles) ? [...new Set(config.extraFiles)] : [];
+const pageModules = Array.isArray(config.pageModules) ? [...new Set(config.pageModules)] : [];
+const workerModules = Array.isArray(config.workerModules) ? [...new Set(config.workerModules)] : [];
+const declaredModules = [...new Set([...pageModules, ...workerModules])];
 const manifest = JSON.parse(await readFile(join(ROOT, 'scripts/legacy-manifest.json'), 'utf8'));
 if (manifest.files.length !== 836) warnings.push(`legacy manifest expected historical 836 files, got ${manifest.files.length}`);
-if (meta.pinnedFiles !== manifest.files.length || meta.extraFiles !== extraFiles.length) errors.push(`build-meta file accounting mismatch: ${JSON.stringify(meta)}`);
+if (meta.pinnedFiles !== manifest.files.length || meta.extraFiles !== extraFiles.length || JSON.stringify(meta.pageModules||[]) !== JSON.stringify(pageModules) || JSON.stringify(meta.workerModules||[]) !== JSON.stringify(workerModules)) errors.push(`build-meta file/module accounting mismatch: ${JSON.stringify(meta)}`);
 
 const sourceFiles = await walk(LEGACY);
 const sourceRuntime = sourceFiles.filter(p => relative(LEGACY, p).replaceAll('\\', '/') !== 'PROVENANCE.md');
-const expectedSourceCount = manifest.files.length + extraFiles.length;
-if (sourceRuntime.length !== expectedSourceCount) errors.push(`src/legacy runtime file count ${sourceRuntime.length} != pinned+extra ${expectedSourceCount}`);
-for (const rel of extraFiles) {
-  if (!sourceRuntime.some(p => relative(LEGACY, p).replaceAll('\\', '/') === rel)) errors.push(`declared extra source file missing: ${rel}`);
+const expectedPaths = [...new Set([...manifest.files.map(f=>f.path), ...extraFiles, ...declaredModules])];
+if (sourceRuntime.length !== expectedPaths.length) errors.push(`src/legacy runtime file count ${sourceRuntime.length} != declared source paths ${expectedPaths.length}`);
+for (const rel of [...extraFiles, ...declaredModules]) {
+  if (!sourceRuntime.some(p => relative(LEGACY, p).replaceAll('\\', '/') === rel)) errors.push(`declared source file missing: ${rel}`);
 }
 
 let hashDrift = 0;
@@ -76,14 +79,7 @@ let historicalPatchFiles = 0;
 for (const path of allSrc) {
   const rel = relative(SRC, path).replaceAll('\\', '/');
   if (!['.js', '.mjs', '.html', '.css', '.json'].includes(extname(path).toLowerCase())) continue;
-
-  // src/vNNN is the pre-Stage-1 patch archive. It is deliberately excluded
-  // from the active source policy because npm build no longer reads it.
-  // Stage 1e will delete/archive it after the patchless release path is green.
-  if (/^v\d+\//.test(rel)) {
-    historicalPatchFiles += 1;
-    continue;
-  }
+  if (/^v\d+\//.test(rel)) { historicalPatchFiles += 1; continue; }
   if (rel === 'version.js') continue;
 
   const text = await readFile(path, 'utf8').catch(() => '');
@@ -110,7 +106,7 @@ if (strictSource && (legacyVersionedNames || legacyBuildQueries || manifestVersi
 const provenance = await readFile(join(LEGACY, 'PROVENANCE.md'), 'utf8').catch(() => '');
 if (!/files:\s*836/.test(provenance) || !/build:\s*213/.test(provenance)) errors.push('src/legacy/PROVENANCE.md does not describe the pinned snapshot');
 
-console.log(`stage1 check: build=${version.BUILD} pinned=${manifest.files.length} extra=${extraFiles.length} hashDrift=${hashDrift} versionedNames=${legacyVersionedNames} buildQueries=${legacyBuildQueries} historicalPatchFiles=${historicalPatchFiles} errors=${errors.length} warnings=${warnings.length}`);
+console.log(`stage1 check: build=${version.BUILD} pinned=${manifest.files.length} extra=${extraFiles.length} modules=${declaredModules.length} hashDrift=${hashDrift} versionedNames=${legacyVersionedNames} buildQueries=${legacyBuildQueries} historicalPatchFiles=${historicalPatchFiles} errors=${errors.length} warnings=${warnings.length}`);
 for (const w of warnings) console.log(`stage1 warning: ${w}`);
 for (const e of errors) console.error(`stage1 error: ${e}`);
 process.exitCode = errors.length ? 1 : 0;
