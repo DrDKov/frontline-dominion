@@ -132,13 +132,14 @@
     const raw = strategy.evaluate(ai, execute);
     const diag = decorate(game, raw, reason);
     if (diag) {
-      game.__aiLogisticsAdaptiveState ||= { evaluations: 0, executedEvaluations: 0, changes: 0, lastTick: -Infinity, signature: null };
+      game.__aiLogisticsAdaptiveState ||= { evaluations: 0, executedEvaluations: 0, changes: 0, lastTick: -Infinity, signature: null, lastExecuted: null };
       const state = game.__aiLogisticsAdaptiveState;
       state.evaluations += 1;
       if (execute) state.executedEvaluations += 1;
       state.lastTick = Number(game.simTick) || 0;
       state.lastReason = reason;
       state.lastSelected = diag.selected || null;
+      if (diag.selected?.executed) state.lastExecuted = { ...diag.selected };
     }
     return diag;
   }
@@ -147,7 +148,7 @@
     const ai = this.ai;
     const tick = Number(this.simTick) || 0;
     if (!ai || tick <= 0) return;
-    this.__aiLogisticsAdaptiveState ||= { evaluations: 0, executedEvaluations: 0, changes: 0, lastTick: -Infinity, signature: null };
+    this.__aiLogisticsAdaptiveState ||= { evaluations: 0, executedEvaluations: 0, changes: 0, lastTick: -Infinity, signature: null, lastExecuted: null };
     const state = this.__aiLogisticsAdaptiveState;
     const signature = situationSignature(this);
     const changed = state.signature !== null && signature !== state.signature;
@@ -155,21 +156,21 @@
     if (!changed && !due && state.signature !== null) return;
     if (changed) {
       state.changes += 1;
-      // A material situation change must not wait for the previous strategy cooldown.
       ai._nextAdaptiveLogisticsStrategy = Math.min(Number(ai._nextAdaptiveLogisticsStrategy) || Infinity, Number(this.time) || 0);
     }
     state.signature = signature;
     evaluateNow(this, true, changed ? 'SITUATION_CHANGE' : 'PERIODIC');
   }
 
-  if (typeof Game.prototype.registerLogisticsHook206 === 'function') {
-    Game.prototype.registerLogisticsHook206('post', adaptivePostHook, 97);
-  }
+  const authoritativePostHookRegistered = typeof Game.prototype.registerLogisticsHook206 === 'function'
+    ? Boolean(Game.prototype.registerLogisticsHook206('post', adaptivePostHook, 97))
+    : false;
 
   root.__FD_AI_LOGISTICS_ADAPTIVE__ = Object.freeze({
     automaticReplanning: true,
     changeResponsive: true,
     deterministic: true,
+    authoritativePostHookRegistered,
     replanIntervalTicks: REPLAN_INTERVAL_TICKS,
     minimumAlternativesPerProblem: MIN_ALTERNATIVES,
     objectiveProfiles: Object.keys(OBJECTIVES),
@@ -179,6 +180,7 @@
     aviationLogistics: true,
     protectedFieldMissions: true,
     evaluate(game, execute = false) { return evaluateNow(game, execute, execute ? 'EXPLICIT_EXECUTION' : 'EXPLICIT_ANALYSIS'); },
+    signature(game) { return situationSignature(game); },
     diagnostics(game) { return game?.__aiLogisticsStrategy || null; },
     state(game) { return game?.__aiLogisticsAdaptiveState || null; },
   });
