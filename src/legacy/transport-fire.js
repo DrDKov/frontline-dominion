@@ -25,7 +25,16 @@
 
   function isEmbarkedPassenger(unit, transport) {
     if (!unit?.alive || !transport?.alive || !unit.embarkedIn || String(unit.embarkedIn) !== String(transport.id)) return false;
-    return Array.isArray(transport.transportCargoIds) && transport.transportCargoIds.some(id => String(id) === String(unit.id));
+    // embarkedIn is the authoritative passenger->carrier relation and is present
+    // in every canonical save/snapshot. Older/compact Worker states may omit the
+    // reciprocal transportCargoIds array, so only use that list as an additional
+    // consistency check when it is actually populated.
+    const ids = Array.isArray(transport.transportCargoIds) && transport.transportCargoIds.length
+      ? transport.transportCargoIds
+      : (Array.isArray(transport.cargoUnits) && transport.cargoUnits.length
+        ? transport.cargoUnits.map(value => typeof value === 'object' ? value?.id : value)
+        : null);
+    return !ids || ids.some(id => String(id) === String(unit.id));
   }
 
   function withCarrierCombatState(unit, transport, callback) {
@@ -183,6 +192,7 @@
     noDoubleFire: true,
     saveLoadPreserved: true,
     combatStateBridge: true,
+    authoritativeEmbarkRelation: true,
     isGroundTransport,
   });
 })();

@@ -12,12 +12,16 @@
   "pageModules": [
     "logistics-service-replan.js",
     "ai-economy-logistics.js",
-    "transport-fire.js"
+    "ai-logistics-strategy.js",
+    "transport-fire.js",
+    "engineer-command-control.js"
   ],
   "workerModules": [
     "logistics-service-replan.js",
     "ai-economy-logistics.js",
-    "transport-fire.js"
+    "ai-logistics-strategy.js",
+    "transport-fire.js",
+    "engineer-command-control.js"
   ],
   "cacheBust": {
     "mode": "inject",
