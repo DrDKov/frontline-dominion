@@ -13,6 +13,7 @@ on:
       - 'tests/screen-direction214.mjs'
       - 'tests/build213-regression.mjs'
       - 'tests/build213-regression-v2.mjs'
+      - 'tests/logistics211-service-replan.mjs'
   workflow_dispatch:
 
 permissions:
@@ -116,12 +117,14 @@ jobs:
           grep -q 'storedReservePlanning:true' dist/ai-economy-logistics-v214.js
           grep -q '__FD_AI_EXTRACTION_PRIORITY_214__' dist/ai-economy-logistics-v214.js
           grep -q '__FD_TRUCK_DOCK_HOTFIX_213__' dist/supply-transport-v206.js
+          grep -q 'serviceReplanOnUndeliverable:true' dist/supply-transport-v206.js
           grep -q 'friendlyExtractorFogPinning: true' dist/friendly-extractor-visibility-v213.js
           python -m py_compile scripts/assemble214.py scripts/hotfix214_ai_extraction_priority.py
           node --check tests/build214-regression.mjs
           node --check tests/worker214-bootstrap.mjs
           node --check tests/screen-direction214.mjs
           node --check tests/build213-regression-v2.mjs
+          node --check tests/logistics211-service-replan.mjs
           for file in dist/*.js; do node --check "$file"; done
 
       - name: Install Chromium and generate inherited gates
@@ -153,6 +156,7 @@ jobs:
           FD_GAME_URL="$GAME_URL" node tests/worker214-bootstrap.mjs 2>&1 | tee /tmp/fd214-bootstrap.log
           FD_GAME_URL="$GAME_URL" node tests/logistics211-service.generated.mjs 2>&1 | tee /tmp/fd214-inherited-service.log
           FD_GAME_URL="$GAME_URL" node tests/logistics211-missions.generated.mjs 2>&1 | tee /tmp/fd214-inherited-missions.log
+          FD_GAME_URL="$GAME_URL" node tests/logistics211-service-replan.mjs 2>&1 | tee /tmp/fd214-service-replan.log
           FD_GAME_URL="$GAME_URL" node tests/build212-regression.mjs 2>&1 | tee /tmp/fd214-inherited-212.log
           FD_GAME_URL="$GAME_URL" node tests/build213-regression-v2.mjs 2>&1 | tee /tmp/fd214-inherited-213.log
           FD_GAME_URL="$GAME_URL" node tests/screen-direction214.mjs 2>&1 | tee /tmp/fd214-screen.log
