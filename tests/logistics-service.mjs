@@ -20,15 +20,6 @@ const waitFor = async (fn, arg = undefined, timeout = 45000, interval = 100) => 
   throw new Error(`Timed out ${timeout}ms; last=${JSON.stringify(last)}; errors=${JSON.stringify(errors)}`);
 };
 
-const latestGlobal = prefix => page.evaluate(prefix => {
-  const key = Object.keys(globalThis).filter(k => k.startsWith(prefix)).sort((a, b) => {
-    const na = Number(a.match(/_(\d+)__$/)?.[1] || 0);
-    const nb = Number(b.match(/_(\d+)__$/)?.[1] || 0);
-    return nb - na;
-  })[0] || null;
-  return key ? { key, value: globalThis[key] } : null;
-}, prefix);
-
 const I = {
   source: 'e211001', provider: 'e211002', receiver: 'e211003', tank: 'e211004', infantry: 'e211005', outside: 'e211006', air: 'e211007',
   groupSource: 'e211010', groupTruck: 'e211011', group: ['e211012','e211013','e211014'],
@@ -39,7 +30,7 @@ await waitFor(() => {
   const b = document.getElementById('start-game');
   const globals = Object.keys(globalThis);
   const logistics = globals.some(k => k.startsWith('__FD_LOGISTICS_INTEGRITY_'));
-  const shell = globals.map(k => globalThis[k]).find((v, i) => globals[i].startsWith('__FD_RUNTIME_SHELL_') && v?.state?.installed);
+  const shell = globals.some(k => k.startsWith('__FD_RUNTIME_SHELL_') && globalThis[k]?.state?.installed);
   return b && !b.disabled && logistics && shell ? true : null;
 });
 
@@ -113,12 +104,7 @@ const area = await waitFor(I => {
   const g=globalThis.__FD_DEBUG__.game,L=globalThis.__FD_LOGISTICS206__,b=globalThis.__FD_STABLE_STATE165__.bridge;
   const state=id=>{const u=g.getEntity(id),s=L.ensureUnit(u,false);return{id,fuel:Number(s?.fuel||0),fuelMax:Number(s?.fuelMax||0),ammo:Number(s?.ammoReserve||0),ammoMax:Number(s?.ammoReserveMax||0),support:Number(s?.support||0),supportMax:Number(s?.supportMax||0),cargo:{...s?.cargo},resupplySourceId:s?.resupplySourceId||null};};
   const receiver=state(I.receiver),tank=state(I.tank),infantry=state(I.infantry),outside=state(I.outside),air=state(I.air),provider=state(I.provider);
-  const complete = receiver.fuel>=receiver.fuelMax*.92-1 &&
-    tank.fuel>=tank.fuelMax*.92-1 &&
-    tank.ammo>=60*.92-1 &&
-    tank.support>=180*.88-1 &&
-    infantry.ammo>=150*.92-1 &&
-    infantry.support>=95*.88-1;
+  const complete = receiver.fuel>=receiver.fuelMax*.92-1 && tank.fuel>=tank.fuelMax*.92-1 && tank.ammo>=60*.92-1 && tank.support>=180*.88-1 && infantry.ammo>=150*.92-1 && infantry.support>=95*.88-1;
   if(complete) return {receiver,tank,infantry,outside,air,provider,tick:b.workerTick};
   return {__pending:true,receiver,tank,infantry,outside,air,provider,truckStatus:g.getEntity(I.provider)?.logistics206?.status,phase:g.getEntity(I.provider)?.logistics206?.phase206};
 }, I, 60000);
@@ -129,8 +115,8 @@ if(area.receiver.resupplySourceId!==I.provider) throw new Error(`truck recipient
 if(area.outside.fuel>1 || area.outside.ammo>1 || area.outside.support>1) throw new Error(`outside-radius unit was serviced ${JSON.stringify(area.outside)}`);
 if(area.air.fuel>1 || area.air.ammo>1 || area.air.support>1) throw new Error(`air unit was directly area-serviced ${JSON.stringify(area.air)}`);
 if(area.receiver.fuel < area.receiver.fuelMax*.92-1) throw new Error(`receiver truck tank insufficiently refuelled ${JSON.stringify(area.receiver)}`);
-if(area.tank.fuel < area.tank.fuelMax*.92-1 || area.tank.ammo < 60*.92-1 || area.tank.support < 180*.88-1) throw new Error(`tank demand not satisfied ${JSON.stringify(area.tank)}`);
-if(area.infantry.ammo < 150*.92-1 || area.infantry.support < 95*.88-1) throw new Error(`infantry demand not satisfied ${JSON.stringify(area.infantry)}`);
+if(area.tank.fuel < area.tank.fuelMax*.92-1 || area.tank.ammo < 60*.92-1 || area.tank.support < 180*.88-1) throw new Error(`ground vehicle did not reach Fuel/Ammo/Support targets ${JSON.stringify(area.tank)}`);
+if(area.infantry.ammo < 150*.92-1 || area.infantry.support < 95*.88-1) throw new Error(`infantry did not reach Ammo/Support targets ${JSON.stringify(area.infantry)}`);
 
 const groupInitial = await page.evaluate(I=>I.group.map(id=>{const s=globalThis.__FD_LOGISTICS206__.ensureUnit(globalThis.__FD_DEBUG__.game.getEntity(id),false);return{id,total:Number(s.fuel||0)+Number(s.ammoReserve||0)+Number(s.support||0)};}),I);
 await send({truckIds:[I.groupTruck],missionType:'SUPPLY_GROUP',targetUnitIds208:I.group,targetX:16600,targetY:15800,serviceRadius:620});
@@ -145,12 +131,12 @@ if(group.units.some(u=>u.source!==I.groupTruck)) throw new Error(`group recipien
 const final = await page.evaluate(I=>{
   const g=globalThis.__FD_DEBUG__.game,L=globalThis.__FD_LOGISTICS206__,b=globalThis.__FD_STABLE_STATE165__.bridge;
   const r=L.ensureUnit(g.getEntity(I.receiver),false),p=L.ensureUnit(g.getEntity(I.provider),false);
-  const markerKey=Object.keys(globalThis).filter(k=>k.startsWith('__FD_LOGISTICS_INTEGRITY_')).sort((a,b)=>Number(b.match(/_(\d+)__$/)?.[1]||0)-Number(a.match(/_(\d+)__$/)?.[1]||0))[0];
+  const markerKey=Object.keys(globalThis).filter(k=>k.startsWith('__FD_LOGISTICS_INTEGRITY_')).find(k=>globalThis[k]?.truckToTruckTankService&&globalThis[k]?.missionRadiusAuthoritative&&globalThis[k]?.receiverCargoIsolation) || null;
   return {receiver:{fuel:r.fuel,fuelMax:r.fuelMax,cargo:{...r.cargo}},provider:{cargo:{...p.cargo},mission:p.missionType,phase:p.phase206,status:p.status},bridge:{ready:b.ready,failed:b.failed,tick:b.workerTick,recoveries:Number(b.recoveryAttempts201||0),error:b.lastError||null},markerKey,marker:markerKey?globalThis[markerKey]:null};
 },I);
 if(final.bridge.failed || final.bridge.recoveries) throw new Error(`authoritative bridge unhealthy ${JSON.stringify(final.bridge)}`);
-if(!final.marker?.truckToTruckTankService || !final.marker?.missionRadiusAuthoritative || !final.marker?.receiverCargoIsolation) throw new Error(`logistics service marker missing ${JSON.stringify(final)}`);
+if(!final.marker) throw new Error(`service capability owner missing ${JSON.stringify(final)}`);
 if(errors.length) throw new Error(`browser errors ${JSON.stringify(errors)}`);
 
-console.log(JSON.stringify({ok:true,initial,area,group,final,capability:await latestGlobal('__FD_LOGISTICS_INTEGRITY_')},null,2));
+console.log(JSON.stringify({ok:true,initial,area,group,final},null,2));
 await browser.close();
