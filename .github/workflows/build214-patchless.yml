@@ -54,11 +54,15 @@ jobs:
           node --check tools/stage1-check.mjs
           node --check src/legacy/logistics-service-replan.js
           node --check src/legacy/ai-economy-logistics.js
+          node --check src/legacy/ai-logistics-strategy.js
           node --check src/legacy/transport-fire.js
+          node --check src/legacy/engineer-command-control.js
           node --check tests/command-bridge.mjs
           node --check tests/logistics-service-replan.mjs
           node --check tests/transport-fire.mjs
           node --check tests/ai-economy-logistics.mjs
+          node --check tests/ai-logistics-strategy.mjs
+          node --check tests/engineer-command-control.mjs
 
       - name: Patchless build and dependency graph
         run: npm run check:stage1
@@ -69,10 +73,14 @@ jobs:
           grep -q 'FD_MANIFEST_PAGE_MODULES' dist/frontline-dominion.html
           grep -q 'transport-fire.js?build=214' dist/frontline-dominion.html
           grep -q 'ai-economy-logistics.js?build=214' dist/frontline-dominion.html
+          grep -q 'ai-logistics-strategy.js?build=214' dist/frontline-dominion.html
+          grep -q 'engineer-command-control.js?build=214' dist/frontline-dominion.html
           grep -q 'logistics-service-replan.js?build=214' dist/frontline-dominion.html
           grep -q 'FD_MANIFEST_WORKER_MODULES' dist/authoritative-simulation-worker-v174.js
           grep -q 'transport-fire.js?build=214' dist/authoritative-simulation-worker-v174.js
-          node -e "const m=require('./dist/build-meta.json'); if(m.build!==214||m.version!=='16.9.8'||m.cacheBustMode!=='inject'||m.pageModules.length!==3||m.workerModules.length!==3) process.exit(1)"
+          grep -q 'ai-logistics-strategy.js?build=214' dist/authoritative-simulation-worker-v174.js
+          grep -q 'engineer-command-control.js?build=214' dist/authoritative-simulation-worker-v174.js
+          node -e "const m=require('./dist/build-meta.json'); if(m.build!==214||m.version!=='16.9.8'||m.cacheBustMode!=='inject'||m.pageModules.length!==5||m.workerModules.length!==5) process.exit(1)"
 
       - name: Install Chromium
         run: |
@@ -105,20 +113,22 @@ jobs:
           node tests/extractor-haul.mjs 2>&1 | tee /tmp/fd214-07-extractor-haul.log
           node tests/save-load-current.mjs 2>&1 | tee /tmp/fd214-08-save-load-current.log
 
-      - name: New logistics and combat gates
+      - name: Logistics combat engineer and strategy gates
         run: |
           set -euo pipefail
           node tests/logistics-service-replan.mjs 2>&1 | tee /tmp/fd214-09-service-replan.log
           node tests/transport-fire.mjs 2>&1 | tee /tmp/fd214-10-transport-fire.log
           node tests/ai-economy-logistics.mjs 2>&1 | tee /tmp/fd214-11-ai-economy.log
+          node tests/engineer-command-control.mjs 2>&1 | tee /tmp/fd214-12-engineer-control.log
+          node tests/ai-logistics-strategy.mjs 2>&1 | tee /tmp/fd214-13-ai-strategy.log
 
       - name: Multiplayer deterministic hash probe
         run: |
           set -euo pipefail
-          node tests/multiplayer-probe.mjs 2>&1 | tee /tmp/fd214-12-multiplayer.log
-          grep -Eq '"hashAdvance":[[:space:]]*(3[0-9]|[4-9][0-9]|[1-9][0-9]{2,})' /tmp/fd214-12-multiplayer.log
-          ! grep -Eq '"hashMismatches":[[:space:]]*[1-9]' /tmp/fd214-12-multiplayer.log
-          ! grep -Eq '"resyncsRequested":[[:space:]]*[1-9]' /tmp/fd214-12-multiplayer.log
+          node tests/multiplayer-probe.mjs 2>&1 | tee /tmp/fd214-14-multiplayer.log
+          grep -Eq '"hashAdvance":[[:space:]]*(3[0-9]|[4-9][0-9]|[1-9][0-9]{2,})' /tmp/fd214-14-multiplayer.log
+          ! grep -Eq '"hashMismatches":[[:space:]]*[1-9]' /tmp/fd214-14-multiplayer.log
+          ! grep -Eq '"resyncsRequested":[[:space:]]*[1-9]' /tmp/fd214-14-multiplayer.log
 
       - name: Upload diagnostics
         if: always()
