@@ -54,21 +54,27 @@ jobs:
           test -s dist/transport-fire-v214.js
           test -s dist/ai-economy-logistics-v214.js
           test -s dist/ai-logistics-strategy.js
+          test -s dist/ai-logistics-adaptive-controller.js
           test -s dist/engineer-command-control.js
           test -s dist/authoritative-simulation-worker-v174.js
           grep -q 'data-fd-canonical-build="214"' dist/frontline-dominion.html
           grep -q 'transport-fire-v214.js?build=214' dist/frontline-dominion.html
           grep -q 'ai-economy-logistics-v214.js?build=214' dist/frontline-dominion.html
           grep -q 'ai-logistics-strategy.js?build=214' dist/frontline-dominion.html
+          grep -q 'ai-logistics-adaptive-controller.js?build=214' dist/frontline-dominion.html
           grep -q 'engineer-command-control.js?build=214' dist/frontline-dominion.html
           grep -q 'ai-logistics-strategy.js?build=214' dist/authoritative-simulation-worker-v174.js
+          grep -q 'ai-logistics-adaptive-controller.js?build=214' dist/authoritative-simulation-worker-v174.js
           grep -q 'engineer-command-control.js?build=214' dist/authoritative-simulation-worker-v174.js
           grep -q 'minimumAlternatives: MIN_ALTERNATIVES' dist/ai-logistics-strategy.js
-          grep -q 'manualConstructionOnly: true' dist/engineer-command-control.js
-          grep -q 'automaticConstructionDisabled: true' dist/engineer-command-control.js
+          grep -q 'minimumAlternativesPerProblem: MIN_ALTERNATIVES' dist/ai-logistics-adaptive-controller.js
+          grep -q 'automaticReplanning: true' dist/ai-logistics-adaptive-controller.js
+          grep -q 'explicitConstructionAssignmentOnly: true' dist/engineer-command-control.js
+          grep -q 'unassignedEngineersIgnoreConstruction: true' dist/engineer-command-control.js
           grep -q 'automaticRepairPreserved: true' dist/engineer-command-control.js
           python -m py_compile scripts/build.py scripts/assemble214.py scripts/hotfix214_ai_extraction_priority.py scripts/hotfix214_adaptive_modules.py
           node --check dist/ai-logistics-strategy.js
+          node --check dist/ai-logistics-adaptive-controller.js
           node --check dist/engineer-command-control.js
           node --check tests/engineer-command-control.mjs
           node --check tests/ai-logistics-strategy.mjs
@@ -106,13 +112,13 @@ jobs:
           node tests/save-load-current.mjs 2>&1 | tee /tmp/fd214-current-06-save-load.log
           node tests/logistics-service-replan.mjs 2>&1 | tee /tmp/fd214-current-07-service-replan.log
           node tests/engineer-command-control.mjs 2>&1 | tee /tmp/fd214-current-08-engineer.log
+          node tests/ai-logistics-strategy.mjs 2>&1 | tee /tmp/fd214-current-09-adaptive-ai.log
 
-      - name: AI, transport and multiplayer diagnostics
+      - name: Legacy AI, transport and multiplayer diagnostics
         continue-on-error: true
         run: |
           set -o pipefail
-          node tests/ai-economy-logistics.mjs 2>&1 | tee /tmp/fd214-current-09-ai-economy.log || true
-          node tests/ai-logistics-strategy.mjs 2>&1 | tee /tmp/fd214-current-10-ai-strategy.log || true
+          node tests/ai-economy-logistics.mjs 2>&1 | tee /tmp/fd214-current-10-ai-economy.log || true
           node tests/transport-fire.mjs 2>&1 | tee /tmp/fd214-current-11-transport-fire.log || true
           node tests/build214-regression.mjs 2>&1 | tee /tmp/fd214-current-12-build214-regression.log || true
           node tests/multiplayer-probe.mjs 2>&1 | tee /tmp/fd214-current-13-multiplayer.log || true
@@ -128,7 +134,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git checkout -b gh-pages
           git add -A
-          git commit -m 'Frontline Dominion v16.9.8 build 214 adaptive AI and engineer control'
+          git commit -m 'Frontline Dominion v16.9.8 build 214 adaptive logistics and explicit engineer assignments'
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
 
@@ -142,6 +148,7 @@ jobs:
             if curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_GAME" >/tmp/fd214-current-public.html && \
                grep -q 'data-fd-canonical-build="214"' /tmp/fd214-current-public.html && \
                grep -q 'ai-logistics-strategy.js?build=214' /tmp/fd214-current-public.html && \
+               grep -q 'ai-logistics-adaptive-controller.js?build=214' /tmp/fd214-current-public.html && \
                grep -q 'engineer-command-control.js?build=214' /tmp/fd214-current-public.html; then
               ok=1
               break
@@ -150,10 +157,14 @@ jobs:
           done
           test "$ok" -eq 1
           curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/ai-logistics-strategy.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-ai-strategy.js
+          curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/ai-logistics-adaptive-controller.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-ai-adaptive.js
           curl --retry 2 --retry-all-errors -fsSL "$PUBLIC_ROOT/engineer-command-control.js?build=214&verify=${GITHUB_SHA}" >/tmp/fd214-current-public-engineer.js
           grep -q 'multiOptionPlanning: true' /tmp/fd214-current-public-ai-strategy.js
           grep -q 'minimumAlternatives: MIN_ALTERNATIVES' /tmp/fd214-current-public-ai-strategy.js
-          grep -q 'manualConstructionOnly: true' /tmp/fd214-current-public-engineer.js
+          grep -q 'minimumAlternativesPerProblem: MIN_ALTERNATIVES' /tmp/fd214-current-public-ai-adaptive.js
+          grep -q 'automaticReplanning: true' /tmp/fd214-current-public-ai-adaptive.js
+          grep -q 'explicitConstructionAssignmentOnly: true' /tmp/fd214-current-public-engineer.js
+          grep -q 'unassignedEngineersIgnoreConstruction: true' /tmp/fd214-current-public-engineer.js
           grep -q 'automaticRepairPreserved: true' /tmp/fd214-current-public-engineer.js
           FD_GAME_URL="$PUBLIC_GAME" node tests/worker214-bootstrap.mjs 2>&1 | tee /tmp/fd214-current-public-worker.log
 
