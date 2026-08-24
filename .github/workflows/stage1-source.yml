@@ -66,6 +66,7 @@ jobs:
           node --check tests/logistics-service.mjs
           node --check tests/logistics-missions.mjs
           node --check tests/multiplayer-probe.mjs
+          node --check tests/multiplayer-current-soak.mjs
           node --check tests/aviation207-worker.mjs
           node --check tests/command-bridge.mjs
           node --check tests/extractor-haul.mjs
@@ -115,6 +116,7 @@ jobs:
           node tests/multiplayer-probe.mjs 2>&1 | tee /tmp/fd-stage1-11-multiplayer.log
           grep -Eq '"hashAdvance":[[:space:]]*(3[0-9]|[4-9][0-9]|[1-9][0-9]{2,})' /tmp/fd-stage1-11-multiplayer.log
           ! grep -Eq '"hashMismatches":[[:space:]]*[1-9]' /tmp/fd-stage1-11-multiplayer.log
+          ! grep -Eq '"resyncsRequested":[[:space:]]*[1-9]' /tmp/fd-stage1-11-multiplayer.log
 
       - name: Upload Stage 1 diagnostics
         if: always()
