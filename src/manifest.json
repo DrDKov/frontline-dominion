@@ -6,6 +6,7 @@
   "worker": "authoritative-simulation-worker-v174.js",
   "extraFiles": [],
   "cacheBust": {
+    "mode": "replace-existing",
     "html": true,
     "workerImportScripts": true
   }
