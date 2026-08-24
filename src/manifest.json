@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "legacySnapshotManifest": "../scripts/legacy-manifest.json",
+  "sourceRoot": "legacy",
+  "entry": "frontline-dominion.html",
+  "worker": "authoritative-simulation-worker-v174.js",
+  "extraFiles": [],
+  "cacheBust": {
+    "html": true,
+    "workerImportScripts": true
+  }
+}
