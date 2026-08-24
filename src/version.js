@@ -3,4 +3,5 @@ export const BUILD = 214;
 export const VERSION = '16.9.8';
 export const PROTOCOL_VERSION = '1.0.0';
 
+// Native merge trigger for the final canonical build 214 publication.
 export default Object.freeze({ BUILD, VERSION, PROTOCOL_VERSION });
