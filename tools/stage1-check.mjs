@@ -44,11 +44,19 @@ run('node', ['tools/plan-unversioned.mjs', '--root', 'src/legacy', '--json', '.s
 const meta = JSON.parse(await readFile(join(DIST, 'build-meta.json'), 'utf8'));
 if (meta.build !== version.BUILD || meta.version !== version.VERSION) errors.push(`build metadata mismatch: ${JSON.stringify(meta)}`);
 
+const config = JSON.parse(await readFile(join(SRC, 'manifest.json'), 'utf8'));
+const extraFiles = Array.isArray(config.extraFiles) ? [...new Set(config.extraFiles)] : [];
 const manifest = JSON.parse(await readFile(join(ROOT, 'scripts/legacy-manifest.json'), 'utf8'));
 if (manifest.files.length !== 836) warnings.push(`legacy manifest expected historical 836 files, got ${manifest.files.length}`);
+if (meta.pinnedFiles !== manifest.files.length || meta.extraFiles !== extraFiles.length) errors.push(`build-meta file accounting mismatch: ${JSON.stringify(meta)}`);
+
 const sourceFiles = await walk(LEGACY);
 const sourceRuntime = sourceFiles.filter(p => relative(LEGACY, p).replaceAll('\\', '/') !== 'PROVENANCE.md');
-if (sourceRuntime.length !== manifest.files.length) errors.push(`src/legacy runtime file count ${sourceRuntime.length} != manifest ${manifest.files.length}`);
+const expectedSourceCount = manifest.files.length + extraFiles.length;
+if (sourceRuntime.length !== expectedSourceCount) errors.push(`src/legacy runtime file count ${sourceRuntime.length} != pinned+extra ${expectedSourceCount}`);
+for (const rel of extraFiles) {
+  if (!sourceRuntime.some(p => relative(LEGACY, p).replaceAll('\\', '/') === rel)) errors.push(`declared extra source file missing: ${rel}`);
+}
 
 let hashDrift = 0;
 for (const entry of manifest.files) {
@@ -73,18 +81,20 @@ for (const path of allSrc) {
   if (inLegacy) {
     legacyBuildQueries += buildRefs;
     if (/-v\d+\.(?:js|mjs|css|json)$/i.test(rel)) legacyVersionedNames += 1;
-  } else if (buildRefs || /\bBUILD\s*[=:]\s*\d+/.test(text) || /-v\d+\.(?:js|mjs)/i.test(text)) {
+  } else if (rel !== 'manifest.json' && (buildRefs || /\bBUILD\s*[=:]\s*\d+/.test(text) || /-v\d+\.(?:js|mjs)/i.test(text))) {
     illegalOutsideLegacy += 1;
     errors.push(`${rel}: build coupling outside grandfathered legacy source`);
   }
 }
-if (strictSource && (legacyVersionedNames || legacyBuildQueries)) errors.push(`strict source policy: legacy still has ${legacyVersionedNames} versioned filenames and ${legacyBuildQueries} ?build references`);
+const manifestVersionRefs = (JSON.stringify(config).match(/-v\d+\.(?:js|mjs|css|json)/gi) || []).length;
+if (manifestVersionRefs) warnings.push(`migration debt: source manifest still names ${manifestVersionRefs} versioned legacy file(s)`);
+if (strictSource && (legacyVersionedNames || legacyBuildQueries || manifestVersionRefs)) errors.push(`strict source policy: legacy still has ${legacyVersionedNames} versioned filenames, ${legacyBuildQueries} ?build references and ${manifestVersionRefs} manifest version refs`);
 else if (legacyVersionedNames || legacyBuildQueries) warnings.push(`migration debt: legacy has ${legacyVersionedNames} versioned filenames and ${legacyBuildQueries} ?build references`);
 
 const provenance = await readFile(join(LEGACY, 'PROVENANCE.md'), 'utf8').catch(() => '');
 if (!/files:\s*836/.test(provenance) || !/build:\s*213/.test(provenance)) errors.push('src/legacy/PROVENANCE.md does not describe the pinned snapshot');
 
-console.log(`stage1 check: build=${version.BUILD} hashDrift=${hashDrift} versionedNames=${legacyVersionedNames} buildQueries=${legacyBuildQueries} errors=${errors.length} warnings=${warnings.length}`);
+console.log(`stage1 check: build=${version.BUILD} pinned=${manifest.files.length} extra=${extraFiles.length} hashDrift=${hashDrift} versionedNames=${legacyVersionedNames} buildQueries=${legacyBuildQueries} errors=${errors.length} warnings=${warnings.length}`);
 for (const w of warnings) console.log(`stage1 warning: ${w}`);
 for (const e of errors) console.error(`stage1 error: ${e}`);
 process.exitCode = errors.length ? 1 : 0;
