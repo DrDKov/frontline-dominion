@@ -1,9 +1,0 @@
-{
- "build": 213,
- "fileCount": 836,
- "generatedAt": "2026-08-24T10:06:50Z",
- "manifest": "scripts/legacy-manifest.json",
- "manifestSha256": "63d2cd13ce45a07948e45d4e1682c85ec061331d6f0cd1638ec1e751736223e5",
- "note": "Byte-exact snapshot of the published build; verified against the pinned manifest.",
- "source": "https://drdkov.github.io/frontline-dominion"
-}
