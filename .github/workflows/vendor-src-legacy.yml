@@ -1,0 +1,53 @@
+# Stage 1b CI: vendor src/legacy from the pinned published set.
+#
+# This file lives outside .github/workflows/ because the token used for the
+# push lacks the `workflow` scope. To activate, move it (unchanged) to:
+#     .github/workflows/vendor-src-legacy.yml
+# then run it manually from the Actions tab (workflow_dispatch).
+# It downloads the pinned set, verifies it, vendors src/legacy/, and pushes
+# the result straight to main (or set VENDOR_BRANCH to push to a branch).
+name: vendor-src-legacy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download pinned published set + verify (hashes, checkdeps)
+        run: python scripts/build.py --from-published
+
+      - name: Vendor into src/legacy
+        run: python scripts/vendor_src_legacy.py --dist dist
+
+      - name: Sanity-check offline build from src/legacy
+        run: python scripts/build.py --from-src
+
+      - name: Commit and push src/legacy
+        env:
+          VENDOR_BRANCH: ${{ vars.VENDOR_BRANCH }}
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/legacy
+          if git diff --cached --quiet; then
+            echo "src/legacy already up to date — nothing to commit"
+            exit 0
+          fi
+          git commit -m "stage1b: vendor src/legacy snapshot (pinned build 213, 836 files)"
+          if [ -n "$VENDOR_BRANCH" ]; then
+            git push origin "HEAD:$VENDOR_BRANCH"
+          else
+            git push
+          fi
