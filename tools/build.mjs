@@ -12,6 +12,8 @@ const legacyManifest = JSON.parse(await readFile(resolve(SRC, config.legacySnaps
 const sourceRoot = resolve(SRC, config.sourceRoot);
 const TEXT_EXT = new Set(['.js', '.html', '.css', '.json', '.mjs']);
 const cacheMode = config.cacheBust?.mode || 'inject';
+const pageModules = Array.isArray(config.pageModules) ? [...new Set(config.pageModules)] : [];
+const workerModules = Array.isArray(config.workerModules) ? [...new Set(config.workerModules)] : [];
 
 function hasBuildParam(url) {
   return /(?:[?&])build=\d+(?:&|#|$)/.test(String(url));
@@ -50,6 +52,24 @@ function rewriteImportScripts(text) {
   });
 }
 
+function injectPageModules(text) {
+  if (!pageModules.length) return text;
+  const tags = pageModules.map(rel => `  <script src="./${withBuild(rel)}"></script>`).join('\n');
+  const marker = '<!-- FD_MANIFEST_PAGE_MODULES -->';
+  const block = `${marker}\n${tags}\n`;
+  if (text.includes(marker)) return text;
+  const bodyClose = text.lastIndexOf('</body>');
+  return bodyClose >= 0 ? `${text.slice(0, bodyClose)}${block}${text.slice(bodyClose)}` : `${text}\n${block}`;
+}
+
+function injectWorkerModules(text) {
+  if (!workerModules.length) return text;
+  const marker = '// FD_MANIFEST_WORKER_MODULES';
+  if (text.includes(marker)) return text;
+  const args = workerModules.map(rel => `'./${withBuild(rel)}'`).join(', ');
+  return `${text.replace(/\s*$/, '')}\n\n${marker}\nimportScripts(${args});\n`;
+}
+
 async function copySource(relPath) {
   const from = join(sourceRoot, relPath);
   const to = join(DIST, relPath);
@@ -62,12 +82,15 @@ async function copySource(relPath) {
   let text = await readFile(from, 'utf8');
   if (ext === '.html') text = rewriteHtml(text);
   if (ext === '.js' || ext === '.mjs') text = rewriteImportScripts(text);
+  if (relPath === config.entry) text = injectPageModules(text);
+  if (relPath === config.worker) text = injectWorkerModules(text);
   await writeFile(to, text, 'utf8');
 }
 
 const legacyFiles = legacyManifest.files.map(f => f.path);
 const extraFiles = Array.isArray(config.extraFiles) ? config.extraFiles : [];
-const allFiles = [...new Set([...legacyFiles, ...extraFiles])].sort();
+const declaredModules = [...new Set([...pageModules, ...workerModules])];
+const allFiles = [...new Set([...legacyFiles, ...extraFiles, ...declaredModules])].sort();
 
 await rm(DIST, { recursive: true, force: true });
 await mkdir(DIST, { recursive: true });
@@ -82,7 +105,9 @@ const metadata = {
   cacheBustMode: cacheMode,
   pinnedFiles: legacyFiles.length,
   extraFiles: extraFiles.length,
+  pageModules,
+  workerModules,
   files: allFiles.length,
 };
 await writeFile(join(DIST, 'build-meta.json'), `${JSON.stringify(metadata, null, 2)}\n`, 'utf8');
-console.log(`stage1 build: ${allFiles.length} source files -> dist; pinned=${legacyFiles.length} extra=${extraFiles.length} build=${version.BUILD} version=${version.VERSION} cache=${cacheMode}`);
+console.log(`stage1 build: ${allFiles.length} source files -> dist; pinned=${legacyFiles.length} extra=${extraFiles.length} modules=${declaredModules.length} build=${version.BUILD} version=${version.VERSION} cache=${cacheMode}`);
