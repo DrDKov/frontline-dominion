@@ -1,0 +1,19 @@
+import { chromium } from 'playwright';
+import { gameUrl } from './lib/fd-env.mjs';
+
+const browser=await chromium.launch({headless:true});
+const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
+const page=await context.newPage();const errors=[];
+page.on('pageerror',e=>errors.push(String(e?.stack||e)));
+page.on('console',m=>{if(m.type()==='error'&&!/favicon|404|audio|autoplay|Failed to load resource/i.test(m.text()))errors.push(`console:${m.text()}`);});
+const waitFor=async(fn,arg=undefined,timeout=50000,interval=80)=>{const t=Date.now();let last=null;while(Date.now()-t<timeout){if(errors.length)throw new Error(`Browser errors ${JSON.stringify(errors)}`);last=await page.evaluate(fn,arg);if(last&&!last.__pending)return last;await page.waitForTimeout(interval);}throw new Error(`Timed out ${timeout}ms last=${JSON.stringify(last)}`);};
+await page.goto(gameUrl(),{waitUntil:'load',timeout:60000});
+const slotKey=await waitFor(()=>{const b=document.getElementById('start-game');const keys=Object.keys(globalThis).filter(k=>k.startsWith('__FD_SAVE_SLOTS_')).sort((a,b)=>Number(b.match(/_(\d+)__$/)?.[1]||0)-Number(a.match(/_(\d+)__$/)?.[1]||0));const key=keys.find(k=>globalThis[k]?.state?.ready);return b&&!b.disabled&&key?key:null;});
+await page.locator('#start-game').click();
+const baseline=await waitFor(slotKey=>{const g=globalThis.__FD_DEBUG__?.game,b=globalThis.__FD_STABLE_STATE165__?.bridge,slots=globalThis[slotKey];const unit=(g?.units||[]).find(u=>u?.alive&&u.team==='player'&&!u.embarkedIn&&!u.air);return g&&unit&&slots?.state?.ready&&b?.ready&&!b.failed&&Number(b.workerTick)>10?{id:unit.id,x:unit.x,y:unit.y,tick:Number(b.workerTick)}:{__pending:true,tick:Number(b?.workerTick||0)};},slotKey);
+const saved=await page.evaluate(async({slotKey,baseline})=>{const slots=globalThis[slotKey];const r=await slots.saveNamed('Stage1 current save-load');return{id:r.id,build:r.build,baseline};},{slotKey,baseline});if(!saved.id)throw new Error(`save failed ${JSON.stringify(saved)}`);
+const moved=await page.evaluate(saved=>{const D=globalThis.__FD_DEBUG__,g=D.game,b=globalThis.__FD_STABLE_STATE165__.bridge,u=g.getEntity(saved.baseline.id);g.setSelection([u],false);const beforeSeq=Number(b.seq||0);const ok=g.issueMove(Math.min(D.WORLD.width-120,u.x+420),Math.min(D.WORLD.height-120,u.y+120),false);return{ok,beforeSeq,sentSeq:Number(b.seq||0),x:u.x,y:u.y};},saved);if(!moved.ok||moved.sentSeq<=moved.beforeSeq)throw new Error(`move after save not routed ${JSON.stringify(moved)}`);
+await waitFor(({saved,moved})=>{const g=globalThis.__FD_DEBUG__?.game,b=globalThis.__FD_STABLE_STATE165__?.bridge,u=g?.getEntity(saved.baseline.id);const d=u?Math.hypot(u.x-saved.baseline.x,u.y-saved.baseline.y):0;return Number(b?.lastAck||0)>=moved.sentSeq&&d>5?{distance:d,tick:Number(b.workerTick)}:{__pending:true,distance:d,ack:Number(b?.lastAck||0)};},{saved,moved},15000);
+const load=await page.evaluate(async({slotKey,id})=>{try{const r=await globalThis[slotKey].loadSlot(id);return{ok:true,id:r.id};}catch(e){return{ok:false,error:String(e?.stack||e)};}},{slotKey,id:saved.id});if(!load.ok)throw new Error(`load failed ${JSON.stringify(load)}`);
+const restored=await waitFor(({slotKey,saved})=>{const g=globalThis.__FD_DEBUG__?.game,b=globalThis.__FD_STABLE_STATE165__?.bridge,slots=globalThis[slotKey],u=g?.getEntity(saved.baseline.id);const d=u?Math.hypot(u.x-saved.baseline.x,u.y-saved.baseline.y):Infinity;return slots?.state?.lastLoadedId===saved.id&&b?.ready&&!b.failed&&Number(b.workerTick)>5&&d<8?{distance:d,lastLoadedId:slots.state.lastLoadedId,tick:Number(b.workerTick),x:u.x,y:u.y}:{__pending:true,distance:d,lastLoadedId:slots?.state?.lastLoadedId||null,tick:Number(b?.workerTick||0),failed:Boolean(b?.failed)};},{slotKey,saved},60000);
+console.log(JSON.stringify({ok:true,slotKey,baseline,saved,moved,load,restored}));await context.close();await browser.close();
